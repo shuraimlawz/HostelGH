@@ -1,0 +1,187 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  TENANT
+  OWNER
+  ADMIN
+}
+
+enum BookingStatus {
+  PENDING_APPROVAL   // tenant created, waiting owner action
+  APPROVED           // owner approved, payment can proceed (or required)
+  REJECTED           // owner rejected
+  CANCELLED          // tenant/admin cancelled
+  CONFIRMED          // payment verified (or marked confirmed)
+  EXPIRED            // auto-expired if not paid within window (optional)
+}
+
+enum PaymentProvider {
+  PAYSTACK
+}
+
+enum PaymentStatus {
+  INITIATED
+  PENDING
+  SUCCESS
+  FAILED
+  REFUNDED
+}
+
+model User {
+  id            String   @id @default(cuid())
+  email         String   @unique
+  phone         String?  @unique
+  passwordHash  String
+  role          UserRole @default(TENANT)
+
+  firstName     String?
+  lastName      String?
+
+  isActive      Boolean  @default(true)
+  emailVerified Boolean  @default(false)
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // relations
+  ownedHostels  Hostel[]  @relation("HostelOwner")
+  bookings      Booking[] @relation("BookingTenant")
+  refreshTokens RefreshToken[]
+
+  @@index([role])
+}
+
+model RefreshToken {
+  id          String   @id @default(cuid())
+  userId      String
+  tokenHash   String   // store hashed refresh token
+  revokedAt   DateTime?
+  expiresAt   DateTime
+  createdAt   DateTime @default(now())
+
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+model Hostel {
+  id          String   @id @default(cuid())
+  ownerId     String
+  name        String
+  description String?
+  addressLine String
+  city        String
+  region      String?
+  country     String   @default("GH")
+
+  latitude    Float?
+  longitude   Float?
+
+  isPublished Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  owner       User     @relation("HostelOwner", fields: [ownerId], references: [id], onDelete: Restrict)
+  rooms       Room[]
+  bookings    Booking[]
+
+  @@index([ownerId])
+  @@index([city])
+  @@index([isPublished])
+}
+
+model Room {
+  id          String   @id @default(cuid())
+  hostelId    String
+  name        String   // e.g. "2-in-1", "4-in-1"
+  description String?
+  capacity    Int      // number of tenants per room
+  totalUnits  Int      // inventory count of this room type
+  pricePerTerm Int     // store in minor unit? (e.g. kobo/pesewas) decide in service layer
+
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  hostel      Hostel   @relation(fields: [hostelId], references: [id], onDelete: Cascade)
+  bookings    BookingItem[]
+
+  @@index([hostelId])
+  @@index([isActive])
+}
+
+model Booking {
+  id           String        @id @default(cuid())
+  hostelId     String
+  tenantId     String
+  status       BookingStatus @default(PENDING_APPROVAL)
+
+  // term/time window (customize later)
+  startDate    DateTime
+  endDate      DateTime
+
+  notes        String?
+  expiresAt    DateTime?     // for approval/payment window (optional)
+
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  hostel       Hostel        @relation(fields: [hostelId], references: [id], onDelete: Restrict)
+  tenant       User          @relation("BookingTenant", fields: [tenantId], references: [id], onDelete: Restrict)
+
+  items        BookingItem[]
+  payment      Payment?
+
+  @@index([hostelId])
+  @@index([tenantId])
+  @@index([status])
+}
+
+model BookingItem {
+  id         String   @id @default(cuid())
+  bookingId  String
+  roomId     String
+  quantity   Int      @default(1) // number of units requested of this room type
+  unitPrice  Int      // price snapshot at time of booking
+  createdAt  DateTime @default(now())
+
+  booking    Booking  @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  room       Room     @relation(fields: [roomId], references: [id], onDelete: Restrict)
+
+  @@index([bookingId])
+  @@index([roomId])
+}
+
+model Payment {
+  id            String          @id @default(cuid())
+  bookingId     String          @unique
+  provider      PaymentProvider @default(PAYSTACK)
+  status        PaymentStatus   @default(INITIATED)
+
+  amount        Int             // in minor unit
+  currency      String          @default("GHS")
+
+  // Paystack fields
+  reference     String          @unique
+  authorizationUrl String?
+  accessCode    String?
+
+  paidAt        DateTime?
+  rawWebhook    Json?           // store last webhook payload (optional)
+
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+
+  booking       Booking         @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+
+  @@index([status])
+  @@index([provider])
+}

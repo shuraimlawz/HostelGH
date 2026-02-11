@@ -1,0 +1,44 @@
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query, Req, UseGuards } from "@nestjs/common";
+import { HostelsService } from "./hostels.service";
+import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
+import { RolesGuard } from "../../common/guards/roles.guard";
+import { Roles } from "../../common/decorators/roles.decorator";
+import { UserRole } from "@prisma/client";
+import { CreateHostelDto, UpdateHostelDto } from "./dto/create-hostel.dto";
+
+import { ApiTags, ApiOperation, ApiBearerAuth, ApiQuery } from "@nestjs/swagger";
+
+@ApiTags("Hostels")
+@ApiBearerAuth()
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Controller("hostels")
+export class HostelsController {
+    constructor(private hostels: HostelsService) { }
+
+    @Roles(UserRole.OWNER)
+    @Post()
+    @ApiOperation({ summary: "Create a new hostel (Owner only)" })
+    create(@Req() req: any, @Body() dto: CreateHostelDto) {
+        return this.hostels.create(req.user.userId, dto);
+    }
+
+    @Roles(UserRole.OWNER, UserRole.ADMIN)
+    @Patch(":id")
+    @ApiOperation({ summary: "Update hostel details (Owner/Admin only)" })
+    update(@Req() req: any, @Param("id") id: string, @Body() dto: UpdateHostelDto) {
+        return this.hostels.update({ userId: req.user.userId, role: req.user.role }, id, dto);
+    }
+
+    @Roles(UserRole.OWNER, UserRole.ADMIN)
+    @Delete(":id")
+    delete(@Req() req: any, @Param("id") id: string) {
+        return this.hostels.delete({ userId: req.user.userId, role: req.user.role }, id);
+    }
+
+    @Get("public")
+    @ApiOperation({ summary: "Public search for hostels" })
+    @ApiQuery({ name: "city", required: false })
+    publicSearch(@Query("city") city?: string) {
+        return this.hostels.publicSearch(city);
+    }
+}
