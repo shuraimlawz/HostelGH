@@ -20,6 +20,9 @@ enum BookingStatus {
   REJECTED           // owner rejected
   CANCELLED          // tenant/admin cancelled
   CONFIRMED          // payment verified (or marked confirmed)
+  CHECKED_IN         // tenant has moved in
+  CHECKED_OUT        // tenant has moved out
+  COMPLETED          // booking fully finished
   EXPIRED            // auto-expired if not paid within window (optional)
 }
 
@@ -33,6 +36,11 @@ enum PaymentStatus {
   SUCCESS
   FAILED
   REFUNDED
+}
+
+enum PayoutMethodType {
+  BANK
+  MOBILE_MONEY
 }
 
 model User {
@@ -56,8 +64,25 @@ model User {
   ownedHostels  Hostel[]  @relation("HostelOwner")
   bookings      Booking[] @relation("BookingTenant")
   refreshTokens RefreshToken[]
+  payoutMethods PayoutMethod[]
 
   @@index([role])
+}
+
+model PayoutMethod {
+  id            String           @id @default(cuid())
+  ownerId       String
+  type          PayoutMethodType
+  provider      String           // e.g. "GCB", "MTN"
+  accountNumber String
+  accountName   String
+  isDefault     Boolean          @default(false)
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+
+  owner         User             @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+
+  @@index([ownerId])
 }
 
 model RefreshToken {
@@ -87,6 +112,10 @@ model Hostel {
   latitude    Float?
   longitude   Float?
 
+  images      String[] @default([])
+  amenities   String[] @default([])
+  university  String?
+
   isPublished Boolean  @default(false)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -108,6 +137,7 @@ model Room {
   capacity    Int      // number of tenants per room
   totalUnits  Int      // inventory count of this room type
   pricePerTerm Int     // store in minor unit? (e.g. kobo/pesewas) decide in service layer
+  images       String[] @default([])
 
   isActive    Boolean  @default(true)
   createdAt   DateTime @default(now())

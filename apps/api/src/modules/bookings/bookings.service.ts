@@ -101,7 +101,7 @@ export class BookingsService {
         }).catch(e => console.error("Email failed", e));
     }
 
-    async approveBooking(actor: { userId: string; role: UserRole }, bookingId: string) {
+    async updateStatus(actor: { userId: string; role: UserRole }, bookingId: string, status: BookingStatus, allowedSourceStatuses: BookingStatus[]) {
         const booking = await this.prisma.booking.findUnique({
             where: { id: bookingId },
             include: { hostel: true },
@@ -109,17 +109,21 @@ export class BookingsService {
         if (!booking) throw new NotFoundException("Booking not found");
 
         const isOwnerOfHostel = booking.hostel.ownerId === actor.userId;
-        if (!(actor.role === UserRole.ADMIN || isOwnerOfHostel)) throw new ForbiddenException("Not authorized to approve this booking");
+        if (!(actor.role === UserRole.ADMIN || isOwnerOfHostel)) throw new ForbiddenException("Not authorized to update this booking");
 
-        if (booking.status !== BookingStatus.PENDING_APPROVAL) {
-            throw new BadRequestException(`Booking is in ${booking.status} state and cannot be approved.`);
+        if (!allowedSourceStatuses.includes(booking.status)) {
+            throw new BadRequestException(`Booking cannot transition from ${booking.status} to ${status}.`);
         }
 
-        const updated = await this.prisma.booking.update({
+        return this.prisma.booking.update({
             where: { id: bookingId },
-            data: { status: BookingStatus.APPROVED },
+            data: { status },
             include: { tenant: true, hostel: true }
         });
+    }
+
+    async approveBooking(actor: { userId: string; role: UserRole }, bookingId: string) {
+        const updated = await this.updateStatus(actor, bookingId, BookingStatus.APPROVED, [BookingStatus.PENDING_APPROVAL]);
 
         // Trigger notification
         this.notifications.sendBookingApprovedEmail(updated.tenant.email, {
@@ -174,5 +178,17 @@ export class BookingsService {
             include: { items: { include: { room: true } }, hostel: true, tenant: true, payment: true },
             orderBy: { createdAt: "desc" },
         });
+    }
+
+    async checkIn(actor: { userId: string; role: UserRole }, bookingId: string) {
+        return this.updateStatus(actor, bookingId, BookingStatus.CHECKED_IN, [BookingStatus.CONFIRMED, BookingStatus.APPROVED]); // Allow from APPROVED if payment is handled offline
+    }
+
+    async checkOut(actor: { userId: string; role: UserRole }, bookingId: string) {
+        return this.updateStatus(actor, bookingId, BookingStatus.CHECKED_OUT, [BookingStatus.CHECKED_IN]);
+    }
+
+    async complete(actor: { userId: string; role: UserRole }, bookingId: string) {
+        return this.updateStatus(actor, bookingId, BookingStatus.COMPLETED, [BookingStatus.CHECKED_OUT]);
     }
 }

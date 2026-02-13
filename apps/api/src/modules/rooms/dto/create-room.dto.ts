@@ -19,6 +19,9 @@ export class CreateRoomDto {
 
     @ApiProperty({ example: true, default: true })
     @IsOptional() @IsBoolean() isActive?: boolean = true;
+
+    @ApiProperty({ example: ["https://images.unsplash.com/photo-1596401057633-5310457b1d4f"] })
+    @IsOptional() @IsString({ each: true }) images?: string[] = [];
 }
 
 export class UpdateRoomDto extends PartialType(CreateRoomDto) { }

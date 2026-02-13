@@ -22,6 +22,15 @@ export class CreateHostelDto {
 
     @ApiProperty({ example: false, default: false })
     @IsOptional() @IsBoolean() isPublished?: boolean = false;
+
+    @ApiProperty({ example: ["https://images.unsplash.com/photo-1596401057633-5310457b1d4f"] })
+    @IsOptional() @IsString({ each: true }) images?: string[] = [];
+
+    @ApiProperty({ example: ["WiFi", "AC", "Laundry"] })
+    @IsOptional() @IsString({ each: true }) amenities?: string[] = [];
+
+    @ApiProperty({ example: "KNUST" })
+    @IsOptional() @IsString() university?: string;
 }
 
 export class UpdateHostelDto extends PartialType(CreateHostelDto) { }

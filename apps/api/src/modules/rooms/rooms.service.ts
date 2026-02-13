@@ -82,6 +82,7 @@ interface CreateRoomDto {
     totalUnits: number;
     pricePerTerm: number;
     description?: string;
+    images?: string[];
 }
 
 interface UpdateRoomDto extends Partial<CreateRoomDto> {

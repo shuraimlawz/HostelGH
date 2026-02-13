@@ -30,40 +30,74 @@ function PaymentCallbackContent() {
     }, [reference]);
 
     return (
-        <div className="min-h-[60vh] flex flex-col items-center justify-center p-6 text-center">
-            {status === "loading" && (
-                <div className="space-y-4">
-                    <Loader2 className="w-16 h-16 text-primary animate-spin mx-auto" />
-                    <h2 className="text-2xl font-bold">Verifying your payment...</h2>
-                    <p className="text-muted-foreground">This will only take a moment.</p>
-                </div>
-            )}
-
-            {status === "success" && (
-                <div className="space-y-6">
-                    <CheckCircle2 className="w-20 h-20 text-green-500 mx-auto" />
-                    <div className="space-y-2">
-                        <h2 className="text-3xl font-extrabold text-foreground">Payment Confirmed!</h2>
-                        <p className="text-muted-foreground text-lg">Your booking is now confirmed. We've sent the details to your email.</p>
+        <div className="min-h-[80vh] flex flex-col items-center justify-center p-6 text-center bg-gray-50/30">
+            <div className="w-full max-w-xl bg-white rounded-[3rem] border border-gray-100 p-12 shadow-2xl shadow-gray-200/40 animate-in fade-in zoom-in duration-700">
+                {status === "loading" && (
+                    <div className="space-y-6">
+                        <div className="w-24 h-24 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-8">
+                            <Loader2 className="w-12 h-12 text-blue-600 animate-spin" />
+                        </div>
+                        <h2 className="text-3xl font-black text-gray-900 tracking-tight italic">Verifying Payment...</h2>
+                        <p className="text-gray-500 font-medium text-lg leading-relaxed">Please wait while we secure your booking details.<br />Do not refresh this page.</p>
                     </div>
-                    <Button size="lg" className="rounded-full px-10 h-12 font-bold" onClick={() => router.push("/tenant/bookings")}>
-                        View My Bookings
-                    </Button>
-                </div>
-            )}
+                )}
 
-            {status === "error" && (
-                <div className="space-y-6">
-                    <XCircle className="w-20 h-20 text-destructive mx-auto" />
-                    <div className="space-y-2">
-                        <h2 className="text-3xl font-extrabold">Payment Verification Failed</h2>
-                        <p className="text-muted-foreground text-lg">Something went wrong. Please contact support if your account was debited.</p>
+                {status === "success" && (
+                    <div className="space-y-8">
+                        <div className="w-24 h-24 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-8 shadow-inner">
+                            <CheckCircle2 className="w-12 h-12 text-green-500" />
+                        </div>
+                        <div className="space-y-4">
+                            <h2 className="text-4xl font-black text-gray-900 tracking-tight italic uppercase">Success! 🏡</h2>
+                            <p className="text-gray-500 font-medium text-lg leading-relaxed">
+                                Your payment has been confirmed and room secured. A receipt has been sent to your email.
+                            </p>
+                        </div>
+
+                        <div className="pt-4 flex flex-col gap-4">
+                            <Button
+                                size="lg"
+                                className="w-full bg-black text-white hover:opacity-90 h-16 rounded-2xl font-bold text-lg shadow-xl shadow-black/10 active:scale-95 transition-all"
+                                onClick={() => router.push("/tenant/bookings")}
+                            >
+                                Go to My Bookings
+                            </Button>
+                            <Button
+                                variant="ghost"
+                                className="text-gray-400 font-bold hover:text-black uppercase tracking-widest text-xs"
+                                onClick={() => router.push("/")}
+                            >
+                                Back to Home
+                            </Button>
+                        </div>
                     </div>
-                    <Button size="lg" variant="outline" className="rounded-full px-10 h-12 font-bold" onClick={() => router.push("/tenant/bookings")}>
-                        Go Back
-                    </Button>
-                </div>
-            )}
+                )}
+
+                {status === "error" && (
+                    <div className="space-y-8">
+                        <div className="w-24 h-24 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-8">
+                            <XCircle className="w-12 h-12 text-red-500" />
+                        </div>
+                        <div className="space-y-4">
+                            <h2 className="text-3xl font-black text-gray-900 tracking-tight italic uppercase">Verification Error</h2>
+                            <p className="text-gray-500 font-medium text-lg leading-relaxed">
+                                We couldn't verify your payment reference. If you were debited, don't worry—our team will reach out within 24 hours.
+                            </p>
+                        </div>
+                        <div className="pt-4">
+                            <Button
+                                variant="outline"
+                                className="w-full h-16 rounded-2xl border-gray-200 font-bold text-lg hover:bg-gray-50 active:scale-95 transition-all"
+                                onClick={() => router.push("/tenant/bookings")}
+                            >
+                                Back to My Bookings
+                            </Button>
+                        </div>
+                    </div>
+                )}
+            </div>
+
+            <p className="mt-12 text-[10px] font-black uppercase tracking-[0.2em] text-gray-300">HostelGH Secure Payments • Powered by Paystack</p>
         </div>
     );
 }

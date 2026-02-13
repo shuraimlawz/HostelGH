@@ -36,12 +36,31 @@ export class HostelsController {
         return this.hostels.delete({ userId: req.user.userId, role: req.user.role }, id);
     }
 
+    @Roles(UserRole.OWNER)
+    @Get("my-hostels")
+    @ApiOperation({ summary: "Get all hostels owned by the user" })
+    getMyHostels(@Req() req: any) {
+        return this.hostels.findMyHostels(req.user.userId);
+    }
+
     @Public()
     @Get("public")
     @ApiOperation({ summary: "Public search for hostels" })
-    @ApiQuery({ name: "city", required: false })
-    publicSearch(@Query("city") city?: string) {
-        return this.hostels.publicSearch(city);
+    publicSearch(
+        @Query("city") city?: string,
+        @Query("minPrice") minPrice?: string,
+        @Query("maxPrice") maxPrice?: string,
+        @Query("university") university?: string,
+        @Query("amenities") amenities?: string | string[],
+    ) {
+        const amenitiesArr = typeof amenities === 'string' ? amenities.split(',') : amenities;
+        return this.hostels.publicSearch({
+            city,
+            minPrice: minPrice ? parseInt(minPrice, 10) : undefined,
+            maxPrice: maxPrice ? parseInt(maxPrice, 10) : undefined,
+            university,
+            amenities: amenitiesArr,
+        });
     }
 
     @Public()

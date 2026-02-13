@@ -1,7 +1,7 @@
 export interface Room {
     id: string;
     name: string;
-    image?: string;
+    images?: string[];
     capacity: number;
     pricePerTerm: number;
     isActive?: boolean;
@@ -14,6 +14,9 @@ export interface Hostel {
     addressLine: string;
     description?: string;
     images?: string[];
+    amenities?: string[];
+    university?: string;
+    isPublished?: boolean;
     rooms?: Room[];
     owner?: {
         firstName?: string;

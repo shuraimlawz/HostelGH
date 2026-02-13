@@ -46,4 +46,22 @@ export class BookingsController {
     reject(@Req() req: any, @Param("id") id: string, @Body() body: { reason?: string }) {
         return this.bookings.rejectBooking({ userId: req.user.userId, role: req.user.role }, id, body.reason);
     }
+
+    @Roles(UserRole.OWNER, UserRole.ADMIN)
+    @Patch(":id/check-in")
+    checkIn(@Req() req: any, @Param("id") id: string) {
+        return this.bookings.checkIn({ userId: req.user.userId, role: req.user.role }, id);
+    }
+
+    @Roles(UserRole.OWNER, UserRole.ADMIN)
+    @Patch(":id/check-out")
+    checkOut(@Req() req: any, @Param("id") id: string) {
+        return this.bookings.checkOut({ userId: req.user.userId, role: req.user.role }, id);
+    }
+
+    @Roles(UserRole.OWNER, UserRole.ADMIN)
+    @Patch(":id/complete")
+    complete(@Req() req: any, @Param("id") id: string) {
+        return this.bookings.complete({ userId: req.user.userId, role: req.user.role }, id);
+    }
 }

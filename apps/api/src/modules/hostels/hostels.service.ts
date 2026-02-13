@@ -29,11 +29,38 @@ export class HostelsService {
         return this.prisma.hostel.delete({ where: { id: hostelId } });
     }
 
-    async publicSearch(city?: string) {
+    async findMyHostels(ownerId: string) {
+        return this.prisma.hostel.findMany({
+            where: { ownerId },
+            include: { _count: { select: { rooms: true, bookings: true } } },
+            orderBy: { createdAt: "desc" },
+        });
+    }
+
+    async publicSearch(params: {
+        city?: string,
+        minPrice?: number,
+        maxPrice?: number,
+        amenities?: string[],
+        university?: string
+    }) {
+        const { city, minPrice, maxPrice, amenities, university } = params;
+
         return this.prisma.hostel.findMany({
             where: {
                 isPublished: true,
                 city: city ? { contains: city, mode: "insensitive" } : undefined,
+                university: university ? { contains: university, mode: "insensitive" } : undefined,
+                amenities: amenities && amenities.length > 0 ? { hasEvery: amenities } : undefined,
+                rooms: (minPrice || maxPrice) ? {
+                    some: {
+                        isActive: true,
+                        pricePerTerm: {
+                            gte: minPrice,
+                            lte: maxPrice,
+                        }
+                    }
+                } : undefined,
             },
             include: { rooms: true },
         });
@@ -99,8 +126,12 @@ interface CreateHostelDto {
     addressLine: string;
     city: string;
     description?: string;
-}
-
-interface UpdateHostelDto extends Partial<CreateHostelDto> {
+    region?: string;
+    country?: string;
+    images?: string[];
+    amenities?: string[];
+    university?: string;
     isPublished?: boolean;
 }
+
+interface UpdateHostelDto extends Partial<CreateHostelDto> { }
