@@ -3,6 +3,7 @@ import { HostelsService } from "./hostels.service";
 import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
 import { RolesGuard } from "../../common/guards/roles.guard";
 import { Roles } from "../../common/decorators/roles.decorator";
+import { Public } from "../../common/decorators/public.decorator";
 import { UserRole } from "@prisma/client";
 import { CreateHostelDto, UpdateHostelDto } from "./dto/create-hostel.dto";
 
@@ -35,10 +36,25 @@ export class HostelsController {
         return this.hostels.delete({ userId: req.user.userId, role: req.user.role }, id);
     }
 
+    @Public()
     @Get("public")
     @ApiOperation({ summary: "Public search for hostels" })
     @ApiQuery({ name: "city", required: false })
     publicSearch(@Query("city") city?: string) {
         return this.hostels.publicSearch(city);
+    }
+
+    @Public()
+    @Get("public/:id")
+    @ApiOperation({ summary: "Public get hostel details" })
+    getPublicById(@Param("id") id: string) {
+        return this.hostels.getPublicById(id);
+    }
+
+    @Public()
+    @Get("city-stats")
+    @ApiOperation({ summary: "Get count of hostels per city" })
+    getCityStats() {
+        return this.hostels.getCityStats();
     }
 }

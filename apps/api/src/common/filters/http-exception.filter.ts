@@ -10,7 +10,7 @@ import { Request, Response } from 'express';
 
 @Catch()
 export class HttpExceptionFilter implements ExceptionFilter {
-    private readonly logger = new Logger(HttpExceptionFilter.name);
+    private readonly logger = new Logger('HttpExceptionFilter');
 
     catch(exception: unknown, host: ArgumentsHost) {
         const ctx = host.switchToHttp();
@@ -28,14 +28,15 @@ export class HttpExceptionFilter implements ExceptionFilter {
                 : 'Internal server error';
 
         this.logger.error(
-            `Http Status: ${status} Error Message: ${JSON.stringify(message)}`,
+            `Http Status: ${status} Error: ${JSON.stringify(message)}`,
+            status === HttpStatus.INTERNAL_SERVER_ERROR && exception instanceof Error ? exception.stack : '',
         );
 
         response.status(status).json({
             statusCode: status,
             timestamp: new Date().toISOString(),
             path: request.url,
-            message: typeof message === 'string' ? message : (message as any).message || message,
+            message: typeof message === 'object' ? (message as any).message || message : message,
         });
     }
 }

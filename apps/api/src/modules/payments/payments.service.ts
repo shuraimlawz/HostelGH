@@ -4,13 +4,15 @@ import { BookingStatus, PaymentStatus, UserRole } from "@prisma/client";
 import { PaystackService } from "./paystack.service";
 import { ConfigService } from "@nestjs/config";
 import { randomBytes } from "crypto";
+import { NotificationsService } from "../notifications/notifications.service";
 
 @Injectable()
 export class PaymentsService {
     constructor(
-        private prisma: PrismaService,
-        private paystack: PaystackService,
-        private config: ConfigService
+        private readonly prisma: PrismaService,
+        private readonly paystack: PaystackService,
+        private readonly config: ConfigService,
+        private readonly notifications: NotificationsService
     ) { }
 
     async initPaystackPayment(actor: { userId: string; role: UserRole }, bookingId: string) {
@@ -42,13 +44,13 @@ export class PaymentsService {
             update: {
                 status: PaymentStatus.INITIATED,
                 amount: totalAmount,
-                currency: "GHS",
+                currency: "GH₵",
                 reference,
             },
             create: {
                 bookingId: booking.id,
                 amount: totalAmount,
-                currency: "GHS",
+                currency: "GH₵",
                 reference,
                 status: PaymentStatus.INITIATED,
             },
@@ -77,37 +79,25 @@ export class PaymentsService {
             authorizationUrl: data?.authorization_url,
             reference,
             amount: totalAmount,
-            currency: "GHS",
+            currency: "GH₵",
         };
     }
 
     async verifyPaystackReference(reference: string) {
         const payment = await this.prisma.payment.findUnique({
             where: { reference },
-            include: { booking: true }
+            include: { booking: { include: { tenant: true, hostel: { include: { owner: true } } } } }
         });
         if (!payment) throw new NotFoundException("Payment record not found");
 
         const verification = await this.paystack.verifyTransaction(reference);
         const data = verification?.data;
-
         const isSuccess = data?.status === "success";
 
-        if (isSuccess) {
-            await this.prisma.$transaction([
-                this.prisma.payment.update({
-                    where: { reference },
-                    data: {
-                        status: PaymentStatus.SUCCESS,
-                        paidAt: data?.paidAt ? new Date(data.paidAt) : new Date(),
-                    },
-                }),
-                this.prisma.booking.update({
-                    where: { id: payment.bookingId },
-                    data: { status: BookingStatus.CONFIRMED },
-                }),
-            ]);
-        } else {
+        if (isSuccess && payment.status !== PaymentStatus.SUCCESS) {
+            const { paymentRow, bookingRow } = await this.completePaymentTransaction(reference, payment.bookingId, data?.rawWebhook || {});
+            this.sendPaymentConfirmationNotifications(bookingRow, paymentRow, reference);
+        } else if (!isSuccess) {
             await this.prisma.payment.update({
                 where: { reference },
                 data: { status: PaymentStatus.FAILED },
@@ -121,16 +111,24 @@ export class PaymentsService {
         const payment = await this.prisma.payment.findUnique({ where: { reference } });
         if (!payment) return;
 
-        // Idempotency: skip if already successful
         if (payment.status === PaymentStatus.SUCCESS) {
-            await this.prisma.payment.update({
-                where: { reference },
-                data: { rawWebhook: rawWebhook as any }
-            });
+            await this.updatePaymentWebhook(reference, rawWebhook);
             return;
         }
 
-        await this.prisma.$transaction([
+        const { paymentRow, bookingRow } = await this.completePaymentTransaction(reference, payment.bookingId, rawWebhook, paidAt);
+        this.sendPaymentConfirmationNotifications(bookingRow, paymentRow, reference);
+    }
+
+    private async updatePaymentWebhook(reference: string, rawWebhook: any) {
+        await this.prisma.payment.update({
+            where: { reference },
+            data: { rawWebhook: rawWebhook as any }
+        });
+    }
+
+    private async completePaymentTransaction(reference: string, bookingId: string, rawWebhook: any, paidAt?: string) {
+        const [paymentRow, bookingRow] = await this.prisma.$transaction([
             this.prisma.payment.update({
                 where: { reference },
                 data: {
@@ -140,9 +138,26 @@ export class PaymentsService {
                 },
             }),
             this.prisma.booking.update({
-                where: { id: payment.bookingId },
+                where: { id: bookingId },
                 data: { status: BookingStatus.CONFIRMED },
+                include: { tenant: true, hostel: { include: { owner: true } } }
             }),
         ]);
+        return { paymentRow, bookingRow };
+    }
+
+    private sendPaymentConfirmationNotifications(booking: any, payment: any, reference: string) {
+        const amountGhs = `GH₵ ${(payment.amount / 100).toFixed(2)}`;
+        const emailData = {
+            hostelName: booking.hostel.name,
+            amount: amountGhs,
+            reference,
+        };
+
+        this.notifications.sendPaymentConfirmedEmail(booking.tenant.email, emailData).catch(e => console.error("Email failed", e));
+
+        if (booking.hostel.owner?.email) {
+            this.notifications.sendPaymentConfirmedEmail(booking.hostel.owner.email, emailData).catch(e => console.error("Email failed", e));
+        }
     }
 }

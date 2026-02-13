@@ -5,6 +5,7 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 enum UserRole {
@@ -38,7 +39,8 @@ model User {
   id            String   @id @default(cuid())
   email         String   @unique
   phone         String?  @unique
-  passwordHash  String
+  passwordHash  String?
+  googleId      String?  @unique
   role          UserRole @default(TENANT)
 
   firstName     String?
@@ -167,7 +169,7 @@ model Payment {
   status        PaymentStatus   @default(INITIATED)
 
   amount        Int             // in minor unit
-  currency      String          @default("GHS")
+  currency      String          @default("GH₵")
 
   // Paystack fields
   reference     String          @unique

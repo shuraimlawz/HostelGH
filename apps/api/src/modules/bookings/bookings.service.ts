@@ -2,17 +2,24 @@ import { BadRequestException, ForbiddenException, Injectable, NotFoundException 
 import { PrismaService } from "../../prisma/prisma.service";
 import { BookingStatus, UserRole } from "@prisma/client";
 import { CreateBookingDto } from "./dto/create-booking.dto";
+import { NotificationsService } from "../notifications/notifications.service";
 
 @Injectable()
 export class BookingsService {
-    constructor(private prisma: PrismaService) { }
+    constructor(
+        private prisma: PrismaService,
+        private notifications: NotificationsService
+    ) { }
 
     async createBooking(tenantId: string, dto: CreateBookingDto) {
         const hostel = await this.prisma.hostel.findUnique({
             where: { id: dto.hostelId },
-            include: { rooms: true },
+            include: { rooms: true, owner: true },
         });
         if (!hostel || !hostel.isPublished) throw new NotFoundException("Hostel not found or not published");
+
+        const tenant = await this.prisma.user.findUnique({ where: { id: tenantId } });
+        if (!tenant) throw new NotFoundException("User not found");
 
         const start = new Date(dto.startDate);
         const end = new Date(dto.endDate);
@@ -26,32 +33,9 @@ export class BookingsService {
             if (item.quantity > room.totalUnits) throw new BadRequestException(`Quantity exceeds total capacity for room: ${room.name}`);
         }
 
-        // Robust availability check using a transaction to maintain consistency
+        // Validate availability and create booking in a transaction
         return await this.prisma.$transaction(async (tx) => {
-            // Count total booked quantity per room in overlapping confirmed/approved/pending bookings
-            const overlappingItems = await tx.bookingItem.findMany({
-                where: {
-                    roomId: { in: dto.items.map((i) => i.roomId) },
-                    booking: {
-                        hostelId: dto.hostelId,
-                        status: { in: [BookingStatus.PENDING_APPROVAL, BookingStatus.APPROVED, BookingStatus.CONFIRMED] },
-                        startDate: { lt: end },
-                        endDate: { gt: start },
-                    },
-                },
-                select: { roomId: true, quantity: true },
-            });
-
-            const bookedQty = new Map<string, number>();
-            for (const row of overlappingItems) bookedQty.set(row.roomId, (bookedQty.get(row.roomId) ?? 0) + row.quantity);
-
-            for (const item of dto.items) {
-                const room = roomMap.get(item.roomId)!;
-                const alreadyBooked = bookedQty.get(item.roomId) ?? 0;
-                if (alreadyBooked + item.quantity > room.totalUnits) {
-                    throw new BadRequestException(`Not enough availability for room: ${room.name}. Available: ${room.totalUnits - alreadyBooked}, Requested: ${item.quantity}`);
-                }
-            }
+            await this.validateRoomAvailability(tx, dto, start, end, roomMap);
 
             const booking = await tx.booking.create({
                 data: {
@@ -72,8 +56,49 @@ export class BookingsService {
                 include: { items: true },
             });
 
+            this.sendBookingNotification(hostel.owner.email, {
+                tenantName: `${tenant.firstName || ''} ${tenant.lastName || ''}`.trim() || tenant.email,
+                hostelName: hostel.name,
+                startDate: start,
+                endDate: end,
+            });
+
             return booking;
         });
+    }
+
+    private async validateRoomAvailability(tx: any, dto: CreateBookingDto, start: Date, end: Date, roomMap: Map<string, any>) {
+        const overlappingItems = await tx.bookingItem.findMany({
+            where: {
+                roomId: { in: dto.items.map((i) => i.roomId) },
+                booking: {
+                    hostelId: dto.hostelId,
+                    status: { in: [BookingStatus.PENDING_APPROVAL, BookingStatus.APPROVED, BookingStatus.CONFIRMED] },
+                    startDate: { lt: end },
+                    endDate: { gt: start },
+                },
+            },
+            select: { roomId: true, quantity: true },
+        });
+
+        const bookedQty = new Map<string, number>();
+        for (const row of overlappingItems) bookedQty.set(row.roomId, (bookedQty.get(row.roomId) ?? 0) + row.quantity);
+
+        for (const item of dto.items) {
+            const room = roomMap.get(item.roomId)!;
+            const alreadyBooked = bookedQty.get(item.roomId) ?? 0;
+            if (alreadyBooked + item.quantity > room.totalUnits) {
+                throw new BadRequestException(`Not enough availability for room: ${room.name}. Available: ${room.totalUnits - alreadyBooked}, Requested: ${item.quantity}`);
+            }
+        }
+    }
+
+    private sendBookingNotification(ownerEmail: string, payload: { tenantName: string; hostelName: string; startDate: Date; endDate: Date }) {
+        this.notifications.sendBookingRequestEmail(ownerEmail, {
+            ...payload,
+            startDate: payload.startDate.toDateString(),
+            endDate: payload.endDate.toDateString(),
+        }).catch(e => console.error("Email failed", e));
     }
 
     async approveBooking(actor: { userId: string; role: UserRole }, bookingId: string) {
@@ -90,10 +115,20 @@ export class BookingsService {
             throw new BadRequestException(`Booking is in ${booking.status} state and cannot be approved.`);
         }
 
-        return this.prisma.booking.update({
+        const updated = await this.prisma.booking.update({
             where: { id: bookingId },
             data: { status: BookingStatus.APPROVED },
+            include: { tenant: true, hostel: true }
         });
+
+        // Trigger notification
+        this.notifications.sendBookingApprovedEmail(updated.tenant.email, {
+            hostelName: updated.hostel.name,
+            startDate: updated.startDate.toDateString(),
+            endDate: updated.endDate.toDateString(),
+        }).catch(e => console.error("Email failed", e));
+
+        return updated;
     }
 
     async rejectBooking(actor: { userId: string; role: UserRole }, bookingId: string, reason?: string) {
@@ -110,10 +145,19 @@ export class BookingsService {
             throw new BadRequestException(`Booking is in ${booking.status} state and cannot be rejected.`);
         }
 
-        return this.prisma.booking.update({
+        const updated = await this.prisma.booking.update({
             where: { id: bookingId },
             data: { status: BookingStatus.REJECTED, notes: reason ? `Rejected: ${reason}` : booking.notes },
+            include: { tenant: true, hostel: true }
         });
+
+        // Trigger notification
+        this.notifications.sendBookingRejectedEmail(updated.tenant.email, {
+            hostelName: updated.hostel.name,
+            reason: reason,
+        }).catch(e => console.error("Email failed", e));
+
+        return updated;
     }
 
     async getMyBookings(tenantId: string) {

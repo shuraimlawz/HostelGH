@@ -1,31 +1,27 @@
 import { ForbiddenException, Injectable, NotFoundException } from "@nestjs/common";
 import { PrismaService } from "../../prisma/prisma.service";
-import { UserRole } from "@prisma/client";
+import { UserRole, BookingStatus } from "@prisma/client";
 
 @Injectable()
 export class RoomsService {
-    constructor(private prisma: PrismaService) { }
+    constructor(private readonly prisma: PrismaService) { }
 
-    async create(ownerId: string, hostelId: string, dto: any) {
+    async create(ownerId: string, hostelId: string, dto: CreateRoomDto) {
         const hostel = await this.prisma.hostel.findUnique({ where: { id: hostelId } });
         if (!hostel) throw new NotFoundException("Hostel not found");
         if (hostel.ownerId !== ownerId) throw new ForbiddenException("Not your hostel");
 
         return this.prisma.room.create({
-            data: { ...dto, hostelId },
+            data: {
+                ...dto,
+                hostel: { connect: { id: hostelId } }
+            },
         });
     }
 
-    async update(actor: { userId: string; role: UserRole }, roomId: string, dto: any) {
-        const room = await this.prisma.room.findUnique({
-            where: { id: roomId },
-            include: { hostel: true },
-        });
-        if (!room) throw new NotFoundException("Room not found");
-
-        const isOwner = room.hostel.ownerId === actor.userId;
-        if (!(actor.role === UserRole.ADMIN || isOwner))
-            throw new ForbiddenException("Not allowed");
+    async update(actor: UserActor, roomId: string, dto: UpdateRoomDto) {
+        const room = await this.getRoomWithHostel(roomId);
+        this.validateOwnership(actor, room.hostel.ownerId);
 
         return this.prisma.room.update({
             where: { id: roomId },
@@ -33,24 +29,11 @@ export class RoomsService {
         });
     }
 
-    async delete(actor: { userId: string; role: UserRole }, roomId: string) {
-        const room = await this.prisma.room.findUnique({
-            where: { id: roomId },
-            include: { hostel: true },
-        });
-        if (!room) throw new NotFoundException("Room not found");
+    async delete(actor: UserActor, roomId: string) {
+        const room = await this.getRoomWithHostel(roomId);
+        this.validateOwnership(actor, room.hostel.ownerId);
 
-        // Check for active bookings before deleting (Phase 4 requirement)
-        const activeBookings = await this.prisma.bookingItem.findFirst({
-            where: { roomId, booking: { status: { in: ['APPROVED', 'CONFIRMED', 'PENDING_APPROVAL'] } } }
-        });
-        if (activeBookings) {
-            throw new ForbiddenException("Cannot delete room with active/pending bookings. Archive instead.");
-        }
-
-        const isOwner = room.hostel.ownerId === actor.userId;
-        if (!(actor.role === UserRole.ADMIN || isOwner))
-            throw new ForbiddenException("Not allowed");
+        await this.checkActiveBookings(roomId);
 
         return this.prisma.room.delete({ where: { id: roomId } });
     }
@@ -60,4 +43,47 @@ export class RoomsService {
             where: { hostelId, isActive: true }
         });
     }
+
+    private async getRoomWithHostel(id: string) {
+        const room = await this.prisma.room.findUnique({
+            where: { id },
+            include: { hostel: true },
+        });
+        if (!room) throw new NotFoundException("Room not found");
+        return room;
+    }
+
+    private validateOwnership(actor: UserActor, ownerId: string) {
+        const isAuthorized = actor.role === UserRole.ADMIN || actor.userId === ownerId;
+        if (!isAuthorized) throw new ForbiddenException("Not allowed to modify this room");
+    }
+
+    private async checkActiveBookings(roomId: string) {
+        const activeBookings = await this.prisma.bookingItem.findFirst({
+            where: {
+                roomId,
+                booking: { status: { in: [BookingStatus.PENDING_APPROVAL, BookingStatus.APPROVED, BookingStatus.CONFIRMED] } }
+            }
+        });
+        if (activeBookings) {
+            throw new ForbiddenException("Cannot delete room with active/pending bookings. Archive instead.");
+        }
+    }
+}
+
+interface UserActor {
+    userId: string;
+    role: UserRole;
+}
+
+interface CreateRoomDto {
+    name: string;
+    capacity: number;
+    totalUnits: number;
+    pricePerTerm: number;
+    description?: string;
+}
+
+interface UpdateRoomDto extends Partial<CreateRoomDto> {
+    isActive?: boolean;
 }

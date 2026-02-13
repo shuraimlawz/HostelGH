@@ -30,7 +30,10 @@ async function bootstrap() {
         }),
     );
 
-    app.use(helmet());
+    app.use(helmet({
+        crossOriginResourcePolicy: { policy: "cross-origin" },
+        contentSecurityPolicy: false, // Disable CSP if it interferes with Swagger (local dev)
+    }));
 
     app.useGlobalPipes(
         new ValidationPipe({
@@ -45,9 +48,13 @@ async function bootstrap() {
     const prisma = app.get(PrismaService);
     await prisma.enableShutdownHooks(app);
 
-    app.enableCors({ origin: true, credentials: true });
+    const appUrl = process.env.APP_URL || 'http://localhost:3001';
+    app.enableCors({
+        origin: [appUrl, 'http://localhost:3001', 'http://localhost:3000'],
+        credentials: true,
+    });
 
-    const port = process.env.PORT || 3000;
+    const port = process.env.PORT || 3001;
     await app.listen(port);
     logger.log(`Application is running on: http://localhost:${port}`);
 }

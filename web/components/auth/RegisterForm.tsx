@@ -1,0 +1,131 @@
+"use client";
+
+import { api } from "@/lib/api";
+import { useState } from "react";
+
+import { useSearchParams, useRouter } from "next/navigation";
+
+export default function RegisterForm({ onSuccess }: { onSuccess?: () => void }) {
+    const searchParams = useSearchParams();
+    const defaultRole = searchParams.get("role") === "OWNER" ? "OWNER" : "TENANT";
+
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [role, setRole] = useState<"TENANT" | "OWNER">(defaultRole);
+    const router = useRouter();
+    const [loading, setLoading] = useState(false);
+    const [err, setErr] = useState<string | null>(null);
+
+    const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://127.0.0.1:3001";
+
+    async function submit(e: React.FormEvent) {
+        e.preventDefault();
+        setErr(null);
+        setLoading(true);
+
+        try {
+            await api.post("/auth/register", { email, password, role });
+
+            if (onSuccess) {
+                onSuccess();
+            } else {
+                router.push("/auth/login?registered=true");
+            }
+        } catch (error: any) {
+            setErr(error?.message ?? "Registration failed");
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    const handleGoogleLogin = () => {
+        window.location.href = `${API_BASE_URL}/auth/google`;
+    };
+
+    return (
+        <div className="space-y-4">
+            <form onSubmit={submit} className="space-y-4">
+                <div className="space-y-1">
+                    <label className="text-xs font-semibold text-gray-500 px-1">Email</label>
+                    <input
+                        type="email"
+                        className="w-full px-4 py-3 bg-gray-50 rounded-xl outline-none border border-transparent focus:border-black focus:bg-white transition-all text-sm"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        placeholder="your@email.com"
+                        required
+                    />
+                </div>
+
+                <div className="space-y-1">
+                    <label className="text-xs font-semibold text-gray-500 px-1">Password</label>
+                    <input
+                        type="password"
+                        className="w-full px-4 py-3 bg-gray-50 rounded-xl outline-none border border-transparent focus:border-black focus:bg-white transition-all text-sm"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        placeholder="••••••••"
+                        required
+                    />
+                </div>
+
+                <div className="space-y-1">
+                    <label className="text-xs font-semibold text-gray-500 px-1">Account Type</label>
+                    <div className="relative">
+                        <select
+                            className="w-full px-4 py-3 bg-gray-50 rounded-xl outline-none border border-transparent focus:border-black focus:bg-white transition-all text-sm appearance-none"
+                            value={role}
+                            onChange={(e) => setRole(e.target.value as any)}
+                        >
+                            <option value="TENANT">Tenant (I want to book)</option>
+                            <option value="OWNER">Owner (I want to host)</option>
+                        </select>
+                        <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
+                            <svg width="10" height="10" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M2 4L6 8L10 4" stroke="#666" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+
+                {err && <div className="text-xs text-red-600 font-medium px-1">{err}</div>}
+
+                <div className="pt-1">
+                    <button
+                        disabled={loading}
+                        className="w-full rounded-xl bg-black text-white font-bold py-3.5 hover:opacity-90 transition-all active:scale-[0.98] disabled:opacity-60 text-sm shadow-md shadow-black/10"
+                    >
+                        {loading ? "Creating Account..." : "Sign Up"}
+                    </button>
+                </div>
+            </form>
+
+            <div className="relative py-1">
+                <div className="absolute inset-0 flex items-center">
+                    <div className="w-full border-t border-gray-100"></div>
+                </div>
+                <div className="relative flex justify-center text-[10px] uppercase tracking-widest font-bold">
+                    <span className="bg-white px-2 text-gray-400">or</span>
+                </div>
+            </div>
+
+            <button
+                onClick={handleGoogleLogin}
+                type="button"
+                className="w-full flex items-center justify-center gap-3 rounded-xl border border-gray-200 bg-white text-gray-700 font-semibold py-3 hover:bg-gray-50 transition-all active:scale-[0.98] text-sm"
+            >
+                <svg viewBox="0 0 18 18" width="18" height="18" xmlns="http://www.w3.org/2000/svg">
+                    <path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z" />
+                    <path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z" />
+                    <path fill="#FBBC05" d="M3.964 10.706A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.706V4.962H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.038l3.007-2.332z" />
+                    <path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.962l3.007 2.332c.708-2.127 2.692-3.711 5.036-3.711z" />
+                </svg>
+                Continue with Google
+            </button>
+
+            <div className="text-center text-xs text-gray-500 pt-1">
+                Already have an account? <a href="/auth/login" className="font-bold text-black border-b border-black hover:opacity-70 transition-opacity ml-1">Log In</a>
+            </div>
+        </div>
+    );
+}

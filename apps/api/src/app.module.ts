@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import configuration, { envSchema } from './common/config/configuration';
 import { PrismaModule } from './prisma/prisma.module';
@@ -9,10 +9,12 @@ import { RoomsModule } from './modules/rooms/rooms.module';
 import { BookingsModule } from './modules/bookings/bookings.module';
 import { PaymentsModule } from './modules/payments/payments.module';
 import { HealthModule } from './modules/health/health.module';
+import { NotificationsModule } from './modules/notifications/notifications.module';
 import { ThrottlerModule } from "@nestjs/throttler";
 import { ThrottlerGuard } from "@nestjs/throttler";
 import { APP_FILTER, APP_GUARD } from '@nestjs/core';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
+import { LoggingMiddleware } from './common/middleware/logging.middleware';
 
 @Module({
     imports: [
@@ -29,6 +31,7 @@ import { HttpExceptionFilter } from './common/filters/http-exception.filter';
         BookingsModule,
         PaymentsModule,
         HealthModule,
+        NotificationsModule,
         ThrottlerModule.forRoot([{
             ttl: 60000,
             limit: 100,
@@ -45,4 +48,8 @@ import { HttpExceptionFilter } from './common/filters/http-exception.filter';
         },
     ],
 })
-export class AppModule { }
+export class AppModule implements NestModule {
+    configure(consumer: MiddlewareConsumer) {
+        consumer.apply(LoggingMiddleware).forRoutes('*');
+    }
+}

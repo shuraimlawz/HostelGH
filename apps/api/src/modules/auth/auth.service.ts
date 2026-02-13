@@ -17,9 +17,9 @@ export class AuthService {
     private readonly logger = new Logger(AuthService.name);
 
     constructor(
-        private prisma: PrismaService,
-        private jwt: JwtService,
-        private config: ConfigService
+        private readonly prisma: PrismaService,
+        private readonly jwt: JwtService,
+        private readonly config: ConfigService
     ) { }
 
     async register(dto: RegisterDto) {
@@ -79,6 +79,39 @@ export class AuthService {
             data: { revokedAt: new Date() },
         });
         return { ok: true };
+    }
+
+    async validateGoogleUser(googleUser: any) {
+        let user = await this.prisma.user.findFirst({
+            where: {
+                OR: [
+                    { googleId: googleUser.googleId },
+                    { email: googleUser.email }
+                ]
+            }
+        });
+
+        if (!user) {
+            user = await this.prisma.user.create({
+                data: {
+                    email: googleUser.email,
+                    googleId: googleUser.googleId,
+                    firstName: googleUser.firstName,
+                    lastName: googleUser.lastName,
+                    role: UserRole.TENANT, // Default to tenant
+                    emailVerified: true
+                }
+            });
+        } else if (!user.googleId) {
+            // Link existing email-only account to Google
+            user = await this.prisma.user.update({
+                where: { id: user.id },
+                data: { googleId: googleUser.googleId }
+            });
+        }
+
+        const tokens = await this.issueTokens(user.id, user.role);
+        return { user: { id: user.id, email: user.email, role: user.role }, ...tokens };
     }
 
     private async issueTokens(userId: string, role: string) {

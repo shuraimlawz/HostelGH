@@ -14,7 +14,7 @@ export class CreateRoomDto {
     @ApiProperty({ example: 10 })
     @IsInt() @Min(1) totalUnits!: number;
 
-    @ApiProperty({ example: 150000, description: "Price in minor units (e.g. 1500.00 GHS)" })
+    @ApiProperty({ example: 150000, description: "Price in minor units (e.g. 1500.00 GH₵)" })
     @IsInt() @Min(1) pricePerTerm!: number;
 
     @ApiProperty({ example: true, default: true })

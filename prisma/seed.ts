@@ -4,89 +4,169 @@ import * as bcrypt from "bcrypt";
 const prisma = new PrismaClient();
 
 async function main() {
-    console.log("Seeding...");
+    console.log("Starting robust seeding...");
+
+    // 1. Cleanup
+    console.log("Cleaning up database...");
+    await prisma.payment.deleteMany();
+    await prisma.bookingItem.deleteMany();
+    await prisma.booking.deleteMany();
+    await prisma.room.deleteMany();
+    await prisma.hostel.deleteMany();
+    await prisma.refreshToken.deleteMany();
+    await prisma.user.deleteMany();
+
     const passwordHash = await bcrypt.hash("Password123!", 12);
 
-    // Users
-    const admin = await prisma.user.upsert({
-        where: { email: "admin@hostelbook.test" },
-        update: {},
-        create: {
-            email: "admin@hostelbook.test",
+    // 2. Users
+    console.log("Creating users...");
+    const admin = await prisma.user.create({
+        data: {
+            email: "admin@hostelgh.test",
             passwordHash,
             role: UserRole.ADMIN,
-            firstName: "System",
+            firstName: "Ama",
             lastName: "Admin",
             emailVerified: true,
         },
     });
 
-    const owner = await prisma.user.upsert({
-        where: { email: "owner@hostelbook.test" },
-        update: {},
-        create: {
-            email: "owner@hostelbook.test",
-            passwordHash,
-            role: UserRole.OWNER,
-            firstName: "Hostel",
-            lastName: "Owner",
-            emailVerified: true,
-        },
-    });
+    const owners = await Promise.all([
+        prisma.user.create({
+            data: {
+                email: "kwame@hostelgh.test",
+                passwordHash,
+                role: UserRole.OWNER,
+                firstName: "Kwame",
+                lastName: "Ansah",
+                emailVerified: true,
+            },
+        }),
+        prisma.user.create({
+            data: {
+                email: "abena@hostelgh.test",
+                passwordHash,
+                role: UserRole.OWNER,
+                firstName: "Abena",
+                lastName: "Mensah",
+                emailVerified: true,
+            },
+        }),
+    ]);
 
-    const tenant = await prisma.user.upsert({
-        where: { email: "tenant@hostelbook.test" },
-        update: {},
-        create: {
-            email: "tenant@hostelbook.test",
-            passwordHash,
-            role: UserRole.TENANT,
-            firstName: "Test",
-            lastName: "Tenant",
-            emailVerified: true,
-        },
-    });
+    const tenants = await Promise.all([
+        prisma.user.create({
+            data: {
+                email: "kofi@hostelgh.test",
+                passwordHash,
+                role: UserRole.TENANT,
+                firstName: "Kofi",
+                lastName: "Addon",
+                emailVerified: true,
+            },
+        }),
+        prisma.user.create({
+            data: {
+                email: "ekua@hostelgh.test",
+                passwordHash,
+                role: UserRole.TENANT,
+                firstName: "Ekua",
+                lastName: "Dapaah",
+                emailVerified: true,
+            },
+        }),
+    ]);
 
-    // Hostel
-    const hostel = await prisma.hostel.create({
-        data: {
-            ownerId: owner.id,
-            name: "Sunrise Hostel",
-            description: "Affordable rooms near campus.",
-            addressLine: "123 Campus Road",
+    // 3. Hostels & Rooms
+    console.log("Creating hostels and rooms...");
+    const hostelData = [
+        {
+            ownerId: owners[0].id,
+            name: "Lakeside Executive Hostel",
+            description: "Premium student accommodation with high-speed internet and backup power.",
+            addressLine: "Lakeside Link, near UG Gate",
             city: "Accra",
             region: "Greater Accra",
-            country: "GH",
-            isPublished: true,
-            rooms: {
-                create: [
-                    {
-                        name: "2-in-1",
-                        description: "Two people per room",
-                        capacity: 2,
-                        totalUnits: 10,
-                        pricePerTerm: 150000,
-                        isActive: true,
-                    },
-                    {
-                        name: "4-in-1",
-                        description: "Four people per room",
-                        capacity: 4,
-                        totalUnits: 20,
-                        pricePerTerm: 90000,
-                        isActive: true,
-                    },
-                ],
-            },
+            rooms: [
+                { name: "1-in-1 Executive", capacity: 1, totalUnits: 5, pricePerTerm: 450000, description: "Private room with ensuite bath" },
+                { name: "2-in-1 Premium", capacity: 2, totalUnits: 15, pricePerTerm: 280000, description: "Shared with 1 person, AC included" },
+                { name: "4-in-1 Standard", capacity: 4, totalUnits: 20, pricePerTerm: 150000, description: "Economical choice for students" },
+            ]
         },
-    });
+        {
+            ownerId: owners[1].id,
+            name: "Garden City Residency",
+            description: "Quiet and serene environment, perfect for engineering and medical students.",
+            addressLine: "KNUST South Campus Road",
+            city: "Kumasi",
+            region: "Ashanti",
+            rooms: [
+                { name: "2-in-1 Classic", capacity: 2, totalUnits: 25, pricePerTerm: 220000 },
+                { name: "3-in-1 Spacious", capacity: 3, totalUnits: 10, pricePerTerm: 180000 },
+            ]
+        },
+        {
+            ownerId: owners[0].id,
+            name: "Ocean View Plaza",
+            description: "Walking distance to the beach and UCC campus.",
+            addressLine: "Science Market Road",
+            city: "Cape Coast",
+            region: "Central",
+            rooms: [
+                { name: "2-in-1 Ensuite", capacity: 2, totalUnits: 12, pricePerTerm: 200000 },
+                { name: "4-in-1 Budget", capacity: 4, totalUnits: 30, pricePerTerm: 120000 },
+            ]
+        },
+        {
+            ownerId: owners[1].id,
+            name: "Oil City Suites",
+            description: "Modern facility with 24/7 security and swimming pool.",
+            addressLine: "TTU Main Gate",
+            city: "Takoradi",
+            region: "Western",
+            rooms: [
+                { name: "Single Studio", capacity: 1, totalUnits: 8, pricePerTerm: 500000 },
+                { name: "Double Suite", capacity: 2, totalUnits: 14, pricePerTerm: 300000 },
+            ]
+        },
+        {
+            ownerId: owners[0].id,
+            name: "Unity Hall Extension",
+            description: "Vibrant community and close to major lecture halls.",
+            addressLine: "Hall 7 Link",
+            city: "Accra",
+            region: "Greater Accra",
+            rooms: [
+                { name: "4-in-1 Basic", capacity: 4, totalUnits: 50, pricePerTerm: 95000 },
+            ]
+        }
+    ];
 
-    console.log({
-        admin: admin.email,
-        owner: owner.email,
-        tenant: tenant.email,
-        hostel: hostel.name
-    });
+    for (const data of hostelData) {
+        await prisma.hostel.create({
+            data: {
+                ownerId: data.ownerId,
+                name: data.name,
+                description: data.description,
+                addressLine: data.addressLine,
+                city: data.city,
+                region: data.region,
+                isPublished: true,
+                rooms: {
+                    create: data.rooms.map(room => ({
+                        name: room.name,
+                        capacity: room.capacity,
+                        totalUnits: room.totalUnits,
+                        pricePerTerm: room.pricePerTerm,
+                        description: room.description || `Spacious ${room.name} room.`,
+                        isActive: true
+                    }))
+                }
+            }
+        });
+    }
+
+    console.log("Seeding complete!");
 }
 
 main()

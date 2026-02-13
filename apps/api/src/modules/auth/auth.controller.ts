@@ -1,14 +1,19 @@
-import { Body, Controller, Post, Req, UseGuards, HttpCode, HttpStatus } from "@nestjs/common";
+import { Body, Controller, Get, Post, Req, Res, UseGuards, HttpCode, HttpStatus } from "@nestjs/common";
 import { AuthService } from "./auth.service";
 import { RegisterDto } from "./dto/register.dto";
 import { LoginDto, RefreshTokenDto } from "./dto/login.dto";
 import { JwtAuthGuard } from "./guards/jwt-auth.guard";
+import { AuthGuard } from "@nestjs/passport";
+import { ConfigService } from "@nestjs/config";
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from "@nestjs/swagger";
 
 @ApiTags("Authentication")
 @Controller("auth")
 export class AuthController {
-    constructor(private auth: AuthService) { }
+    constructor(
+        private readonly auth: AuthService,
+        private readonly config: ConfigService
+    ) { }
 
     @Post("register")
     @ApiOperation({ summary: "Register a new user" })
@@ -39,6 +44,23 @@ export class AuthController {
     @HttpCode(HttpStatus.OK)
     refresh(@Body() dto: RefreshTokenDto) {
         return this.auth.refresh(dto.userId, dto.refreshToken);
+    }
+
+    @Get("google")
+    @UseGuards(AuthGuard("google"))
+    @ApiOperation({ summary: "Initiate Google OAuth2 flow" })
+    googleAuth(@Req() req: any) {
+        // Guard handles redirect
+    }
+
+    @Get("google/callback")
+    @UseGuards(AuthGuard("google"))
+    @ApiOperation({ summary: "Google OAuth2 callback" })
+    async googleAuthCallback(@Req() req: any, @Res() res: any) {
+        const result = await this.auth.validateGoogleUser(req.user);
+        const frontendUrl = this.config.get<string>("app.frontendUrl");
+        const redirectUrl = `${frontendUrl}/auth/callback?accessToken=${result.accessToken}&refreshToken=${result.refreshToken}&userId=${result.user.id}&role=${result.user.role}&email=${result.user.email}`;
+        return res.redirect(redirectUrl);
     }
 }
 
