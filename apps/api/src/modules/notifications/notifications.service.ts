@@ -1,5 +1,5 @@
 import { Injectable } from "@nestjs/common";
-import { ResendService } from "./resend.service";
+import { EmailService } from "./email.service";
 import { bookingRequestedTemplate } from "./templates/booking-requested";
 import { bookingApprovedTemplate } from "./templates/booking-approved";
 import { bookingRejectedTemplate } from "./templates/booking-rejected";
@@ -31,13 +31,13 @@ interface PaymentConfirmedPayload extends EmailPayloadBase {
 
 @Injectable()
 export class NotificationsService {
-    constructor(private resend: ResendService) { }
+    constructor(private email: EmailService) { }
 
     async sendBookingRequestEmail(
         ownerEmail: string,
         payload: BookingRequestPayload,
     ) {
-        return this.resend.send({
+        return this.email.send({
             to: ownerEmail,
             subject: `New booking request • ${payload.hostelName}`,
             html: bookingRequestedTemplate(payload),
@@ -48,7 +48,7 @@ export class NotificationsService {
         tenantEmail: string,
         payload: BookingApprovedPayload,
     ) {
-        return this.resend.send({
+        return this.email.send({
             to: tenantEmail,
             subject: `Booking approved • ${payload.hostelName}`,
             html: bookingApprovedTemplate(payload),
@@ -59,7 +59,7 @@ export class NotificationsService {
         tenantEmail: string,
         payload: BookingRejectedPayload,
     ) {
-        return this.resend.send({
+        return this.email.send({
             to: tenantEmail,
             subject: `Booking update • ${payload.hostelName}`,
             html: bookingRejectedTemplate(payload),
@@ -70,7 +70,7 @@ export class NotificationsService {
         to: string,
         payload: PaymentConfirmedPayload,
     ) {
-        return this.resend.send({
+        return this.email.send({
             to,
             subject: `Payment confirmed • ${payload.hostelName}`,
             html: paymentConfirmedTemplate(payload),

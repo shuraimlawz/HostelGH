@@ -11,6 +11,11 @@ export const envSchema = Joi.object({
     GOOGLE_CLIENT_SECRET: Joi.string().optional(),
     GOOGLE_CALLBACK_URL: Joi.string().optional(),
     FRONTEND_URL: Joi.string().default('http://localhost:3000'),
+    SMTP_HOST: Joi.string().optional(),
+    SMTP_PORT: Joi.number().optional(),
+    SMTP_USER: Joi.string().optional(),
+    SMTP_PASS: Joi.string().optional(),
+    EMAIL_FROM: Joi.string().optional(),
 });
 
 export default () => ({
