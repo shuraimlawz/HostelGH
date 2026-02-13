@@ -7,8 +7,6 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { AlertCircle } from "lucide-react";
 
-import { useRouter } from "next/navigation";
-
 export default function LoginForm({ onSuccess }: { onSuccess?: () => void }) {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
