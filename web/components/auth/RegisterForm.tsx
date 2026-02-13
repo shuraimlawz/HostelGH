@@ -2,6 +2,9 @@
 
 import { api } from "@/lib/api";
 import { useState } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
+import { toast } from "sonner";
+import { AlertCircle } from "lucide-react";
 
 import { useSearchParams, useRouter } from "next/navigation";
 
@@ -32,7 +35,16 @@ export default function RegisterForm({ onSuccess }: { onSuccess?: () => void }) 
                 router.push("/auth/login?registered=true");
             }
         } catch (error: any) {
-            setErr(error?.message ?? "Registration failed");
+            const isNetworkError = !error.response;
+            if (isNetworkError) {
+                toast.error("Connectivity Issue", {
+                    description: "We’re having trouble connecting to our servers. Please check your internet connection.",
+                    duration: 5000,
+                });
+            } else {
+                const message = error.response?.data?.message || "Registration failed. Please check your details.";
+                setErr(Array.isArray(message) ? message[0] : message);
+            }
         } finally {
             setLoading(false);
         }
@@ -88,14 +100,31 @@ export default function RegisterForm({ onSuccess }: { onSuccess?: () => void }) 
                     </div>
                 </div>
 
-                {err && <div className="text-xs text-red-600 font-medium px-1">{err}</div>}
+                {err && (
+                    <div className="flex items-center gap-2 text-xs bg-red-50 text-red-600 font-medium px-3 py-2.5 rounded-xl border border-red-100 animate-in fade-in slide-in-from-top-1 duration-200">
+                        <AlertCircle className="w-4 h-4" />
+                        <span>{err}</span>
+                    </div>
+                )}
 
                 <div className="pt-1">
                     <button
                         disabled={loading}
-                        className="w-full rounded-xl bg-black text-white font-bold py-3.5 hover:opacity-90 transition-all active:scale-[0.98] disabled:opacity-60 text-sm shadow-md shadow-black/10"
+                        className="group relative w-full rounded-xl bg-black text-white font-bold py-3.5 hover:opacity-90 transition-all active:scale-[0.98] disabled:opacity-60 text-sm shadow-md shadow-black/10 overflow-hidden"
                     >
-                        {loading ? "Creating Account..." : "Sign Up"}
+                        {loading ? (
+                            <div className="flex items-center justify-center gap-2">
+                                <div className="w-1.5 h-1.5 bg-white rounded-full animate-bounce [animation-delay:-0.3s]"></div>
+                                <div className="w-1.5 h-1.5 bg-white rounded-full animate-bounce [animation-delay:-0.15s]"></div>
+                                <div className="w-1.5 h-1.5 bg-white rounded-full animate-bounce"></div>
+                                <span className="ml-1">Preparing your account...</span>
+                            </div>
+                        ) : (
+                            "Sign Up"
+                        )}
+                        {loading && (
+                            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full animate-[shimmer_2s_infinite]"></div>
+                        )}
                     </button>
                 </div>
             </form>
