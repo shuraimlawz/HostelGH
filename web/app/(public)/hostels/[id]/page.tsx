@@ -28,6 +28,8 @@ import {
     Users,
     Clock
 } from "lucide-react";
+import { cn } from "@/lib/utils";
+import Link from "next/link";
 
 const AMENITY_ICONS: Record<string, any> = {
     "WiFi": Wifi,
@@ -286,5 +288,3 @@ export default function HostelDetailsPage() {
         </div>
     );
 }
-
-import { Building2, Users, Clock } from "lucide-react";

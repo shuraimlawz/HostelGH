@@ -8,6 +8,7 @@ import { Menu, User as UserIcon, LogOut } from "lucide-react";
 import { useAuthModal } from "@/components/auth/AuthModalProvider";
 import { useRouter } from "next/navigation";
 import RegionSelector from "./RegionSelector";
+import { Suspense } from "react";
 
 export default function Navbar() {
     const { user, logout, isLoading } = useAuth();
@@ -75,7 +76,9 @@ export default function Navbar() {
                     >
                         Host your home
                     </Link>
-                    <RegionSelector />
+                    <Suspense fallback={<div className="w-10 h-10" />}>
+                        <RegionSelector />
+                    </Suspense>
 
                     <div className="relative" ref={menuRef}>
                         <button
