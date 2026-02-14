@@ -19,15 +19,25 @@ import {
     Share2,
     Heart,
     ChevronLeft,
-    CheckCircle2
+    CheckCircle2,
+    Utensils,
+    Waves,
+    Car,
+    Coffee,
+    Building2,
+    Users,
+    Clock
 } from "lucide-react";
-import { cn } from "@/lib/utils";
-import Link from "next/link";
 
 const AMENITY_ICONS: Record<string, any> = {
     "WiFi": Wifi,
     "AC": Wind,
+    "Laundry": Utensils,
+    "Swimming Pool": Waves,
+    "Parking": Car,
     "Security": ShieldCheck,
+    "Study Room": Coffee,
+    "Generator": Building2,
 };
 
 export default function HostelDetailsPage() {
@@ -144,7 +154,9 @@ export default function HostelDetailsPage() {
                                 </div>
                                 <div className="text-right flex flex-col items-end">
                                     <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Starting Price</p>
-                                    <p className="text-3xl font-black text-black">₵{(Math.min(...hostel.rooms.map((r: any) => r.pricePerTerm)) / 100).toLocaleString()}</p>
+                                    <p className="text-3xl font-black text-black">
+                                        ₵{(hostel.minPrice ? hostel.minPrice / 100 : (hostel.rooms?.length ? Math.min(...hostel.rooms.map((r: any) => r.pricePerTerm)) / 100 : 0)).toLocaleString()}
+                                    </p>
                                     <p className="text-xs text-gray-400 font-bold uppercase tracking-tighter">Per Academic Term</p>
                                 </div>
                             </div>

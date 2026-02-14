@@ -116,6 +116,9 @@ model Hostel {
   amenities   String[] @default([])
   university  String?
 
+  isFeatured  Boolean  @default(false)
+  minPrice    Int?
+
   isPublished Boolean  @default(false)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt

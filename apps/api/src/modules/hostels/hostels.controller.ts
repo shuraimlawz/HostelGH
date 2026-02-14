@@ -53,6 +53,7 @@ export class HostelsController {
         @Query("maxPrice") maxPrice?: string,
         @Query("university") university?: string,
         @Query("amenities") amenities?: string | string[],
+        @Query("sort") sort?: string,
     ) {
         const amenitiesArr = typeof amenities === 'string' ? amenities.split(',') : amenities;
         return this.hostels.publicSearch({
@@ -62,6 +63,7 @@ export class HostelsController {
             maxPrice: maxPrice ? parseInt(maxPrice, 10) : undefined,
             university,
             amenities: amenitiesArr,
+            sort,
         });
     }
 

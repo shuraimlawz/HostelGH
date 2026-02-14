@@ -11,22 +11,26 @@ export class RoomsService {
         if (!hostel) throw new NotFoundException("Hostel not found");
         if (hostel.ownerId !== ownerId) throw new ForbiddenException("Not your hostel");
 
-        return this.prisma.room.create({
+        const room = await this.prisma.room.create({
             data: {
                 ...dto,
                 hostel: { connect: { id: hostelId } }
             },
         });
+        await this.syncHostelMinPrice(hostelId);
+        return room;
     }
 
     async update(actor: UserActor, roomId: string, dto: UpdateRoomDto) {
         const room = await this.getRoomWithHostel(roomId);
         this.validateOwnership(actor, room.hostel.ownerId);
 
-        return this.prisma.room.update({
+        const updated = await this.prisma.room.update({
             where: { id: roomId },
             data: dto,
         });
+        await this.syncHostelMinPrice(room.hostelId);
+        return updated;
     }
 
     async delete(actor: UserActor, roomId: string) {
@@ -35,7 +39,21 @@ export class RoomsService {
 
         await this.checkActiveBookings(roomId);
 
-        return this.prisma.room.delete({ where: { id: roomId } });
+        const deleted = await this.prisma.room.delete({ where: { id: roomId } });
+        await this.syncHostelMinPrice(room.hostelId);
+        return deleted;
+    }
+
+    private async syncHostelMinPrice(hostelId: string) {
+        const rooms = await this.prisma.room.findMany({
+            where: { hostelId, isActive: true },
+            select: { pricePerTerm: true }
+        });
+        const minPrice = rooms.length > 0 ? Math.min(...rooms.map(r => r.pricePerTerm)) : null;
+        await this.prisma.hostel.update({
+            where: { id: hostelId },
+            data: { minPrice }
+        });
     }
 
     async findByHostel(hostelId: string) {

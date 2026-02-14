@@ -43,9 +43,25 @@ export class HostelsService {
         minPrice?: number,
         maxPrice?: number,
         amenities?: string[],
-        university?: string
+        university?: string,
+        sort?: string
     }) {
-        const { city, region, minPrice, maxPrice, amenities, university } = params;
+        const { city, region, minPrice, maxPrice, amenities, university, sort } = params;
+
+        // Intelligent Suggestion Algorithm: 
+        // 1. Featured hostels first
+        // 2. Then by selected sorting criteria
+        const orderBy: any[] = [{ isFeatured: "desc" }];
+
+        if (sort === "price_asc") {
+            orderBy.push({ minPrice: "asc" });
+        } else if (sort === "price_desc") {
+            orderBy.push({ minPrice: "desc" });
+        } else if (sort === "name_asc") {
+            orderBy.push({ name: "asc" });
+        } else {
+            orderBy.push({ createdAt: "desc" }); // Default to Newest
+        }
 
         return this.prisma.hostel.findMany({
             where: {
@@ -54,17 +70,13 @@ export class HostelsService {
                 region: region ? { equals: region, mode: "insensitive" } : undefined,
                 university: university ? { contains: university, mode: "insensitive" } : undefined,
                 amenities: amenities && amenities.length > 0 ? { hasEvery: amenities } : undefined,
-                rooms: (minPrice || maxPrice) ? {
-                    some: {
-                        isActive: true,
-                        pricePerTerm: {
-                            gte: minPrice,
-                            lte: maxPrice,
-                        }
-                    }
+                minPrice: (minPrice !== undefined || maxPrice !== undefined) ? {
+                    gte: minPrice,
+                    lte: maxPrice,
                 } : undefined,
             },
-            include: { rooms: true },
+            include: { rooms: { where: { isActive: true } } },
+            orderBy: orderBy,
         });
     }
 

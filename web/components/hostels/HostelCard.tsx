@@ -2,19 +2,26 @@
 
 import Link from "next/link";
 import { Hostel } from "@/types";
-import { MapPin, School, Wifi, Wind, ShieldCheck, Star } from "lucide-react";
+import { MapPin, School, Wifi, Wind, ShieldCheck, Star, Utensils, Waves, Car, Coffee, Building2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const AMENITY_ICONS: Record<string, any> = {
     "WiFi": Wifi,
     "AC": Wind,
+    "Laundry": Utensils,
+    "Swimming Pool": Waves,
+    "Parking": Car,
     "Security": ShieldCheck,
+    "Study Room": Coffee,
+    "Generator": Building2,
 };
 
-export default function HostelCard({ hostel }: { hostel: Hostel }) {
-    const minPrice = hostel.rooms?.length
-        ? Math.min(...hostel.rooms.map(r => r.pricePerTerm)) / 100
-        : null;
+export default function HostelCard({ hostel }: { hostel: any }) {
+    const minPrice = hostel.minPrice
+        ? hostel.minPrice / 100
+        : (hostel.rooms?.length
+            ? Math.min(...hostel.rooms.map((r: any) => r.pricePerTerm)) / 100
+            : null);
 
     return (
         <Link href={`/hostels/${hostel.id}`} className="group block h-full">
@@ -35,6 +42,12 @@ export default function HostelCard({ hostel }: { hostel: Hostel }) {
 
                     {/* Floating Badges */}
                     <div className="absolute top-4 left-4 flex flex-col gap-2">
+                        {hostel.isFeatured && (
+                            <span className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-wider flex items-center gap-1.5 shadow-lg shadow-orange-500/20">
+                                <Star size={12} fill="white" />
+                                Recommended
+                            </span>
+                        )}
                         {hostel.university && (
                             <span className="bg-white/90 backdrop-blur-md px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-wider flex items-center gap-1.5 shadow-sm">
                                 <School size={12} className="text-blue-600" />
@@ -45,7 +58,7 @@ export default function HostelCard({ hostel }: { hostel: Hostel }) {
 
                     <div className="absolute bottom-4 left-4 right-4 flex justify-between items-end">
                         <div className="bg-black/40 backdrop-blur-md px-3 py-1 rounded-xl flex gap-1.5">
-                            {hostel.amenities?.slice(0, 3).map((a) => {
+                            {hostel.amenities?.slice(0, 3).map((a: string) => {
                                 const Icon = AMENITY_ICONS[a];
                                 if (!Icon) return null;
                                 return <Icon key={a} size={14} className="text-white" />;
