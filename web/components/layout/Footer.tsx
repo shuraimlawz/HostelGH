@@ -55,7 +55,7 @@ export default function Footer() {
                             </li>
                             <li className="flex items-center gap-3">
                                 <Phone size={16} className="text-[#1877F2]" />
-                                <span>+233 20 000 0000</span>
+                                <span>+233 59 849 4617</span>
                             </li>
                             <li className="flex items-center gap-3">
                                 <Globe size={16} className="text-[#1877F2]" />

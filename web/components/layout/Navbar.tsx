@@ -7,6 +7,7 @@ import LogoAnimation from "./LogoAnimation";
 import { Menu, User as UserIcon, LogOut } from "lucide-react";
 import { useAuthModal } from "@/components/auth/AuthModalProvider";
 import { useRouter } from "next/navigation";
+import RegionSelector from "./RegionSelector";
 
 export default function Navbar() {
     const { user, logout, isLoading } = useAuth();
@@ -74,9 +75,7 @@ export default function Navbar() {
                     >
                         Host your home
                     </Link>
-                    <div className="hidden md:flex items-center justify-center w-10 h-10 rounded-full hover:bg-gray-100 cursor-pointer transition-colors mr-1">
-                        <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" role="presentation" focusable="false" style={{ display: 'block', height: '16px', width: '16px', fill: 'currentcolor' }}><path d="m8.002.25a7.77 7.77 0 0 1 7.748 7.776 7.75 7.75 0 0 1 -7.521 7.72l-.246.004a7.75 7.75 0 0 1 -7.73-7.513l-.003-.245a7.75 7.75 0 0 1 7.752-7.742zm1.949 8.5h-3.903c.155 2.897 1.176 5.343 1.886 5.493l.068.007c.68-.002 1.72-2.522 1.953-5.5zm-6.703.447c.602 4.067 3.535 7.206 7.372 7.538l.38.016.37-.016c3.837-.332 6.77-3.471 7.373-7.538zm6.577-7.443a6.25 6.25 0 0 1 1.94 5.446h-3.922c.166-2.587 1.096-4.966 1.868-5.385zm-3.649.061c.704.402 1.56 2.502 1.764 4.885h-3.922a6.25 6.25 0 0 1 2.158-4.885zm4.845-.589a6.28 6.28 0 0 0 -1.025-.562c-1.168 2.05-2.269 5.353-2.392 6.095h4.204a6.24 6.24 0 0 0 -.787-5.534zm-9.088.563a6.28 6.28 0 0 0 -1.025.565 6.24 6.24 0 0 0 -.784 5.531h4.202c-.123-.742-1.224-4.045-2.393-6.096z"></path></svg>
-                    </div>
+                    <RegionSelector />
 
                     <div className="relative" ref={menuRef}>
                         <button

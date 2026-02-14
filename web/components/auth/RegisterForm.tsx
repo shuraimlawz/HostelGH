@@ -6,8 +6,6 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { AlertCircle } from "lucide-react";
 
-import { useSearchParams, useRouter } from "next/navigation";
-
 export default function RegisterForm({ onSuccess }: { onSuccess?: () => void }) {
     const searchParams = useSearchParams();
     const defaultRole = searchParams.get("role") === "OWNER" ? "OWNER" : "TENANT";

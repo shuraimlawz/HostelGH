@@ -39,17 +39,19 @@ export class HostelsService {
 
     async publicSearch(params: {
         city?: string,
+        region?: string,
         minPrice?: number,
         maxPrice?: number,
         amenities?: string[],
         university?: string
     }) {
-        const { city, minPrice, maxPrice, amenities, university } = params;
+        const { city, region, minPrice, maxPrice, amenities, university } = params;
 
         return this.prisma.hostel.findMany({
             where: {
                 isPublished: true,
                 city: city ? { contains: city, mode: "insensitive" } : undefined,
+                region: region ? { equals: region, mode: "insensitive" } : undefined,
                 university: university ? { contains: university, mode: "insensitive" } : undefined,
                 amenities: amenities && amenities.length > 0 ? { hasEvery: amenities } : undefined,
                 rooms: (minPrice || maxPrice) ? {

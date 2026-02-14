@@ -31,14 +31,112 @@ const AMENITIES = [
     { id: "Generator", icon: Building2 },
 ];
 
-const UNIVERSITIES = [
-    "University of Ghana",
-    "KNUST",
-    "UCC",
-    "University of Education, Winneba",
-    "GIMPA",
-    "Ashesi University",
-    "Valley View University",
+const REGIONAL_UNIVERSITIES = [
+    {
+        region: "Greater Accra",
+        unis: [
+            "Academic City University",
+            "Accra Institute of Technology",
+            "Accra Technical University",
+            "African University College of Communications",
+            "BlueCrest College",
+            "Central University",
+            "Ghana Christian University College",
+            "Ghana Communication Technology University (GCTU)",
+            "GIMPA",
+            "Islamic University College",
+            "Kings University College",
+            "Knutsford University College",
+            "Lancaster University Ghana",
+            "Maranatha University College",
+            "Methodist University Ghana",
+            "Mountcrest University College",
+            "Pentecost University",
+            "Radford University College",
+            "Regional Maritime University",
+            "Regent University College of Science and Tech",
+            "University of Ghana (Legon)",
+            "University of Media, Arts and Communication (UniMAC)",
+            "UPSA",
+            "West End University College",
+            "Wisconsin International University College",
+            "Zenith University College"
+        ]
+    },
+    {
+        region: "Ashanti",
+        unis: [
+            "AAM-USTED (Kumasi/Mampong)",
+            "Baptist University College",
+            "Christ Apostolic University College",
+            "Christian Service University College",
+            "Garden City University College",
+            "KNUST",
+            "Kumasi Technical University"
+        ]
+    },
+    {
+        region: "Central",
+        unis: [
+            "Cape Coast Technical University",
+            "University of Cape Coast (UCC)",
+            "University of Education, Winneba (UEW)"
+        ]
+    },
+    {
+        region: "Eastern",
+        unis: [
+            "All Nations University",
+            "Koforidua Technical University",
+            "Presbyterian University Ghana",
+            "University College of Agriculture and Environmental Studies",
+            "University of Environment and Sustainable Development"
+        ]
+    },
+    {
+        region: "Western / Western North",
+        unis: [
+            "Takoradi Technical University",
+            "University of Mines and Technology (UMaT)"
+        ]
+    },
+    {
+        region: "Volta / Oti",
+        unis: [
+            "Evangelical Presbyterian University",
+            "Ho Technical University",
+            "University of Health and Allied Sciences (UHAS)"
+        ]
+    },
+    {
+        region: "Northern / NE / Savannah",
+        unis: [
+            "Tamale Technical University",
+            "University for Development Studies (UDS)"
+        ]
+    },
+    {
+        region: "Bono / Bono East / Ahafo",
+        unis: [
+            "Catholic University of Ghana",
+            "Sunyani Technical University",
+            "University of Energy and Natural Resources (UENR)"
+        ]
+    },
+    {
+        region: "Upper East",
+        unis: [
+            "Bolgatanga Technical University",
+            "CK Tedam Uni of Technology & Applied Sciences"
+        ]
+    },
+    {
+        region: "Upper West",
+        unis: [
+            "Dr. Hilla Limann Technical University",
+            "SDD-UBIDS (Wa)"
+        ]
+    }
 ];
 
 export default function HostelFilters() {
@@ -46,6 +144,7 @@ export default function HostelFilters() {
     const params = useSearchParams();
 
     const [city, setCity] = useState(params.get("city") ?? "");
+    const [region, setRegion] = useState(params.get("region") ?? "");
     const [university, setUniversity] = useState(params.get("university") ?? "");
     const [minPrice, setMinPrice] = useState(params.get("minPrice") ?? "");
     const [maxPrice, setMaxPrice] = useState(params.get("maxPrice") ?? "");
@@ -55,6 +154,7 @@ export default function HostelFilters() {
 
     useEffect(() => {
         setCity(params.get("city") ?? "");
+        setRegion(params.get("region") ?? "");
         setUniversity(params.get("university") ?? "");
         setMinPrice(params.get("minPrice") ?? "");
         setMaxPrice(params.get("maxPrice") ?? "");
@@ -64,6 +164,7 @@ export default function HostelFilters() {
     const handleApply = () => {
         const p = new URLSearchParams();
         if (city) p.set("city", city);
+        if (region) p.set("region", region);
         if (university) p.set("university", university);
         if (minPrice) p.set("minPrice", (parseInt(minPrice) * 100).toString());
         if (maxPrice) p.set("maxPrice", (parseInt(maxPrice) * 100).toString());
@@ -80,6 +181,7 @@ export default function HostelFilters() {
 
     const clearFilters = () => {
         setCity("");
+        setRegion("");
         setUniversity("");
         setMinPrice("");
         setMaxPrice("");
@@ -124,8 +226,12 @@ export default function HostelFilters() {
                         className="w-full h-14 bg-white border border-gray-100 rounded-2xl px-4 outline-none focus:ring-2 focus:ring-black transition-all text-sm font-medium shadow-sm appearance-none"
                     >
                         <option value="">Any University</option>
-                        {UNIVERSITIES.map(u => (
-                            <option key={u} value={u}>{u}</option>
+                        {REGIONAL_UNIVERSITIES.map(group => (
+                            <optgroup key={group.region} label={group.region} className="font-bold text-blue-600 bg-gray-50">
+                                {group.unis.map(u => (
+                                    <option key={u} value={u} className="text-gray-900 bg-white">{u}</option>
+                                ))}
+                            </optgroup>
                         ))}
                     </select>
                 </div>

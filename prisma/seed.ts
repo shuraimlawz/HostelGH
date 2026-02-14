@@ -22,11 +22,11 @@ async function main() {
     console.log("Creating users...");
     const admin = await prisma.user.create({
         data: {
-            email: "admin@hostelgh.test",
+            email: "admin@hostelgh.com",
             passwordHash,
             role: UserRole.ADMIN,
-            firstName: "Ama",
-            lastName: "Admin",
+            firstName: "System",
+            lastName: "Administrator",
             emailVerified: true,
         },
     });
@@ -34,7 +34,7 @@ async function main() {
     const owners = await Promise.all([
         prisma.user.create({
             data: {
-                email: "kwame@hostelgh.test",
+                email: "kwame.ansah@hostelgh.com",
                 passwordHash,
                 role: UserRole.OWNER,
                 firstName: "Kwame",
@@ -44,7 +44,7 @@ async function main() {
         }),
         prisma.user.create({
             data: {
-                email: "abena@hostelgh.test",
+                email: "abena.mensah@hostelgh.com",
                 passwordHash,
                 role: UserRole.OWNER,
                 firstName: "Abena",
@@ -57,17 +57,17 @@ async function main() {
     const tenants = await Promise.all([
         prisma.user.create({
             data: {
-                email: "kofi@hostelgh.test",
+                email: "kofi.addo@hostelgh.com",
                 passwordHash,
                 role: UserRole.TENANT,
                 firstName: "Kofi",
-                lastName: "Addon",
+                lastName: "Addo",
                 emailVerified: true,
             },
         }),
         prisma.user.create({
             data: {
-                email: "ekua@hostelgh.test",
+                email: "ekua.dapaah@hostelgh.com",
                 passwordHash,
                 role: UserRole.TENANT,
                 firstName: "Ekua",
@@ -82,15 +82,15 @@ async function main() {
     const hostelData = [
         {
             ownerId: owners[0].id,
-            name: "Lakeside Executive Hostel",
+            name: "Lakeside Executive",
             description: "Premium student accommodation with high-speed internet and backup power.",
             addressLine: "Lakeside Link, near UG Gate",
             city: "Accra",
             region: "Greater Accra",
+            university: "University of Ghana (Legon)",
             rooms: [
                 { name: "1-in-1 Executive", capacity: 1, totalUnits: 5, pricePerTerm: 450000, description: "Private room with ensuite bath" },
                 { name: "2-in-1 Premium", capacity: 2, totalUnits: 15, pricePerTerm: 280000, description: "Shared with 1 person, AC included" },
-                { name: "4-in-1 Standard", capacity: 4, totalUnits: 20, pricePerTerm: 150000, description: "Economical choice for students" },
             ]
         },
         {
@@ -100,44 +100,57 @@ async function main() {
             addressLine: "KNUST South Campus Road",
             city: "Kumasi",
             region: "Ashanti",
+            university: "KNUST",
             rooms: [
                 { name: "2-in-1 Classic", capacity: 2, totalUnits: 25, pricePerTerm: 220000 },
-                { name: "3-in-1 Spacious", capacity: 3, totalUnits: 10, pricePerTerm: 180000 },
             ]
         },
         {
             ownerId: owners[0].id,
-            name: "Ocean View Plaza",
-            description: "Walking distance to the beach and UCC campus.",
+            name: "Sea Breeze Plaza",
+            description: "Walking distance to the UCC campus.",
             addressLine: "Science Market Road",
             city: "Cape Coast",
             region: "Central",
+            university: "University of Cape Coast (UCC)",
             rooms: [
                 { name: "2-in-1 Ensuite", capacity: 2, totalUnits: 12, pricePerTerm: 200000 },
-                { name: "4-in-1 Budget", capacity: 4, totalUnits: 30, pricePerTerm: 120000 },
             ]
         },
         {
             ownerId: owners[1].id,
-            name: "Oil City Suites",
-            description: "Modern facility with 24/7 security and swimming pool.",
-            addressLine: "TTU Main Gate",
-            city: "Takoradi",
-            region: "Western",
+            name: "Pentecost Hall",
+            description: "Affordable housing for students in Sowutuom.",
+            addressLine: "Sowutuom Road",
+            city: "Accra",
+            region: "Greater Accra",
+            university: "Pentecost University",
             rooms: [
-                { name: "Single Studio", capacity: 1, totalUnits: 8, pricePerTerm: 500000 },
-                { name: "Double Suite", capacity: 2, totalUnits: 14, pricePerTerm: 300000 },
+                { name: "4-in-1 Basic", capacity: 4, totalUnits: 50, pricePerTerm: 120000 },
             ]
         },
         {
             ownerId: owners[0].id,
-            name: "Unity Hall Extension",
-            description: "Vibrant community and close to major lecture halls.",
-            addressLine: "Hall 7 Link",
+            name: "Ashesi Heights",
+            description: "Modern facility overlooking the Ashesi campus.",
+            addressLine: "Berekuso Hills",
+            city: "Berekuso",
+            region: "Eastern",
+            university: "Presbyterian University Ghana",
+            rooms: [
+                { name: "Single Studio", capacity: 1, totalUnits: 8, pricePerTerm: 500000 },
+            ]
+        },
+        {
+            ownerId: owners[1].id,
+            name: "GIMPA Gardens",
+            description: "Conducive for postgraduate students.",
+            addressLine: "Greenhill Road",
             city: "Accra",
             region: "Greater Accra",
+            university: "GIMPA",
             rooms: [
-                { name: "4-in-1 Basic", capacity: 4, totalUnits: 50, pricePerTerm: 95000 },
+                { name: "Double Suite", capacity: 2, totalUnits: 10, pricePerTerm: 350000 },
             ]
         }
     ];
@@ -151,6 +164,7 @@ async function main() {
                 addressLine: data.addressLine,
                 city: data.city,
                 region: data.region,
+                university: data.university,
                 isPublished: true,
                 rooms: {
                     create: data.rooms.map(room => ({

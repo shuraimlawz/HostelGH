@@ -48,6 +48,7 @@ export class HostelsController {
     @ApiOperation({ summary: "Public search for hostels" })
     publicSearch(
         @Query("city") city?: string,
+        @Query("region") region?: string,
         @Query("minPrice") minPrice?: string,
         @Query("maxPrice") maxPrice?: string,
         @Query("university") university?: string,
@@ -56,6 +57,7 @@ export class HostelsController {
         const amenitiesArr = typeof amenities === 'string' ? amenities.split(',') : amenities;
         return this.hostels.publicSearch({
             city,
+            region,
             minPrice: minPrice ? parseInt(minPrice, 10) : undefined,
             maxPrice: maxPrice ? parseInt(maxPrice, 10) : undefined,
             university,
