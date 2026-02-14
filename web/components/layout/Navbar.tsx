@@ -70,12 +70,14 @@ export default function Navbar() {
 
                 {/* User Menu */}
                 <div className="flex items-center gap-2">
-                    <Link
-                        href="/auth/register?role=OWNER"
-                        className="hidden md:block text-sm font-semibold px-4 py-3 rounded-full hover:bg-gray-100 transition-colors"
-                    >
-                        Host your home
-                    </Link>
+                    {!user && (
+                        <Link
+                            href="/auth/register?role=OWNER"
+                            className="hidden md:block text-sm font-semibold px-4 py-3 rounded-full hover:bg-gray-100 transition-colors"
+                        >
+                            Host your home
+                        </Link>
+                    )}
                     <Suspense fallback={<div className="w-10 h-10" />}>
                         <RegionSelector />
                     </Suspense>

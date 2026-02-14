@@ -4,20 +4,19 @@ import { useAuth } from "@/lib/auth-context";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import AdminSidebar from "@/components/admin/AdminSidebar";
-import Shell from "@/components/layout/Shell";
 import { Loader2, ShieldAlert } from "lucide-react";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
-    const { user, loading } = useAuth();
+    const { user, isLoading } = useAuth();
     const router = useRouter();
 
     useEffect(() => {
-        if (!loading && (!user || user.role !== "ADMIN")) {
+        if (!isLoading && (!user || user.role !== "ADMIN")) {
             router.push("/");
         }
-    }, [user, loading, router]);
+    }, [user, isLoading, router]);
 
-    if (loading) {
+    if (isLoading) {
         return (
             <div className="flex min-h-screen items-center justify-center bg-gray-50">
                 <div className="text-center space-y-4">
@@ -45,13 +44,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     }
 
     return (
-        <Shell>
-            <div className="flex bg-gray-50 min-h-[calc(100vh-80px)]">
-                <AdminSidebar />
-                <main className="flex-1 p-6 md:p-10 lg:p-12 overflow-y-auto">
-                    {children}
-                </main>
-            </div>
-        </Shell>
+        <div className="flex bg-gray-50 min-h-[calc(100vh-80px)]">
+            <AdminSidebar />
+            <main className="flex-1 p-6 md:p-10 lg:p-12 overflow-y-auto">
+                {children}
+            </main>
+        </div>
     );
 }
