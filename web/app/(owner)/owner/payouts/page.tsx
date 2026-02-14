@@ -26,7 +26,7 @@ const payoutSchema = z.object({
     provider: z.string().min(2, "Provider name is required"),
     accountNumber: z.string().min(8, "Account number is too short"),
     accountName: z.string().min(3, "Account name is required"),
-    isDefault: z.boolean().default(false),
+    isDefault: z.boolean(),
 });
 
 type PayoutFormValues = z.infer<typeof payoutSchema>;
