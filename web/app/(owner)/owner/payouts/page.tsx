@@ -20,6 +20,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
+import { GHANA_BANKS, GHANA_MOMO_PROVIDERS } from "@/lib/constants";
 
 const payoutSchema = z.object({
     type: z.enum(["BANK", "MOBILE_MONEY"]),
@@ -129,11 +130,17 @@ export default function PayoutSettingsPage() {
 
                             <div className="space-y-2">
                                 <label className="text-xs font-bold uppercase tracking-widest text-gray-400">Provider Name</label>
-                                <input
+                                <select
                                     {...register("provider")}
-                                    placeholder={selectedType === "BANK" ? "e.g. GCB Bank" : "e.g. MTN Mobile Money"}
-                                    className="w-full h-12 bg-gray-50 border rounded-xl px-4 text-sm font-medium focus:ring-2 focus:ring-black outline-none transition-all"
-                                />
+                                    className="w-full h-12 bg-gray-50 border rounded-xl px-4 text-sm font-medium focus:ring-2 focus:ring-black outline-none transition-all appearance-none"
+                                >
+                                    <option value="">Select a provider</option>
+                                    {selectedType === "BANK" ? (
+                                        GHANA_BANKS.map(bank => <option key={bank} value={bank}>{bank}</option>)
+                                    ) : (
+                                        GHANA_MOMO_PROVIDERS.map(momo => <option key={momo} value={momo}>{momo}</option>)
+                                    )}
+                                </select>
                                 {errors.provider && <p className="text-[10px] text-red-500 font-bold">{errors.provider.message}</p>}
                             </div>
 
@@ -248,7 +255,7 @@ export default function PayoutSettingsPage() {
                 </div>
                 <div className="space-y-1">
                     <h4 className="text-sm font-bold uppercase tracking-widest text-gray-400">Security Notice</h4>
-                    <p className="text-xs text-gray-500 leading-relaxed font-medium">Your payout information is encrypted and stored securely. We only use these details to transfer your earnings. Payouts are typically processed within 24-48 hours of booking confirmation.</p>
+                    <p className="text-xs text-gray-500 leading-relaxed font-medium">Your payout information is encrypted and stored securely. We only use these details to transfer your earnings. Payouts are processed immediately upon booking confirmation for verified accounts. </p>
                 </div>
             </div>
         </div>

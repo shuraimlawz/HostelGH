@@ -33,7 +33,7 @@ export default function RootLayout({
         <AuthProvider>
           <QueryProvider>
             <AuthModalProvider>
-              <Shell>{children}</Shell>
+              {children}
               <Toaster position="top-center" richColors />
             </AuthModalProvider>
           </QueryProvider>

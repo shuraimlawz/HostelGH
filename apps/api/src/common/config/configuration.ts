@@ -16,6 +16,9 @@ export const envSchema = Joi.object({
     SMTP_USER: Joi.string().optional(),
     SMTP_PASS: Joi.string().optional(),
     EMAIL_FROM: Joi.string().optional(),
+    CLOUDINARY_CLOUD_NAME: Joi.string().optional(),
+    CLOUDINARY_API_KEY: Joi.string().optional(),
+    CLOUDINARY_API_SECRET: Joi.string().optional(),
 });
 
 export default () => ({
@@ -37,6 +40,11 @@ export default () => ({
     },
     app: {
         frontendUrl: process.env.FRONTEND_URL,
+    },
+    cloudinary: {
+        cloudName: process.env.CLOUDINARY_CLOUD_NAME,
+        apiKey: process.env.CLOUDINARY_API_KEY,
+        apiSecret: process.env.CLOUDINARY_API_SECRET,
     },
 });
 

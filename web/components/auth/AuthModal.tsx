@@ -14,7 +14,7 @@ export default function AuthModal({
     open: boolean;
     mode: "login" | "register";
     onClose: () => void;
-    onSuccess: () => void;
+    onSuccess: (user: any) => void;
     onSwitchMode: (m: "login" | "register") => void;
 }) {
     const [isRendered, setIsRendered] = useState(false);

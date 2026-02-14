@@ -5,14 +5,17 @@ import { api } from "@/lib/api";
 import { useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, Eye, EyeOff } from "lucide-react";
+import { useAuth } from "@/lib/auth-context";
 
 export default function RegisterForm({ onSuccess }: { onSuccess?: () => void }) {
     const searchParams = useSearchParams();
+    const { login } = useAuth();
     const defaultRole = searchParams.get("role") === "OWNER" ? "OWNER" : "TENANT";
 
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [showPassword, setShowPassword] = useState(false);
     const [role, setRole] = useState<"TENANT" | "OWNER">(defaultRole);
     const router = useRouter();
     const [loading, setLoading] = useState(false);
@@ -26,11 +29,28 @@ export default function RegisterForm({ onSuccess }: { onSuccess?: () => void }) 
         setLoading(true);
 
         try {
-            await api.post("/auth/register", { email, password, role });
+            const res = await api.post("/auth/register", { email, password, role });
+            const data = res.data?.data || res.data;
+            const { accessToken, user } = data;
 
-            if (onSuccess) {
-                onSuccess();
+            if (accessToken && user) {
+                login(accessToken, user);
+                toast.success("Account created successfully!");
+
+                if (onSuccess) {
+                    onSuccess();
+                } else {
+                    // Immediate role-based redirection
+                    if (user.role === "OWNER") {
+                        router.push("/owner");
+                    } else if (user.role === "ADMIN") {
+                        router.push("/admin");
+                    } else {
+                        router.push("/hostels");
+                    }
+                }
             } else {
+                toast.success("Account created! Please log in.");
                 router.push("/auth/login?registered=true");
             }
         } catch (error: any) {
@@ -70,14 +90,23 @@ export default function RegisterForm({ onSuccess }: { onSuccess?: () => void }) 
 
                 <div className="space-y-1">
                     <label className="text-xs font-semibold text-gray-500 px-1">Password</label>
-                    <input
-                        type="password"
-                        className="w-full px-4 py-3 bg-gray-50 rounded-xl outline-none border border-transparent focus:border-black focus:bg-white transition-all text-sm"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        placeholder="••••••••"
-                        required
-                    />
+                    <div className="relative">
+                        <input
+                            type={showPassword ? "text" : "password"}
+                            className="w-full px-4 py-3 bg-gray-50 rounded-xl outline-none border border-transparent focus:border-black focus:bg-white transition-all text-sm pr-12"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            placeholder="••••••••"
+                            required
+                        />
+                        <button
+                            type="button"
+                            onClick={() => setShowPassword(!showPassword)}
+                            className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-black transition-colors outline-none"
+                        >
+                            {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                        </button>
+                    </div>
                 </div>
 
                 <div className="space-y-1">

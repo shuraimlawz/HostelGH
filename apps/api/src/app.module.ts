@@ -11,6 +11,7 @@ import { PaymentsModule } from './modules/payments/payments.module';
 import { HealthModule } from './modules/health/health.module';
 import { NotificationsModule } from './modules/notifications/notifications.module';
 import { PayoutsModule } from './modules/payouts/payouts.module';
+import { UploadModule } from './modules/upload/upload.module';
 import { ThrottlerModule } from "@nestjs/throttler";
 import { ThrottlerGuard } from "@nestjs/throttler";
 import { APP_FILTER, APP_GUARD } from '@nestjs/core';
@@ -34,6 +35,7 @@ import { LoggingMiddleware } from './common/middleware/logging.middleware';
         HealthModule,
         NotificationsModule,
         PayoutsModule,
+        UploadModule,
         ThrottlerModule.forRoot([{
             ttl: 60000,
             limit: 100,

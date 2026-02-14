@@ -1,7 +1,7 @@
-"use client";
-
 import { createContext, useContext, useMemo, useState } from "react";
 import AuthModal from "./AuthModal";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/lib/auth-context";
 
 type Mode = "login" | "register";
 
@@ -16,6 +16,8 @@ export function AuthModalProvider({ children }: { children: React.ReactNode }) {
     const [isOpen, setIsOpen] = useState(false);
     const [mode, setMode] = useState<Mode>("login");
     const [resolver, setResolver] = useState<((ok: boolean) => void) | null>(null);
+    const router = useRouter();
+    const { user } = useAuth();
 
     const api = useMemo<AuthModalCtx>(() => {
         return {
@@ -40,8 +42,14 @@ export function AuthModalProvider({ children }: { children: React.ReactNode }) {
                 open={isOpen}
                 mode={mode}
                 onClose={() => api.close()}
-                onSuccess={() => {
+                onSuccess={(u: any) => {
                     setIsOpen(false);
+                    // Handle redirection if user is now available
+                    if (u) {
+                        if (u.role === "OWNER") router.push("/owner");
+                        else if (u.role === "ADMIN") router.push("/admin");
+                        else router.push("/account");
+                    }
                     if (resolver) resolver(true);
                     setResolver(null);
                 }}

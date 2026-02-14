@@ -17,8 +17,9 @@ import {
     DollarSign,
     MapPin
 } from "lucide-react";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
+import { REGIONAL_UNIVERSITIES } from "@/lib/constants";
 
 const AMENITIES = [
     { id: "WiFi", icon: Wifi },
@@ -29,114 +30,6 @@ const AMENITIES = [
     { id: "Security", icon: ShieldCheck },
     { id: "Study Room", icon: Coffee },
     { id: "Generator", icon: Building2 },
-];
-
-const REGIONAL_UNIVERSITIES = [
-    {
-        region: "Greater Accra",
-        unis: [
-            "Academic City University",
-            "Accra Institute of Technology",
-            "Accra Technical University",
-            "African University College of Communications",
-            "BlueCrest College",
-            "Central University",
-            "Ghana Christian University College",
-            "Ghana Communication Technology University (GCTU)",
-            "GIMPA",
-            "Islamic University College",
-            "Kings University College",
-            "Knutsford University College",
-            "Lancaster University Ghana",
-            "Maranatha University College",
-            "Methodist University Ghana",
-            "Mountcrest University College",
-            "Pentecost University",
-            "Radford University College",
-            "Regional Maritime University",
-            "Regent University College of Science and Tech",
-            "University of Ghana (Legon)",
-            "University of Media, Arts and Communication (UniMAC)",
-            "UPSA",
-            "West End University College",
-            "Wisconsin International University College",
-            "Zenith University College"
-        ]
-    },
-    {
-        region: "Ashanti",
-        unis: [
-            "AAM-USTED (Kumasi/Mampong)",
-            "Baptist University College",
-            "Christ Apostolic University College",
-            "Christian Service University College",
-            "Garden City University College",
-            "KNUST",
-            "Kumasi Technical University"
-        ]
-    },
-    {
-        region: "Central",
-        unis: [
-            "Cape Coast Technical University",
-            "University of Cape Coast (UCC)",
-            "University of Education, Winneba (UEW)"
-        ]
-    },
-    {
-        region: "Eastern",
-        unis: [
-            "All Nations University",
-            "Koforidua Technical University",
-            "Presbyterian University Ghana",
-            "University College of Agriculture and Environmental Studies",
-            "University of Environment and Sustainable Development"
-        ]
-    },
-    {
-        region: "Western / Western North",
-        unis: [
-            "Takoradi Technical University",
-            "University of Mines and Technology (UMaT)"
-        ]
-    },
-    {
-        region: "Volta / Oti",
-        unis: [
-            "Evangelical Presbyterian University",
-            "Ho Technical University",
-            "University of Health and Allied Sciences (UHAS)"
-        ]
-    },
-    {
-        region: "Northern / NE / Savannah",
-        unis: [
-            "Tamale Technical University",
-            "University for Development Studies (UDS)"
-        ]
-    },
-    {
-        region: "Bono / Bono East / Ahafo",
-        unis: [
-            "Catholic University of Ghana",
-            "Sunyani Technical University",
-            "University of Energy and Natural Resources (UENR)"
-        ]
-    },
-    {
-        region: "Upper East",
-        unis: [
-            "Bolgatanga Technical University",
-            "CK Tedam Uni of Technology & Applied Sciences"
-        ]
-    },
-    {
-        region: "Upper West",
-        unis: [
-            "Dr. Hilla Limann Technical University",
-            "SDD-UBIDS (Wa)"
-        ]
-    }
 ];
 
 export default function HostelFilters() {
@@ -156,8 +49,8 @@ export default function HostelFilters() {
         setCity(params.get("city") ?? "");
         setRegion(params.get("region") ?? "");
         setUniversity(params.get("university") ?? "");
-        setMinPrice(params.get("minPrice") ?? "");
-        setMaxPrice(params.get("maxPrice") ?? "");
+        setMinPrice(params.get("minPrice") && !isNaN(parseInt(params.get("minPrice")!)) ? (parseInt(params.get("minPrice")!) / 100).toString() : "");
+        setMaxPrice(params.get("maxPrice") && !isNaN(parseInt(params.get("maxPrice")!)) ? (parseInt(params.get("maxPrice")!) / 100).toString() : "");
         setSelectedAmenities(params.get("amenities")?.split(",").filter(Boolean) ?? []);
     }, [params]);
 
@@ -166,8 +59,8 @@ export default function HostelFilters() {
         if (city) p.set("city", city);
         if (region) p.set("region", region);
         if (university) p.set("university", university);
-        if (minPrice) p.set("minPrice", (parseInt(minPrice) * 100).toString());
-        if (maxPrice) p.set("maxPrice", (parseInt(maxPrice) * 100).toString());
+        if (minPrice) p.set("minPrice", (parseFloat(minPrice) * 100).toString());
+        if (maxPrice) p.set("maxPrice", (parseFloat(maxPrice) * 100).toString());
         if (selectedAmenities.length > 0) p.set("amenities", selectedAmenities.join(","));
 
         router.push(`/hostels?${p.toString()}`);

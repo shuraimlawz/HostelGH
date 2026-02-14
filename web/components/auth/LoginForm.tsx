@@ -6,11 +6,12 @@ import { useState } from "react";
 import { useAuth } from "@/lib/auth-context";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, Eye, EyeOff } from "lucide-react";
 
-export default function LoginForm({ onSuccess }: { onSuccess?: () => void }) {
+export default function LoginForm({ onSuccess }: { onSuccess?: (user: any) => void }) {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [showPassword, setShowPassword] = useState(false);
     const router = useRouter();
     const [loading, setLoading] = useState(false);
     const [err, setErr] = useState<string | null>(null);
@@ -30,14 +31,18 @@ export default function LoginForm({ onSuccess }: { onSuccess?: () => void }) {
             const { accessToken, user } = data;
 
             login(accessToken, user);
+            toast.success("Welcome back!");
+
             if (onSuccess) {
-                onSuccess();
+                onSuccess(user);
             } else {
                 // Role-based redirection
                 if (user.role === "OWNER") {
                     router.push("/owner");
                 } else if (user.role === "ADMIN") {
                     router.push("/admin");
+                } else if (user.role === "TENANT") {
+                    router.push("/hostels");
                 } else {
                     router.push("/account");
                 }
@@ -81,14 +86,23 @@ export default function LoginForm({ onSuccess }: { onSuccess?: () => void }) {
 
                 <div className="space-y-1 relative">
                     <label className="text-xs font-semibold text-gray-500 px-1">Password</label>
-                    <input
-                        type="password"
-                        className="w-full px-4 py-3 bg-gray-50 rounded-xl outline-none border border-transparent focus:border-black focus:bg-white transition-all text-sm"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        placeholder="••••••••"
-                        required
-                    />
+                    <div className="relative">
+                        <input
+                            type={showPassword ? "text" : "password"}
+                            className="w-full px-4 py-3 bg-gray-50 rounded-xl outline-none border border-transparent focus:border-black focus:bg-white transition-all text-sm pr-12"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            placeholder="••••••••"
+                            required
+                        />
+                        <button
+                            type="button"
+                            onClick={() => setShowPassword(!showPassword)}
+                            className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-black transition-colors outline-none"
+                        >
+                            {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                        </button>
+                    </div>
                 </div>
 
                 <div className="flex justify-between items-center px-1">

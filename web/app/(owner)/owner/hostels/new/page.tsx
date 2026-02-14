@@ -22,10 +22,13 @@ import {
     ShieldCheck,
     Coffee,
     School,
-    Plus
+    Trash2,
+    Image as ImageIcon
 } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
+import ImageUpload from "@/components/common/ImageUpload";
+import { REGIONAL_UNIVERSITIES } from "@/lib/constants";
 
 const formSchema = z.object({
     name: z.string().min(3, "Name must be at least 3 characters"),
@@ -62,8 +65,6 @@ export default function NewHostelPage() {
     const router = useRouter();
     const [loading, setLoading] = useState(false);
     const [selectedAmenities, setSelectedAmenities] = useState<string[]>([]);
-    const [imageInput, setImageInput] = useState("");
-    const [images, setImages] = useState<string[]>([]);
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -86,17 +87,9 @@ export default function NewHostelPage() {
         form.setValue("amenities", updated);
     };
 
-    const addImage = () => {
-        if (!imageInput) return;
-        const updated = [...images, imageInput];
-        setImages(updated);
-        form.setValue("images", updated);
-        setImageInput("");
-    };
-
     const removeImage = (index: number) => {
-        const updated = images.filter((_, i) => i !== index);
-        setImages(updated);
+        const currentImages = form.getValues("images");
+        const updated = currentImages.filter((_, i) => i !== index);
         form.setValue("images", updated);
     };
 
@@ -214,8 +207,12 @@ export default function NewHostelPage() {
                             className="w-full px-5 py-4 bg-gray-50 rounded-2xl outline-none focus:ring-2 focus:ring-black transition-all font-medium appearance-none"
                         >
                             <option value="">Select a university</option>
-                            {UNIVERSITIES.map(u => (
-                                <option key={u} value={u}>{u}</option>
+                            {REGIONAL_UNIVERSITIES.map(group => (
+                                <optgroup key={group.region} label={group.region}>
+                                    {group.unis.map(u => (
+                                        <option key={u} value={u}>{u}</option>
+                                    ))}
+                                </optgroup>
                             ))}
                         </select>
                     </div>
@@ -257,46 +254,19 @@ export default function NewHostelPage() {
                 <section className="bg-white rounded-[2rem] border p-8 md:p-10 shadow-sm space-y-8">
                     <div className="flex items-center gap-3 pb-6 border-b">
                         <div className="w-10 h-10 bg-purple-50 rounded-xl flex items-center justify-center text-purple-600">
-                            <Building2 size={20} />
+                            <ImageIcon size={20} />
                         </div>
-                        <h2 className="text-xl font-bold">Photos</h2>
+                        <h2 className="text-xl font-bold">Property Photos</h2>
                     </div>
 
                     <div className="space-y-6">
-                        <div className="flex gap-4">
-                            <input
-                                value={imageInput}
-                                onChange={(e) => setImageInput(e.target.value)}
-                                className="flex-1 px-5 py-4 bg-gray-50 rounded-2xl outline-none focus:ring-2 focus:ring-black transition-all font-medium"
-                                placeholder="Paste image URL here..."
-                            />
-                            <button
-                                type="button"
-                                onClick={addImage}
-                                className="px-8 py-4 bg-gray-100 font-bold rounded-2xl hover:bg-gray-200 transition-colors"
-                            >
-                                Add
-                            </button>
-                        </div>
-
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                            {images.map((img, i) => (
-                                <div key={i} className="group relative aspect-[4/3] rounded-2xl overflow-hidden bg-gray-100 border">
-                                    <img src={img} alt="Preview" className="w-full h-full object-cover" />
-                                    <button
-                                        type="button"
-                                        onClick={() => removeImage(i)}
-                                        className="absolute top-2 right-2 p-1.5 bg-red-600 text-white rounded-lg opacity-0 group-hover:opacity-100 transition-opacity"
-                                    >
-                                        <Trash2 size={14} />
-                                    </button>
-                                </div>
-                            ))}
-                            <div className="aspect-[4/3] rounded-2xl border-2 border-dashed border-gray-200 flex flex-col items-center justify-center text-gray-400 gap-2">
-                                <Plus size={24} />
-                                <span className="text-[10px] font-bold uppercase">Add Photo</span>
-                            </div>
-                        </div>
+                        <ImageUpload
+                            value={form.watch("images")}
+                            onChange={(urls) => form.setValue("images", urls)}
+                        />
+                        {form.formState.errors.images && (
+                            <p className="text-xs text-red-500 font-medium">{form.formState.errors.images.message}</p>
+                        )}
                     </div>
                 </section>
 
@@ -314,6 +284,3 @@ export default function NewHostelPage() {
         </div>
     );
 }
-
-// Minimal Trash2 icon import fix if needed elsewhere
-import { Trash2 } from "lucide-react";

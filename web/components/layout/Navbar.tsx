@@ -86,13 +86,16 @@ export default function Navbar() {
                             className="flex items-center gap-3 border rounded-full pl-3 pr-1 py-1 hover:shadow-md transition-shadow ml-1"
                         >
                             <Menu size={18} className="ml-1" />
-                            <div className="bg-gray-500 text-white rounded-full p-1 opacity-80 overflow-hidden">
+                            <div
+                                className="bg-gray-500 text-white rounded-full p-1 opacity-80 overflow-hidden cursor-pointer hover:opacity-100 transition-opacity"
+                                onClick={() => router.push("/account")}
+                            >
                                 {user ? (
                                     <div className="w-6 h-6 bg-black text-white rounded-full flex items-center justify-center text-[10px] font-bold">
                                         {user.firstName ? user.firstName[0].toUpperCase() : user.email[0].toUpperCase()}
                                     </div>
                                 ) : (
-                                    <UserIcon size={24} className="fill-white text-gray-500 relative -bottom-1" />
+                                    <UserIcon size={24} className="fill-white text-gray-400 relative -bottom-1" />
                                 )}
                             </div>
                         </button>
@@ -107,11 +110,11 @@ export default function Navbar() {
                                         </div>
 
                                         <Link
-                                            href={user.role === "OWNER" ? "/owner" : "/account"}
+                                            href={user.role === "ADMIN" ? "/admin" : user.role === "OWNER" ? "/owner" : "/account"}
                                             className="block px-4 py-3 hover:bg-gray-50 text-sm font-semibold text-blue-600 transition-colors"
                                             onClick={() => setIsOpen(false)}
                                         >
-                                            {user.role === "OWNER" ? "Owner Dashboard" : "My Account"}
+                                            {user.role === "ADMIN" ? "Admin Dashboard" : user.role === "OWNER" ? "Owner Dashboard" : "My Account"}
                                         </Link>
                                         <div className="border-t my-1" />
                                         <Link

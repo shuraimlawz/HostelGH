@@ -4,7 +4,6 @@ import { useAuth } from "@/lib/auth-context";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import OwnerSidebar from "@/components/owner/OwnerSidebar";
-import Navbar from "@/components/layout/Navbar";
 
 export default function OwnerLayout({ children }: { children: React.ReactNode }) {
     const { user, isLoading } = useAuth();
@@ -26,7 +25,6 @@ export default function OwnerLayout({ children }: { children: React.ReactNode })
 
     return (
         <div className="flex flex-col min-h-screen bg-gray-50/50">
-            <Navbar />
             <div className="flex flex-1">
                 <OwnerSidebar />
                 <main className="flex-1 p-8 md:p-12 overflow-y-auto">

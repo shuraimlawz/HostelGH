@@ -1,9 +1,24 @@
+"use client";
+
 import AuthLayout from "@/components/auth/AuthLayout";
 import RegisterForm from "@/components/auth/RegisterForm";
-import { Suspense } from "react";
+import { Suspense, useEffect } from "react";
 import { Loader2 } from "lucide-react";
+import { useAuth } from "@/lib/auth-context";
+import { useRouter } from "next/navigation";
 
 export default function RegisterPage() {
+    const { user, isLoading } = useAuth();
+    const router = useRouter();
+
+    useEffect(() => {
+        if (!isLoading && user) {
+            if (user.role === "OWNER") router.push("/owner");
+            else if (user.role === "ADMIN") router.push("/admin");
+            else router.push("/hostels");
+        }
+    }, [user, isLoading, router]);
+
     return (
         <AuthLayout
             title="Create Account"

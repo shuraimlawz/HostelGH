@@ -27,11 +27,14 @@ import {
     Save,
     BedDouble,
     DollarSign,
-    Users as UsersIcon
+    Users as UsersIcon,
+    Image as ImageIcon
 } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import ImageUpload from "@/components/common/ImageUpload";
+import { REGIONAL_UNIVERSITIES } from "@/lib/constants";
 
 const hostelSchema = z.object({
     name: z.string().min(3, "Name must be at least 3 characters"),
@@ -61,16 +64,6 @@ const AMENITIES = [
     { id: "Security", icon: ShieldCheck },
     { id: "Study Room", icon: Coffee },
     { id: "Generator", icon: Building2 },
-];
-
-const UNIVERSITIES = [
-    "University of Ghana",
-    "KNUST",
-    "UCC",
-    "University of Education, Winneba",
-    "GIMPA",
-    "Ashesi University",
-    "Valley View University",
 ];
 
 export default function EditHostelPage() {
@@ -228,11 +221,28 @@ export default function EditHostelPage() {
                                 <input {...form.register("addressLine")} className="w-full px-5 py-4 bg-gray-50 rounded-2xl outline-none border focus:border-black transition-all" placeholder="Address Line" />
                                 <select {...form.register("university")} className="w-full px-5 py-4 bg-gray-50 rounded-2xl outline-none border focus:border-black transition-all appearance-none">
                                     <option value="">Select University</option>
-                                    {UNIVERSITIES.map(u => <option key={u} value={u}>{u}</option>)}
+                                    {REGIONAL_UNIVERSITIES.map(group => (
+                                        <optgroup key={group.region} label={group.region}>
+                                            {group.unis.map(u => (
+                                                <option key={u} value={u}>{u}</option>
+                                            ))}
+                                        </optgroup>
+                                    ))}
                                 </select>
                             </div>
                         </section>
                     </div>
+
+                    <section className="bg-white rounded-[2rem] border p-10 shadow-sm space-y-8">
+                        <div className="flex items-center gap-3 pb-4 border-b">
+                            <ImageIcon size={20} className="text-purple-500" />
+                            <h2 className="text-xl font-bold">Property Photos</h2>
+                        </div>
+                        <ImageUpload
+                            value={form.watch("images")}
+                            onChange={(urls) => form.setValue("images", urls)}
+                        />
+                    </section>
 
                     <section className="bg-white rounded-[2rem] border p-10 shadow-sm space-y-8">
                         <h2 className="text-xl font-bold">Amenities</h2>
