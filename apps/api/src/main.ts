@@ -48,14 +48,16 @@ async function bootstrap() {
     const prisma = app.get(PrismaService);
     await prisma.enableShutdownHooks(app);
 
-    const appUrl = process.env.APP_URL || 'http://localhost:3001';
+    const appUrl = process.env.APP_URL || 'https://hostelgh.onrender.com';
+    const frontendUrl = process.env.FRONTEND_URL || 'https://hostelgh.vercel.app';
+
     app.enableCors({
-        origin: [appUrl, 'http://localhost:3001', 'http://localhost:3000'],
+        origin: [appUrl, frontendUrl, 'http://localhost:3000', 'http://localhost:3001'],
         credentials: true,
     });
 
     const port = process.env.PORT || 3001;
     await app.listen(port);
-    logger.log(`Application is running on: http://localhost:${port}`);
+    logger.log(`Application is running on: ${appUrl}`);
 }
 bootstrap();

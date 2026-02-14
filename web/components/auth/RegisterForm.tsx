@@ -18,7 +18,7 @@ export default function RegisterForm({ onSuccess }: { onSuccess?: () => void }) 
     const [loading, setLoading] = useState(false);
     const [err, setErr] = useState<string | null>(null);
 
-    const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://127.0.0.1:3001";
+    const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "https://hostelgh.onrender.com";
 
     async function submit(e: React.FormEvent) {
         e.preventDefault();
