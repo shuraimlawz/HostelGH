@@ -11,7 +11,8 @@ import {
     ShieldCheck,
     ChevronRight,
     BarChart3,
-    AlertCircle
+    AlertCircle,
+    Trash2 // Added Trash2 as per instruction
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -20,8 +21,10 @@ const adminLinks = [
     { name: "Manage Users", href: "/admin/users", icon: Users },
     { name: "All Hostels", href: "/admin/hostels", icon: Building2 },
     { name: "System Stats", href: "/admin/stats", icon: BarChart3 },
-    { name: "Global Settings", href: "/account", icon: Settings },
+    { name: "Settings", href: "/admin/settings", icon: Settings },
 ];
+
+const deletionLink = { name: "Deletion Requests", href: "/admin/deletions", icon: Trash2 };
 
 export default function AdminSidebar() {
     const pathname = usePathname();
@@ -58,6 +61,24 @@ export default function AdminSidebar() {
                         </Link>
                     );
                 })}
+
+                <div className="pt-4 mt-4 border-t border-gray-800">
+                    <Link
+                        href={deletionLink.href}
+                        className={cn(
+                            "flex items-center justify-between px-4 py-3.5 rounded-2xl transition-all group",
+                            pathname === deletionLink.href
+                                ? "bg-red-600 text-white shadow-xl shadow-red-900/40"
+                                : "text-gray-400 hover:bg-gray-800 hover:text-white"
+                        )}
+                    >
+                        <div className="flex items-center gap-3">
+                            <deletionLink.icon size={20} className={cn(pathname === deletionLink.href ? "text-white" : "text-gray-500 group-hover:text-red-400")} />
+                            <span className="font-bold text-sm tracking-tight">{deletionLink.name}</span>
+                        </div>
+                        {pathname === deletionLink.href && <ChevronRight size={14} className="text-white/60" />}
+                    </Link>
+                </div>
             </nav>
 
             <div className="mt-auto pt-10 px-2">

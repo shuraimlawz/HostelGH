@@ -1,5 +1,6 @@
-import { Body, Controller, Get, Post, Req, Res, UseGuards, HttpCode, HttpStatus } from "@nestjs/common";
+import { Body, Controller, Get, Post, Patch, Req, Res, UseGuards, HttpCode, HttpStatus } from "@nestjs/common";
 import { AuthService } from "./auth.service";
+import { UserRole } from "@prisma/client";
 import { RegisterDto } from "./dto/register.dto";
 import { LoginDto, RefreshTokenDto } from "./dto/login.dto";
 import { JwtAuthGuard } from "./guards/jwt-auth.guard";
@@ -46,6 +47,14 @@ export class AuthController {
         return this.auth.refresh(dto.userId, dto.refreshToken);
     }
 
+    @ApiBearerAuth()
+    @UseGuards(JwtAuthGuard)
+    @Patch("onboard")
+    @ApiOperation({ summary: "Complete onboarding role selection" })
+    onboard(@Req() req: any, @Body() body: { role: UserRole }) {
+        return this.auth.completeOnboarding(req.user.userId, body.role);
+    }
+
     @Get("google")
     @UseGuards(AuthGuard("google"))
     @ApiOperation({ summary: "Initiate Google OAuth2 flow" })
@@ -59,7 +68,7 @@ export class AuthController {
     async googleAuthCallback(@Req() req: any, @Res() res: any) {
         const result = await this.auth.validateGoogleUser(req.user);
         const frontendUrl = this.config.get<string>("app.frontendUrl");
-        const redirectUrl = `${frontendUrl}/auth/callback?accessToken=${result.accessToken}&refreshToken=${result.refreshToken}&userId=${result.user.id}&role=${result.user.role}&email=${result.user.email}`;
+        const redirectUrl = `${frontendUrl}/auth/callback?accessToken=${result.accessToken}&refreshToken=${result.refreshToken}&userId=${result.user.id}&role=${result.user.role}&email=${result.user.email}&isOnboarded=${result.user.isOnboarded}`;
         return res.redirect(redirectUrl);
     }
 }

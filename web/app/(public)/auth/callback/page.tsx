@@ -17,11 +17,17 @@ function AuthCallbackContent() {
         const userId = searchParams.get("userId");
         const role = searchParams.get("role");
         const email = searchParams.get("email");
+        const isOnboarded = searchParams.get("isOnboarded") === "true";
 
         if (accessToken && refreshToken && userId && role && email) {
-            login(accessToken, { id: userId, role, email } as any);
-            toast.success("Login successful!");
-            router.push("/");
+            login(accessToken, { id: userId, role, email, isOnboarded } as any);
+
+            if (!isOnboarded) {
+                router.push("/auth/onboarding");
+            } else {
+                toast.success("Login successful!");
+                router.push("/");
+            }
         } else {
             toast.error("Authentication failed. Please try again.");
             router.push("/auth/login");

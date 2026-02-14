@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Patch, Post, Req, UseGuards } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Patch, Post, Req, UseGuards } from "@nestjs/common";
 import { BookingsService } from "./bookings.service";
 import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
 import { Roles } from "../../common/decorators/roles.decorator";
@@ -63,5 +63,23 @@ export class BookingsController {
     @Patch(":id/complete")
     complete(@Req() req: any, @Param("id") id: string) {
         return this.bookings.complete({ userId: req.user.userId, role: req.user.role }, id);
+    }
+
+    @Roles(UserRole.OWNER, UserRole.ADMIN)
+    @Patch(":id/request-deletion")
+    requestDeletion(@Req() req: any, @Param("id") id: string, @Body() body: { reason: string }) {
+        return this.bookings.requestDeletion({ userId: req.user.userId, role: req.user.role }, id, body.reason);
+    }
+
+    @Roles(UserRole.ADMIN)
+    @Get("pending-deletions")
+    getPendingDeletions() {
+        return this.bookings.getPendingDeletions();
+    }
+
+    @Roles(UserRole.ADMIN)
+    @Delete(":id/admin-confirm")
+    confirmDeletion(@Param("id") id: string) {
+        return this.bookings.confirmDeletion(id);
     }
 }

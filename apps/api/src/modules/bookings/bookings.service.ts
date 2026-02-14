@@ -191,4 +191,40 @@ export class BookingsService {
     async complete(actor: { userId: string; role: UserRole }, bookingId: string) {
         return this.updateStatus(actor, bookingId, BookingStatus.COMPLETED, [BookingStatus.CHECKED_OUT]);
     }
+
+    async requestDeletion(actor: { userId: string; role: UserRole }, bookingId: string, reason: string) {
+        const booking = await this.prisma.booking.findUnique({
+            where: { id: bookingId },
+            include: { hostel: true },
+        });
+
+        if (!booking) throw new NotFoundException("Booking not found");
+
+        const isOwner = booking.hostel.ownerId === actor.userId;
+        if (!isOwner && actor.role !== UserRole.ADMIN) {
+            throw new ForbiddenException("Not authorized to request deletion");
+        }
+
+        return this.prisma.booking.update({
+            where: { id: bookingId },
+            data: {
+                deletionRequested: true,
+                deletionReason: reason || "Owner requested deletion of old record."
+            },
+        });
+    }
+
+    async confirmDeletion(bookingId: string) {
+        // Admin only action (guarded by controller)
+        return this.prisma.booking.delete({
+            where: { id: bookingId },
+        });
+    }
+
+    async getPendingDeletions() {
+        return this.prisma.booking.findMany({
+            where: { deletionRequested: true },
+            include: { hostel: true, tenant: true, items: { include: { room: true } } },
+        });
+    }
 }

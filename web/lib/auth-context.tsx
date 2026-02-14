@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState, ReactNode } from "react";
+import { createContext, useContext, useEffect, useState, ReactNode, useCallback } from "react";
 import { api } from "@/lib/api";
 
 type User = {
@@ -9,6 +9,7 @@ type User = {
     role: "ADMIN" | "TENANT" | "OWNER";
     firstName?: string;
     lastName?: string;
+    isOnboarded?: boolean;
 };
 
 type AuthContextType = {
@@ -16,6 +17,7 @@ type AuthContextType = {
     isLoading: boolean;
     login: (token: string, user: User) => void;
     logout: () => void;
+    updateUser: (user: Partial<User>) => void;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -42,7 +44,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         initAuth();
     }, []);
 
-    const login = (token: string, userData: User) => {
+    const login = useCallback((token: string, userData: User) => {
         if (!token || !userData) {
             console.error("Login failed: missing token or user data");
             return;
@@ -50,15 +52,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         localStorage.setItem("accessToken", token);
         localStorage.setItem("user", JSON.stringify(userData));
         setUser(userData);
-    };
+    }, []);
 
-    const logout = () => {
+    const logout = useCallback(() => {
         localStorage.clear();
         setUser(null);
-    };
+    }, []);
+
+    const updateUser = useCallback((updatedData: Partial<User>) => {
+        setUser(prev => {
+            if (!prev) return null;
+            const newUser = { ...prev, ...updatedData };
+            localStorage.setItem("user", JSON.stringify(newUser));
+            return newUser;
+        });
+    }, []);
 
     return (
-        <AuthContext.Provider value={{ user, isLoading, login, logout }}>
+        <AuthContext.Provider value={{ user, isLoading, login, logout, updateUser }}>
             {children}
         </AuthContext.Provider>
     );

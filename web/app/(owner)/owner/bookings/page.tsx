@@ -81,6 +81,16 @@ export default function OwnerBookingsPage() {
         onError: (err: any) => toast.error(err.response?.data?.message || "Failed to complete")
     });
 
+    const requestDeletionMutation = useMutation({
+        mutationFn: ({ id, reason }: { id: string; reason: string }) =>
+            api.patch(`/bookings/${id}/request-deletion`, { reason }),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["owner-bookings"] });
+            toast.success("Deletion request sent to admin.");
+        },
+        onError: (err: any) => toast.error(err.response?.data?.message || "Failed to request deletion")
+    });
+
     const filteredBookings = bookings?.filter((b: any) => filter === "ALL" || b.status === filter);
 
     if (isLoading) return (
@@ -163,6 +173,12 @@ export default function OwnerBookingsPage() {
                                                 <Calendar size={14} />
                                                 <span>Requested {new Date(booking.createdAt).toLocaleDateString()}</span>
                                             </div>
+                                            {booking.deletionRequested && (
+                                                <div className="flex items-center gap-2 text-red-500 text-[10px] font-black uppercase tracking-widest pl-1">
+                                                    <XCircle size={12} />
+                                                    <span>Deletion Requested</span>
+                                                </div>
+                                            )}
                                         </div>
                                     </div>
 
@@ -263,10 +279,23 @@ export default function OwnerBookingsPage() {
                                             </button>
                                         )}
                                         {(booking.status === "REJECTED" || booking.status === "CANCELLED" || booking.status === "COMPLETED") && (
-                                            <div className="text-center py-4 bg-gray-50 rounded-2xl">
-                                                <p className="text-[10px] font-black uppercase text-gray-400 tracking-widest">
-                                                    {booking.status.replace('_', ' ')}
-                                                </p>
+                                            <div className="space-y-3">
+                                                <div className="text-center py-4 bg-gray-50 rounded-2xl">
+                                                    <p className="text-[10px] font-black uppercase text-gray-400 tracking-widest">
+                                                        {booking.status.replace('_', ' ')}
+                                                    </p>
+                                                </div>
+                                                {!booking.deletionRequested && (
+                                                    <button
+                                                        onClick={() => {
+                                                            const reason = prompt("Enter reason for deletion request:");
+                                                            if (reason) requestDeletionMutation.mutate({ id: booking.id, reason });
+                                                        }}
+                                                        className="w-full text-red-500 text-[10px] font-bold uppercase tracking-widest hover:underline"
+                                                    >
+                                                        Request Deletion
+                                                    </button>
+                                                )}
                                             </div>
                                         )}
                                     </div>

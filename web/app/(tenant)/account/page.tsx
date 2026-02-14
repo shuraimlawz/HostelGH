@@ -7,8 +7,7 @@ import { toast } from "sonner";
 import { User, Mail, Phone, Shield, Camera, Loader2 } from "lucide-react";
 
 export default function AccountPage() {
-    const { user, login } = useAuth();
-    const [loading, setLoading] = useState(true);
+    const { user, isLoading, updateUser } = useAuth();
     const [updating, setUpdating] = useState(false);
     const [formData, setFormData] = useState({
         firstName: "",
@@ -28,26 +27,19 @@ export default function AccountPage() {
                 });
             } catch (error) {
                 console.error("Failed to fetch profile", error);
-            } finally {
-                setLoading(false);
             }
         };
 
-        if (user) fetchProfile();
-    }, [user]);
+        if (user && !isLoading) fetchProfile();
+    }, [user, isLoading]);
 
     const handleUpdate = async (e: React.FormEvent) => {
         e.preventDefault();
         setUpdating(true);
         try {
-            const res = await api.patch("/users/me", formData);
-            // Update the auth context user data as well
-            if (user) {
-                const updatedUser = { ...user, ...res.data };
-                const token = localStorage.getItem("accessToken");
-                if (token) login(token, updatedUser);
-            }
-            toast.success("Profile updated successfully");
+            const { data } = await api.patch("/users/me", formData);
+            updateUser(data);
+            toast.success("Profile updated successfully!");
         } catch (error: any) {
             toast.error(error.message || "Failed to update profile");
         } finally {
@@ -55,7 +47,21 @@ export default function AccountPage() {
         }
     };
 
-    if (loading) {
+    const handleDeleteAccount = async () => {
+        if (!confirm("Are you absolutely sure you want to delete your account? This action is permanent and all your data will be lost.")) return;
+
+        try {
+            await api.delete("/users/me");
+            toast.success("Account deleted successfully.");
+            // Log out and redirect
+            localStorage.clear();
+            window.location.href = "/";
+        } catch (error: any) {
+            toast.error(error.message || "Failed to delete account");
+        }
+    };
+
+    if (isLoading) {
         return (
             <div className="flex flex-col items-center justify-center min-h-[60vh]">
                 <Loader2 className="animate-spin text-blue-600 mb-4" size={40} />
@@ -85,7 +91,7 @@ export default function AccountPage() {
                     <div className="bg-white rounded-3xl border p-8 shadow-sm text-center">
                         <div className="relative inline-block mb-6">
                             <div className="w-24 h-24 bg-black text-white rounded-full flex items-center justify-center text-3xl font-bold mx-auto">
-                                {formData.firstName ? formData.firstName[0] : user.email[0].toUpperCase()}
+                                {formData.firstName ? formData.firstName[0] : (user.email ? user.email[0].toUpperCase() : "U")}
                             </div>
                             <button className="absolute bottom-0 right-0 bg-white border shadow-sm rounded-full p-2 hover:bg-gray-50 transition-colors">
                                 <Camera size={16} />
@@ -180,7 +186,10 @@ export default function AccountPage() {
                     <div className="bg-red-50 rounded-3xl p-8 border border-red-100">
                         <h3 className="text-xl font-bold text-red-900 mb-2">Danger Zone</h3>
                         <p className="text-red-800 text-sm mb-6">Once you delete your account, there is no going back. Please be certain.</p>
-                        <button className="px-6 py-3 bg-red-600 text-white rounded-xl font-bold hover:bg-red-700 transition-colors">
+                        <button
+                            onClick={handleDeleteAccount}
+                            className="px-6 py-3 bg-red-600 text-white rounded-xl font-bold hover:bg-red-700 transition-colors"
+                        >
                             Delete Account
                         </button>
                     </div>

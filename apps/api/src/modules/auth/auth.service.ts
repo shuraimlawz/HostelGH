@@ -98,8 +98,9 @@ export class AuthService {
                     googleId: googleUser.googleId,
                     firstName: googleUser.firstName,
                     lastName: googleUser.lastName,
-                    role: UserRole.TENANT, // Default to tenant
-                    emailVerified: true
+                    role: UserRole.TENANT, // Default to tenant temporarily
+                    emailVerified: true,
+                    isOnboarded: false // Force role selection
                 }
             });
         } else if (!user.googleId) {
@@ -109,6 +110,23 @@ export class AuthService {
                 data: { googleId: googleUser.googleId }
             });
         }
+
+        const tokens = await this.issueTokens(user.id, user.role);
+        return { user: { id: user.id, email: user.email, role: user.role, isOnboarded: user.isOnboarded }, ...tokens };
+    }
+
+    async completeOnboarding(userId: string, role: UserRole) {
+        if (role === UserRole.ADMIN) {
+            throw new BadRequestException("Cannot select ADMIN role");
+        }
+
+        const user = await this.prisma.user.update({
+            where: { id: userId },
+            data: {
+                role,
+                isOnboarded: true
+            },
+        });
 
         const tokens = await this.issueTokens(user.id, user.role);
         return { user: { id: user.id, email: user.email, role: user.role }, ...tokens };
