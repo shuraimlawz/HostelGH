@@ -1,0 +1,14 @@
+<svg width="32" height="32" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+    <!-- Pin Shape -->
+    <path
+        d="M50 10 C30 10, 15 25, 15 45 C15 65, 50 90, 50 90 C50 90, 85 65, 85 45 C85 25, 70 10, 50 10 Z"
+        fill="#1877F2"
+    />
+    <!-- Inner Content - House Symbol -->
+    <path
+        d="M35 45 L50 32 L65 45 V65 H35 V45 Z"
+        fill="white"
+    />
+    <!-- Window/Detail on house -->
+    <rect x="46" y="50" width="8" height="10" fill="#1877F2" rx="1" />
+</svg>
