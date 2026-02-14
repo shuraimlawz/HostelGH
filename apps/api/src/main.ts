@@ -52,7 +52,7 @@ async function bootstrap() {
     const frontendUrl = process.env.FRONTEND_URL || 'https://hostelgh.vercel.app';
 
     app.enableCors({
-        origin: [appUrl, frontendUrl, 'http://localhost:3000', 'http://localhost:3001'],
+        origin: [appUrl, frontendUrl, 'https://hostelgh.onrender.com', 'https://hostelgh.vercel.app',],
         credentials: true,
     });
 
