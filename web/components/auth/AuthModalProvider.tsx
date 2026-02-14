@@ -1,3 +1,4 @@
+"use client";
 import { createContext, useContext, useMemo, useState } from "react";
 import AuthModal from "./AuthModal";
 import { useRouter } from "next/navigation";
