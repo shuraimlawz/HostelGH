@@ -3,6 +3,18 @@ import { ConfigService } from '@nestjs/config';
 import { v2 as cloudinary, UploadApiResponse, UploadApiErrorResponse } from 'cloudinary';
 import { Readable } from 'stream';
 
+export interface MulterFile {
+    fieldname: string;
+    originalname: string;
+    encoding: string;
+    mimetype: string;
+    size: number;
+    destination?: string;
+    filename?: string;
+    path?: string;
+    buffer: Buffer;
+}
+
 @Injectable()
 export class UploadService {
     constructor(private config: ConfigService) {
@@ -13,7 +25,7 @@ export class UploadService {
         });
     }
 
-    async uploadImage(file: Express.Multer.File): Promise<string> {
+    async uploadImage(file: MulterFile): Promise<string> {
         return new Promise((resolve, reject) => {
             const upload = cloudinary.uploader.upload_stream(
                 {
@@ -33,7 +45,7 @@ export class UploadService {
         });
     }
 
-    async uploadMultiple(files: Express.Multer.File[]): Promise<string[]> {
+    async uploadMultiple(files: MulterFile[]): Promise<string[]> {
         const uploadPromises = files.map((file) => this.uploadImage(file));
         return Promise.all(uploadPromises);
     }

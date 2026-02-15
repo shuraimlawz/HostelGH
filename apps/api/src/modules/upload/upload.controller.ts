@@ -7,7 +7,7 @@ import {
     BadRequestException,
 } from '@nestjs/common';
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
-import { UploadService } from './upload.service';
+import { UploadService, MulterFile } from './upload.service';
 import { ApiTags, ApiOperation, ApiConsumes, ApiBody } from '@nestjs/swagger';
 
 @ApiTags('Upload')
@@ -30,7 +30,7 @@ export class UploadController {
             },
         },
     })
-    async uploadImage(@UploadedFile() file: Express.Multer.File) {
+    async uploadImage(@UploadedFile() file: MulterFile) {
         if (!file) {
             throw new BadRequestException('No file uploaded');
         }
@@ -42,7 +42,7 @@ export class UploadController {
     @ApiOperation({ summary: 'Upload multiple images' })
     @UseInterceptors(FilesInterceptor('files', 10))
     @ApiConsumes('multipart/form-data')
-    async uploadImages(@UploadedFiles() files: Express.Multer.File[]) {
+    async uploadImages(@UploadedFiles() files: MulterFile[]) {
         if (!files || files.length === 0) {
             throw new BadRequestException('No files uploaded');
         }
