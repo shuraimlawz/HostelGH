@@ -227,4 +227,65 @@ export class BookingsService {
             include: { hostel: true, tenant: true, items: { include: { room: true } } },
         });
     }
+
+    async getOwnerAnalytics(ownerId: string) {
+        // Get all bookings for owner's hostels
+        const bookings = await this.prisma.booking.findMany({
+            where: { hostel: { ownerId } },
+            include: { items: true, hostel: { include: { rooms: true } } },
+            orderBy: { createdAt: 'asc' }
+        });
+
+        // Calculate monthly trends for last 6 months
+        const now = new Date();
+        const sixMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 5, 1);
+
+        const monthlyData = [];
+        for (let i = 0; i < 6; i++) {
+            const monthStart = new Date(now.getFullYear(), now.getMonth() - (5 - i), 1);
+            const monthEnd = new Date(now.getFullYear(), now.getMonth() - (5 - i) + 1, 0);
+
+            const monthBookings = bookings.filter(b => {
+                const createdDate = new Date(b.createdAt);
+                return createdDate >= monthStart && createdDate <= monthEnd;
+            });
+
+            const monthRevenue = monthBookings
+                .filter(b => b.status === 'CONFIRMED' || b.status === 'CHECKED_IN' || b.status === 'CHECKED_OUT' || b.status === 'COMPLETED')
+                .reduce((sum, b) => {
+                    const itemTotal = b.items.reduce((itemSum, item) => itemSum + (item.unitPrice * item.quantity), 0);
+                    return sum + itemTotal;
+                }, 0) / 100; // Convert from cents
+
+            monthlyData.push({
+                month: monthStart.toLocaleDateString('en-US', { month: 'short' }),
+                bookings: monthBookings.length,
+                revenue: Math.round(monthRevenue)
+            });
+        }
+
+        // Calculate occupancy rate
+        const totalRooms = await this.prisma.room.count({
+            where: { hostel: { ownerId }, isActive: true }
+        });
+
+        const currentOccupants = bookings.filter(b => b.status === 'CHECKED_IN').length;
+        const occupancyRate = totalRooms > 0 ? Math.round((currentOccupants / totalRooms) * 100) : 0;
+
+        // Calculate trend percentages (compare current month vs previous month)
+        const currentMonthBookings = monthlyData[5]?.bookings || 0;
+        const previousMonthBookings = monthlyData[4]?.bookings || 1; // Avoid division by zero
+        const bookingTrend = previousMonthBookings > 0
+            ? Math.round(((currentMonthBookings - previousMonthBookings) / previousMonthBookings) * 100)
+            : 0;
+
+        return {
+            monthlyTrends: monthlyData,
+            occupancyRate,
+            trends: {
+                bookings: bookingTrend
+            }
+        };
+    }
 }
+

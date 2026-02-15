@@ -29,6 +29,12 @@ export class AdminController {
         return this.adminService.getActivity();
     }
 
+    @Get("analytics")
+    @ApiOperation({ summary: "Get analytics data for charts" })
+    getAnalytics() {
+        return this.adminService.getAnalytics();
+    }
+
     @Get("alerts")
     @ApiOperation({ summary: "Get security alerts" })
     getSecurityAlerts() {

@@ -82,4 +82,11 @@ export class BookingsController {
     confirmDeletion(@Param("id") id: string) {
         return this.bookings.confirmDeletion(id);
     }
+
+    @Roles(UserRole.OWNER)
+    @Get("owner/analytics")
+    @ApiOperation({ summary: "Get booking analytics for owner (Owner only)" })
+    ownerAnalytics(@Req() req: any) {
+        return this.bookings.getOwnerAnalytics(req.user.userId);
+    }
 }

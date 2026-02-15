@@ -14,22 +14,80 @@ export class AdminService {
     ) { }
 
     async getStats() {
-        const [totalUsers, liveHostels, bookings, revenue] = await Promise.all([
+        const now = new Date();
+        const lastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+        const thisMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+
+        const [totalUsers, liveHostels, bookings, revenue, lastMonthUsers, lastMonthBookings] = await Promise.all([
             this.prisma.user.count(),
             this.prisma.hostel.count({ where: { isPublished: true } }),
             this.prisma.booking.count(),
             this.prisma.payment.aggregate({
                 _sum: { amount: true },
                 where: { status: "SUCCESS" }
+            }),
+            this.prisma.user.count({
+                where: { createdAt: { gte: lastMonth, lt: thisMonthStart } }
+            }),
+            this.prisma.booking.count({
+                where: { createdAt: { gte: lastMonth, lt: thisMonthStart } }
             })
         ]);
+
+        const thisMonthUsers = await this.prisma.user.count({
+            where: { createdAt: { gte: thisMonthStart } }
+        });
+
+        const thisMonthBookings = await this.prisma.booking.count({
+            where: { createdAt: { gte: thisMonthStart } }
+        });
+
+        // Calculate trends
+        const userTrend = lastMonthUsers > 0 ? Math.round(((thisMonthUsers - lastMonthUsers) / lastMonthUsers) * 100) : 0;
+        const bookingTrend = lastMonthBookings > 0 ? Math.round(((thisMonthBookings - lastMonthBookings) / lastMonthBookings) * 100) : 0;
 
         return {
             totalUsers,
             liveHostels,
             bookings,
-            revenue: revenue._sum.amount || 0
+            revenue: revenue._sum.amount || 0,
+            trends: {
+                users: userTrend,
+                bookings: bookingTrend
+            }
         };
+    }
+
+    async getAnalytics() {
+        // Get monthly data for last 6 months
+        const now = new Date();
+        const monthlyData = [];
+
+        for (let i = 0; i < 6; i++) {
+            const monthStart = new Date(now.getFullYear(), now.getMonth() - (5 - i), 1);
+            const monthEnd = new Date(now.getFullYear(), now.getMonth() - (5 - i) + 1, 0);
+
+            const [users, revenue] = await Promise.all([
+                this.prisma.user.count({
+                    where: { createdAt: { gte: monthStart, lte: monthEnd } }
+                }),
+                this.prisma.payment.aggregate({
+                    _sum: { amount: true },
+                    where: {
+                        status: "SUCCESS",
+                        createdAt: { gte: monthStart, lte: monthEnd }
+                    }
+                })
+            ]);
+
+            monthlyData.push({
+                month: monthStart.toLocaleDateString('en-US', { month: 'short' }),
+                users,
+                revenue: (revenue._sum.amount || 0) / 100
+            });
+        }
+
+        return { monthlyData };
     }
 
     async getActivity() {
