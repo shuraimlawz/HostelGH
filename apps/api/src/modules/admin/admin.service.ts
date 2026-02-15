@@ -115,7 +115,7 @@ export class AdminService {
 
         const hashedPassword = await bcrypt.hash(dto.password, 10);
 
-        return this.prisma.user.create({
+        const user = await this.prisma.user.create({
             data: {
                 email: dto.email,
                 passwordHash: hashedPassword,
@@ -126,6 +126,9 @@ export class AdminService {
                 emailVerified: true
             }
         });
+
+        const { passwordHash, ...result } = user;
+        return result;
     }
 
     async broadcastMessage(dto: BroadcastMessageDto) {

@@ -19,6 +19,8 @@ import { APP_FILTER, APP_GUARD } from '@nestjs/core';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { LoggingMiddleware } from './common/middleware/logging.middleware';
 
+import { AppController } from './app.controller';
+
 @Module({
     imports: [
         ConfigModule.forRoot({
@@ -43,6 +45,7 @@ import { LoggingMiddleware } from './common/middleware/logging.middleware';
             limit: 100,
         }]),
     ],
+    controllers: [AppController],
     providers: [
         {
             provide: APP_FILTER,
