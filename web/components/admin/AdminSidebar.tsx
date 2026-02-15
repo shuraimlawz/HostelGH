@@ -14,6 +14,7 @@ import {
     ChevronRight,
     BarChart3,
     AlertCircle,
+    Activity,
     Trash2,
     CheckCircle2,
     Menu,
@@ -27,6 +28,7 @@ const adminLinks = [
     { name: "Manage Users", href: "/admin/users", icon: Users },
     { name: "All Hostels", href: "/admin/hostels", icon: Building2 },
     { name: "System Stats", href: "/admin/stats", icon: BarChart3 },
+    { name: "System Logs", href: "/admin/logs", icon: Activity },
     { name: "Settings", href: "/admin/settings", icon: Settings },
 ];
 

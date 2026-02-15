@@ -90,29 +90,36 @@ export class AdminService {
         return { monthlyData };
     }
 
-    async getActivity() {
-        const [users, bookings, payments, hostels] = await Promise.all([
+    async getActivity(page: number = 1, limit: number = 10) {
+        const skip = (page - 1) * limit;
+        const fetchCount = Math.max(skip + limit, 50); // Fetch enough to cover sorting
+
+        const [users, bookings, payments, hostels, totalUsers, totalBookings, totalPayments, totalHostels] = await Promise.all([
             this.prisma.user.findMany({
-                take: 5,
+                take: fetchCount,
                 orderBy: { createdAt: 'desc' },
                 select: { id: true, firstName: true, email: true, createdAt: true, role: true }
             }),
             this.prisma.booking.findMany({
-                take: 5,
+                take: fetchCount,
                 orderBy: { createdAt: 'desc' },
                 include: { tenant: { select: { id: true, firstName: true, email: true } } }
             }),
             this.prisma.payment.findMany({
-                take: 5,
+                take: fetchCount,
                 where: { status: "SUCCESS" },
                 orderBy: { createdAt: 'desc' },
                 include: { booking: { include: { tenant: { select: { id: true, firstName: true, email: true } } } } }
             }),
             this.prisma.hostel.findMany({
-                take: 5,
+                take: fetchCount,
                 orderBy: { createdAt: 'desc' },
                 include: { owner: { select: { id: true, firstName: true, email: true } } }
-            })
+            }),
+            this.prisma.user.count(),
+            this.prisma.booking.count(),
+            this.prisma.payment.count({ where: { status: "SUCCESS" } }),
+            this.prisma.hostel.count()
         ]);
 
         const activities = [
@@ -146,11 +153,23 @@ export class AdminService {
                 action: `Listed new hostel: ${h.name}`,
                 time: h.createdAt,
                 type: "warning",
-                targetUrl: `/hostels/${h.id}` // Public hostel page or arguably admin edit page
+                targetUrl: `/hostels/${h.id}`
             }))
-        ].sort((a, b) => b.time.getTime() - a.time.getTime()).slice(0, 10);
+        ]
+            .sort((a, b) => b.time.getTime() - a.time.getTime())
+            .slice(skip, skip + limit);
 
-        return activities;
+        const total = totalUsers + totalBookings + totalPayments + totalHostels;
+
+        return {
+            activities,
+            meta: {
+                total,
+                page,
+                limit,
+                totalPages: Math.ceil(total / limit)
+            }
+        };
     }
 
     async getSecurityAlerts() {

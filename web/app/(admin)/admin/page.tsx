@@ -137,11 +137,11 @@ export default function AdminDashboardPage() {
                                 <p className="text-xs text-gray-400 font-bold uppercase tracking-widest">Global logs</p>
                             </div>
                         </div>
-                        <button className="text-[10px] font-black uppercase tracking-widest text-blue-600 hover:underline">View All Logs</button>
+                        <Link href="/admin/logs" className="text-[10px] font-black uppercase tracking-widest text-blue-600 hover:underline">View All Logs</Link>
                     </div>
 
                     <div className="space-y-4">
-                        {activity?.map((log: any, i: number) => (
+                        {activity?.activities?.map((log: any, i: number) => (
                             <div key={i} className="flex items-center gap-4 p-5 rounded-2xl hover:bg-gray-50 transition-colors border border-transparent hover:border-gray-100 group">
                                 <div className={cn(
                                     "w-3 h-3 rounded-full shrink-0",
@@ -165,7 +165,7 @@ export default function AdminDashboardPage() {
                                 </Link>
                             </div>
                         ))}
-                        {activity?.length === 0 && (
+                        {(!activity?.activities || activity.activities.length === 0) && (
                             <p className="text-center text-gray-400 py-8">No recent activity.</p>
                         )}
                     </div>

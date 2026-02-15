@@ -1,0 +1,9 @@
+﻿apps/api/src/modules/rooms/rooms.service.ts(16,13): error TS2322: Type '{ availableSlots: number; hostel: { connect: { id: string; }; }; name: string; description?: string; capacity: number; totalUnits: number; pricePerTerm: number; isActive?: boolean; images?: string[]; ... 4 more ...; utilitiesIncluded?: string[]; }' is not assignable to type '(Without<RoomCreateInput, RoomUncheckedCreateInput> & RoomUncheckedCreateInput) | (Without<...> & RoomCreateInput)'.
+  Type '{ availableSlots: number; hostel: { connect: { id: string; }; }; name: string; description?: string; capacity: number; totalUnits: number; pricePerTerm: number; isActive?: boolean; images?: string[]; ... 4 more ...; utilitiesIncluded?: string[]; }' is not assignable to type 'Without<RoomUncheckedCreateInput, RoomCreateInput> & RoomCreateInput'.
+    Type '{ availableSlots: number; hostel: { connect: { id: string; }; }; name: string; description?: string; capacity: number; totalUnits: number; pricePerTerm: number; isActive?: boolean; images?: string[]; ... 4 more ...; utilitiesIncluded?: string[]; }' is not assignable to type 'RoomCreateInput'.
+      Types of property 'gender' are incompatible.
+        Type 'string' is not assignable to type 'RoomGender'.
+apps/api/src/modules/rooms/rooms.service.ts(32,13): error TS2322: Type 'UpdateRoomDto' is not assignable to type '(Without<RoomUpdateInput, RoomUncheckedUpdateInput> & RoomUncheckedUpdateInput) | (Without<...> & RoomUpdateInput)'.
+  Type 'UpdateRoomDto' is not assignable to type 'Without<RoomUncheckedUpdateInput, RoomUpdateInput> & RoomUpdateInput'.
+    Types of property 'gender' are incompatible.
+      Type 'string' is not assignable to type 'RoomGender | EnumRoomGenderFieldUpdateOperationsInput'.

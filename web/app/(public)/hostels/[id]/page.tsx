@@ -26,7 +26,13 @@ import {
     Coffee,
     Building2,
     Users,
-    Clock
+    Clock,
+    MessageCircle,
+    UserCheck,
+    User,
+    Droplets,
+    Zap,
+    Flame
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
@@ -152,6 +158,14 @@ export default function HostelDetailsPage() {
                                     <div className="flex items-center gap-2 text-gray-500 font-medium">
                                         <MapPin size={16} className="text-red-400" />
                                         <span>{hostel.addressLine}, {hostel.city}</span>
+                                        {hostel.distanceToCampus && (
+                                            <>
+                                                <span className="text-gray-300">•</span>
+                                                <span className="flex items-center gap-1 text-blue-600 font-bold uppercase text-[10px] tracking-widest bg-blue-50 px-2 py-0.5 rounded-md">
+                                                    <Clock size={10} /> {hostel.distanceToCampus}
+                                                </span>
+                                            </>
+                                        )}
                                     </div>
                                 </div>
                                 <div className="text-right flex flex-col items-end">
@@ -175,9 +189,25 @@ export default function HostelDetailsPage() {
 
                                 <div className="pt-8 border-t">
                                     <h3 className="text-xl font-bold mb-6 flex items-center gap-2 uppercase tracking-tight">
-                                        <Star size={20} className="text-orange-400" /> Top Amenities
+                                        <Star size={20} className="text-orange-400" /> Top Amenities & Utilities
                                     </h3>
                                     <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                                        {/* Core Utilities */}
+                                        {hostel.utilitiesIncluded?.map((u: string) => {
+                                            const utilMap: Record<string, { label: string, icon: any, color: string }> = {
+                                                'water': { label: 'Water Included', icon: Droplets, color: 'text-blue-500' },
+                                                'light': { label: 'Light Included', icon: Zap, color: 'text-yellow-500' },
+                                                'gas': { label: 'Gas Included', icon: Flame, color: 'text-orange-500' },
+                                            };
+                                            const data = utilMap[u.toLowerCase()] || { label: u, icon: CheckCircle2, color: 'text-green-500' };
+                                            return (
+                                                <div key={u} className="flex flex-col items-center gap-3 p-6 rounded-3xl bg-blue-50/20 border border-blue-100/50 hover:border-blue-200 hover:bg-blue-50/50 transition-all group">
+                                                    <data.icon size={28} className={cn("text-gray-400 group-hover:transition-colors", data.color)} />
+                                                    <span className="text-[10px] font-black uppercase tracking-widest text-gray-500">{data.label}</span>
+                                                </div>
+                                            );
+                                        })}
+                                        {/* Standard Amenities */}
                                         {hostel.amenities?.map((a: string) => {
                                             const Icon = AMENITY_ICONS[a] || Info;
                                             return (
@@ -187,7 +217,9 @@ export default function HostelDetailsPage() {
                                                 </div>
                                             );
                                         })}
-                                        {(!hostel.amenities || hostel.amenities.length === 0) && <p className="text-gray-400 text-sm italic">Amenities not listed.</p>}
+                                        {(!hostel.amenities || hostel.amenities.length === 0) && (!hostel.utilitiesIncluded || hostel.utilitiesIncluded.length === 0) && (
+                                            <p className="text-gray-400 text-sm italic">Amenities not listed.</p>
+                                        )}
                                     </div>
                                 </div>
                             </div>
@@ -210,16 +242,46 @@ export default function HostelDetailsPage() {
                                                 {r.images?.[0] ? <img src={r.images[0]} className="w-full h-full object-cover" /> : <Star size={40} />}
                                             </div>
                                             <div className="flex-1 space-y-4 text-center md:text-left">
-                                                <h4 className="text-2xl font-black tracking-tight uppercase">{r.name}</h4>
+                                                <div className="flex items-center justify-center md:justify-start gap-3">
+                                                    <h4 className="text-2xl font-black tracking-tight uppercase">{r.name}</h4>
+                                                    {r.gender && (
+                                                        <span className={cn(
+                                                            "px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest flex items-center gap-1",
+                                                            r.gender === 'MALE' ? "bg-blue-50 text-blue-600 border border-blue-100" :
+                                                                r.gender === 'FEMALE' ? "bg-pink-50 text-pink-600 border border-pink-100" :
+                                                                    "bg-gray-50 text-gray-600 border border-gray-100"
+                                                        )}>
+                                                            {r.gender === 'MALE' ? <User size={10} /> :
+                                                                r.gender === 'FEMALE' ? <UserCheck size={10} /> :
+                                                                    <Users size={10} />}
+                                                            {r.gender}
+                                                        </span>
+                                                    )}
+                                                </div>
                                                 <div className="flex flex-wrap justify-center md:justify-start gap-4">
                                                     <div className="flex items-center gap-2 bg-gray-50 px-4 py-2 rounded-xl border border-gray-100">
                                                         <Users className="text-gray-400" size={16} />
-                                                        <span className="text-xs font-bold uppercase tracking-widest">{r.capacity} Per Room</span>
+                                                        <span className="text-xs font-bold uppercase tracking-widest">
+                                                            {r.roomConfiguration || `${r.capacity} Per Room`}
+                                                        </span>
                                                     </div>
-                                                    <div className="flex items-center gap-2 bg-gray-50 px-4 py-2 rounded-xl border border-gray-100">
-                                                        <Clock className="text-gray-400" size={16} />
-                                                        <span className="text-xs font-bold uppercase tracking-widest">Instant Booking</span>
-                                                    </div>
+                                                    {r.availableSlots !== undefined && (
+                                                        <div className={cn(
+                                                            "flex items-center gap-2 px-4 py-2 rounded-xl border transition-all",
+                                                            r.availableSlots <= 3 ? "bg-red-50 border-red-100 text-red-600 animate-pulse" : "bg-green-50 border-green-100 text-green-600"
+                                                        )}>
+                                                            <div className={cn("w-2 h-2 rounded-full", r.availableSlots <= 3 ? "bg-red-500" : "bg-green-500")} />
+                                                            <span className="text-xs font-black uppercase tracking-widest">
+                                                                {r.availableSlots <= 0 ? "Full" : `${r.availableSlots} Slots Left`}
+                                                            </span>
+                                                        </div>
+                                                    )}
+                                                    {r.hasAC && (
+                                                        <div className="flex items-center gap-2 bg-blue-50 px-4 py-2 rounded-xl border border-blue-100 text-blue-600">
+                                                            <Wind size={16} />
+                                                            <span className="text-xs font-bold uppercase tracking-widest">A/C Included</span>
+                                                        </div>
+                                                    )}
                                                 </div>
                                             </div>
                                             <div className="md:w-64 text-center md:text-right space-y-4">
@@ -248,9 +310,20 @@ export default function HostelDetailsPage() {
                                 <Building2 size={32} />
                             </div>
                             <h3 className="font-bold text-2xl mb-2">Ready to move?</h3>
-                            <p className="text-gray-500 mb-8 leading-relaxed font-medium">Select a room type to begin your reservation process. Your request will be sent directly to the owner.</p>
+                            <p className="text-gray-500 mb-8 leading-relaxed font-medium">Select a room type to begin your reservation process or contact the owner directly for inquiries.</p>
 
                             <div className="space-y-4 mb-8">
+                                {hostel.whatsappNumber && (
+                                    <a
+                                        href={`https://wa.me/233${hostel.whatsappNumber.replace(/^0/, '')}?text=Hi, I'm interested in ${hostel.name} on HostelGH. Is there availability?`}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="w-full bg-[#25D366] text-white py-4 rounded-2xl font-black uppercase tracking-[0.2em] text-xs shadow-xl shadow-green-500/20 hover:bg-[#128C7E] transition-all flex items-center justify-center gap-2"
+                                    >
+                                        <MessageCircle size={18} />
+                                        Chat via WhatsApp
+                                    </a>
+                                )}
                                 <div className="flex items-start gap-3">
                                     <div className="mt-1 w-5 h-5 bg-green-50 rounded-full flex items-center justify-center text-green-600 shrink-0">
                                         <CheckCircle2 size={12} />

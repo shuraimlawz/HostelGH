@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, UseGuards, UsePipes, ValidationPipe, UseInterceptors, ClassSerializerInterceptor } from "@nestjs/common";
+import { Body, Controller, Get, Post, Query, UseGuards, UsePipes, ValidationPipe, UseInterceptors, ClassSerializerInterceptor } from "@nestjs/common";
 import { AdminService } from "./admin.service";
 import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
 import { RolesGuard } from "../auth/guards/roles.guard";
@@ -25,8 +25,11 @@ export class AdminController {
 
     @Get("activity")
     @ApiOperation({ summary: "Get recent system activity" })
-    getActivity() {
-        return this.adminService.getActivity();
+    getActivity(
+        @Query("page") page?: number,
+        @Query("limit") limit?: number
+    ) {
+        return this.adminService.getActivity(page ? Number(page) : 1, limit ? Number(limit) : 10);
     }
 
     @Get("analytics")

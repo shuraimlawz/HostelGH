@@ -1,6 +1,7 @@
 import { ForbiddenException, Injectable, NotFoundException } from "@nestjs/common";
 import { PrismaService } from "../../prisma/prisma.service";
-import { UserRole, BookingStatus } from "@prisma/client";
+import { UserRole, BookingStatus, RoomGender } from "@prisma/client";
+import { CreateRoomDto, UpdateRoomDto } from "./dto/create-room.dto";
 
 @Injectable()
 export class RoomsService {
@@ -14,6 +15,8 @@ export class RoomsService {
         const room = await this.prisma.room.create({
             data: {
                 ...dto,
+                gender: dto.gender as RoomGender,
+                availableSlots: dto.totalSlots, // Initialize availableSlots to totalSlots
                 hostel: { connect: { id: hostelId } }
             },
         });
@@ -27,7 +30,10 @@ export class RoomsService {
 
         const updated = await this.prisma.room.update({
             where: { id: roomId },
-            data: dto,
+            data: {
+                ...dto,
+                gender: dto.gender ? (dto.gender as RoomGender) : undefined,
+            },
         });
         await this.syncHostelMinPrice(room.hostelId);
         return updated;
@@ -120,17 +126,4 @@ export class RoomsService {
 interface UserActor {
     userId: string;
     role: UserRole;
-}
-
-interface CreateRoomDto {
-    name: string;
-    capacity: number;
-    totalUnits: number;
-    pricePerTerm: number;
-    description?: string;
-    images?: string[];
-}
-
-interface UpdateRoomDto extends Partial<CreateRoomDto> {
-    isActive?: boolean;
 }

@@ -1,5 +1,5 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Req, UseGuards, UseInterceptors, UploadedFile, BadRequestException } from "@nestjs/common";
-import { FileInterceptor } from "@nestjs/platform-express";
+import { Body, Controller, Delete, Get, Param, Patch, Post, Req, UseGuards, UseInterceptors, UploadedFile, UploadedFiles, BadRequestException } from "@nestjs/common";
+import { FileInterceptor, FilesInterceptor } from "@nestjs/platform-express";
 import { RoomsService } from "./rooms.service";
 import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
 import { RolesGuard } from "../../common/guards/roles.guard";
@@ -77,6 +77,32 @@ export class RoomsController {
         return {
             url: result.url,
             publicId: result.publicId,
+        };
+    }
+
+    @Roles(UserRole.OWNER)
+    @Post(":id/images/multiple")
+    @ApiOperation({ summary: "Upload multiple room images (Owner only)" })
+    @UseInterceptors(FilesInterceptor('images', 10))
+    @ApiConsumes('multipart/form-data')
+    async uploadMultipleRoomImages(
+        @Req() req: any,
+        @Param("id") roomId: string,
+        @UploadedFiles() files: Express.Multer.File[],
+    ) {
+        if (!files || files.length === 0) {
+            throw new BadRequestException('No files uploaded');
+        }
+
+        const results = await this.upload.uploadMultipleWithMetadata(files, 'hostelgh/rooms');
+        const urls = results.map(r => r.url);
+        await this.rooms.addRoomImages(roomId, req.user.userId, urls);
+
+        return {
+            images: results.map(r => ({
+                url: r.url,
+                publicId: r.publicId,
+            })),
         };
     }
 

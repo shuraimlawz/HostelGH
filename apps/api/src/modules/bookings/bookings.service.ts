@@ -1,6 +1,7 @@
 import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from "@nestjs/common";
 import { PrismaService } from "../../prisma/prisma.service";
-import { BookingStatus, UserRole } from "@prisma/client";
+import { BookingStatus, UserRole, RoomGender } from "@prisma/client";
+import { Cron, CronExpression } from "@nestjs/schedule";
 import { CreateBookingDto } from "./dto/create-booking.dto";
 import { NotificationsService } from "../notifications/notifications.service";
 
@@ -37,6 +38,9 @@ export class BookingsService {
         return await this.prisma.$transaction(async (tx) => {
             await this.validateRoomAvailability(tx, dto, start, end, roomMap);
 
+            const now = new Date();
+            const paymentDeadline = new Date(now.getTime() + 24 * 60 * 60 * 1000); // 24 hours from now
+
             const booking = await tx.booking.create({
                 data: {
                     hostelId: dto.hostelId,
@@ -45,7 +49,11 @@ export class BookingsService {
                     endDate: end,
                     notes: dto.notes,
                     status: BookingStatus.PENDING_APPROVAL,
-                    expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24), // 24h window
+                    // @ts-ignore
+                    paymentDeadline: paymentDeadline,
+                    // @ts-ignore
+                    autoReleaseAt: paymentDeadline,
+                    expiresAt: paymentDeadline, // Keep for backward compatibility if needed
                     items: {
                         create: dto.items.map((i) => {
                             const room = roomMap.get(i.roomId)!;
@@ -123,16 +131,55 @@ export class BookingsService {
     }
 
     async approveBooking(actor: { userId: string; role: UserRole }, bookingId: string) {
-        const updated = await this.updateStatus(actor, bookingId, BookingStatus.APPROVED, [BookingStatus.PENDING_APPROVAL]);
+        return await this.prisma.$transaction(async (tx) => {
+            const booking = await tx.booking.findUnique({
+                where: { id: bookingId },
+                include: { items: true, hostel: { include: { owner: true } } }
+            });
 
-        // Trigger notification
-        this.notifications.sendBookingApprovedEmail(updated.tenant.email, {
-            hostelName: updated.hostel.name,
-            startDate: updated.startDate.toDateString(),
-            endDate: updated.endDate.toDateString(),
-        }).catch(e => console.error("Email failed", e));
+            if (!booking) throw new NotFoundException("Booking not found");
+            if (booking.status !== BookingStatus.PENDING_APPROVAL) {
+                throw new BadRequestException("Only pending bookings can be approved.");
+            }
 
-        return updated;
+            // Verify ownership
+            if (actor.role !== UserRole.ADMIN && booking.hostel.ownerId !== actor.userId) {
+                throw new ForbiddenException("Not authorized to approve this booking");
+            }
+
+            // Assign slot number and update room availability
+            for (const item of booking.items) {
+                await tx.room.update({
+                    where: { id: item.roomId },
+                    data: {
+                        // @ts-ignore
+                        availableSlots: { decrement: item.quantity }
+                    }
+                });
+            }
+
+            const updated: any = await tx.booking.update({
+                where: { id: bookingId },
+                data: {
+                    status: BookingStatus.APPROVED,
+                    // Refresh payment deadline and auto-release from approval time
+                    // @ts-ignore
+                    paymentDeadline: new Date(Date.now() + 24 * 60 * 60 * 1000),
+                    // @ts-ignore
+                    autoReleaseAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
+                },
+                include: { tenant: true, hostel: true }
+            });
+
+            // Trigger notification
+            this.notifications.sendBookingApprovedEmail(updated.tenant.email, {
+                hostelName: updated.hostel.name,
+                startDate: updated.startDate.toDateString(),
+                endDate: updated.endDate.toDateString(),
+            }).catch(e => console.error("Email failed", e));
+
+            return updated;
+        });
     }
 
     async rejectBooking(actor: { userId: string; role: UserRole }, bookingId: string, reason?: string) {
@@ -286,6 +333,48 @@ export class BookingsService {
                 bookings: bookingTrend
             }
         };
+    }
+
+    @Cron(CronExpression.EVERY_HOUR)
+    async handleAutoRelease() {
+        console.log("Running auto-release cron job...");
+        const now = new Date();
+
+        // Find expired bookings that are not yet confirmed
+        const expiredBookings = await this.prisma.booking.findMany({
+            where: {
+                status: { in: [BookingStatus.PENDING_APPROVAL, BookingStatus.APPROVED] },
+                // @ts-ignore
+                autoReleaseAt: { lt: now },
+            },
+            include: { items: true }
+        });
+
+        if (expiredBookings.length === 0) return;
+
+        console.log(`Found ${expiredBookings.length} expired bookings to release.`);
+
+        for (const booking of expiredBookings) {
+            await this.prisma.$transaction(async (tx) => {
+                // Return slots to rooms if it was approved
+                if (booking.status === BookingStatus.APPROVED) {
+                    // @ts-ignore
+                    for (const item of booking.items) {
+                        await tx.room.update({
+                            where: { id: item.roomId },
+                            // @ts-ignore
+                            data: { availableSlots: { increment: item.quantity } }
+                        });
+                    }
+                }
+
+                // Update booking status to EXPIRED
+                await tx.booking.update({
+                    where: { id: booking.id },
+                    data: { status: BookingStatus.EXPIRED, notes: "Auto-released due to payment expiration (24h)." }
+                });
+            });
+        }
     }
 }
 

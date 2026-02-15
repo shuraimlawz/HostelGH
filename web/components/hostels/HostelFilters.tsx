@@ -13,6 +13,10 @@ import {
     ShieldCheck,
     Coffee,
     Building2,
+    Users,
+    User,
+    UserCheck,
+    Layout,
     School,
     DollarSign,
     MapPin
@@ -41,6 +45,8 @@ export default function HostelFilters() {
     const [university, setUniversity] = useState(params.get("university") ?? "");
     const [minPrice, setMinPrice] = useState(params.get("minPrice") ?? "");
     const [maxPrice, setMaxPrice] = useState(params.get("maxPrice") ?? "");
+    const [gender, setGender] = useState(params.get("gender") ?? "");
+    const [roomConfig, setRoomConfig] = useState(params.get("roomConfig") ?? "");
     const [selectedAmenities, setSelectedAmenities] = useState<string[]>(
         params.get("amenities")?.split(",").filter(Boolean) ?? []
     );
@@ -49,6 +55,8 @@ export default function HostelFilters() {
         setCity(params.get("city") ?? "");
         setRegion(params.get("region") ?? "");
         setUniversity(params.get("university") ?? "");
+        setGender(params.get("gender") ?? "");
+        setRoomConfig(params.get("roomConfig") ?? "");
         setMinPrice(params.get("minPrice") && !isNaN(parseInt(params.get("minPrice")!)) ? (parseInt(params.get("minPrice")!) / 100).toString() : "");
         setMaxPrice(params.get("maxPrice") && !isNaN(parseInt(params.get("maxPrice")!)) ? (parseInt(params.get("maxPrice")!) / 100).toString() : "");
         setSelectedAmenities(params.get("amenities")?.split(",").filter(Boolean) ?? []);
@@ -59,6 +67,8 @@ export default function HostelFilters() {
         if (city) p.set("city", city);
         if (region) p.set("region", region);
         if (university) p.set("university", university);
+        if (gender) p.set("gender", gender);
+        if (roomConfig) p.set("roomConfig", roomConfig);
         if (minPrice) p.set("minPrice", (parseFloat(minPrice) * 100).toString());
         if (maxPrice) p.set("maxPrice", (parseFloat(maxPrice) * 100).toString());
         if (selectedAmenities.length > 0) p.set("amenities", selectedAmenities.join(","));
@@ -76,6 +86,8 @@ export default function HostelFilters() {
         setCity("");
         setRegion("");
         setUniversity("");
+        setGender("");
+        setRoomConfig("");
         setMinPrice("");
         setMaxPrice("");
         setSelectedAmenities([]);
@@ -126,6 +138,52 @@ export default function HostelFilters() {
                                 ))}
                             </optgroup>
                         ))}
+                    </select>
+                </div>
+
+                {/* Gender Filter */}
+                <div className="space-y-3">
+                    <Label className="text-xs font-bold uppercase tracking-widest text-gray-400 flex items-center gap-2">
+                        <Users size={12} className="text-pink-500" /> Room For
+                    </Label>
+                    <div className="flex gap-2">
+                        {[
+                            { id: "MALE", label: "Boys", icon: User },
+                            { id: "FEMALE", label: "Girls", icon: UserCheck },
+                            { id: "MIXED", label: "Mixed", icon: Users }
+                        ].map((g) => (
+                            <button
+                                key={g.id}
+                                onClick={() => setGender(gender === g.id ? "" : g.id)}
+                                className={cn(
+                                    "flex-1 flex flex-col items-center gap-2 py-3 rounded-2xl border text-[10px] font-bold uppercase transition-all",
+                                    gender === g.id
+                                        ? "bg-black text-white border-black"
+                                        : "bg-white text-gray-500 border-gray-100 hover:bg-gray-50"
+                                )}
+                            >
+                                <g.icon size={14} />
+                                {g.label}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+
+                {/* Room Configuration Filter */}
+                <div className="space-y-3">
+                    <Label className="text-xs font-bold uppercase tracking-widest text-gray-400 flex items-center gap-2">
+                        <Layout size={12} className="text-orange-500" /> Type
+                    </Label>
+                    <select
+                        value={roomConfig}
+                        onChange={(e) => setRoomConfig(e.target.value)}
+                        className="w-full h-14 bg-white border border-gray-100 rounded-2xl px-4 outline-none focus:ring-2 focus:ring-black transition-all text-sm font-medium shadow-sm appearance-none"
+                    >
+                        <option value="">Any Configuration</option>
+                        <option value="1 in a room">1 in a room (Single)</option>
+                        <option value="2 in a room">2 in a room</option>
+                        <option value="3 in a room">3 in a room</option>
+                        <option value="4 in a room">4 in a room</option>
                     </select>
                 </div>
 

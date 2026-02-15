@@ -59,6 +59,8 @@ export class HostelsController {
         @Query("university") university?: string,
         @Query("amenities") amenities?: string | string[],
         @Query("sort") sort?: string,
+        @Query("gender") gender?: string,
+        @Query("roomConfig") roomConfig?: string,
     ) {
         const amenitiesArr = typeof amenities === 'string' ? amenities.split(',') : amenities;
         return this.hostels.publicSearch({
@@ -69,6 +71,8 @@ export class HostelsController {
             university,
             amenities: amenitiesArr,
             sort,
+            gender,
+            roomConfig,
         });
     }
 

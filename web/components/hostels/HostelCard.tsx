@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { Hostel } from "@/types";
-import { MapPin, School, Wifi, Wind, ShieldCheck, Star, Utensils, Waves, Car, Coffee, Building2 } from "lucide-react";
+import { MapPin, School, Wifi, Wind, ShieldCheck, Star, Utensils, Waves, Car, Coffee, Building2, User, UserCheck, Users, Clock } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const AMENITY_ICONS: Record<string, any> = {
@@ -54,6 +54,12 @@ export default function HostelCard({ hostel }: { hostel: any }) {
                                 {hostel.university}
                             </span>
                         )}
+                        {hostel.distanceToCampus && (
+                            <span className="bg-blue-600 text-white px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-wider flex items-center gap-1.5 shadow-lg shadow-blue-500/20">
+                                <Clock size={12} />
+                                {hostel.distanceToCampus}
+                            </span>
+                        )}
                     </div>
 
                     <div className="absolute bottom-4 left-4 right-4 flex justify-between items-end">
@@ -64,6 +70,12 @@ export default function HostelCard({ hostel }: { hostel: any }) {
                                 return <Icon key={a} size={14} className="text-white" />;
                             })}
                         </div>
+
+                        {hostel.rooms?.[0]?.availableSlots !== undefined && hostel.rooms?.[0]?.availableSlots <= 5 && (
+                            <div className="bg-red-500 text-white px-3 py-1 rounded-xl text-[10px] font-black uppercase tracking-wider animate-pulse shadow-lg shadow-red-500/40">
+                                Only {hostel.rooms[0].availableSlots} slots left!
+                            </div>
+                        )}
                     </div>
                 </div>
 
@@ -75,9 +87,24 @@ export default function HostelCard({ hostel }: { hostel: any }) {
                         </h3>
                     </div>
 
-                    <div className="flex items-center gap-1.5 text-gray-500 text-sm mb-4">
-                        <MapPin size={14} className="text-red-400" />
-                        <span className="font-medium">{hostel.city}, {hostel.addressLine}</span>
+                    <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center gap-1.5 text-gray-500 text-sm">
+                            <MapPin size={14} className="text-red-400" />
+                            <span className="font-medium">{hostel.city}, {hostel.addressLine}</span>
+                        </div>
+                        {hostel.rooms?.[0]?.gender && (
+                            <div className={cn(
+                                "flex items-center gap-1 px-2 py-1 rounded-lg text-[9px] font-bold uppercase tracking-widest",
+                                hostel.rooms[0].gender === 'MALE' ? "bg-blue-50 text-blue-600" :
+                                    hostel.rooms[0].gender === 'FEMALE' ? "bg-pink-50 text-pink-600" :
+                                        "bg-gray-50 text-gray-600"
+                            )}>
+                                {hostel.rooms[0].gender === 'MALE' ? <User size={10} /> :
+                                    hostel.rooms[0].gender === 'FEMALE' ? <UserCheck size={10} /> :
+                                        <Users size={10} />}
+                                {hostel.rooms[0].gender}
+                            </div>
+                        )}
                     </div>
 
                     <div className="mt-auto pt-4 border-t flex items-center justify-between">

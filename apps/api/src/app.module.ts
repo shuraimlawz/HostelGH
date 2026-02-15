@@ -15,6 +15,7 @@ import { UploadModule } from './modules/upload/upload.module';
 import { AdminModule } from './modules/admin/admin.module';
 import { ThrottlerModule } from "@nestjs/throttler";
 import { ThrottlerGuard } from "@nestjs/throttler";
+import { ScheduleModule } from "@nestjs/schedule";
 import { APP_FILTER, APP_GUARD } from '@nestjs/core';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { LoggingMiddleware } from './common/middleware/logging.middleware';
@@ -40,6 +41,7 @@ import { AppController } from './app.controller';
         PayoutsModule,
         UploadModule,
         AdminModule,
+        ScheduleModule.forRoot(),
         ThrottlerModule.forRoot([{
             ttl: 60000,
             limit: 100,

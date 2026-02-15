@@ -44,9 +44,11 @@ export class HostelsService {
         maxPrice?: number,
         amenities?: string[],
         university?: string,
-        sort?: string
+        sort?: string,
+        gender?: string,
+        roomConfig?: string
     }) {
-        const { city, region, minPrice, maxPrice, amenities, university, sort } = params;
+        const { city, region, minPrice, maxPrice, amenities, university, sort, gender, roomConfig } = params;
 
         // Intelligent Suggestion Algorithm: 
         // 1. Featured hostels first
@@ -70,10 +72,19 @@ export class HostelsService {
                 region: region ? { equals: region, mode: "insensitive" } : undefined,
                 university: university ? { contains: university, mode: "insensitive" } : undefined,
                 amenities: amenities && amenities.length > 0 ? { hasEvery: amenities } : undefined,
+                bookingStatus: { not: "CLOSED" },
                 minPrice: (minPrice !== undefined || maxPrice !== undefined) ? {
                     gte: minPrice,
                     lte: maxPrice,
                 } : undefined,
+                rooms: (gender || roomConfig) ? {
+                    some: {
+                        isActive: true,
+                        gender: gender ? (gender as any) : undefined,
+                        roomConfiguration: roomConfig ? { contains: roomConfig, mode: "insensitive" } : undefined,
+                        availableSlots: { gt: 0 }
+                    }
+                } : undefined
             },
             include: { rooms: { where: { isActive: true } } },
             orderBy: orderBy,

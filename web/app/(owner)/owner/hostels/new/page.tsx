@@ -23,7 +23,12 @@ import {
     Coffee,
     School,
     Trash2,
-    Image as ImageIcon
+    Image as ImageIcon,
+    MessageSquare,
+    Zap,
+    Droplets,
+    Flame,
+    Clock
 } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
@@ -36,6 +41,9 @@ const formSchema = z.object({
     city: z.string().min(2, "City is required"),
     addressLine: z.string().min(5, "Address is required"),
     university: z.string().optional().or(z.literal("")),
+    whatsappNumber: z.string().regex(/^(0|233)[0-9]{9}$/, "Invalid Ghana number (e.g. 0244123456)"),
+    distanceToCampus: z.string().optional().or(z.literal("")),
+    utilitiesIncluded: z.array(z.string()),
     amenities: z.array(z.string()),
     images: z.array(z.string()),
 });
@@ -74,6 +82,9 @@ export default function NewHostelPage() {
             city: "",
             addressLine: "",
             university: "",
+            whatsappNumber: "",
+            distanceToCampus: "",
+            utilitiesIncluded: [],
             amenities: [],
             images: [],
         }
@@ -197,24 +208,77 @@ export default function NewHostelPage() {
                         </div>
                     </div>
 
-                    <div className="space-y-2">
-                        <label className="text-sm font-bold text-gray-700 ml-1 uppercase tracking-wider flex items-center gap-2">
-                            <School size={14} className="text-blue-600" />
-                            Nearest University
-                        </label>
-                        <select
-                            {...form.register("university")}
-                            className="w-full px-5 py-4 bg-gray-50 rounded-2xl outline-none focus:ring-2 focus:ring-black transition-all font-medium appearance-none"
-                        >
-                            <option value="">Select a university</option>
-                            {REGIONAL_UNIVERSITIES.map(group => (
-                                <optgroup key={group.region} label={group.region}>
-                                    {group.unis.map(u => (
-                                        <option key={u} value={u}>{u}</option>
-                                    ))}
-                                </optgroup>
-                            ))}
-                        </select>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div className="space-y-2">
+                            <label className="text-sm font-bold text-gray-700 ml-1 uppercase tracking-wider flex items-center gap-2">
+                                <MessageSquare size={14} className="text-green-500" /> WhatsApp Number
+                            </label>
+                            <input
+                                {...form.register("whatsappNumber")}
+                                className="w-full px-5 py-4 bg-gray-50 rounded-2xl outline-none focus:ring-2 focus:ring-black transition-all font-medium"
+                                placeholder="e.g. 0541234567"
+                            />
+                            <p className="text-[10px] text-gray-400 ml-1 uppercase font-bold tracking-tighter">Students will contact you via this number</p>
+                            {form.formState.errors.whatsappNumber && (
+                                <p className="text-xs text-red-500 ml-1 font-medium">{form.formState.errors.whatsappNumber.message}</p>
+                            )}
+                        </div>
+
+                        <div className="space-y-2">
+                            <label className="text-sm font-bold text-gray-700 ml-1 uppercase tracking-wider flex items-center gap-2">
+                                <Clock size={14} className="text-blue-500" /> Distance to Campus
+                            </label>
+                            <input
+                                {...form.register("distanceToCampus")}
+                                className="w-full px-5 py-4 bg-gray-50 rounded-2xl outline-none focus:ring-2 focus:ring-black transition-all font-medium"
+                                placeholder="e.g. 5 mins walk / 10 mins trotro"
+                            />
+                            {form.formState.errors.distanceToCampus && (
+                                <p className="text-xs text-red-500 ml-1 font-medium">{form.formState.errors.distanceToCampus.message}</p>
+                            )}
+                        </div>
+                    </div>
+                </section>
+
+                {/* Utilities Section */}
+                <section className="bg-white rounded-[2rem] border p-8 md:p-10 shadow-sm space-y-8">
+                    <div className="flex items-center gap-3 pb-6 border-b">
+                        <div className="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center text-blue-600">
+                            <Zap size={20} />
+                        </div>
+                        <h2 className="text-xl font-bold">Included Utilities</h2>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        {[
+                            { id: "water", label: "Water Included", icon: Droplets, color: "text-blue-500" },
+                            { id: "light", label: "Electricity Included", icon: Zap, color: "text-yellow-500" },
+                            { id: "gas", label: "Gas/Cooking Included", icon: Flame, color: "text-orange-500" }
+                        ].map((util) => {
+                            const isSelected = form.watch("utilitiesIncluded")?.includes(util.id);
+                            return (
+                                <button
+                                    key={util.id}
+                                    type="button"
+                                    onClick={() => {
+                                        const current = form.getValues("utilitiesIncluded") || [];
+                                        const updated = isSelected
+                                            ? current.filter(u => u !== util.id)
+                                            : [...current, util.id];
+                                        form.setValue("utilitiesIncluded", updated);
+                                    }}
+                                    className={cn(
+                                        "flex items-center gap-4 p-5 rounded-2xl border-2 transition-all",
+                                        isSelected
+                                            ? "border-black bg-black text-white"
+                                            : "border-gray-100 bg-gray-50 text-gray-500 hover:border-gray-200"
+                                    )}
+                                >
+                                    <util.icon size={20} className={isSelected ? "text-white" : util.color} />
+                                    <span className="text-xs font-bold uppercase tracking-wider">{util.label}</span>
+                                </button>
+                            );
+                        })}
                     </div>
                 </section>
 

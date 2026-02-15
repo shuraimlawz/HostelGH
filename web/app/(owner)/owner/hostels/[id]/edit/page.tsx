@@ -28,7 +28,14 @@ import {
     BedDouble,
     DollarSign,
     Users as UsersIcon,
-    Image as ImageIcon
+    Image as ImageIcon,
+    MessageSquare,
+    Zap,
+    Droplets,
+    Flame,
+    Clock,
+    UserCircle,
+    Layout
 } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
@@ -41,7 +48,10 @@ const hostelSchema = z.object({
     description: z.string().min(10, "Description must be at least 10 characters"),
     city: z.string().min(2, "City is required"),
     addressLine: z.string().min(5, "Address is required"),
-    university: z.string().optional().or(z.literal("")),
+    university: z.string(),
+    whatsappNumber: z.string().regex(/^(0|233)[0-9]{9}$/, "Invalid Ghana number (e.g. 0244123456)"),
+    distanceToCampus: z.string(),
+    utilitiesIncluded: z.array(z.string()),
     amenities: z.array(z.string()),
     images: z.array(z.string()),
     isPublished: z.boolean(),
@@ -50,6 +60,9 @@ const hostelSchema = z.object({
 const roomSchema = z.object({
     name: z.string().min(2, "Room name is required"),
     capacity: z.number().min(1),
+    roomConfiguration: z.string().min(1, "Config is required (e.g. 2 in a room)"),
+    gender: z.enum(["MALE", "FEMALE", "MIXED"]).default("MIXED"),
+    totalSlots: z.number().min(1),
     totalUnits: z.number().min(1),
     pricePerTerm: z.number().min(1),
     description: z.string().optional(),
@@ -93,6 +106,9 @@ export default function EditHostelPage() {
             city: "",
             addressLine: "",
             university: "",
+            whatsappNumber: "",
+            distanceToCampus: "",
+            utilitiesIncluded: [],
             amenities: [],
             images: [],
             isPublished: false,
@@ -107,6 +123,9 @@ export default function EditHostelPage() {
                 city: hostel.city,
                 addressLine: hostel.addressLine,
                 university: hostel.university || "",
+                whatsappNumber: hostel.whatsappNumber || "",
+                distanceToCampus: hostel.distanceToCampus || "",
+                utilitiesIncluded: hostel.utilitiesIncluded || [],
                 amenities: hostel.amenities || [],
                 images: hostel.images || [],
                 isPublished: hostel.isPublished,
@@ -233,6 +252,58 @@ export default function EditHostelPage() {
                         </section>
                     </div>
 
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <section className="bg-white rounded-[2rem] border p-8 shadow-sm space-y-6">
+                            <h2 className="text-xl font-bold flex items-center gap-2">
+                                <MessageSquare size={20} className="text-pink-500" />
+                                Support Info
+                            </h2>
+                            <div className="space-y-4">
+                                <div className="space-y-1">
+                                    <label className="text-[10px] font-bold text-gray-400 uppercase ml-1">WhatsApp Number</label>
+                                    <input {...form.register("whatsappNumber")} className="w-full px-5 py-4 bg-gray-50 rounded-2xl border focus:border-black outline-none" placeholder="e.g. 0244000000" />
+                                </div>
+                                <div className="space-y-1">
+                                    <label className="text-[10px] font-bold text-gray-400 uppercase ml-1">Distance to Campus</label>
+                                    <input {...form.register("distanceToCampus")} className="w-full px-5 py-4 bg-gray-50 rounded-2xl border focus:border-black outline-none" placeholder="e.g. 5 min walk" />
+                                </div>
+                            </div>
+                        </section>
+
+                        <section className="bg-white rounded-[2rem] border p-8 shadow-sm space-y-6">
+                            <h2 className="text-xl font-bold flex items-center gap-2">
+                                <Zap size={20} className="text-yellow-500" />
+                                Included Utilities
+                            </h2>
+                            <div className="flex flex-wrap gap-2">
+                                {[
+                                    { id: "water", label: "Water", icon: Droplets, color: "text-blue-500" },
+                                    { id: "light", label: "Light", icon: Zap, color: "text-yellow-500" },
+                                    { id: "gas", label: "Gas", icon: Flame, color: "text-orange-500" }
+                                ].map(util => {
+                                    const isSelected = form.watch("utilitiesIncluded")?.includes(util.id);
+                                    return (
+                                        <button
+                                            key={util.id} type="button"
+                                            onClick={() => {
+                                                const curr = form.getValues("utilitiesIncluded") || [];
+                                                const next = isSelected ? curr.filter(x => x !== util.id) : [...curr, util.id];
+                                                form.setValue("utilitiesIncluded", next);
+                                            }}
+                                            className={cn(
+                                                "flex items-center gap-2 px-4 py-3 rounded-xl border-2 transition-all",
+                                                isSelected ? "border-black bg-black text-white" : "border-gray-50 bg-gray-50 text-gray-500"
+                                            )}
+                                        >
+                                            <util.icon size={16} className={isSelected ? "text-white" : util.color} />
+                                            <span className="text-xs font-bold uppercase tracking-wider">{util.label}</span>
+                                        </button>
+                                    );
+                                })}
+                            </div>
+                        </section>
+                    </div>
+
                     <section className="bg-white rounded-[2rem] border p-10 shadow-sm space-y-8">
                         <div className="flex items-center gap-3 pb-4 border-b">
                             <ImageIcon size={20} className="text-purple-500" />
@@ -350,6 +421,9 @@ function AddRoomForm({ onCancel, onSave, isLoading }: any) {
         defaultValues: {
             name: "",
             capacity: 2,
+            roomConfiguration: "2 in a room",
+            gender: "MIXED",
+            totalSlots: 2,
             totalUnits: 10,
             pricePerTerm: 150000,
         }
@@ -376,9 +450,31 @@ function AddRoomForm({ onCancel, onSave, isLoading }: any) {
                         <input type="number" {...register("capacity", { valueAsNumber: true })} className="w-full px-5 py-4 bg-gray-50 rounded-2xl border outline-none focus:border-black" />
                     </div>
                     <div>
-                        <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400 ml-1">Units</label>
+                        <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400 ml-1">Total Slots</label>
+                        <input type="number" {...register("totalSlots", { valueAsNumber: true })} className="w-full px-5 py-4 bg-gray-50 rounded-2xl border outline-none focus:border-black" />
+                    </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                    <div>
+                        <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400 ml-1">Gender</label>
+                        <select {...register("gender")} className="w-full px-5 py-4 bg-gray-50 rounded-2xl border outline-none focus:border-black appearance-none">
+                            <option value="MIXED">Mixed</option>
+                            <option value="MALE">Boys Only</option>
+                            <option value="FEMALE">Girls Only</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400 ml-1">Units (Quantity)</label>
                         <input type="number" {...register("totalUnits", { valueAsNumber: true })} className="w-full px-5 py-4 bg-gray-50 rounded-2xl border outline-none focus:border-black" />
                     </div>
+                </div>
+
+                <div>
+                    <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400 ml-1 flex items-center gap-2">
+                        <Layout size={10} /> Room Configuration
+                    </label>
+                    <input {...register("roomConfiguration")} className="w-full px-5 py-4 bg-gray-50 rounded-2xl border outline-none focus:border-black" placeholder="e.g. 2 in a room" />
                 </div>
                 <div>
                     <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400 ml-1">Price (₵)</label>
