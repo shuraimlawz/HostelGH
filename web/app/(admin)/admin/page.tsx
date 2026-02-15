@@ -53,10 +53,42 @@ export default function AdminDashboardPage() {
     });
 
     const statCards = [
-        { label: "Total Users", value: stats?.totalUsers || 0, icon: Users, color: "text-blue-600", bg: "bg-blue-50", trend: "+12%", up: true },
-        { label: "Live Hostels", value: stats?.liveHostels || 0, icon: Building2, color: "text-emerald-600", bg: "bg-emerald-50", trend: "+5%", up: true },
-        { label: "Bookings", value: stats?.bookings || 0, icon: CalendarCheck, color: "text-purple-600", bg: "bg-purple-50", trend: "+18%", up: true },
-        { label: "Platform Revenue", value: `₵${(stats?.revenue || 0).toLocaleString()}`, icon: TrendingUp, color: "text-orange-600", bg: "bg-orange-50", trend: "-2%", up: false },
+        {
+            label: "Total Users",
+            value: stats?.totalUsers || 0,
+            icon: Users,
+            color: "text-blue-600",
+            bg: "bg-blue-50",
+            trend: stats?.trends?.users || 0,
+            up: (stats?.trends?.users || 0) >= 0
+        },
+        {
+            label: "Live Hostels",
+            value: stats?.liveHostels || 0,
+            icon: Building2,
+            color: "text-emerald-600",
+            bg: "bg-emerald-50",
+            trend: 0,
+            up: true
+        },
+        {
+            label: "Bookings",
+            value: stats?.bookings || 0,
+            icon: CalendarCheck,
+            color: "text-purple-600",
+            bg: "bg-purple-50",
+            trend: stats?.trends?.bookings || 0,
+            up: (stats?.trends?.bookings || 0) >= 0
+        },
+        {
+            label: "Platform Revenue",
+            value: `₵${((stats?.revenue || 0) / 100).toLocaleString()}`,
+            icon: TrendingUp,
+            color: "text-orange-600",
+            bg: "bg-orange-50",
+            trend: 0,
+            up: true
+        },
     ];
 
     if (statsLoading || activityLoading) return (
@@ -84,7 +116,7 @@ export default function AdminDashboardPage() {
                                 stat.up ? "bg-emerald-50 text-emerald-600" : "bg-red-50 text-red-600"
                             )}>
                                 {stat.up ? <ArrowUpRight size={12} /> : <ArrowDownRight size={12} />}
-                                {stat.trend}
+                                {stat.trend > 0 ? '+' : ''}{stat.trend}%
                             </div>
                         </div>
                         <h3 className="text-gray-400 text-xs font-black uppercase tracking-widest mb-1">{stat.label}</h3>
