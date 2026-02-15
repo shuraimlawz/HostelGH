@@ -151,4 +151,24 @@ export class AuthService {
 
         return { accessToken, refreshToken: refreshPlain };
     }
+
+    async changePassword(userId: string, dto: any) {
+        const user = await this.prisma.user.findUnique({ where: { id: userId } });
+        if (!user || !user.passwordHash) {
+            throw new BadRequestException("User not found or password not set");
+        }
+
+        const valid = await bcrypt.compare(dto.oldPassword, user.passwordHash);
+        if (!valid) {
+            throw new BadRequestException("Current password is incorrect");
+        }
+
+        const newHash = await bcrypt.hash(dto.newPassword, 12);
+        await this.prisma.user.update({
+            where: { id: userId },
+            data: { passwordHash: newHash }
+        });
+
+        return { message: "Password updated successfully" };
+    }
 }

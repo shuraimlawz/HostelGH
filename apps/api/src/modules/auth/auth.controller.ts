@@ -3,6 +3,7 @@ import { AuthService } from "./auth.service";
 import { UserRole } from "@prisma/client";
 import { RegisterDto } from "./dto/register.dto";
 import { LoginDto, RefreshTokenDto } from "./dto/login.dto";
+import { ChangePasswordDto } from "./dto/change-password.dto";
 import { JwtAuthGuard } from "./guards/jwt-auth.guard";
 import { AuthGuard } from "@nestjs/passport";
 import { ConfigService } from "@nestjs/config";
@@ -70,6 +71,14 @@ export class AuthController {
         const frontendUrl = this.config.get<string>("app.frontendUrl");
         const redirectUrl = `${frontendUrl}/auth/callback?accessToken=${result.accessToken}&refreshToken=${result.refreshToken}&userId=${result.user.id}&role=${result.user.role}&email=${result.user.email}&isOnboarded=${result.user.isOnboarded}`;
         return res.redirect(redirectUrl);
+    }
+
+    @Patch("password")
+    @UseGuards(JwtAuthGuard)
+    @ApiBearerAuth()
+    @ApiOperation({ summary: "Change current user password" })
+    changePassword(@Req() req: any, @Body() dto: ChangePasswordDto) {
+        return this.auth.changePassword(req.user.userId, dto);
     }
 }
 

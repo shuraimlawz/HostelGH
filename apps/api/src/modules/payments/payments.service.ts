@@ -160,4 +160,50 @@ export class PaymentsService {
             this.notifications.sendPaymentConfirmedEmail(booking.hostel.owner.email, emailData).catch(e => console.error("Email failed", e));
         }
     }
+
+    async getUserPaymentHistory(userId: string) {
+        return this.prisma.payment.findMany({
+            where: {
+                booking: {
+                    tenantId: userId
+                },
+                status: PaymentStatus.SUCCESS
+            },
+            include: {
+                booking: {
+                    include: {
+                        hostel: {
+                            select: { name: true }
+                        }
+                    }
+                }
+            },
+            orderBy: { createdAt: 'desc' }
+        });
+    }
+
+    async getPaymentById(paymentId: string, userId: string) {
+        const payment = await this.prisma.payment.findUnique({
+            where: { id: paymentId },
+            include: {
+                booking: {
+                    include: {
+                        hostel: true,
+                        tenant: true
+                    }
+                }
+            }
+        });
+
+        if (!payment) throw new NotFoundException("Payment not found");
+
+        // Authorization check: User must be the tenant or an admin (or potentially the owner, but let's stick to tenant for now based on context)
+        // Accessing user role in service method might require passing user object, but here we just pass userId.
+        // For simplicity, we check if the bookings tenantId matches userId.
+        if (payment.booking.tenantId !== userId) {
+            throw new ForbiddenException("You are not authorized to view this receipt.");
+        }
+
+        return payment;
+    }
 }

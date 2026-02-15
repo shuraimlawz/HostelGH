@@ -57,6 +57,7 @@ model User {
   isActive      Boolean  @default(true)
   emailVerified Boolean  @default(false)
   isOnboarded   Boolean  @default(true)
+  emailNotifications Boolean @default(true)
 
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt

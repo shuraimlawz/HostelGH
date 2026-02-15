@@ -1,4 +1,4 @@
-import { Body, Controller, Param, Post, Req, UseGuards, HttpCode, HttpStatus } from "@nestjs/common";
+import { Body, Controller, Param, Post, Req, UseGuards, HttpCode, HttpStatus, Get } from "@nestjs/common";
 import { PaymentsService } from "./payments.service";
 import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
 import { RolesGuard } from "../../common/guards/roles.guard";
@@ -19,6 +19,16 @@ export class PaymentsController {
     @HttpCode(HttpStatus.OK)
     verify(@Body() dto: VerifyPaymentDto) {
         return this.payments.verifyPaystackReference(dto.reference);
+    }
+
+    @Get("history")
+    getHistory(@Req() req: any) {
+        return this.payments.getUserPaymentHistory(req.user.userId);
+    }
+
+    @Get(":id")
+    getOne(@Param("id") id: string, @Req() req: any) {
+        return this.payments.getPaymentById(id, req.user.userId);
     }
 }
 
