@@ -19,6 +19,17 @@ export default function RegisterPage() {
         }
     }, [user, isLoading, router]);
 
+    if (isLoading || user) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-gray-50">
+                <div className="flex flex-col items-center gap-4">
+                    <Loader2 className="animate-spin text-blue-600" size={32} />
+                    <p className="text-gray-500 font-medium">Checking session...</p>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <AuthLayout
             title="Create Account"
