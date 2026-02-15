@@ -32,7 +32,12 @@ const adminLinks = [
 
 const deletionLink = { name: "Deletion Requests", href: "/admin/deletions", icon: Trash2 };
 
-export default function AdminSidebar() {
+interface AdminSidebarProps {
+    isOpen?: boolean;
+    onClose?: () => void;
+}
+
+export default function AdminSidebar({ isOpen = false, onClose = () => { } }: AdminSidebarProps) {
     const pathname = usePathname();
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -66,7 +71,7 @@ export default function AdminSidebar() {
                         <Link
                             key={link.href}
                             href={link.href}
-                            onClick={() => setMobileMenuOpen(false)}
+                            onClick={onClose}
                             className={cn(
                                 "flex items-center justify-between px-4 py-3.5 rounded-2xl transition-all group",
                                 isActive
@@ -86,7 +91,7 @@ export default function AdminSidebar() {
                 <div className="pt-4 mt-4 border-t border-gray-800">
                     <Link
                         href={deletionLink.href}
-                        onClick={() => setMobileMenuOpen(false)}
+                        onClick={onClose}
                         className={cn(
                             "flex items-center justify-between px-4 py-3.5 rounded-2xl transition-all group",
                             pathname === deletionLink.href
@@ -133,20 +138,11 @@ export default function AdminSidebar() {
 
     return (
         <>
-            {/* Mobile Hamburger Button */}
-            <button
-                onClick={() => setMobileMenuOpen(true)}
-                className="lg:hidden fixed top-24 left-4 z-40 p-3 bg-gray-950 text-white rounded-xl shadow-lg border border-gray-800 hover:bg-gray-900 transition-colors"
-                aria-label="Open menu"
-            >
-                <Menu size={20} />
-            </button>
-
             {/* Mobile Backdrop */}
-            {mobileMenuOpen && (
+            {isOpen && (
                 <div
                     className="lg:hidden fixed inset-0 bg-black/60 z-40 animate-in fade-in duration-200"
-                    onClick={() => setMobileMenuOpen(false)}
+                    onClick={onClose}
                 />
             )}
 
@@ -154,11 +150,11 @@ export default function AdminSidebar() {
             <aside
                 className={cn(
                     "lg:hidden fixed top-0 left-0 bottom-0 w-72 bg-gray-950 border-r border-gray-800 p-6 gap-2 text-gray-300 z-50 flex flex-col transition-transform duration-300",
-                    mobileMenuOpen ? "translate-x-0" : "-translate-x-full"
+                    isOpen ? "translate-x-0" : "-translate-x-full"
                 )}
             >
                 <button
-                    onClick={() => setMobileMenuOpen(false)}
+                    onClick={onClose}
                     className="absolute top-4 right-4 p-2 text-gray-400 hover:text-white transition-colors"
                     aria-label="Close menu"
                 >

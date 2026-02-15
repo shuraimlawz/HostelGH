@@ -3,12 +3,13 @@
 import TenantSidebar from "@/components/tenant/TenantSidebar";
 import { useAuth } from "@/lib/auth-context";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
-import { Loader2 } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Loader2, Menu } from "lucide-react";
 
 export default function TenantLayout({ children }: { children: React.ReactNode }) {
     const { user, isLoading } = useAuth();
     const router = useRouter();
+    const [sidebarOpen, setSidebarOpen] = useState(false);
 
     useEffect(() => {
         if (!isLoading && user) {
@@ -40,7 +41,16 @@ export default function TenantLayout({ children }: { children: React.ReactNode }
 
     return (
         <div className="flex min-h-screen bg-gray-50/50">
-            <TenantSidebar />
+            {/* Mobile Menu Button */}
+            <button
+                onClick={() => setSidebarOpen(true)}
+                className="md:hidden fixed top-5 left-4 z-40 p-2.5 bg-white text-gray-900 rounded-lg shadow-lg border border-gray-200 hover:bg-gray-50 transition-colors"
+                aria-label="Open menu"
+            >
+                <Menu size={18} />
+            </button>
+
+            <TenantSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
             <div className="flex-1 w-full max-w-[100vw] overflow-x-hidden">
                 <div className="md:p-8 p-4 pb-24 md:pb-8">
                     {children}

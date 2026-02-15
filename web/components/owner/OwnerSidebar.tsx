@@ -25,9 +25,13 @@ const links = [
     { name: "Settings", href: "/account", icon: Settings },
 ];
 
-export default function OwnerSidebar() {
+interface OwnerSidebarProps {
+    isOpen?: boolean;
+    onClose?: () => void;
+}
+
+export default function OwnerSidebar({ isOpen = false, onClose = () => { } }: OwnerSidebarProps) {
     const pathname = usePathname();
-    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
     const SidebarContent = () => (
         <>
@@ -41,7 +45,7 @@ export default function OwnerSidebar() {
                         <Link
                             key={link.href}
                             href={link.href}
-                            onClick={() => setMobileMenuOpen(false)}
+                            onClick={onClose}
                             className={cn(
                                 "flex items-center justify-between px-4 py-3 rounded-xl transition-all group",
                                 isActive
@@ -76,20 +80,11 @@ export default function OwnerSidebar() {
 
     return (
         <>
-            {/* Mobile Hamburger Button */}
-            <button
-                onClick={() => setMobileMenuOpen(true)}
-                className="md:hidden fixed top-24 left-4 z-40 p-3 bg-white text-gray-900 rounded-xl shadow-lg border border-gray-200 hover:bg-gray-50 transition-colors"
-                aria-label="Open menu"
-            >
-                <Menu size={20} />
-            </button>
-
             {/* Mobile Backdrop */}
-            {mobileMenuOpen && (
+            {isOpen && (
                 <div
                     className="md:hidden fixed inset-0 bg-black/60 z-40 animate-in fade-in duration-200"
-                    onClick={() => setMobileMenuOpen(false)}
+                    onClick={onClose}
                 />
             )}
 
@@ -97,11 +92,11 @@ export default function OwnerSidebar() {
             <aside
                 className={cn(
                     "md:hidden fixed top-0 left-0 bottom-0 w-72 bg-white border-r p-6 gap-2 z-50 flex flex-col transition-transform duration-300",
-                    mobileMenuOpen ? "translate-x-0" : "-translate-x-full"
+                    isOpen ? "translate-x-0" : "-translate-x-full"
                 )}
             >
                 <button
-                    onClick={() => setMobileMenuOpen(false)}
+                    onClick={onClose}
                     className="absolute top-4 right-4 p-2 text-gray-400 hover:text-gray-900 transition-colors"
                     aria-label="Close menu"
                 >

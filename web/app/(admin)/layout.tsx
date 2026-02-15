@@ -2,13 +2,14 @@
 
 import { useAuth } from "@/lib/auth-context";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import AdminSidebar from "@/components/admin/AdminSidebar";
-import { Loader2, ShieldAlert } from "lucide-react";
+import { Loader2, ShieldAlert, Menu } from "lucide-react";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
     const { user, isLoading } = useAuth();
     const router = useRouter();
+    const [sidebarOpen, setSidebarOpen] = useState(false);
 
     useEffect(() => {
         if (!isLoading && user) {
@@ -51,7 +52,16 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
     return (
         <div className="flex bg-gray-50 min-h-[calc(100vh-80px)]">
-            <AdminSidebar />
+            {/* Mobile Menu Button - Positioned in navbar area */}
+            <button
+                onClick={() => setSidebarOpen(true)}
+                className="lg:hidden fixed top-5 left-4 z-40 p-2.5 bg-gray-950 text-white rounded-lg shadow-lg border border-gray-800 hover:bg-gray-900 transition-colors"
+                aria-label="Open menu"
+            >
+                <Menu size={18} />
+            </button>
+
+            <AdminSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
             <main className="flex-1 p-6 md:p-10 lg:p-12 overflow-y-auto">
                 {children}
             </main>
