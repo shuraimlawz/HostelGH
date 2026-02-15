@@ -140,26 +140,37 @@ export class AdminService {
     }
 
     async broadcastMessage(dto: BroadcastMessageDto) {
-        // Real implementation: Send emails to all users
-        // Note: For large scale, use a queue (BullMQ). Direct loop is blocking but "real".
-
         const users = await this.prisma.user.findMany({
             where: { emailNotifications: true },
-            select: { email: true }
+            select: { email: true, firstName: true }
         });
 
-        // We'll log the attempt and effectively "send" (calling email service would require a template)
-        // Since we don't have a generic "Broadcast Template" in NotificationsService yet, 
-        // we will implement the logic to iterate.
+        if (users.length === 0) {
+            return {
+                success: true,
+                recipients: 0,
+                message: "No users with email notifications enabled"
+            };
+        }
 
-        // TODO: Implement a generic email template for broadcasts.
-        // For now, we return success with accurate recipient count, ensuring the functionality 'works'
-        // from a system perspective (data is processed).
+        // Send emails to all users (in production, use a queue like BullMQ for better performance)
+        const emailPromises = users.map(user =>
+            this.notifications.sendBroadcastEmail(user.email, {
+                title: dto.title,
+                message: dto.message,
+                type: dto.type
+            }).catch(err => {
+                console.error(`Failed to send broadcast to ${user.email}:`, err.message);
+                return null; // Continue even if one email fails
+            })
+        );
+
+        await Promise.all(emailPromises);
 
         return {
             success: true,
             recipients: users.length,
-            message: "Broadcast queued for delivery"
+            message: `Broadcast sent to ${users.length} user(s)`
         };
     }
 }

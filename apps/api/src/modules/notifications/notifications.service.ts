@@ -4,6 +4,7 @@ import { bookingRequestedTemplate } from "./templates/booking-requested";
 import { bookingApprovedTemplate } from "./templates/booking-approved";
 import { bookingRejectedTemplate } from "./templates/booking-rejected";
 import { paymentConfirmedTemplate } from "./templates/payment-confirmed";
+import { broadcastTemplate } from "./templates/broadcast";
 
 interface EmailPayloadBase {
     hostelName: string;
@@ -27,6 +28,12 @@ interface BookingRejectedPayload extends EmailPayloadBase {
 interface PaymentConfirmedPayload extends EmailPayloadBase {
     amount: string;
     reference: string;
+}
+
+interface BroadcastPayload {
+    title: string;
+    message: string;
+    type: string;
 }
 
 @Injectable()
@@ -74,6 +81,17 @@ export class NotificationsService {
             to,
             subject: `Payment confirmed • ${payload.hostelName}`,
             html: paymentConfirmedTemplate(payload),
+        });
+    }
+
+    async sendBroadcastEmail(
+        to: string,
+        payload: BroadcastPayload,
+    ) {
+        return this.email.send({
+            to,
+            subject: `${payload.title} • HostelGH`,
+            html: broadcastTemplate(payload),
         });
     }
 }
