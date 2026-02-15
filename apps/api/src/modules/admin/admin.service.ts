@@ -140,37 +140,53 @@ export class AdminService {
     }
 
     async broadcastMessage(dto: BroadcastMessageDto) {
-        const users = await this.prisma.user.findMany({
-            where: { emailNotifications: true },
-            select: { email: true, firstName: true }
-        });
+        try {
+            console.log('[Broadcast] Starting broadcast with:', { title: dto.title, type: dto.type });
 
-        if (users.length === 0) {
+            const users = await this.prisma.user.findMany({
+                where: { emailNotifications: true },
+                select: { email: true, firstName: true }
+            });
+
+            console.log(`[Broadcast] Found ${users.length} users with email notifications enabled`);
+
+            if (users.length === 0) {
+                return {
+                    success: true,
+                    recipients: 0,
+                    message: "No users with email notifications enabled"
+                };
+            }
+
+            // Send emails to all users (in production, use a queue like BullMQ for better performance)
+            const emailPromises = users.map(user =>
+                this.notifications.sendBroadcastEmail(user.email, {
+                    title: dto.title,
+                    message: dto.message,
+                    type: dto.type
+                }).then(() => {
+                    console.log(`[Broadcast] Successfully sent to ${user.email}`);
+                    return true;
+                }).catch(err => {
+                    console.error(`[Broadcast] Failed to send to ${user.email}:`, err.message, err.stack);
+                    return null; // Continue even if one email fails
+                })
+            );
+
+            const results = await Promise.all(emailPromises);
+            const successCount = results.filter(r => r === true).length;
+
+            console.log(`[Broadcast] Completed: ${successCount}/${users.length} emails sent successfully`);
+
             return {
                 success: true,
-                recipients: 0,
-                message: "No users with email notifications enabled"
+                recipients: users.length,
+                successfulSends: successCount,
+                message: `Broadcast sent to ${successCount}/${users.length} user(s)`
             };
+        } catch (error) {
+            console.error('[Broadcast] Fatal error:', error.message, error.stack);
+            throw error;
         }
-
-        // Send emails to all users (in production, use a queue like BullMQ for better performance)
-        const emailPromises = users.map(user =>
-            this.notifications.sendBroadcastEmail(user.email, {
-                title: dto.title,
-                message: dto.message,
-                type: dto.type
-            }).catch(err => {
-                console.error(`Failed to send broadcast to ${user.email}:`, err.message);
-                return null; // Continue even if one email fails
-            })
-        );
-
-        await Promise.all(emailPromises);
-
-        return {
-            success: true,
-            recipients: users.length,
-            message: `Broadcast sent to ${users.length} user(s)`
-        };
     }
 }
