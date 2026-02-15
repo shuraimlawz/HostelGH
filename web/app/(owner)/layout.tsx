@@ -10,7 +10,13 @@ export default function OwnerLayout({ children }: { children: React.ReactNode })
     const router = useRouter();
 
     useEffect(() => {
-        if (!isLoading && (!user || user.role !== "OWNER")) {
+        if (!isLoading && user) {
+            if (user.role === "ADMIN") {
+                router.replace("/admin");
+            } else if (user.role === "TENANT") {
+                router.replace("/account");
+            }
+        } else if (!isLoading && !user) {
             router.push("/auth/login");
         }
     }, [user, isLoading, router]);
