@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useQuery } from "@tanstack/react-query";
+import { api } from "@/lib/api";
 import {
     LayoutDashboard,
     Users,
@@ -12,7 +14,8 @@ import {
     ChevronRight,
     BarChart3,
     AlertCircle,
-    Trash2 // Added Trash2 as per instruction
+    Trash2,
+    CheckCircle2
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -28,6 +31,19 @@ const deletionLink = { name: "Deletion Requests", href: "/admin/deletions", icon
 
 export default function AdminSidebar() {
     const pathname = usePathname();
+
+    const { data: alerts } = useQuery({
+        queryKey: ["admin-alerts"],
+        queryFn: async () => {
+            const res = await api.get("/admin/alerts");
+            return res.data;
+        },
+        retry: false,
+        refetchInterval: 30000
+    });
+
+    const hasCriticalAlerts = alerts && alerts.length > 0;
+    const activeAlert = hasCriticalAlerts ? alerts[0] : null;
 
     return (
         <aside className="hidden lg:flex flex-col w-72 bg-gray-950 border-r border-gray-800 min-h-[calc(100vh-80px)] p-6 gap-2 text-gray-300">
@@ -82,16 +98,29 @@ export default function AdminSidebar() {
             </nav>
 
             <div className="mt-auto pt-10 px-2">
-                <div className="bg-red-950/20 border border-red-900/30 rounded-2xl p-6 relative overflow-hidden group hover:bg-red-950/30 transition-colors cursor-help">
-                    <div className="relative z-10">
-                        <div className="flex items-center gap-2 mb-2">
-                            <AlertCircle size={14} className="text-red-500" />
-                            <p className="text-[10px] font-black text-red-500 uppercase tracking-widest">Security Alert</p>
+                {hasCriticalAlerts ? (
+                    <div className="bg-red-950/20 border border-red-900/30 rounded-2xl p-6 relative overflow-hidden group hover:bg-red-950/30 transition-colors cursor-help">
+                        <div className="relative z-10">
+                            <div className="flex items-center gap-2 mb-2">
+                                <AlertCircle size={14} className="text-red-500 animate-pulse" />
+                                <p className="text-[10px] font-black text-red-500 uppercase tracking-widest">System Attention</p>
+                            </div>
+                            <h3 className="font-bold text-xs text-gray-200 mb-1 leading-tight">{activeAlert.message}</h3>
+                            <p className="text-[10px] text-gray-400">Action required immediately</p>
                         </div>
-                        <h3 className="font-bold text-xs text-gray-200 mb-1 leading-tight">Unauthorized access attempts detected</h3>
-                        <p className="text-[10px] text-gray-400">View logs for details</p>
                     </div>
-                </div>
+                ) : (
+                    <div className="bg-emerald-950/20 border border-emerald-900/30 rounded-2xl p-6 relative overflow-hidden group hover:bg-emerald-950/30 transition-colors">
+                        <div className="relative z-10">
+                            <div className="flex items-center gap-2 mb-2">
+                                <CheckCircle2 size={14} className="text-emerald-500" />
+                                <p className="text-[10px] font-black text-emerald-500 uppercase tracking-widest">System Healthy</p>
+                            </div>
+                            <h3 className="font-bold text-xs text-gray-200 mb-1 leading-tight">All systems operational</h3>
+                            <p className="text-[10px] text-gray-400">No security threats detected</p>
+                        </div>
+                    </div>
+                )}
             </div>
         </aside>
     );

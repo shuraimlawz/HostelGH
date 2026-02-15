@@ -1,6 +1,6 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 import {
     Users,
@@ -10,20 +10,59 @@ import {
     Activity,
     ArrowUpRight,
     ArrowDownRight,
-    Loader2
+    Loader2,
+    X,
+    Send
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-
-const stats = [
-    { label: "Total Users", value: "1,284", icon: Users, color: "text-blue-600", bg: "bg-blue-50", trend: "+12%", up: true },
-    { label: "Live Hostels", value: "452", icon: Building2, color: "text-emerald-600", bg: "bg-emerald-50", trend: "+5%", up: true },
-    { label: "Bookings", value: "2,840", icon: CalendarCheck, color: "text-purple-600", bg: "bg-purple-50", trend: "+18%", up: true },
-    { label: "Platform Revenue", value: "₵428.5k", icon: TrendingUp, color: "text-orange-600", bg: "bg-orange-50", trend: "-2%", up: false },
-];
+import { useState } from "react";
+import { toast } from "sonner";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 
 export default function AdminDashboardPage() {
-    // In a real app, we'd fetch these from /admin/stats
-    // For now, let's just make it look stunning.
+    const { data: stats, isLoading: statsLoading } = useQuery({
+        queryKey: ["admin-stats"],
+        queryFn: async () => {
+            const res = await api.get("/admin/stats");
+            return res.data;
+        }
+    });
+
+    const { data: activity, isLoading: activityLoading } = useQuery({
+        queryKey: ["admin-activity"],
+        queryFn: async () => {
+            const res = await api.get("/admin/activity");
+            return res.data;
+        }
+    });
+
+    const [broadcastOpen, setBroadcastOpen] = useState(false);
+    const [broadcastForm, setBroadcastForm] = useState({ title: "", message: "", type: "info" });
+
+    const broadcastMutation = useMutation({
+        mutationFn: async (data: any) => {
+            return api.post("/admin/broadcast", data);
+        },
+        onSuccess: () => {
+            toast.success("Broadcast sent successfully");
+            setBroadcastOpen(false);
+            setBroadcastForm({ title: "", message: "", type: "info" });
+        },
+        onError: () => toast.error("Failed to send broadcast")
+    });
+
+    const statCards = [
+        { label: "Total Users", value: stats?.totalUsers || 0, icon: Users, color: "text-blue-600", bg: "bg-blue-50", trend: "+12%", up: true },
+        { label: "Live Hostels", value: stats?.liveHostels || 0, icon: Building2, color: "text-emerald-600", bg: "bg-emerald-50", trend: "+5%", up: true },
+        { label: "Bookings", value: stats?.bookings || 0, icon: CalendarCheck, color: "text-purple-600", bg: "bg-purple-50", trend: "+18%", up: true },
+        { label: "Platform Revenue", value: `₵${(stats?.revenue || 0).toLocaleString()}`, icon: TrendingUp, color: "text-orange-600", bg: "bg-orange-50", trend: "-2%", up: false },
+    ];
+
+    if (statsLoading || activityLoading) return (
+        <div className="flex h-[60vh] items-center justify-center">
+            <Loader2 className="animate-spin text-blue-600" size={40} />
+        </div>
+    );
 
     return (
         <div className="space-y-12">
@@ -33,7 +72,7 @@ export default function AdminDashboardPage() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                {stats.map((stat) => (
+                {statCards.map((stat) => (
                     <div key={stat.label} className="bg-white rounded-[2rem] border p-8 shadow-sm hover:shadow-xl hover:shadow-gray-200/50 transition-all group">
                         <div className="flex items-start justify-between mb-6">
                             <div className={cn("p-4 rounded-2xl group-hover:scale-110 transition-transform duration-500", stat.bg)}>
@@ -69,12 +108,7 @@ export default function AdminDashboardPage() {
                     </div>
 
                     <div className="space-y-4">
-                        {[
-                            { user: "Issaka K.", action: "Registered a new hostel", time: "2 mins ago", type: "success" },
-                            { user: "System", action: "Automatic payout batch processed", time: "1 hour ago", type: "info" },
-                            { user: "Admin", action: "Updated security protocols", time: "3 hours ago", type: "warning" },
-                            { user: "Sarah A.", action: "Booking confirmed (PAY_SUCCESS)", time: "5 hours ago", type: "success" },
-                        ].map((log, i) => (
+                        {activity?.map((log: any, i: number) => (
                             <div key={i} className="flex items-center gap-4 p-5 rounded-2xl hover:bg-gray-50 transition-colors border border-transparent hover:border-gray-100 group">
                                 <div className={cn(
                                     "w-3 h-3 rounded-full shrink-0",
@@ -86,11 +120,16 @@ export default function AdminDashboardPage() {
                                     <p className="text-sm font-bold text-gray-900">
                                         <span className="text-blue-600">{log.user}</span> {log.action}
                                     </p>
-                                    <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-0.5">{log.time}</p>
+                                    <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-0.5">
+                                        {new Date(log.time).toLocaleString()}
+                                    </p>
                                 </div>
                                 <button className="opacity-0 group-hover:opacity-100 px-3 py-1 text-[10px] font-black text-gray-400 hover:text-black transition-all">Details</button>
                             </div>
                         ))}
+                        {activity?.length === 0 && (
+                            <p className="text-center text-gray-400 py-8">No recent activity.</p>
+                        )}
                     </div>
                 </div>
 
@@ -98,13 +137,60 @@ export default function AdminDashboardPage() {
                     <div className="relative z-10 space-y-6">
                         <h2 className="text-2xl font-bold text-white tracking-tight">Admin Quick Actions</h2>
                         <div className="space-y-3">
-                            <button className="w-full bg-white/10 hover:bg-white/20 text-white rounded-2xl p-4 text-left transition-all border border-white/5 flex items-center justify-between group">
-                                <div>
-                                    <p className="font-bold text-sm">Broadcast Message</p>
-                                    <p className="text-[10px] text-gray-500">Alert all active users</p>
-                                </div>
-                                <ArrowUpRight className="text-gray-600 group-hover:text-white" size={18} />
-                            </button>
+                            <Dialog open={broadcastOpen} onOpenChange={setBroadcastOpen}>
+                                <DialogTrigger asChild>
+                                    <button className="w-full bg-white/10 hover:bg-white/20 text-white rounded-2xl p-4 text-left transition-all border border-white/5 flex items-center justify-between group">
+                                        <div>
+                                            <p className="font-bold text-sm">Broadcast Message</p>
+                                            <p className="text-[10px] text-gray-500">Alert all active users</p>
+                                        </div>
+                                        <ArrowUpRight className="text-gray-600 group-hover:text-white" size={18} />
+                                    </button>
+                                </DialogTrigger>
+                                <DialogContent className="sm:max-w-md">
+                                    <DialogHeader>
+                                        <DialogTitle>Broadcast Message</DialogTitle>
+                                    </DialogHeader>
+                                    <div className="space-y-4 py-4">
+                                        <div className="space-y-2">
+                                            <label className="text-sm font-medium">Title</label>
+                                            <input
+                                                className="w-full border rounded-lg p-2"
+                                                value={broadcastForm.title}
+                                                onChange={e => setBroadcastForm({ ...broadcastForm, title: e.target.value })}
+                                            />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label className="text-sm font-medium">Message</label>
+                                            <textarea
+                                                className="w-full border rounded-lg p-2 h-24"
+                                                value={broadcastForm.message}
+                                                onChange={e => setBroadcastForm({ ...broadcastForm, message: e.target.value })}
+                                            />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label className="text-sm font-medium">Type</label>
+                                            <select
+                                                className="w-full border rounded-lg p-2"
+                                                value={broadcastForm.type}
+                                                onChange={e => setBroadcastForm({ ...broadcastForm, type: e.target.value })}
+                                            >
+                                                <option value="info">Info</option>
+                                                <option value="warning">Warning</option>
+                                                <option value="alert">Alert</option>
+                                            </select>
+                                        </div>
+                                        <button
+                                            onClick={() => broadcastMutation.mutate(broadcastForm)}
+                                            disabled={broadcastMutation.isPending || !broadcastForm.title || !broadcastForm.message}
+                                            className="w-full bg-blue-600 text-white p-3 rounded-lg font-bold disabled:opacity-50"
+                                        >
+                                            {broadcastMutation.isPending ? "Sending..." : "Send Broadcast"}
+                                        </button>
+                                    </div>
+                                </DialogContent>
+                            </Dialog>
+
                             <button className="w-full bg-white/10 hover:bg-white/20 text-white rounded-2xl p-4 text-left transition-all border border-white/5 flex items-center justify-between group">
                                 <div>
                                     <p className="font-bold text-sm">System Maintenance</p>
