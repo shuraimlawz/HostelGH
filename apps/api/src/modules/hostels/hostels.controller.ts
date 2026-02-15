@@ -1,4 +1,5 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Query, Req, UseGuards } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query, Req, UseGuards, UseInterceptors, UploadedFile, UploadedFiles, BadRequestException } from "@nestjs/common";
+import { FileInterceptor, FilesInterceptor } from "@nestjs/platform-express";
 import { HostelsService } from "./hostels.service";
 import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
 import { RolesGuard } from "../../common/guards/roles.guard";
@@ -6,15 +7,19 @@ import { Roles } from "../../common/decorators/roles.decorator";
 import { Public } from "../../common/decorators/public.decorator";
 import { UserRole } from "@prisma/client";
 import { CreateHostelDto, UpdateHostelDto } from "./dto/create-hostel.dto";
+import { UploadService } from "../upload/upload.service";
 
-import { ApiTags, ApiOperation, ApiBearerAuth, ApiQuery } from "@nestjs/swagger";
+import { ApiTags, ApiOperation, ApiBearerAuth, ApiQuery, ApiConsumes, ApiBody } from "@nestjs/swagger";
 
 @ApiTags("Hostels")
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Controller("hostels")
 export class HostelsController {
-    constructor(private hostels: HostelsService) { }
+    constructor(
+        private hostels: HostelsService,
+        private upload: UploadService,
+    ) { }
 
     @Roles(UserRole.OWNER)
     @Post()
@@ -79,5 +84,89 @@ export class HostelsController {
     @ApiOperation({ summary: "Get count of hostels per city" })
     getCityStats() {
         return this.hostels.getCityStats();
+    }
+
+    @Roles(UserRole.OWNER)
+    @Post(":id/images")
+    @ApiOperation({ summary: "Upload a single hostel image (Owner only)" })
+    @UseInterceptors(FileInterceptor('image'))
+    @ApiConsumes('multipart/form-data')
+    @ApiBody({
+        schema: {
+            type: 'object',
+            properties: {
+                image: {
+                    type: 'string',
+                    format: 'binary',
+                },
+            },
+        },
+    })
+    async uploadHostelImage(
+        @Req() req: any,
+        @Param("id") hostelId: string,
+        @UploadedFile() file: Express.Multer.File,
+    ) {
+        if (!file) {
+            throw new BadRequestException('No file uploaded');
+        }
+
+        const result = await this.upload.uploadImageWithMetadata(file, 'hostelgh/hostels');
+        await this.hostels.addHostelImages(hostelId, req.user.userId, [result.url]);
+
+        return {
+            url: result.url,
+            publicId: result.publicId,
+        };
+    }
+
+    @Roles(UserRole.OWNER)
+    @Post(":id/images/multiple")
+    @ApiOperation({ summary: "Upload multiple hostel images (Owner only)" })
+    @UseInterceptors(FilesInterceptor('images', 10))
+    @ApiConsumes('multipart/form-data')
+    async uploadMultipleHostelImages(
+        @Req() req: any,
+        @Param("id") hostelId: string,
+        @UploadedFiles() files: Express.Multer.File[],
+    ) {
+        if (!files || files.length === 0) {
+            throw new BadRequestException('No files uploaded');
+        }
+
+        const results = await this.upload.uploadMultipleWithMetadata(files, 'hostelgh/hostels');
+        const urls = results.map(r => r.url);
+        await this.hostels.addHostelImages(hostelId, req.user.userId, urls);
+
+        return {
+            images: results.map(r => ({
+                url: r.url,
+                publicId: r.publicId,
+            })),
+        };
+    }
+
+    @Roles(UserRole.OWNER)
+    @Delete(":id/images")
+    @ApiOperation({ summary: "Delete a hostel image (Owner only)" })
+    async deleteHostelImage(
+        @Req() req: any,
+        @Param("id") hostelId: string,
+        @Body("imageUrl") imageUrl: string,
+        @Body("publicId") publicId?: string,
+    ) {
+        if (!imageUrl) {
+            throw new BadRequestException('Image URL is required');
+        }
+
+        // Delete from Cloudinary if publicId is provided
+        if (publicId) {
+            await this.upload.deleteImage(publicId);
+        }
+
+        // Remove from database
+        await this.hostels.removeHostelImage(hostelId, req.user.userId, imageUrl);
+
+        return { message: 'Image deleted successfully' };
     }
 }

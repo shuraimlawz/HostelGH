@@ -87,6 +87,34 @@ export class RoomsService {
             throw new ForbiddenException("Cannot delete room with active/pending bookings. Archive instead.");
         }
     }
+
+    async addRoomImages(roomId: string, userId: string, imageUrls: string[]) {
+        const room = await this.getRoomWithHostel(roomId);
+        this.validateOwnership({ userId, role: UserRole.OWNER }, room.hostel.ownerId);
+
+        return this.prisma.room.update({
+            where: { id: roomId },
+            data: {
+                images: {
+                    push: imageUrls,
+                },
+            },
+        });
+    }
+
+    async removeRoomImage(roomId: string, userId: string, imageUrl: string) {
+        const room = await this.getRoomWithHostel(roomId);
+        this.validateOwnership({ userId, role: UserRole.OWNER }, room.hostel.ownerId);
+
+        const updatedImages = room.images.filter(img => img !== imageUrl);
+
+        return this.prisma.room.update({
+            where: { id: roomId },
+            data: {
+                images: updatedImages,
+            },
+        });
+    }
 }
 
 interface UserActor {
