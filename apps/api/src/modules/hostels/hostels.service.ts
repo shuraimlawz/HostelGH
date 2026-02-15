@@ -118,6 +118,34 @@ export class HostelsService {
         }));
     }
 
+    async addHostelImages(hostelId: string, userId: string, imageUrls: string[]) {
+        const hostel = await this.getHostelById(hostelId);
+        this.validateOwnership({ userId, role: UserRole.OWNER }, hostel.ownerId);
+
+        return this.prisma.hostel.update({
+            where: { id: hostelId },
+            data: {
+                images: {
+                    push: imageUrls,
+                },
+            },
+        });
+    }
+
+    async removeHostelImage(hostelId: string, userId: string, imageUrl: string) {
+        const hostel = await this.getHostelById(hostelId);
+        this.validateOwnership({ userId, role: UserRole.OWNER }, hostel.ownerId);
+
+        const updatedImages = hostel.images.filter(img => img !== imageUrl);
+
+        return this.prisma.hostel.update({
+            where: { id: hostelId },
+            data: {
+                images: updatedImages,
+            },
+        });
+    }
+
     private async getHostelById(id: string) {
         const hostel = await this.prisma.hostel.findUnique({ where: { id } });
         if (!hostel) throw new NotFoundException("Hostel not found");

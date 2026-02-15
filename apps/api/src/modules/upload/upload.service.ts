@@ -15,6 +15,11 @@ export interface MulterFile {
     buffer: Buffer;
 }
 
+export interface UploadResult {
+    url: string;
+    publicId: string;
+}
+
 @Injectable()
 export class UploadService {
     constructor(private config: ConfigService) {
@@ -45,8 +50,47 @@ export class UploadService {
         });
     }
 
+    async uploadImageWithMetadata(file: MulterFile, folder: string = 'hostelgh'): Promise<UploadResult> {
+        return new Promise((resolve, reject) => {
+            const upload = cloudinary.uploader.upload_stream(
+                {
+                    folder,
+                    resource_type: 'auto',
+                    transformation: [{ width: 1600, height: 1000, crop: 'limit' }],
+                },
+                (error: UploadApiErrorResponse, result: UploadApiResponse) => {
+                    if (error) return reject(error);
+                    resolve({
+                        url: result.secure_url,
+                        publicId: result.public_id,
+                    });
+                },
+            );
+
+            const stream = new Readable();
+            stream.push(file.buffer);
+            stream.push(null);
+            stream.pipe(upload);
+        });
+    }
+
     async uploadMultiple(files: MulterFile[]): Promise<string[]> {
         const uploadPromises = files.map((file) => this.uploadImage(file));
         return Promise.all(uploadPromises);
     }
+
+    async uploadMultipleWithMetadata(files: MulterFile[], folder: string = 'hostelgh'): Promise<UploadResult[]> {
+        const uploadPromises = files.map((file) => this.uploadImageWithMetadata(file, folder));
+        return Promise.all(uploadPromises);
+    }
+
+    async deleteImage(publicId: string): Promise<void> {
+        try {
+            await cloudinary.uploader.destroy(publicId);
+        } catch (error) {
+            console.error('Error deleting image from Cloudinary:', error);
+            throw error;
+        }
+    }
 }
+

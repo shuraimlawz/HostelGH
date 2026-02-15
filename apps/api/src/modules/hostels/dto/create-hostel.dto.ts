@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, IsOptional, IsBoolean } from "class-validator";
+import { IsString, IsNotEmpty, IsOptional, IsBoolean, IsEnum, IsArray } from "class-validator";
 import { ApiProperty, PartialType } from "@nestjs/swagger";
 
 export class CreateHostelDto {
@@ -31,6 +31,19 @@ export class CreateHostelDto {
 
     @ApiProperty({ example: "KNUST" })
     @IsOptional() @IsString() university?: string;
+
+    // Ghana-specific fields
+    @ApiProperty({ example: "0534094403", required: false })
+    @IsOptional() @IsString() whatsappNumber?: string;
+
+    @ApiProperty({ example: "10 minutes walk", required: false })
+    @IsOptional() @IsString() distanceToCampus?: string;
+
+    @ApiProperty({ example: ["water", "light", "gas"], required: false })
+    @IsOptional() @IsArray() @IsString({ each: true }) utilitiesIncluded?: string[];
+
+    @ApiProperty({ example: "OPEN", enum: ["OPEN", "LIMITED", "CLOSED", "FULL"], required: false })
+    @IsOptional() @IsEnum(["OPEN", "LIMITED", "CLOSED", "FULL"]) bookingStatus?: string;
 }
 
 export class UpdateHostelDto extends PartialType(CreateHostelDto) { }

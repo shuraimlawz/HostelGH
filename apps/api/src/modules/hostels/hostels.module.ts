@@ -1,10 +1,12 @@
-import { Module } from "@nestjs/common";
-import { HostelsController } from "./hostels.controller";
-import { HostelsService } from "./hostels.service";
+import { Module } from '@nestjs/common';
+import { HostelsService } from './hostels.service';
+import { HostelsController } from './hostels.controller';
+import { PrismaModule } from '../../prisma/prisma.module';
+import { UploadModule } from '../upload/upload.module';
 
 @Module({
-    controllers: [HostelsController],
+    imports: [PrismaModule, UploadModule],
     providers: [HostelsService],
-    exports: [HostelsService],
+    controllers: [HostelsController],
 })
 export class HostelsModule { }

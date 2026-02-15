@@ -3,8 +3,8 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
   directUrl = env("DIRECT_URL")
 }
 
@@ -15,15 +15,15 @@ enum UserRole {
 }
 
 enum BookingStatus {
-  PENDING_APPROVAL   // tenant created, waiting owner action
-  APPROVED           // owner approved, payment can proceed (or required)
-  REJECTED           // owner rejected
-  CANCELLED          // tenant/admin cancelled
-  CONFIRMED          // payment verified (or marked confirmed)
-  CHECKED_IN         // tenant has moved in
-  CHECKED_OUT        // tenant has moved out
-  COMPLETED          // booking fully finished
-  EXPIRED            // auto-expired if not paid within window (optional)
+  PENDING_APPROVAL // tenant created, waiting owner action
+  APPROVED // owner approved, payment can proceed (or required)
+  REJECTED // owner rejected
+  CANCELLED // tenant/admin cancelled
+  CONFIRMED // payment verified (or marked confirmed)
+  CHECKED_IN // tenant has moved in
+  CHECKED_OUT // tenant has moved out
+  COMPLETED // booking fully finished
+  EXPIRED // auto-expired if not paid within window (optional)
 }
 
 enum PaymentProvider {
@@ -43,28 +43,41 @@ enum PayoutMethodType {
   MOBILE_MONEY
 }
 
+enum RoomGender {
+  MALE
+  FEMALE
+  MIXED
+}
+
+enum HostelBookingStatus {
+  OPEN // Accepting bookings
+  LIMITED // Few slots left
+  CLOSED // Not accepting bookings
+  FULL // No availability
+}
+
 model User {
-  id            String   @id @default(cuid())
-  email         String   @unique
-  phone         String?  @unique
-  passwordHash  String?
-  googleId      String?  @unique
-  role          UserRole @default(TENANT)
+  id           String   @id @default(cuid())
+  email        String   @unique
+  phone        String?  @unique
+  passwordHash String?
+  googleId     String?  @unique
+  role         UserRole @default(TENANT)
 
-  firstName     String?
-  lastName      String?
+  firstName String?
+  lastName  String?
 
-  isActive      Boolean  @default(true)
-  emailVerified Boolean  @default(false)
-  isOnboarded   Boolean  @default(true)
+  isActive           Boolean @default(true)
+  emailVerified      Boolean @default(false)
+  isOnboarded        Boolean @default(true)
   emailNotifications Boolean @default(true)
 
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   // relations
-  ownedHostels  Hostel[]  @relation("HostelOwner")
-  bookings      Booking[] @relation("BookingTenant")
+  ownedHostels  Hostel[]       @relation("HostelOwner")
+  bookings      Booking[]      @relation("BookingTenant")
   refreshTokens RefreshToken[]
   payoutMethods PayoutMethod[]
 
@@ -75,59 +88,65 @@ model PayoutMethod {
   id            String           @id @default(cuid())
   ownerId       String
   type          PayoutMethodType
-  provider      String           // e.g. "GCB", "MTN"
+  provider      String // e.g. "GCB", "MTN"
   accountNumber String
   accountName   String
   isDefault     Boolean          @default(false)
   createdAt     DateTime         @default(now())
   updatedAt     DateTime         @updatedAt
 
-  owner         User             @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  owner User @relation(fields: [ownerId], references: [id], onDelete: Cascade)
 
   @@index([ownerId])
 }
 
 model RefreshToken {
-  id          String   @id @default(cuid())
-  userId      String
-  tokenHash   String   // store hashed refresh token
-  revokedAt   DateTime?
-  expiresAt   DateTime
-  createdAt   DateTime @default(now())
+  id        String    @id @default(cuid())
+  userId    String
+  tokenHash String // store hashed refresh token
+  revokedAt DateTime?
+  expiresAt DateTime
+  createdAt DateTime  @default(now())
 
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([expiresAt])
 }
 
 model Hostel {
-  id          String   @id @default(cuid())
+  id          String  @id @default(cuid())
   ownerId     String
   name        String
   description String?
   addressLine String
   city        String
   region      String?
-  country     String   @default("GH")
+  country     String  @default("GH")
 
-  latitude    Float?
-  longitude   Float?
+  latitude  Float?
+  longitude Float?
 
-  images      String[] @default([])
-  amenities   String[] @default([])
-  university  String?
+  images     String[] @default([])
+  amenities  String[] @default([])
+  university String?
 
-  isFeatured  Boolean  @default(false)
-  minPrice    Int?
+  isFeatured Boolean @default(false)
+  minPrice   Int?
+
+  // Ghana-specific fields
+  whatsappNumber    String? // Primary contact method
+  distanceToCampus  String? // "10 minutes walk", "5 min trotro"
+  utilitiesIncluded String[]            @default([]) // ["water", "light", "gas"]
+  bookingStatus     HostelBookingStatus @default(OPEN)
 
   isPublished Boolean  @default(false)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  owner       User     @relation("HostelOwner", fields: [ownerId], references: [id], onDelete: Restrict)
-  rooms       Room[]
-  bookings    Booking[]
+  owner    User      @relation("HostelOwner", fields: [ownerId], references: [id], onDelete: Restrict)
+  rooms    Room[]
+  bookings Booking[]
 
   @@index([ownerId])
   @@index([city])
@@ -135,92 +154,107 @@ model Hostel {
 }
 
 model Room {
-  id          String   @id @default(cuid())
-  hostelId    String
-  name        String   // e.g. "2-in-1", "4-in-1"
-  description String?
-  capacity    Int      // number of tenants per room
-  totalUnits  Int      // inventory count of this room type
-  pricePerTerm Int     // store in minor unit? (e.g. kobo/pesewas) decide in service layer
+  id           String   @id @default(cuid())
+  hostelId     String
+  name         String // e.g. "2-in-1", "4-in-1"
+  description  String?
+  capacity     Int // number of tenants per room
+  totalUnits   Int // inventory count of this room type
+  pricePerTerm Int // store in minor unit? (e.g. kobo/pesewas) decide in service layer
   images       String[] @default([])
 
-  isActive    Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  // Ghana-specific fields
+  roomConfiguration String // "1 in a room", "2 in a room", etc.
+  gender            RoomGender @default(MIXED)
+  totalSlots        Int // Total available slots
+  availableSlots    Int // Current availability
+  hasAC             Boolean    @default(false)
+  utilitiesIncluded String[]   @default([]) // ["water", "light", "gas"]
 
-  hostel      Hostel   @relation(fields: [hostelId], references: [id], onDelete: Cascade)
-  bookings    BookingItem[]
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  hostel   Hostel        @relation(fields: [hostelId], references: [id], onDelete: Cascade)
+  bookings BookingItem[]
 
   @@index([hostelId])
   @@index([isActive])
+  @@index([gender])
 }
 
 model Booking {
-  id           String        @id @default(cuid())
-  hostelId     String
-  tenantId     String
-  status       BookingStatus @default(PENDING_APPROVAL)
+  id       String        @id @default(cuid())
+  hostelId String
+  tenantId String
+  status   BookingStatus @default(PENDING_APPROVAL)
 
   // term/time window (customize later)
-  startDate    DateTime
-  endDate      DateTime
+  startDate DateTime
+  endDate   DateTime
 
-  notes        String?
-  expiresAt    DateTime?     // for approval/payment window (optional)
+  notes     String?
+  expiresAt DateTime? // for approval/payment window (optional)
 
-  deletionRequested Boolean  @default(false)
+  // Ghana-specific fields
+  paymentDeadline DateTime? // 24-hour payment deadline
+  autoReleaseAt   DateTime? // When to auto-release if unpaid
+  slotNumber      Int? // Assigned slot number
+
+  deletionRequested Boolean @default(false)
   deletionReason    String?
 
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  hostel       Hostel        @relation(fields: [hostelId], references: [id], onDelete: Restrict)
-  tenant       User          @relation("BookingTenant", fields: [tenantId], references: [id], onDelete: Restrict)
+  hostel Hostel @relation(fields: [hostelId], references: [id], onDelete: Restrict)
+  tenant User   @relation("BookingTenant", fields: [tenantId], references: [id], onDelete: Restrict)
 
-  items        BookingItem[]
-  payment      Payment?
+  items   BookingItem[]
+  payment Payment?
 
   @@index([hostelId])
   @@index([tenantId])
   @@index([status])
+  @@index([autoReleaseAt])
 }
 
 model BookingItem {
-  id         String   @id @default(cuid())
-  bookingId  String
-  roomId     String
-  quantity   Int      @default(1) // number of units requested of this room type
-  unitPrice  Int      // price snapshot at time of booking
-  createdAt  DateTime @default(now())
+  id        String   @id @default(cuid())
+  bookingId String
+  roomId    String
+  quantity  Int      @default(1) // number of units requested of this room type
+  unitPrice Int // price snapshot at time of booking
+  createdAt DateTime @default(now())
 
-  booking    Booking  @relation(fields: [bookingId], references: [id], onDelete: Cascade)
-  room       Room     @relation(fields: [roomId], references: [id], onDelete: Restrict)
+  booking Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  room    Room    @relation(fields: [roomId], references: [id], onDelete: Restrict)
 
   @@index([bookingId])
   @@index([roomId])
 }
 
 model Payment {
-  id            String          @id @default(cuid())
-  bookingId     String          @unique
-  provider      PaymentProvider @default(PAYSTACK)
-  status        PaymentStatus   @default(INITIATED)
+  id        String          @id @default(cuid())
+  bookingId String          @unique
+  provider  PaymentProvider @default(PAYSTACK)
+  status    PaymentStatus   @default(INITIATED)
 
-  amount        Int             // in minor unit
-  currency      String          @default("GH₵")
+  amount   Int // in minor unit
+  currency String @default("GH₵")
 
   // Paystack fields
-  reference     String          @unique
+  reference        String  @unique
   authorizationUrl String?
-  accessCode    String?
+  accessCode       String?
 
-  paidAt        DateTime?
-  rawWebhook    Json?           // store last webhook payload (optional)
+  paidAt     DateTime?
+  rawWebhook Json? // store last webhook payload (optional)
 
-  createdAt     DateTime        @default(now())
-  updatedAt     DateTime        @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  booking       Booking         @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  booking Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
 
   @@index([status])
   @@index([provider])
