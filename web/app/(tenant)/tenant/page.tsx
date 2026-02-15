@@ -68,7 +68,7 @@ export default function TenantDashboardPage() {
     )[0];
 
     // Profile completion percentage
-    const profileFields = [user?.firstName, user?.lastName, user?.phone];
+    const profileFields = [user?.firstName, user?.lastName, (user as any)?.phone];
     const completedFields = profileFields.filter(Boolean).length;
     const profileCompletion = Math.round((completedFields / profileFields.length) * 100);
 
