@@ -9,9 +9,12 @@ import {
     Settings,
     PlusCircle,
     ChevronRight,
-    CreditCard
+    CreditCard,
+    Menu,
+    X
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useState } from "react";
 
 const links = [
     { name: "Dashboard", href: "/owner", icon: LayoutDashboard },
@@ -24,9 +27,10 @@ const links = [
 
 export default function OwnerSidebar() {
     const pathname = usePathname();
+    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-    return (
-        <aside className="hidden md:flex flex-col w-72 bg-white border-r min-h-[calc(100vh-80px)] p-6 gap-2">
+    const SidebarContent = () => (
+        <>
             <div className="mb-6 px-2">
                 <h2 className="text-xs font-bold text-gray-400 uppercase tracking-widest">Management</h2>
             </div>
@@ -37,6 +41,7 @@ export default function OwnerSidebar() {
                         <Link
                             key={link.href}
                             href={link.href}
+                            onClick={() => setMobileMenuOpen(false)}
                             className={cn(
                                 "flex items-center justify-between px-4 py-3 rounded-xl transition-all group",
                                 isActive
@@ -66,6 +71,49 @@ export default function OwnerSidebar() {
                     <div className="absolute -bottom-4 -right-4 w-20 h-20 bg-white/10 rounded-full blur-2xl"></div>
                 </div>
             </div>
-        </aside>
+        </>
+    );
+
+    return (
+        <>
+            {/* Mobile Hamburger Button */}
+            <button
+                onClick={() => setMobileMenuOpen(true)}
+                className="md:hidden fixed top-24 left-4 z-40 p-3 bg-white text-gray-900 rounded-xl shadow-lg border border-gray-200 hover:bg-gray-50 transition-colors"
+                aria-label="Open menu"
+            >
+                <Menu size={20} />
+            </button>
+
+            {/* Mobile Backdrop */}
+            {mobileMenuOpen && (
+                <div
+                    className="md:hidden fixed inset-0 bg-black/60 z-40 animate-in fade-in duration-200"
+                    onClick={() => setMobileMenuOpen(false)}
+                />
+            )}
+
+            {/* Mobile Drawer */}
+            <aside
+                className={cn(
+                    "md:hidden fixed top-0 left-0 bottom-0 w-72 bg-white border-r p-6 gap-2 z-50 flex flex-col transition-transform duration-300",
+                    mobileMenuOpen ? "translate-x-0" : "-translate-x-full"
+                )}
+            >
+                <button
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="absolute top-4 right-4 p-2 text-gray-400 hover:text-gray-900 transition-colors"
+                    aria-label="Close menu"
+                >
+                    <X size={20} />
+                </button>
+                <SidebarContent />
+            </aside>
+
+            {/* Desktop Sidebar */}
+            <aside className="hidden md:flex flex-col w-72 bg-white border-r min-h-[calc(100vh-80px)] p-6 gap-2">
+                <SidebarContent />
+            </aside>
+        </>
     );
 }

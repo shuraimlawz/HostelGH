@@ -15,9 +15,12 @@ import {
     BarChart3,
     AlertCircle,
     Trash2,
-    CheckCircle2
+    CheckCircle2,
+    Menu,
+    X
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useState } from "react";
 
 const adminLinks = [
     { name: "Overview", href: "/admin", icon: LayoutDashboard },
@@ -31,6 +34,7 @@ const deletionLink = { name: "Deletion Requests", href: "/admin/deletions", icon
 
 export default function AdminSidebar() {
     const pathname = usePathname();
+    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
     const { data: alerts } = useQuery({
         queryKey: ["admin-alerts"],
@@ -45,8 +49,8 @@ export default function AdminSidebar() {
     const hasCriticalAlerts = alerts && alerts.length > 0;
     const activeAlert = hasCriticalAlerts ? alerts[0] : null;
 
-    return (
-        <aside className="hidden lg:flex flex-col w-72 bg-gray-950 border-r border-gray-800 min-h-[calc(100vh-80px)] p-6 gap-2 text-gray-300">
+    const SidebarContent = () => (
+        <>
             <div className="mb-8 px-2">
                 <div className="flex items-center gap-2 mb-1">
                     <ShieldCheck className="text-blue-500" size={16} />
@@ -62,6 +66,7 @@ export default function AdminSidebar() {
                         <Link
                             key={link.href}
                             href={link.href}
+                            onClick={() => setMobileMenuOpen(false)}
                             className={cn(
                                 "flex items-center justify-between px-4 py-3.5 rounded-2xl transition-all group",
                                 isActive
@@ -81,6 +86,7 @@ export default function AdminSidebar() {
                 <div className="pt-4 mt-4 border-t border-gray-800">
                     <Link
                         href={deletionLink.href}
+                        onClick={() => setMobileMenuOpen(false)}
                         className={cn(
                             "flex items-center justify-between px-4 py-3.5 rounded-2xl transition-all group",
                             pathname === deletionLink.href
@@ -122,6 +128,49 @@ export default function AdminSidebar() {
                     </div>
                 )}
             </div>
-        </aside>
+        </>
+    );
+
+    return (
+        <>
+            {/* Mobile Hamburger Button */}
+            <button
+                onClick={() => setMobileMenuOpen(true)}
+                className="lg:hidden fixed top-24 left-4 z-40 p-3 bg-gray-950 text-white rounded-xl shadow-lg border border-gray-800 hover:bg-gray-900 transition-colors"
+                aria-label="Open menu"
+            >
+                <Menu size={20} />
+            </button>
+
+            {/* Mobile Backdrop */}
+            {mobileMenuOpen && (
+                <div
+                    className="lg:hidden fixed inset-0 bg-black/60 z-40 animate-in fade-in duration-200"
+                    onClick={() => setMobileMenuOpen(false)}
+                />
+            )}
+
+            {/* Mobile Drawer */}
+            <aside
+                className={cn(
+                    "lg:hidden fixed top-0 left-0 bottom-0 w-72 bg-gray-950 border-r border-gray-800 p-6 gap-2 text-gray-300 z-50 flex flex-col transition-transform duration-300",
+                    mobileMenuOpen ? "translate-x-0" : "-translate-x-full"
+                )}
+            >
+                <button
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="absolute top-4 right-4 p-2 text-gray-400 hover:text-white transition-colors"
+                    aria-label="Close menu"
+                >
+                    <X size={20} />
+                </button>
+                <SidebarContent />
+            </aside>
+
+            {/* Desktop Sidebar */}
+            <aside className="hidden lg:flex flex-col w-72 bg-gray-950 border-r border-gray-800 min-h-[calc(100vh-80px)] p-6 gap-2 text-gray-300">
+                <SidebarContent />
+            </aside>
+        </>
     );
 }
