@@ -5,6 +5,8 @@ import { RolesGuard } from "../auth/guards/roles.guard";
 import { Roles } from "../auth/decorators/roles.decorator";
 import { UserRole } from "@prisma/client";
 import { ApiBearerAuth, ApiOperation, ApiTags } from "@nestjs/swagger";
+import { CreateInternalUserDto } from "./dto/create-internal-user.dto";
+import { BroadcastMessageDto } from "./dto/broadcast-message.dto";
 
 @ApiTags("Admin")
 @Controller("admin")
@@ -34,13 +36,13 @@ export class AdminController {
 
     @Post("users")
     @ApiOperation({ summary: "Create an internal user (Admin/Support)" })
-    createInternalUser(@Body() dto: any) {
+    createInternalUser(@Body() dto: CreateInternalUserDto) {
         return this.adminService.createInternalUser(dto);
     }
 
     @Post("broadcast")
     @ApiOperation({ summary: "Send a broadcast message to all users" })
-    broadcastMessage(@Body() dto: { title: string; message: string; type: "info" | "warning" | "alert" }) {
+    broadcastMessage(@Body() dto: BroadcastMessageDto) {
         return this.adminService.broadcastMessage(dto);
     }
 }

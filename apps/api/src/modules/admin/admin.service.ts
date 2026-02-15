@@ -3,6 +3,8 @@ import { PrismaService } from "../../prisma/prisma.service";
 import * as bcrypt from "bcrypt";
 import { UserRole } from "@prisma/client";
 import { NotificationsService } from "../notifications/notifications.service";
+import { CreateInternalUserDto } from "./dto/create-internal-user.dto";
+import { BroadcastMessageDto } from "./dto/broadcast-message.dto";
 
 @Injectable()
 export class AdminService {
@@ -107,7 +109,7 @@ export class AdminService {
         return alerts;
     }
 
-    async createInternalUser(dto: any) {
+    async createInternalUser(dto: CreateInternalUserDto) {
         const existing = await this.prisma.user.findUnique({ where: { email: dto.email } });
         if (existing) throw new BadRequestException("User already exists");
 
@@ -117,7 +119,7 @@ export class AdminService {
             data: {
                 email: dto.email,
                 passwordHash: hashedPassword,
-                role: dto.role || UserRole.ADMIN,
+                role: dto.role,
                 firstName: dto.firstName,
                 lastName: dto.lastName,
                 isOnboarded: true,
@@ -126,7 +128,7 @@ export class AdminService {
         });
     }
 
-    async broadcastMessage(dto: { title: string; message: string; type: "info" | "warning" | "alert" }) {
+    async broadcastMessage(dto: BroadcastMessageDto) {
         // Real implementation: Send emails to all users
         // Note: For large scale, use a queue (BullMQ). Direct loop is blocking but "real".
 
