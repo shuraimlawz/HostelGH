@@ -37,50 +37,58 @@ export class AdminService {
             this.prisma.user.findMany({
                 take: 5,
                 orderBy: { createdAt: 'desc' },
-                select: { firstName: true, email: true, createdAt: true, role: true }
+                select: { id: true, firstName: true, email: true, createdAt: true, role: true }
             }),
             this.prisma.booking.findMany({
                 take: 5,
                 orderBy: { createdAt: 'desc' },
-                include: { tenant: { select: { firstName: true, email: true } } }
+                include: { tenant: { select: { id: true, firstName: true, email: true } } }
             }),
             this.prisma.payment.findMany({
                 take: 5,
                 where: { status: "SUCCESS" },
                 orderBy: { createdAt: 'desc' },
-                include: { booking: { include: { tenant: { select: { firstName: true, email: true } } } } }
+                include: { booking: { include: { tenant: { select: { id: true, firstName: true, email: true } } } } }
             }),
             this.prisma.hostel.findMany({
                 take: 5,
                 orderBy: { createdAt: 'desc' },
-                include: { owner: { select: { firstName: true, email: true } } }
+                include: { owner: { select: { id: true, firstName: true, email: true } } }
             })
         ]);
 
         const activities = [
             ...users.map(u => ({
+                id: u.id,
                 user: u.firstName || u.email.split('@')[0],
                 action: `Registered as ${u.role.toLowerCase()}`,
                 time: u.createdAt,
-                type: "success"
+                type: "success",
+                targetUrl: `/admin/users?search=${u.email}`
             })),
             ...bookings.map(b => ({
+                id: b.id,
                 user: b.tenant.firstName || b.tenant.email.split('@')[0],
                 action: "Created a new booking",
                 time: b.createdAt,
-                type: "info"
+                type: "info",
+                targetUrl: `/admin/users?search=${b.tenant.email}`
             })),
             ...payments.map(p => ({
+                id: p.id,
                 user: p.booking.tenant.firstName || p.booking.tenant.email.split('@')[0],
                 action: `Payment successful (₵${(p.amount / 100).toFixed(2)})`,
                 time: p.createdAt,
-                type: "success"
+                type: "success",
+                targetUrl: `/admin/users?search=${p.booking.tenant.email}`
             })),
             ...hostels.map(h => ({
+                id: h.id,
                 user: h.owner.firstName || h.owner.email.split('@')[0],
                 action: `Listed new hostel: ${h.name}`,
                 time: h.createdAt,
-                type: "warning"
+                type: "warning",
+                targetUrl: `/hostels/${h.id}` // Public hostel page or arguably admin edit page
             }))
         ].sort((a, b) => b.time.getTime() - a.time.getTime()).slice(0, 10);
 

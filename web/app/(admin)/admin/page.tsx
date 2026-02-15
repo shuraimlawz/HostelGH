@@ -2,6 +2,7 @@
 
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { api } from "@/lib/api";
+import Link from "next/link";
 import {
     Users,
     Building2,
@@ -124,7 +125,12 @@ export default function AdminDashboardPage() {
                                         {new Date(log.time).toLocaleString()}
                                     </p>
                                 </div>
-                                <button className="opacity-0 group-hover:opacity-100 px-3 py-1 text-[10px] font-black text-gray-400 hover:text-black transition-all">Details</button>
+                                <Link
+                                    href={log.targetUrl || "#"}
+                                    className="opacity-0 group-hover:opacity-100 px-3 py-1 text-[10px] font-black text-gray-400 hover:text-black transition-all"
+                                >
+                                    Details
+                                </Link>
                             </div>
                         ))}
                         {activity?.length === 0 && (

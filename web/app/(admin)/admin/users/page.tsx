@@ -14,14 +14,16 @@ import {
     X,
     Check
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { useSearchParams } from "next/navigation";
 
 export default function AdminUsersPage() {
     const queryClient = useQueryClient();
-    const [search, setSearch] = useState("");
+    const searchParams = useSearchParams();
+    const [search, setSearch] = useState(searchParams.get("search") || "");
     const [page, setPage] = useState(1);
     const [addUserOpen, setAddUserOpen] = useState(false);
     const [addUserForm, setAddUserForm] = useState({
