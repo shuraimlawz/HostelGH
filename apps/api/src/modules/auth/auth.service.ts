@@ -137,7 +137,7 @@ export class AuthService {
             { sub: userId, role },
             {
                 secret: this.config.get<string>('jwt.accessSecret'),
-                expiresIn: "15m"
+                expiresIn: "7d"
             }
         );
 

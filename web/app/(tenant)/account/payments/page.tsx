@@ -1,7 +1,7 @@
 "use client";
 // Forced fix for Vercel build
 
-import { CreditCard, History, Download, Loader2, Plus, Trash2, CheckCircle2, MoreVertical, Smartphone } from "lucide-react";
+import { CreditCard, History, Download, Loader2, Plus, Trash2, CheckCircle2, MoreVertical, Smartphone, Building2 } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 import { format } from "date-fns";
@@ -35,7 +35,8 @@ export default function TenantPaymentsPage() {
     const [newMethod, setNewMethod] = useState({
         type: "MOMO",
         provider: "MTN",
-        phone: ""
+        phone: "",
+        last4: ""
     });
 
     const { data: payments, isLoading: isPaymentsLoading } = useQuery({
@@ -61,7 +62,7 @@ export default function TenantPaymentsPage() {
         onSuccess: () => {
             toast.success("Payment method saved successfully");
             setIsAddModalOpen(false);
-            setNewMethod({ type: "MOMO", provider: "MTN", phone: "" });
+            setNewMethod({ type: "MOMO", provider: "MTN", phone: "", last4: "" });
             queryClient.invalidateQueries({ queryKey: ["saved-payment-methods"] });
         },
         onError: (error: any) => {
@@ -93,6 +94,10 @@ export default function TenantPaymentsPage() {
         e.preventDefault();
         if (newMethod.type === "MOMO" && !/^233[0-9]{9}$/.test(newMethod.phone)) {
             toast.error("Please enter a valid Ghana phone number (233XXXXXXXXX)");
+            return;
+        }
+        if (newMethod.type === "CARD" && !/^[0-9]{4}$/.test(newMethod.last4)) {
+            toast.error("Please enter the last 4 digits of your card");
             return;
         }
         addMethodMutation.mutate(newMethod);
@@ -136,37 +141,109 @@ export default function TenantPaymentsPage() {
                                 <DialogHeader>
                                     <DialogTitle>Add Payment Method</DialogTitle>
                                     <DialogDescription>
-                                        Save your MoMo details for faster checkout.
+                                        Save your payment details for faster checkout.
                                     </DialogDescription>
                                 </DialogHeader>
                                 <form onSubmit={handleAddMethod} className="space-y-4 py-4">
                                     <div className="space-y-2">
-                                        <Label>Provider</Label>
+                                        <Label>Method Type</Label>
                                         <Select
-                                            value={newMethod.provider}
-                                            onValueChange={(v) => setNewMethod({ ...newMethod, provider: v })}
+                                            value={newMethod.type}
+                                            onValueChange={(v) => {
+                                                const defaultProvider = v === "MOMO" ? "MTN" : v === "CARD" ? "VISA" : "GCB BANK";
+                                                setNewMethod({ ...newMethod, type: v, provider: defaultProvider });
+                                            }}
                                         >
                                             <SelectTrigger>
-                                                <SelectValue placeholder="Select provider" />
+                                                <SelectValue placeholder="Select type" />
                                             </SelectTrigger>
                                             <SelectContent>
-                                                <SelectItem value="MTN">MTN Mobile Money</SelectItem>
-                                                <SelectItem value="VODAFONE">Vodafone Cash</SelectItem>
-                                                <SelectItem value="AIRTELTIGO">AirtelTigo Money</SelectItem>
+                                                <SelectItem value="MOMO">Mobile Money</SelectItem>
+                                                <SelectItem value="CARD">Bank Card</SelectItem>
+                                                <SelectItem value="BANK">Bank Transfer</SelectItem>
                                             </SelectContent>
                                         </Select>
                                     </div>
+
                                     <div className="space-y-2">
-                                        <Label htmlFor="momoNumber">MoMo Number</Label>
-                                        <Input
-                                            id="momoNumber"
-                                            placeholder="233XXXXXXXXX"
-                                            value={newMethod.phone}
-                                            onChange={(e) => setNewMethod({ ...newMethod, phone: e.target.value })}
-                                            required
-                                        />
-                                        <p className="text-[10px] text-gray-500 font-medium">Must start with 233, e.g. 233244123456</p>
+                                        <Label>Provider / Bank Name</Label>
+                                        {newMethod.type === "MOMO" ? (
+                                            <Select
+                                                value={newMethod.provider}
+                                                onValueChange={(v) => setNewMethod({ ...newMethod, provider: v })}
+                                            >
+                                                <SelectTrigger>
+                                                    <SelectValue placeholder="Select provider" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    <SelectItem value="MTN">MTN Mobile Money</SelectItem>
+                                                    <SelectItem value="VODAFONE">Vodafone Cash</SelectItem>
+                                                    <SelectItem value="AIRTELTIGO">AirtelTigo Money</SelectItem>
+                                                </SelectContent>
+                                            </Select>
+                                        ) : newMethod.type === "CARD" ? (
+                                            <Select
+                                                value={newMethod.provider}
+                                                onValueChange={(v) => setNewMethod({ ...newMethod, provider: v })}
+                                            >
+                                                <SelectTrigger>
+                                                    <SelectValue placeholder="Select provider" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    <SelectItem value="VISA">Visa</SelectItem>
+                                                    <SelectItem value="MASTERCARD">Mastercard</SelectItem>
+                                                </SelectContent>
+                                            </Select>
+                                        ) : (
+                                            <Input
+                                                placeholder="e.g. GCB Bank, Ecobank"
+                                                value={newMethod.provider}
+                                                onChange={(e) => setNewMethod({ ...newMethod, provider: e.target.value })}
+                                                required
+                                            />
+                                        )}
                                     </div>
+
+                                    {newMethod.type === "MOMO" && (
+                                        <div className="space-y-2">
+                                            <Label htmlFor="momoNumber">MoMo Number</Label>
+                                            <Input
+                                                id="momoNumber"
+                                                placeholder="233XXXXXXXXX"
+                                                value={newMethod.phone}
+                                                onChange={(e) => setNewMethod({ ...newMethod, phone: e.target.value })}
+                                                required
+                                            />
+                                            <p className="text-[10px] text-gray-500 font-medium">Must start with 233, e.g. 233244123456</p>
+                                        </div>
+                                    )}
+
+                                    {newMethod.type === "CARD" && (
+                                        <div className="space-y-2">
+                                            <Label htmlFor="last4">Last 4 Digits</Label>
+                                            <Input
+                                                id="last4"
+                                                placeholder="1234"
+                                                maxLength={4}
+                                                value={newMethod.last4}
+                                                onChange={(e) => setNewMethod({ ...newMethod, last4: e.target.value })}
+                                                required
+                                            />
+                                        </div>
+                                    )}
+
+                                    {newMethod.type === "BANK" && (
+                                        <div className="space-y-2">
+                                            <Label htmlFor="accountNumber">Account Number</Label>
+                                            <Input
+                                                id="accountNumber"
+                                                placeholder="Enter account number"
+                                                value={newMethod.phone}
+                                                onChange={(e) => setNewMethod({ ...newMethod, phone: e.target.value })}
+                                                required
+                                            />
+                                        </div>
+                                    )}
                                     <DialogFooter>
                                         <Button type="button" variant="outline" onClick={() => setIsAddModalOpen(false)}>Cancel</Button>
                                         <Button type="submit" disabled={addMethodMutation.isPending}>
@@ -185,11 +262,15 @@ export default function TenantPaymentsPage() {
                                 <div key={method.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-2xl border border-transparent hover:border-gray-200 transition-all group">
                                     <div className="flex items-center gap-4">
                                         <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center border shadow-sm">
-                                            {method.type === "MOMO" ? <Smartphone size={20} className="text-gray-400" /> : <CreditCard size={20} className="text-gray-400" />}
+                                            {method.type === "MOMO" ? <Smartphone size={20} className="text-gray-400" /> :
+                                                method.type === "BANK" ? <Building2 size={20} className="text-gray-400" /> :
+                                                    <CreditCard size={20} className="text-gray-400" />}
                                         </div>
                                         <div>
                                             <div className="flex items-center gap-2">
-                                                <p className="font-bold text-gray-900">{method.provider} • {method.phone || `**** ${method.last4}`}</p>
+                                                <p className="font-bold text-gray-900">
+                                                    {method.provider} • {method.type === "CARD" ? `**** ${method.last4}` : method.phone}
+                                                </p>
                                                 {method.isDefault && (
                                                     <span className="text-[8px] font-black uppercase tracking-widest bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full">Default</span>
                                                 )}

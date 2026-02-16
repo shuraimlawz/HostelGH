@@ -3,7 +3,8 @@ import { ApiProperty } from "@nestjs/swagger";
 
 export enum PaymentMethodType {
     MOMO = "MOMO",
-    CARD = "CARD"
+    CARD = "CARD",
+    BANK = "BANK"
 }
 
 export class CreatePaymentMethodDto {
@@ -11,7 +12,7 @@ export class CreatePaymentMethodDto {
     @IsEnum(PaymentMethodType)
     type: string;
 
-    @ApiProperty({ description: "MTN, VODAFONE, AIRTELTIGO, VISA, MASTERCARD" })
+    @ApiProperty({ description: "MTN, VODAFONE, AIRTELTIGO, VISA, MASTERCARD, or BANK_NAME" })
     @IsNotEmpty()
     @IsString()
     provider: string;

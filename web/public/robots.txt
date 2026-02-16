@@ -1,3 +1,13 @@
+# *
 User-agent: *
 Allow: /
+Disallow: /admin
+Disallow: /owner
+Disallow: /tenant
+Disallow: /account
+
+# Host
+Host: https://hostelgh.vercel.app
+
+# Sitemaps
 Sitemap: https://hostelgh.vercel.app/sitemap.xml
