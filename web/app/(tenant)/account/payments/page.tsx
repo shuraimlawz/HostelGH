@@ -117,15 +117,32 @@ export default function TenantPaymentsPage() {
 
     const handleAddMethod = (e: React.FormEvent) => {
         e.preventDefault();
-        if (newMethod.type === "MOMO" && !/^233[0-9]{9}$/.test(newMethod.phone)) {
-            toast.error("Please enter a valid Ghana phone number (233XXXXXXXXX)");
-            return;
+        const payload: any = {
+            type: newMethod.type,
+            provider: newMethod.provider
+        };
+
+        if (newMethod.type === "MOMO") {
+            if (!/^233[0-9]{9}$/.test(newMethod.phone)) {
+                toast.error("Please enter a valid Ghana phone number (233XXXXXXXXX)");
+                return;
+            }
+            payload.phone = newMethod.phone;
+        } else if (newMethod.type === "CARD") {
+            if (!/^[0-9]{4}$/.test(newMethod.last4)) {
+                toast.error("Please enter the last 4 digits of your card");
+                return;
+            }
+            payload.last4 = newMethod.last4;
+        } else if (newMethod.type === "BANK") {
+            if (!newMethod.phone) {
+                toast.error("Please enter your account number");
+                return;
+            }
+            payload.phone = newMethod.phone;
         }
-        if (newMethod.type === "CARD" && !/^[0-9]{4}$/.test(newMethod.last4)) {
-            toast.error("Please enter the last 4 digits of your card");
-            return;
-        }
-        addMethodMutation.mutate(newMethod);
+
+        addMethodMutation.mutate(payload);
     };
 
     const isLoading = isPaymentsLoading || isMethodsLoading;
