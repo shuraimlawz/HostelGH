@@ -18,7 +18,7 @@ export class PaymentsService {
     async initPaystackPayment(actor: { userId: string; role: UserRole }, bookingId: string) {
         const booking = await this.prisma.booking.findUnique({
             where: { id: bookingId },
-            include: { items: true, tenant: true, payment: true, hostel: true },
+            include: { items: true, tenant: true, payment: true, hostel: { include: { owner: true } } },
         });
         if (!booking) throw new NotFoundException("Booking not found");
 
@@ -65,12 +65,16 @@ export class PaymentsService {
         });
 
         const appUrl = this.config.get<string>('APP_URL');
+        const ownerSubaccountCode = booking.hostel?.owner?.paystackSubaccountCode;
+
         const initResponse = await this.paystack.initializeTransaction({
             email: booking.tenant.email,
             amount: totalAmount,
             reference,
             callback_url: appUrl ? `${appUrl}/payment/callback` : undefined,
             metadata: { bookingId: booking.id, tenantId: booking.tenantId },
+            subaccount: ownerSubaccountCode || undefined,
+            bearer: ownerSubaccountCode ? 'subaccount' : undefined,
         });
 
         const data = initResponse?.data;

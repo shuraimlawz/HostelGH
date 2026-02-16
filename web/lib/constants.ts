@@ -1,28 +1,28 @@
 export const GHANA_BANKS = [
-    "GCB Bank",
-    "EcoBank Ghana",
-    "Zenith Bank Ghana",
-    "Absa Bank Ghana",
-    "Stanbic Bank Ghana",
-    "Fidelity Bank Ghana",
-    "Standard Chartered Bank",
-    "CalBank",
-    "ADB Bank",
-    "Republic Bank",
-    "Universal Merchant Bank (UMB)",
-    "Prudential Bank",
-    "Guaranty Trust Bank (GTBank)",
-    "Access Bank Ghana",
-    "First Atlantic Bank",
-    "Société Générale Ghana",
-    "National Investment Bank (NIB)",
-    "Consolidated Bank Ghana (CBG)"
-].sort();
+    { name: "Access Bank Ghana", code: "044" },
+    { name: "ADB Bank", code: "014" },
+    { name: "Absa Bank Ghana", code: "011" },
+    { name: "CalBank", code: "021" },
+    { name: "Consolidated Bank Ghana (CBG)", code: "028" },
+    { name: "EcoBank Ghana", code: "013" },
+    { name: "Fidelity Bank Ghana", code: "024" },
+    { name: "First Atlantic Bank", code: "023" },
+    { name: "GCB Bank", code: "012" },
+    { name: "Guaranty Trust Bank (GTBank)", code: "026" },
+    { name: "National Investment Bank (NIB)", code: "020" },
+    { name: "Prudential Bank", code: "027" },
+    { name: "Republic Bank", code: "019" },
+    { name: "Société Générale Ghana", code: "015" },
+    { name: "Stanbic Bank Ghana", code: "016" },
+    { name: "Standard Chartered Bank", code: "010" },
+    { name: "Universal Merchant Bank (UMB)", code: "017" },
+    { name: "Zenith Bank Ghana", code: "025" }
+].sort((a, b) => a.name.localeCompare(b.name));
 
 export const GHANA_MOMO_PROVIDERS = [
-    "MTN Mobile Money",
-    "Telecel Cash (formerly Vodafone)",
-    "AirtelTigo Money"
+    { name: "MTN Mobile Money", code: "MTN" },
+    { name: "Telecel Cash (formerly Vodafone)", code: "VOD" },
+    { name: "AirtelTigo Money", code: "ATL" }
 ];
 
 export const REGIONAL_UNIVERSITIES = [

@@ -25,6 +25,7 @@ import { GHANA_BANKS, GHANA_MOMO_PROVIDERS } from "@/lib/constants";
 const payoutSchema = z.object({
     type: z.enum(["BANK", "MOBILE_MONEY"]),
     provider: z.string().min(2, "Provider name is required"),
+    bankCode: z.string().optional(),
     accountNumber: z.string().min(8, "Account number is too short"),
     accountName: z.string().min(3, "Account name is required"),
     isDefault: z.boolean(),
@@ -71,7 +72,7 @@ export default function PayoutSettingsPage() {
         },
     });
 
-    const { register, handleSubmit, reset, watch, formState: { errors } } = useForm<PayoutFormValues>({
+    const { register, handleSubmit, reset, watch, setValue, formState: { errors } } = useForm<PayoutFormValues>({
         resolver: zodResolver(payoutSchema),
         defaultValues: {
             type: "BANK",
@@ -132,13 +133,22 @@ export default function PayoutSettingsPage() {
                                 <label className="text-xs font-bold uppercase tracking-widest text-gray-400">Provider Name</label>
                                 <select
                                     {...register("provider")}
+                                    onChange={(e) => {
+                                        const val = e.target.value;
+                                        const list = selectedType === "BANK" ? GHANA_BANKS : GHANA_MOMO_PROVIDERS;
+                                        const found = list.find(l => l.name === val);
+                                        if (found) {
+                                            setValue("bankCode", found.code);
+                                        }
+                                        register("provider").onChange(e);
+                                    }}
                                     className="w-full h-12 bg-gray-50 border rounded-xl px-4 text-sm font-medium focus:ring-2 focus:ring-black outline-none transition-all appearance-none"
                                 >
                                     <option value="">Select a provider</option>
                                     {selectedType === "BANK" ? (
-                                        GHANA_BANKS.map(bank => <option key={bank} value={bank}>{bank}</option>)
+                                        GHANA_BANKS.map(bank => <option key={bank.code} value={bank.name}>{bank.name}</option>)
                                     ) : (
-                                        GHANA_MOMO_PROVIDERS.map(momo => <option key={momo} value={momo}>{momo}</option>)
+                                        GHANA_MOMO_PROVIDERS.map(momo => <option key={momo.code} value={momo.name}>{momo.name}</option>)
                                     )}
                                 </select>
                                 {errors.provider && <p className="text-[10px] text-red-500 font-bold">{errors.provider.message}</p>}

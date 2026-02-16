@@ -8,9 +8,13 @@ export class CreatePayoutMethodDto {
     type: PayoutMethodType;
 
     @ApiProperty({ example: "GCB" })
-    @IsNotEmpty()
     @IsString()
     provider: string;
+
+    @ApiProperty({ example: "013", required: false })
+    @IsOptional()
+    @IsString()
+    bankCode?: string;
 
     @ApiProperty({ example: "1234567890" })
     @IsNotEmpty()

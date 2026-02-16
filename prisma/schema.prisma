@@ -85,6 +85,8 @@ model User {
   payoutRequests PayoutRequest[]
   subscriptions  Subscription[]
 
+  paystackSubaccountCode String? // For automated split payments
+
   @@index([role])
 }
 
@@ -111,6 +113,7 @@ model PayoutMethod {
   provider      String // e.g. "GCB", "MTN"
   accountNumber String
   accountName   String
+  bankCode      String? // Needed for Paystack subaccount creation
   isDefault     Boolean          @default(false)
   createdAt     DateTime         @default(now())
   updatedAt     DateTime         @updatedAt

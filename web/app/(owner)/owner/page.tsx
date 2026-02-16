@@ -76,8 +76,8 @@ export default function OwnerDashboardPage() {
     const completedBookings = bookings?.filter((b: any) => b.status === "CHECKED_OUT" || b.status === "COMPLETED")?.length || 0;
     const currentOccupants = bookings?.filter((b: any) => b.status === "CHECKED_IN")?.length || 0;
 
-    const totalRevenue = bookings?.filter((b: any) => b.status === "CONFIRMED" || b.status === "CHECKED_IN" || b.status === "CHECKED_OUT" || b.status === "COMPLETED")
-        ?.reduce((acc: number, b: any) => acc + (b.items?.[0]?.unitPrice * b.items?.[0]?.quantity || 0), 0) / 100 || 0;
+    const totalRevenue = (bookings?.filter((b: any) => b.status === "CONFIRMED" || b.status === "CHECKED_IN" || b.status === "CHECKED_OUT" || b.status === "COMPLETED")
+        ?.reduce((acc: number, b: any) => acc + (b.items?.[0]?.unitPrice * b.items?.[0]?.quantity || 0), 0) / 100) * 0.95 || 0;
 
     // Get real data from analytics API
     const bookingTrendData = analytics?.monthlyTrends || [];
@@ -140,12 +140,12 @@ export default function OwnerDashboardPage() {
                     iconColor="text-green-600"
                 />
                 <StatsCard
-                    title="Estimated Revenue"
+                    title="Direct Earnings"
                     value={`₵${((wallet?.balance || 0) / 100).toLocaleString()}`}
                     icon={DollarSign}
                     iconBgColor="bg-orange-50"
                     iconColor="text-orange-600"
-                    subtitle="Available for payout"
+                    subtitle="Settled directly to bank"
                 />
             </div>
 

@@ -21,6 +21,8 @@ export class PaystackService {
         reference: string;
         callback_url?: string;
         metadata?: any;
+        subaccount?: string;
+        bearer?: 'subaccount' | 'account';
     }) {
         try {
             const res = await axios.post(
@@ -31,6 +33,8 @@ export class PaystackService {
                     reference: params.reference,
                     callback_url: params.callback_url,
                     metadata: params.metadata,
+                    subaccount: params.subaccount,
+                    bearer: params.bearer,
                 },
                 { headers: { Authorization: `Bearer ${this.secretKey}` } }
             );
@@ -38,6 +42,25 @@ export class PaystackService {
         } catch (error) {
             this.logger.error(`Paystack Init Error: ${error.response?.data?.message || error.message}`);
             throw new BadRequestException("Failed to initialize Paystack transaction");
+        }
+    }
+
+    async createSubaccount(params: {
+        business_name: string;
+        settlement_bank: string;
+        account_number: string;
+        percentage_charge: number;
+    }) {
+        try {
+            const res = await axios.post(
+                `${this.baseUrl}/subaccount`,
+                params,
+                { headers: { Authorization: `Bearer ${this.secretKey}` } }
+            );
+            return res.data;
+        } catch (error) {
+            this.logger.error(`Paystack Subaccount Error: ${error.response?.data?.message || error.message}`);
+            throw new BadRequestException("Failed to create Paystack subaccount");
         }
     }
 

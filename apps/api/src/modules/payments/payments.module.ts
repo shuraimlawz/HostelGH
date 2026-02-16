@@ -9,6 +9,6 @@ import { NotificationsModule } from "../notifications/notifications.module";
     imports: [NotificationsModule],
     controllers: [PaymentsController, WebhooksController],
     providers: [PaymentsService, PaystackService],
-    exports: [PaymentsService],
+    exports: [PaymentsService, PaystackService],
 })
 export class PaymentsModule { }
