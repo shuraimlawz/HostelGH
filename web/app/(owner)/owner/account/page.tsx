@@ -4,7 +4,7 @@ import { useAuth } from "@/lib/auth-context";
 import { useEffect, useState } from "react";
 import { api } from "@/lib/api";
 import { toast } from "sonner";
-import { User, Mail, Phone, Shield, Camera, Loader2 } from "lucide-react";
+import { User, Mail, Phone, Shield, Camera, Loader2, Bell } from "lucide-react";
 
 export default function OwnerAccountPage() {
     const { user, isLoading, updateUser } = useAuth();
@@ -13,6 +13,7 @@ export default function OwnerAccountPage() {
         firstName: "",
         lastName: "",
         phone: "",
+        emailNotifications: true,
     });
 
     useEffect(() => {
@@ -24,6 +25,7 @@ export default function OwnerAccountPage() {
                     firstName: data.firstName || "",
                     lastName: data.lastName || "",
                     phone: data.phone || "",
+                    emailNotifications: data.emailNotifications ?? true,
                 });
             } catch (error) {
                 console.error("Failed to fetch profile", error);
@@ -182,6 +184,41 @@ export default function OwnerAccountPage() {
                             </button>
                         </div>
                     </form>
+
+                    {/* Preferences */}
+                    <div className="bg-white rounded-3xl border p-8 shadow-sm space-y-6">
+                        <h3 className="text-xl font-bold mb-4">Preferences</h3>
+                        <div className="flex items-center justify-between p-4 bg-gray-50 rounded-2xl">
+                            <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center border shadow-sm text-gray-400">
+                                    <Bell size={20} />
+                                </div>
+                                <div>
+                                    <p className="font-bold text-gray-900">Email Notifications</p>
+                                    <p className="text-xs text-gray-500">Receive alerts about new bookings</p>
+                                </div>
+                            </div>
+                            <label className="relative inline-flex items-center cursor-pointer">
+                                <input
+                                    type="checkbox"
+                                    className="sr-only peer"
+                                    checked={formData.emailNotifications}
+                                    onChange={async (e) => {
+                                        const newValue = e.target.checked;
+                                        setFormData({ ...formData, emailNotifications: newValue });
+                                        try {
+                                            await api.patch("/users/me", { emailNotifications: newValue });
+                                            toast.success("Notification preferences updated");
+                                        } catch (error) {
+                                            toast.error("Failed to update settings");
+                                            setFormData({ ...formData, emailNotifications: !newValue });
+                                        }
+                                    }}
+                                />
+                                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                            </label>
+                        </div>
+                    </div>
 
                     <div className="bg-red-50 rounded-3xl p-8 border border-red-100">
                         <h3 className="text-xl font-bold text-red-900 mb-2">Danger Zone</h3>

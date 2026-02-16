@@ -34,8 +34,12 @@ export class PaymentsService {
             throw new BadRequestException("This booking has already been paid for.");
         }
 
+        const COMMISSION_RATE = 0.05; // 5%
         const totalAmount = booking.items.reduce((sum, i) => sum + i.unitPrice * i.quantity, 0);
         if (totalAmount <= 0) throw new BadRequestException("Invalid booking amount");
+
+        const platformFee = Math.round(totalAmount * COMMISSION_RATE);
+        const ownerEarnings = totalAmount - platformFee;
 
         const reference = `HB_${randomBytes(10).toString("hex")}`;
 
@@ -44,13 +48,17 @@ export class PaymentsService {
             update: {
                 status: PaymentStatus.INITIATED,
                 amount: totalAmount,
-                currency: "GH₵",
+                platformFee,
+                ownerEarnings,
+                currency: "GHS",
                 reference,
             },
             create: {
                 bookingId: booking.id,
                 amount: totalAmount,
-                currency: "GH₵",
+                platformFee,
+                ownerEarnings,
+                currency: "GHS",
                 reference,
                 status: PaymentStatus.INITIATED,
             },
@@ -128,6 +136,12 @@ export class PaymentsService {
     }
 
     private async completePaymentTransaction(reference: string, bookingId: string, rawWebhook: any, paidAt?: string) {
+        // First get the payment to know ownerEarnings
+        const payment = await this.prisma.payment.findUnique({
+            where: { reference },
+            select: { ownerEarnings: true }
+        });
+
         const [paymentRow, bookingRow] = await this.prisma.$transaction([
             this.prisma.payment.update({
                 where: { reference },
@@ -143,6 +157,22 @@ export class PaymentsService {
                 include: { tenant: true, hostel: { include: { owner: true } } }
             }),
         ]);
+
+        // Increment owner wallet balance
+        if (bookingRow.hostel.ownerId && payment?.ownerEarnings) {
+            await this.prisma.wallet.upsert({
+                where: { ownerId: bookingRow.hostel.ownerId },
+                update: {
+                    balance: { increment: payment.ownerEarnings }
+                },
+                create: {
+                    ownerId: bookingRow.hostel.ownerId,
+                    balance: payment.ownerEarnings,
+                    hostelId: bookingRow.hostelId
+                }
+            });
+        }
+
         return { paymentRow, bookingRow };
     }
 

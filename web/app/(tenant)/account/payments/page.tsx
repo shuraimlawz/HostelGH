@@ -1,14 +1,41 @@
-"use client";
-
-import { CreditCard, History, Download, Loader2, Plus } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
+import { CreditCard, History, Download, Loader2, Plus, Trash2, CheckCircle2, MoreVertical, Smartphone } from "lucide-react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 import { format } from "date-fns";
 import { toast } from "sonner";
 import Link from "next/link";
+import { useState } from "react";
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+    DialogFooter,
+    DialogDescription
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue
+} from "@/components/ui/select";
+import { cn } from "@/lib/utils";
 
 export default function TenantPaymentsPage() {
-    const { data: payments, isLoading } = useQuery({
+    const queryClient = useQueryClient();
+    const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+    const [newMethod, setNewMethod] = useState({
+        type: "MOMO",
+        provider: "MTN",
+        phone: ""
+    });
+
+    const { data: payments, isLoading: isPaymentsLoading } = useQuery({
         queryKey: ["tenant-payments"],
         queryFn: async () => {
             const { data } = await api.get("/payments/history");
@@ -16,12 +43,59 @@ export default function TenantPaymentsPage() {
         }
     });
 
-    const handleAddMethod = () => {
-        toast.info("Secure Payment Integration", {
-            description: "Payments are securely handled by Paystack during checkout. You can save your card details there for future use.",
-            duration: 5000,
-        });
+    const { data: savedMethods, isLoading: isMethodsLoading } = useQuery({
+        queryKey: ["saved-payment-methods"],
+        queryFn: async () => {
+            const { data } = await api.get("/payment-methods");
+            return Array.isArray(data) ? data : [];
+        }
+    });
+
+    const addMethodMutation = useMutation({
+        mutationFn: async (dto: any) => {
+            return api.post("/payment-methods", dto);
+        },
+        onSuccess: () => {
+            toast.success("Payment method saved successfully");
+            setIsAddModalOpen(false);
+            setNewMethod({ type: "MOMO", provider: "MTN", phone: "" });
+            queryClient.invalidateQueries({ queryKey: ["saved-payment-methods"] });
+        },
+        onError: (error: any) => {
+            toast.error(error.response?.data?.message || "Failed to save payment method");
+        }
+    });
+
+    const deleteMethodMutation = useMutation({
+        mutationFn: async (id: string) => {
+            return api.delete(`/payment-methods/${id}`);
+        },
+        onSuccess: () => {
+            toast.success("Payment method deleted");
+            queryClient.invalidateQueries({ queryKey: ["saved-payment-methods"] });
+        }
+    });
+
+    const setDefaultMutation = useMutation({
+        mutationFn: async (id: string) => {
+            return api.patch(`/payment-methods/${id}/default`);
+        },
+        onSuccess: () => {
+            toast.success("Default payment method updated");
+            queryClient.invalidateQueries({ queryKey: ["saved-payment-methods"] });
+        }
+    });
+
+    const handleAddMethod = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (newMethod.type === "MOMO" && !/^233[0-9]{9}$/.test(newMethod.phone)) {
+            toast.error("Please enter a valid Ghana phone number (233XXXXXXXXX)");
+            return;
+        }
+        addMethodMutation.mutate(newMethod);
     };
+
+    const isLoading = isPaymentsLoading || isMethodsLoading;
 
     if (isLoading) {
         return (
@@ -48,17 +122,106 @@ export default function TenantPaymentsPage() {
                             </div>
                             <h2 className="text-lg font-bold">Payment Methods</h2>
                         </div>
-                        <button
-                            onClick={handleAddMethod}
-                            className="text-sm font-bold text-blue-600 hover:bg-blue-50 px-4 py-2 rounded-lg transition-colors flex items-center gap-2"
-                        >
-                            <Plus size={16} /> Add Method
-                        </button>
+
+                        <Dialog open={isAddModalOpen} onOpenChange={setIsAddModalOpen}>
+                            <DialogTrigger asChild>
+                                <button className="text-sm font-bold text-blue-600 hover:bg-blue-50 px-4 py-2 rounded-lg transition-colors flex items-center gap-2">
+                                    <Plus size={16} /> Add Method
+                                </button>
+                            </DialogTrigger>
+                            <DialogContent className="sm:max-w-md">
+                                <DialogHeader>
+                                    <DialogTitle>Add Payment Method</DialogTitle>
+                                    <DialogDescription>
+                                        Save your MoMo details for faster checkout.
+                                    </DialogDescription>
+                                </DialogHeader>
+                                <form onSubmit={handleAddMethod} className="space-y-4 py-4">
+                                    <div className="space-y-2">
+                                        <Label>Provider</Label>
+                                        <Select
+                                            value={newMethod.provider}
+                                            onValueChange={(v) => setNewMethod({ ...newMethod, provider: v })}
+                                        >
+                                            <SelectTrigger>
+                                                <SelectValue placeholder="Select provider" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="MTN">MTN Mobile Money</SelectItem>
+                                                <SelectItem value="VODAFONE">Vodafone Cash</SelectItem>
+                                                <SelectItem value="AIRTELTIGO">AirtelTigo Money</SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label htmlFor="momoNumber">MoMo Number</Label>
+                                        <Input
+                                            id="momoNumber"
+                                            placeholder="233XXXXXXXXX"
+                                            value={newMethod.phone}
+                                            onChange={(e) => setNewMethod({ ...newMethod, phone: e.target.value })}
+                                            required
+                                        />
+                                        <p className="text-[10px] text-gray-500 font-medium">Must start with 233, e.g. 233244123456</p>
+                                    </div>
+                                    <DialogFooter>
+                                        <Button type="button" variant="outline" onClick={() => setIsAddModalOpen(false)}>Cancel</Button>
+                                        <Button type="submit" disabled={addMethodMutation.isPending}>
+                                            {addMethodMutation.isPending ? <Loader2 className="animate-spin mr-2" size={16} /> : null}
+                                            Save Method
+                                        </Button>
+                                    </DialogFooter>
+                                </form>
+                            </DialogContent>
+                        </Dialog>
                     </div>
 
-                    <div className="text-center py-10 bg-gray-50 rounded-2xl border border-dashed border-gray-200">
-                        <p className="text-gray-500 mb-2">No payment methods saved explicitly.</p>
-                        <p className="text-xs text-gray-400">Your cards are securely managed by Paystack during checkout.</p>
+                    <div className="space-y-4">
+                        {savedMethods && savedMethods.length > 0 ? (
+                            savedMethods.map((method: any) => (
+                                <div key={method.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-2xl border border-transparent hover:border-gray-200 transition-all group">
+                                    <div className="flex items-center gap-4">
+                                        <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center border shadow-sm">
+                                            {method.type === "MOMO" ? <Smartphone size={20} className="text-gray-400" /> : <CreditCard size={20} className="text-gray-400" />}
+                                        </div>
+                                        <div>
+                                            <div className="flex items-center gap-2">
+                                                <p className="font-bold text-gray-900">{method.provider} • {method.phone || `**** ${method.last4}`}</p>
+                                                {method.isDefault && (
+                                                    <span className="text-[8px] font-black uppercase tracking-widest bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full">Default</span>
+                                                )}
+                                            </div>
+                                            <p className="text-xs text-gray-500 uppercase font-bold tracking-widest">{method.type}</p>
+                                        </div>
+                                    </div>
+                                    <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                        {!method.isDefault && (
+                                            <button
+                                                onClick={() => setDefaultMutation.mutate(method.id)}
+                                                className="text-[10px] font-black uppercase tracking-widest text-blue-600 hover:underline px-2"
+                                            >
+                                                Set Default
+                                            </button>
+                                        )}
+                                        <button
+                                            onClick={() => {
+                                                if (confirm("Are you sure you want to delete this payment method?")) {
+                                                    deleteMethodMutation.mutate(method.id);
+                                                }
+                                            }}
+                                            className="p-2 text-gray-400 hover:text-red-600 transition-colors"
+                                        >
+                                            <Trash2 size={16} />
+                                        </button>
+                                    </div>
+                                </div>
+                            ))
+                        ) : (
+                            <div className="text-center py-10 bg-gray-50 rounded-2xl border border-dashed border-gray-200">
+                                <p className="text-gray-500 mb-2">No payment methods saved yet.</p>
+                                <p className="text-xs text-gray-400 px-4">Save your MoMo number for a seamless booking experience.</p>
+                            </div>
+                        )}
                     </div>
                 </div>
 

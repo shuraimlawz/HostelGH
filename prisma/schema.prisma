@@ -80,8 +80,28 @@ model User {
   bookings      Booking[]      @relation("BookingTenant")
   refreshTokens RefreshToken[]
   payoutMethods PayoutMethod[]
+  savedPaymentMethods SavedPaymentMethod[]
+  wallets       Wallet[]
+  payoutRequests PayoutRequest[]
+  subscriptions  Subscription[]
 
   @@index([role])
+}
+
+model SavedPaymentMethod {
+  id        String   @id @default(cuid())
+  userId    String
+  type      String   // "MOMO" or "CARD"
+  provider  String   // "MTN", "VODAFONE", "AIRTELTIGO" or "VISA", "MASTERCARD"
+  phone     String?  // For MOMO
+  last4     String?  // For CARD
+  isDefault Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }
 
 model PayoutMethod {
@@ -132,6 +152,7 @@ model Hostel {
   university String?
 
   isFeatured Boolean @default(false)
+  featuredUntil DateTime?
   minPrice   Int?
 
   // Ghana-specific fields
@@ -147,10 +168,51 @@ model Hostel {
   owner    User      @relation("HostelOwner", fields: [ownerId], references: [id], onDelete: Restrict)
   rooms    Room[]
   bookings Booking[]
+  wallets  Wallet[]
 
   @@index([ownerId])
   @@index([city])
   @@index([isPublished])
+}
+
+model Wallet {
+  id        String   @id @default(cuid())
+  ownerId   String   @unique
+  balance   Int      @default(0) // pesewas
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  owner User @relation(fields: [ownerId], references: [id])
+  hostelId String?
+  hostel   Hostel? @relation(fields: [hostelId], references: [id])
+}
+
+model PayoutRequest {
+  id          String       @id @default(cuid())
+  ownerId     String
+  amount      Int
+  status      PayoutStatus @default(PENDING)
+  createdAt   DateTime     @default(now())
+  processedAt DateTime?
+
+  owner User @relation(fields: [ownerId], references: [id])
+}
+
+enum PayoutStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  PAID
+}
+
+model Subscription {
+  id        String    @id @default(cuid())
+  ownerId   String
+  plan      String
+  active    Boolean   @default(false)
+  expiresAt DateTime?
+
+  owner User @relation(fields: [ownerId], references: [id])
 }
 
 model Room {
@@ -240,8 +302,10 @@ model Payment {
   provider  PaymentProvider @default(PAYSTACK)
   status    PaymentStatus   @default(INITIATED)
 
-  amount   Int // in minor unit
-  currency String @default("GH₵")
+  amount        Int // in minor unit
+  platformFee   Int @default(0)
+  ownerEarnings Int @default(0)
+  currency      String @default("GHS")
 
   // Paystack fields
   reference        String  @unique

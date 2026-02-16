@@ -13,6 +13,7 @@ import { NotificationsModule } from './modules/notifications/notifications.modul
 import { PayoutsModule } from './modules/payouts/payouts.module';
 import { UploadModule } from './modules/upload/upload.module';
 import { AdminModule } from './modules/admin/admin.module';
+import { PaymentMethodsModule } from './modules/payment-methods/payment-methods.module';
 import { ThrottlerModule } from "@nestjs/throttler";
 import { ThrottlerGuard } from "@nestjs/throttler";
 import { ScheduleModule } from "@nestjs/schedule";
@@ -41,6 +42,7 @@ import { AppController } from './app.controller';
         PayoutsModule,
         UploadModule,
         AdminModule,
+        PaymentMethodsModule,
         ScheduleModule.forRoot(),
         ThrottlerModule.forRoot([{
             ttl: 60000,

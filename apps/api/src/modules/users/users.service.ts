@@ -9,7 +9,7 @@ export class UsersService {
     async findById(id: string) {
         const user = await this.prisma.user.findUnique({
             where: { id },
-            select: { id: true, email: true, role: true, firstName: true, lastName: true, createdAt: true },
+            select: { id: true, email: true, role: true, firstName: true, lastName: true, createdAt: true, emailNotifications: true },
         });
 
         if (!user) throw new NotFoundException("User not found");
@@ -20,7 +20,7 @@ export class UsersService {
         return this.prisma.user.update({
             where: { id },
             data: dto,
-            select: { id: true, email: true, role: true, firstName: true, lastName: true, phone: true },
+            select: { id: true, email: true, role: true, firstName: true, lastName: true, phone: true, emailNotifications: true },
         });
     }
 

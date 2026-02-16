@@ -51,13 +51,17 @@ export default function TenantSettingsPage() {
 
     const handleNotificationToggle = async () => {
         const newValue = !emailNotifications;
+        const previousValue = emailNotifications;
+
         setEmailNotifications(newValue); // Optimistic update
+
         try {
             await api.patch("/users/me", { emailNotifications: newValue });
             toast.success("Notification preferences updated");
-        } catch (error) {
-            setEmailNotifications(!newValue); // Revert
-            toast.error("Failed to update settings");
+        } catch (error: any) {
+            setEmailNotifications(previousValue); // Revert
+            console.error("Failed to update settings", error);
+            toast.error(error.response?.data?.message || "Failed to update settings");
         }
     };
 

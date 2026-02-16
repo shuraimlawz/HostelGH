@@ -12,6 +12,7 @@ export default function AdminSettingsPage() {
     const [formData, setFormData] = useState({
         firstName: "",
         lastName: "",
+        emailNotifications: true,
     });
 
     useEffect(() => {
@@ -22,6 +23,7 @@ export default function AdminSettingsPage() {
                 setFormData({
                     firstName: data.firstName || "",
                     lastName: data.lastName || "",
+                    emailNotifications: data.emailNotifications ?? true,
                 });
             } catch (error) {
                 console.error("Failed to fetch profile", error);
@@ -160,22 +162,24 @@ export default function AdminSettingsPage() {
                                     </div>
                                 </div>
                                 <label className="relative inline-flex items-center cursor-pointer">
-                                    <input type="checkbox" className="sr-only peer" defaultChecked />
+                                    <input
+                                        type="checkbox"
+                                        className="sr-only peer"
+                                        checked={formData.emailNotifications}
+                                        onChange={async (e) => {
+                                            const newValue = e.target.checked;
+                                            setFormData({ ...formData, emailNotifications: newValue });
+                                            try {
+                                                await api.patch("/users/me", { emailNotifications: newValue });
+                                                toast.success("Notification preferences updated");
+                                            } catch (error) {
+                                                toast.error("Failed to update notification settings");
+                                                setFormData({ ...formData, emailNotifications: !newValue });
+                                            }
+                                        }}
+                                    />
                                     <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
                                 </label>
-                            </div>
-
-                            <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
-                                <div className="flex items-center gap-3">
-                                    <Lock size={20} className="text-gray-600" />
-                                    <div>
-                                        <p className="font-medium text-sm">Two-Factor Authentication</p>
-                                        <p className="text-xs text-gray-500">Add extra security to your account</p>
-                                    </div>
-                                </div>
-                                <button className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors">
-                                    Enable
-                                </button>
                             </div>
                         </div>
                     </div>
