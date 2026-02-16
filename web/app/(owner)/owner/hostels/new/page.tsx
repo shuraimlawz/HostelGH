@@ -107,8 +107,8 @@ export default function NewHostelPage() {
     const onSubmit = async (values: z.infer<typeof formSchema>) => {
         setLoading(true);
         try {
-            await api.post("/hostels", values);
-            toast.success("Hostel created successfully!");
+            await api.post("/hostels", { ...values, isPublished: true });
+            toast.success("Hostel created and published successfully!");
             router.push("/owner/hostels");
         } catch (error: any) {
             toast.error(error.response?.data?.message || "Failed to create hostel");

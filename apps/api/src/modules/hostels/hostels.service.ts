@@ -91,15 +91,22 @@ export class HostelsService {
         });
     }
 
-    async getPublicById(id: string) {
-        const hostel = await this.prisma.hostel.findFirst({
-            where: { id, isPublished: true },
+    async getPublicById(id: string, actor?: UserActor) {
+        const hostel = await this.prisma.hostel.findUnique({
+            where: { id },
             include: {
                 rooms: { where: { isActive: true }, orderBy: { createdAt: "asc" } },
                 owner: { select: { id: true, firstName: true, lastName: true } },
             },
         });
-        if (!hostel) throw new NotFoundException("Hostel not found or not published");
+
+        if (!hostel) throw new NotFoundException("Hostel not found");
+
+        if (!hostel.isPublished) {
+            const isOwner = actor && (actor.role === UserRole.ADMIN || actor.userId === hostel.ownerId);
+            if (!isOwner) throw new NotFoundException("Hostel not found or not published");
+        }
+
         return hostel;
     }
 
@@ -155,6 +162,21 @@ export class HostelsService {
                 images: updatedImages,
             },
         });
+    }
+
+    async getById(actor: UserActor, id: string) {
+        const hostel = await this.prisma.hostel.findUnique({
+            where: { id },
+            include: {
+                rooms: { orderBy: { createdAt: "asc" } },
+                _count: { select: { bookings: true } }
+            }
+        });
+
+        if (!hostel) throw new NotFoundException("Hostel not found");
+        this.validateOwnership(actor, hostel.ownerId);
+
+        return hostel;
     }
 
     private async getHostelById(id: string) {

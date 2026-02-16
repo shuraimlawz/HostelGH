@@ -90,12 +90,13 @@ export default function EditHostelPage() {
     const [isAddingRoom, setIsAddingRoom] = useState(false);
 
     // Fetch Hostel Data
-    const { data: hostel, isLoading } = useQuery({
+    const { data: hostel, isLoading, isError } = useQuery({
         queryKey: ["hostel", hostelId],
         queryFn: async () => {
-            const res = await api.get(`/hostels/public/${hostelId}`);
+            const res = await api.get(`/hostels/${hostelId}`);
             return res.data;
-        }
+        },
+        retry: false
     });
 
     const form = useForm<z.infer<typeof hostelSchema>>({
@@ -170,6 +171,15 @@ export default function EditHostelPage() {
     });
 
     if (isLoading) return <div className="p-20 text-center"><Loader2 className="animate-spin mx-auto" size={40} /></div>;
+
+    if (isError || !hostel) {
+        return (
+            <div className="p-20 text-center space-y-4">
+                <p className="text-red-500 font-bold">Hostel not found or access denied</p>
+                <Link href="/owner/hostels" className="text-blue-600 hover:underline">Back to Dashboard</Link>
+            </div>
+        );
+    }
 
     return (
         <div className="max-w-5xl mx-auto pb-20">
