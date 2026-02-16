@@ -216,6 +216,33 @@ export class AdminService {
         return result;
     }
 
+    async getUsers() {
+        return this.prisma.user.findMany({
+            orderBy: { createdAt: 'desc' },
+            select: {
+                id: true,
+                email: true,
+                firstName: true,
+                lastName: true,
+                role: true,
+                emailVerified: true,
+                createdAt: true,
+                isActive: true
+            }
+        });
+    }
+
+    async updateUserRole(userId: string, role: UserRole) {
+        const user = await this.prisma.user.findUnique({ where: { id: userId } });
+        if (!user) throw new BadRequestException("User not found");
+
+        return this.prisma.user.update({
+            where: { id: userId },
+            data: { role },
+            select: { id: true, email: true, role: true }
+        });
+    }
+
     async broadcastMessage(dto: BroadcastMessageDto) {
         try {
             console.log('[Broadcast] Starting broadcast with:', { title: dto.title, type: dto.type });

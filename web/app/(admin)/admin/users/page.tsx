@@ -37,7 +37,7 @@ export default function AdminUsersPage() {
     const { data: users, isLoading } = useQuery({
         queryKey: ["users"],
         queryFn: async () => {
-            const res = await api.get("/users");
+            const res = await api.get("/admin/users");
             return res.data;
         }
     });
@@ -58,7 +58,7 @@ export default function AdminUsersPage() {
 
     const updateRoleMutation = useMutation({
         mutationFn: async ({ userId, role }: { userId: string, role: string }) => {
-            return api.patch(`/users/${userId}/role`, { role });
+            return api.patch(`/admin/users/${userId}/role`, { role });
         },
         onSuccess: () => {
             toast.success("User role updated");

@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Query, UseGuards, UsePipes, ValidationPipe, UseInterceptors, ClassSerializerInterceptor } from "@nestjs/common";
+import { Body, Controller, Get, Post, Patch, Param, Query, UseGuards, UsePipes, ValidationPipe, UseInterceptors, ClassSerializerInterceptor } from "@nestjs/common";
 import { AdminService } from "./admin.service";
 import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
 import { RolesGuard } from "../auth/guards/roles.guard";
@@ -42,6 +42,18 @@ export class AdminController {
     @ApiOperation({ summary: "Get security alerts" })
     getSecurityAlerts() {
         return this.adminService.getSecurityAlerts();
+    }
+
+    @Get("users")
+    @ApiOperation({ summary: "Get all platform users" })
+    getUsers() {
+        return this.adminService.getUsers();
+    }
+
+    @Patch("users/:userId/role")
+    @ApiOperation({ summary: "Update user role" })
+    updateUserRole(@Param("userId") userId: string, @Body("role") role: UserRole) {
+        return this.adminService.updateUserRole(userId, role);
     }
 
     @Post("users")
