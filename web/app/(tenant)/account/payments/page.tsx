@@ -1,4 +1,5 @@
 "use client";
+// Forced fix for Vercel build
 
 import { CreditCard, History, Download, Loader2, Plus, Trash2, CheckCircle2, MoreVertical, Smartphone } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
