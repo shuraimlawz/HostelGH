@@ -29,6 +29,31 @@ import {
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 
+const GHANA_BANKS = [
+    "GCB Bank",
+    "Ecobank Ghana",
+    "Absa Bank Ghana",
+    "Zenith Bank Ghana",
+    "Standard Chartered Ghana",
+    "Stanbic Bank Ghana",
+    "Fidelity Bank Ghana",
+    "United Bank for Africa (UBA)",
+    "CalBank",
+    "Access Bank Ghana",
+    "Republic Bank Ghana",
+    "Societe Generale Ghana",
+    "Prudential Bank Ghana",
+    "First National Bank (FNB)",
+    "OmniBSIC Bank",
+    "Bank of Africa Ghana",
+    "Consolidated Bank Ghana (CBG)",
+    "FBNBank Ghana",
+    "GTBank Ghana",
+    "Agricultural Development Bank (ADB)",
+    "National Investment Bank (NIB)",
+    "First Atlantic Bank"
+].sort();
+
 export default function TenantPaymentsPage() {
     const queryClient = useQueryClient();
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -150,7 +175,7 @@ export default function TenantPaymentsPage() {
                                         <Select
                                             value={newMethod.type}
                                             onValueChange={(v) => {
-                                                const defaultProvider = v === "MOMO" ? "MTN" : v === "CARD" ? "VISA" : "GCB BANK";
+                                                const defaultProvider = v === "MOMO" ? "MTN" : v === "CARD" ? "VISA" : "GCB Bank";
                                                 setNewMethod({ ...newMethod, type: v, provider: defaultProvider });
                                             }}
                                         >
@@ -195,12 +220,19 @@ export default function TenantPaymentsPage() {
                                                 </SelectContent>
                                             </Select>
                                         ) : (
-                                            <Input
-                                                placeholder="e.g. GCB Bank, Ecobank"
+                                            <Select
                                                 value={newMethod.provider}
-                                                onChange={(e) => setNewMethod({ ...newMethod, provider: e.target.value })}
-                                                required
-                                            />
+                                                onValueChange={(v) => setNewMethod({ ...newMethod, provider: v })}
+                                            >
+                                                <SelectTrigger>
+                                                    <SelectValue placeholder="Select bank" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    {GHANA_BANKS.map(bank => (
+                                                        <SelectItem key={bank} value={bank}>{bank}</SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
                                         )}
                                     </div>
 
