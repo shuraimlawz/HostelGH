@@ -41,4 +41,18 @@ export class PayoutsController {
     setDefault(@Req() req: any, @Param("id") id: string) {
         return this.payouts.setDefault(req.user.userId, id);
     }
+
+    @Roles(UserRole.OWNER)
+    @Post("request")
+    @ApiOperation({ summary: "Request a payout (Owner only)" })
+    requestPayout(@Req() req: any, @Body() body: { amount: number }) {
+        return this.payouts.createPayoutRequest(req.user.userId, body.amount);
+    }
+
+    @Roles(UserRole.OWNER)
+    @Get("history")
+    @ApiOperation({ summary: "Get payout request history (Owner only)" })
+    getHistory(@Req() req: any) {
+        return this.payouts.getPayoutHistory(req.user.userId);
+    }
 }

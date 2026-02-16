@@ -56,6 +56,18 @@ export class AdminController {
         return this.adminService.updateUserRole(userId, role);
     }
 
+    @Get("payouts")
+    @ApiOperation({ summary: "Get pending payout requests" })
+    getPendingPayouts() {
+        return this.adminService.getPendingPayouts();
+    }
+
+    @Patch("payouts/:id")
+    @ApiOperation({ summary: "Approve/Reject/Pay payout request" })
+    updatePayoutStatus(@Param("id") id: string, @Body("status") status: any) {
+        return this.adminService.updatePayoutStatus(id, status);
+    }
+
     @Post("users")
     @ApiOperation({ summary: "Create an internal user (Admin/Support)" })
     createInternalUser(@Body() dto: CreateInternalUserDto) {

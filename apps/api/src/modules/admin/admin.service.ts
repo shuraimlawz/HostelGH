@@ -1,4 +1,4 @@
-import { Injectable, BadRequestException } from "@nestjs/common";
+import { Injectable, BadRequestException, NotFoundException } from "@nestjs/common";
 import { PrismaService } from "../../prisma/prisma.service";
 import * as bcrypt from "bcrypt";
 import { UserRole } from "@prisma/client";
@@ -240,6 +240,31 @@ export class AdminService {
             where: { id: userId },
             data: { role },
             select: { id: true, email: true, role: true }
+        });
+    }
+
+    async updatePayoutStatus(id: string, status: "APPROVED" | "REJECTED" | "PAID") {
+        const payout = await this.prisma.payoutRequest.findUnique({
+            where: { id },
+            include: { owner: true }
+        });
+
+        if (!payout) throw new NotFoundException("Payout request not found");
+
+        return this.prisma.payoutRequest.update({
+            where: { id },
+            data: {
+                status,
+                processedAt: status === "PAID" ? new Date() : null
+            }
+        });
+    }
+
+    async getPendingPayouts() {
+        return this.prisma.payoutRequest.findMany({
+            where: { status: "PENDING" },
+            include: { owner: true },
+            orderBy: { createdAt: "desc" }
         });
     }
 

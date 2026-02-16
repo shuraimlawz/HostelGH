@@ -52,7 +52,15 @@ export default function OwnerDashboardPage() {
         }
     });
 
-    if (hostelsLoading || bookingsLoading || analyticsLoading) {
+    const { data: wallet, isLoading: walletLoading } = useQuery({
+        queryKey: ["owner-wallet"],
+        queryFn: async () => {
+            const res = await api.get("/wallets/me");
+            return res.data;
+        }
+    });
+
+    if (hostelsLoading || bookingsLoading || analyticsLoading || walletLoading) {
         return (
             <div className="flex h-[60vh] items-center justify-center">
                 <Loader2 className="animate-spin text-blue-600" size={40} />
@@ -132,12 +140,12 @@ export default function OwnerDashboardPage() {
                     iconColor="text-green-600"
                 />
                 <StatsCard
-                    title="Occupancy Rate"
-                    value={`${occupancyRate}%`}
-                    icon={Percent}
-                    iconBgColor="bg-purple-50"
-                    iconColor="text-purple-600"
-                    subtitle={`${currentOccupants}/${totalRooms} rooms`}
+                    title="Estimated Revenue"
+                    value={`₵${((wallet?.balance || 0) / 100).toLocaleString()}`}
+                    icon={DollarSign}
+                    iconBgColor="bg-orange-50"
+                    iconColor="text-orange-600"
+                    subtitle="Available for payout"
                 />
             </div>
 

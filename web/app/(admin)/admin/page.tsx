@@ -37,6 +37,14 @@ export default function AdminDashboardPage() {
         }
     });
 
+    const { data: payouts, isLoading: payoutsLoading } = useQuery({
+        queryKey: ["admin-payouts"],
+        queryFn: async () => {
+            const res = await api.get("/admin/payouts");
+            return res.data;
+        }
+    });
+
     const [broadcastOpen, setBroadcastOpen] = useState(false);
     const [broadcastForm, setBroadcastForm] = useState({ title: "", message: "", type: "info" });
 
@@ -91,14 +99,14 @@ export default function AdminDashboardPage() {
         },
     ];
 
-    if (statsLoading || activityLoading) return (
+    if (statsLoading || activityLoading || payoutsLoading) return (
         <div className="flex h-[60vh] items-center justify-center">
             <Loader2 className="animate-spin text-blue-600" size={40} />
         </div>
     );
 
     return (
-        <div className="space-y-12">
+        <div className="space-y-12 pb-20">
             <div>
                 <h1 className="text-4xl font-black tracking-tight text-gray-950 mb-3">Systems Overview</h1>
                 <p className="text-gray-500 text-lg font-medium">Real-time health and performance metrics for HostelGH.</p>
@@ -126,125 +134,170 @@ export default function AdminDashboardPage() {
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                <div className="lg:col-span-2 bg-white rounded-[3rem] border p-10 shadow-sm space-y-8">
-                    <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                            <div className="w-12 h-12 bg-gray-50 rounded-2xl flex items-center justify-center text-gray-900 border">
-                                <Activity size={24} />
+                <div className="lg:col-span-2 space-y-8">
+                    {/* Activity Logs */}
+                    <div className="bg-white rounded-[3rem] border p-10 shadow-sm space-y-8">
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                                <div className="w-12 h-12 bg-gray-50 rounded-2xl flex items-center justify-center text-gray-900 border">
+                                    <Activity size={24} />
+                                </div>
+                                <div>
+                                    <h2 className="text-2xl font-bold tracking-tight">System Activity</h2>
+                                    <p className="text-xs text-gray-400 font-bold uppercase tracking-widest">Global logs</p>
+                                </div>
                             </div>
-                            <div>
-                                <h2 className="text-2xl font-bold tracking-tight">System Activity</h2>
-                                <p className="text-xs text-gray-400 font-bold uppercase tracking-widest">Global logs</p>
-                            </div>
+                            <Link href="/admin/logs" className="text-[10px] font-black uppercase tracking-widest text-blue-600 hover:underline">View All Logs</Link>
                         </div>
-                        <Link href="/admin/logs" className="text-[10px] font-black uppercase tracking-widest text-blue-600 hover:underline">View All Logs</Link>
+
+                        <div className="space-y-4">
+                            {activity?.activities?.map((log: any, i: number) => (
+                                <div key={i} className="flex items-center gap-4 p-5 rounded-2xl hover:bg-gray-50 transition-colors border border-transparent hover:border-gray-100 group">
+                                    <div className={cn(
+                                        "w-3 h-3 rounded-full shrink-0",
+                                        log.type === "success" && "bg-emerald-500 shadow-sm shadow-emerald-200",
+                                        log.type === "info" && "bg-blue-500 shadow-sm shadow-blue-200",
+                                        log.type === "warning" && "bg-orange-500 shadow-sm shadow-orange-200"
+                                    )} />
+                                    <div className="flex-1">
+                                        <p className="text-sm font-bold text-gray-900">
+                                            <span className="text-blue-600">{log.user}</span> {log.action}
+                                        </p>
+                                        <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-0.5">
+                                            {new Date(log.time).toLocaleString()}
+                                        </p>
+                                    </div>
+                                    <Link
+                                        href={log.targetUrl || "#"}
+                                        className="opacity-0 group-hover:opacity-100 px-3 py-1 text-[10px] font-black text-gray-400 hover:text-black transition-all"
+                                    >
+                                        Details
+                                    </Link>
+                                </div>
+                            ))}
+                            {(!activity?.activities || activity.activities.length === 0) && (
+                                <p className="text-center text-gray-400 py-8">No recent activity.</p>
+                            )}
+                        </div>
                     </div>
 
-                    <div className="space-y-4">
-                        {activity?.activities?.map((log: any, i: number) => (
-                            <div key={i} className="flex items-center gap-4 p-5 rounded-2xl hover:bg-gray-50 transition-colors border border-transparent hover:border-gray-100 group">
-                                <div className={cn(
-                                    "w-3 h-3 rounded-full shrink-0",
-                                    log.type === "success" && "bg-emerald-500 shadow-sm shadow-emerald-200",
-                                    log.type === "info" && "bg-blue-500 shadow-sm shadow-blue-200",
-                                    log.type === "warning" && "bg-orange-500 shadow-sm shadow-orange-200"
-                                )} />
-                                <div className="flex-1">
-                                    <p className="text-sm font-bold text-gray-900">
-                                        <span className="text-blue-600">{log.user}</span> {log.action}
-                                    </p>
-                                    <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-0.5">
-                                        {new Date(log.time).toLocaleString()}
-                                    </p>
+                    {/* Payout Requests */}
+                    <div className="bg-white rounded-[3rem] border p-10 shadow-sm space-y-8">
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                                <div className="w-12 h-12 bg-orange-50 rounded-2xl flex items-center justify-center text-orange-900 border">
+                                    <TrendingUp size={24} />
                                 </div>
-                                <Link
-                                    href={log.targetUrl || "#"}
-                                    className="opacity-0 group-hover:opacity-100 px-3 py-1 text-[10px] font-black text-gray-400 hover:text-black transition-all"
-                                >
-                                    Details
-                                </Link>
+                                <div>
+                                    <h2 className="text-2xl font-bold tracking-tight">Payout Requests</h2>
+                                    <p className="text-xs text-gray-400 font-bold uppercase tracking-widest">Pending approval</p>
+                                </div>
                             </div>
-                        ))}
-                        {(!activity?.activities || activity.activities.length === 0) && (
-                            <p className="text-center text-gray-400 py-8">No recent activity.</p>
-                        )}
+                        </div>
+
+                        <div className="space-y-4">
+                            {payouts?.map((payout: any) => (
+                                <div key={payout.id} className="flex items-center justify-between p-5 rounded-2xl hover:bg-gray-50 transition-colors border border-transparent hover:border-gray-100 group">
+                                    <div>
+                                        <p className="text-sm font-bold text-gray-900">
+                                            ₵{(payout.amount / 100).toLocaleString()} <span className="text-gray-400 font-medium">to</span> {payout.owner.firstName} {payout.owner.lastName}
+                                        </p>
+                                        <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-0.5">
+                                            {new Date(payout.createdAt).toLocaleDateString()}
+                                        </p>
+                                    </div>
+                                    <div className="flex gap-2">
+                                        <button
+                                            onClick={() => api.patch(`/admin/payouts/${payout.id}`, { status: "PAID" }).then(() => toast.success("Payout marked as paid"))}
+                                            className="px-3 py-1.5 bg-emerald-600 text-white text-[10px] font-black uppercase tracking-widest rounded-lg transition-transform active:scale-95"
+                                        >
+                                            Mark Paid
+                                        </button>
+                                    </div>
+                                </div>
+                            ))}
+                            {(!payouts || payouts.length === 0) && (
+                                <p className="text-center text-gray-400 py-8">No pending payouts.</p>
+                            )}
+                        </div>
                     </div>
                 </div>
 
-                <div className="bg-gray-950 rounded-[3rem] p-10 flex flex-col justify-between relative overflow-hidden">
-                    <div className="relative z-10 space-y-6">
-                        <h2 className="text-2xl font-bold text-white tracking-tight">Admin Quick Actions</h2>
-                        <div className="space-y-3">
-                            <Dialog open={broadcastOpen} onOpenChange={setBroadcastOpen}>
-                                <DialogTrigger asChild>
-                                    <button className="w-full bg-white/10 hover:bg-white/20 text-white rounded-2xl p-4 text-left transition-all border border-white/5 flex items-center justify-between group">
-                                        <div>
-                                            <p className="font-bold text-sm">Broadcast Message</p>
-                                            <p className="text-[10px] text-gray-500">Alert all active users</p>
-                                        </div>
-                                        <ArrowUpRight className="text-gray-600 group-hover:text-white" size={18} />
-                                    </button>
-                                </DialogTrigger>
-                                <DialogContent className="sm:max-w-md">
-                                    <DialogHeader>
-                                        <DialogTitle>Broadcast Message</DialogTitle>
-                                    </DialogHeader>
-                                    <div className="space-y-4 py-4">
-                                        <div className="space-y-2">
-                                            <label className="text-sm font-medium">Title</label>
-                                            <input
-                                                className="w-full border rounded-lg p-2"
-                                                value={broadcastForm.title}
-                                                onChange={e => setBroadcastForm({ ...broadcastForm, title: e.target.value })}
-                                            />
-                                        </div>
-                                        <div className="space-y-2">
-                                            <label className="text-sm font-medium">Message</label>
-                                            <textarea
-                                                className="w-full border rounded-lg p-2 h-24"
-                                                value={broadcastForm.message}
-                                                onChange={e => setBroadcastForm({ ...broadcastForm, message: e.target.value })}
-                                            />
-                                        </div>
-                                        <div className="space-y-2">
-                                            <label className="text-sm font-medium">Type</label>
-                                            <select
-                                                className="w-full border rounded-lg p-2"
-                                                value={broadcastForm.type}
-                                                onChange={e => setBroadcastForm({ ...broadcastForm, type: e.target.value })}
-                                            >
-                                                <option value="info">Info</option>
-                                                <option value="warning">Warning</option>
-                                                <option value="alert">Alert</option>
-                                            </select>
-                                        </div>
-                                        <button
-                                            onClick={() => broadcastMutation.mutate(broadcastForm)}
-                                            disabled={broadcastMutation.isPending || !broadcastForm.title || !broadcastForm.message}
-                                            className="w-full bg-blue-600 text-white p-3 rounded-lg font-bold disabled:opacity-50"
-                                        >
-                                            {broadcastMutation.isPending ? "Sending..." : "Send Broadcast"}
+                <div className="space-y-8">
+                    <div className="bg-gray-950 rounded-[3rem] p-10 flex flex-col justify-between relative overflow-hidden min-h-[400px]">
+                        <div className="relative z-10 space-y-6">
+                            <h2 className="text-2xl font-bold text-white tracking-tight">Admin Quick Actions</h2>
+                            <div className="space-y-3">
+                                <Dialog open={broadcastOpen} onOpenChange={setBroadcastOpen}>
+                                    <DialogTrigger asChild>
+                                        <button className="w-full bg-white/10 hover:bg-white/20 text-white rounded-2xl p-4 text-left transition-all border border-white/5 flex items-center justify-between group">
+                                            <div>
+                                                <p className="font-bold text-sm">Broadcast Message</p>
+                                                <p className="text-[10px] text-gray-500">Alert all active users</p>
+                                            </div>
+                                            <ArrowUpRight className="text-gray-600 group-hover:text-white" size={18} />
                                         </button>
+                                    </DialogTrigger>
+                                    <DialogContent className="sm:max-w-md">
+                                        <DialogHeader>
+                                            <DialogTitle>Broadcast Message</DialogTitle>
+                                        </DialogHeader>
+                                        <div className="space-y-4 py-4">
+                                            <div className="space-y-2">
+                                                <label className="text-sm font-medium">Title</label>
+                                                <input
+                                                    className="w-full border rounded-lg p-2"
+                                                    value={broadcastForm.title}
+                                                    onChange={e => setBroadcastForm({ ...broadcastForm, title: e.target.value })}
+                                                />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <label className="text-sm font-medium">Message</label>
+                                                <textarea
+                                                    className="w-full border rounded-lg p-2 h-24"
+                                                    value={broadcastForm.message}
+                                                    onChange={e => setBroadcastForm({ ...broadcastForm, message: e.target.value })}
+                                                />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <label className="text-sm font-medium">Type</label>
+                                                <select
+                                                    className="w-full border rounded-lg p-2"
+                                                    value={broadcastForm.type}
+                                                    onChange={e => setBroadcastForm({ ...broadcastForm, type: e.target.value })}
+                                                >
+                                                    <option value="info">Info</option>
+                                                    <option value="warning">Warning</option>
+                                                    <option value="alert">Alert</option>
+                                                </select>
+                                            </div>
+                                            <button
+                                                onClick={() => broadcastMutation.mutate(broadcastForm)}
+                                                disabled={broadcastMutation.isPending || !broadcastForm.title || !broadcastForm.message}
+                                                className="w-full bg-blue-600 text-white p-3 rounded-lg font-bold disabled:opacity-50"
+                                            >
+                                                {broadcastMutation.isPending ? "Sending..." : "Send Broadcast"}
+                                            </button>
+                                        </div>
+                                    </DialogContent>
+                                </Dialog>
+
+                                <button className="w-full bg-white/10 hover:bg-white/20 text-white rounded-2xl p-4 text-left transition-all border border-white/5 flex items-center justify-between group">
+                                    <div>
+                                        <p className="font-bold text-sm">System Maintenance</p>
+                                        <p className="text-[10px] text-gray-500">Configure downtime</p>
                                     </div>
-                                </DialogContent>
-                            </Dialog>
-
-                            <button className="w-full bg-white/10 hover:bg-white/20 text-white rounded-2xl p-4 text-left transition-all border border-white/5 flex items-center justify-between group">
-                                <div>
-                                    <p className="font-bold text-sm">System Maintenance</p>
-                                    <p className="text-[10px] text-gray-500">Configure downtime</p>
-                                </div>
-                                <ArrowUpRight className="text-gray-600 group-hover:text-white" size={18} />
-                            </button>
+                                    <ArrowUpRight className="text-gray-600 group-hover:text-white" size={18} />
+                                </button>
+                            </div>
                         </div>
-                    </div>
 
-                    <div className="relative z-10 bg-blue-600 rounded-2xl p-6 shadow-2xl shadow-blue-900/50">
-                        <p className="text-white font-black text-2xl tracking-tighter mb-1">GH-PLATFORM-V1.2</p>
-                        <p className="text-blue-100 text-[10px] font-black uppercase tracking-widest">Internal Build Ready</p>
+                        <div className="mt-8 relative z-10 bg-blue-600 rounded-2xl p-6 shadow-2xl shadow-blue-900/50">
+                            <p className="text-white font-black text-2xl tracking-tighter mb-1">GH-PLATFORM-V1.2</p>
+                            <p className="text-blue-100 text-[10px] font-black uppercase tracking-widest">Internal Build Ready</p>
+                        </div>
+                        <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/10 rounded-full blur-[100px]" />
                     </div>
-
-                    <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/10 rounded-full blur-[100px]" />
                 </div>
             </div>
         </div>

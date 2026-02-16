@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
+import { Injectable, NotFoundException, BadRequestException } from "@nestjs/common";
 import { PrismaService } from "../../prisma/prisma.service";
 import { CreatePayoutMethodDto } from "./dto/provide-payout-method.dto";
 
@@ -19,6 +19,46 @@ export class PayoutsService {
                 ...dto,
                 ownerId,
             },
+        });
+    }
+
+    async createPayoutRequest(ownerId: string, amount: number) {
+        // Validate balance
+        const wallet = await this.prisma.wallet.findUnique({ where: { ownerId } });
+        if (!wallet || wallet.balance < amount) {
+            throw new BadRequestException("Insufficient balance in wallet");
+        }
+
+        // Check for default payout method
+        const defaultMethod = await this.prisma.payoutMethod.findFirst({
+            where: { ownerId, isDefault: true }
+        });
+        if (!defaultMethod) {
+            throw new BadRequestException("Please set a default payout method first");
+        }
+
+        return await this.prisma.$transaction(async (tx) => {
+            // Deduct from wallet
+            await tx.wallet.update({
+                where: { ownerId },
+                data: { balance: { decrement: amount } }
+            });
+
+            // Create request
+            return tx.payoutRequest.create({
+                data: {
+                    ownerId,
+                    amount,
+                    status: "PENDING"
+                }
+            });
+        });
+    }
+
+    async getPayoutHistory(ownerId: string) {
+        return this.prisma.payoutRequest.findMany({
+            where: { ownerId },
+            orderBy: { createdAt: "desc" }
         });
     }
 
