@@ -1,3 +1,7 @@
+import HeroSearch from "@/components/home/HeroSearch";
+import CityCarousel from "@/components/home/CityCarousel";
+import FeaturedHostels from "@/components/home/FeaturedHostels";
+
 export default function LandingPage() {
     return (
         <div className="pb-20">
