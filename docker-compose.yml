@@ -4,13 +4,70 @@ services:
     image: postgres:15
     container_name: hostel_postgres
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: hostel_booking
+      POSTGRES_USER: ${DATABASE_USER:-postgres}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD:-postgres}
+      POSTGRES_DB: ${DATABASE_NAME:-hostel_booking}
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    networks:
+      - hostel_net
+
+  redis:
+    image: redis:7-alpine
+    container_name: hostel_redis
+    ports:
+      - "6379:6379"
+    networks:
+      - hostel_net
+
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    container_name: hostel_api
+    environment:
+      DATABASE_URL: ${DATABASE_URL:-postgresql://postgres:postgres@postgres:5432/hostel_booking?schema=public}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
+      PAYSTACK_SECRET_KEY: ${PAYSTACK_SECRET_KEY}
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - hostel_net
+
+  web:
+    build:
+      context: .
+      dockerfile: web/Dockerfile
+    container_name: hostel_web
+    environment:
+      NEXT_PUBLIC_API_URL: http://api:3001
+    depends_on:
+      - api
+    networks:
+      - hostel_net
+
+  nginx:
+    image: nginx:alpine
+    container_name: hostel_nginx
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    ports:
+      - "80:80"
+    depends_on:
+      - web
+      - api
+    networks:
+      - hostel_net
+
+networks:
+  hostel_net:
+    driver: bridge
 
 volumes:
   postgres_data:

@@ -19,6 +19,8 @@ export const envSchema = Joi.object({
     CLOUDINARY_CLOUD_NAME: Joi.string().optional(),
     CLOUDINARY_API_KEY: Joi.string().optional(),
     CLOUDINARY_API_SECRET: Joi.string().optional(),
+    REDIS_HOST: Joi.string().default('localhost'),
+    REDIS_PORT: Joi.number().default(6379),
 });
 
 export default () => ({
@@ -45,6 +47,10 @@ export default () => ({
         cloudName: process.env.CLOUDINARY_CLOUD_NAME,
         apiKey: process.env.CLOUDINARY_API_KEY,
         apiSecret: process.env.CLOUDINARY_API_SECRET,
+    },
+    redis: {
+        host: process.env.REDIS_HOST || 'localhost',
+        port: parseInt(process.env.REDIS_PORT || '6379', 10),
     },
 });
 

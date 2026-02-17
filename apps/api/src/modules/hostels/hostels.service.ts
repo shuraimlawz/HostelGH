@@ -1,10 +1,14 @@
 import { ForbiddenException, Injectable, NotFoundException } from "@nestjs/common";
 import { PrismaService } from "../../prisma/prisma.service";
 import { UserRole } from "@prisma/client";
+import { RedisService } from "../redis/redis.service";
 
 @Injectable()
 export class HostelsService {
-    constructor(private readonly prisma: PrismaService) { }
+    constructor(
+        private readonly prisma: PrismaService,
+        private readonly redis: RedisService
+    ) { }
 
     async create(ownerId: string, dto: CreateHostelDto) {
         return this.prisma.hostel.create({
@@ -48,6 +52,10 @@ export class HostelsService {
         gender?: string,
         roomConfig?: string
     }) {
+        const cacheKey = `search:${JSON.stringify(params)}`;
+        const cached = await this.redis.getJson<any[]>(cacheKey);
+        if (cached) return cached;
+
         const { city, region, minPrice, maxPrice, amenities, university, sort, gender, roomConfig } = params;
 
         // Intelligent Suggestion Algorithm: 
@@ -65,7 +73,7 @@ export class HostelsService {
             orderBy.push({ createdAt: "desc" }); // Default to Newest
         }
 
-        return this.prisma.hostel.findMany({
+        const results = await this.prisma.hostel.findMany({
             where: {
                 isPublished: true,
                 city: city ? { contains: city, mode: "insensitive" } : undefined,
@@ -89,6 +97,9 @@ export class HostelsService {
             include: { rooms: { where: { isActive: true } } },
             orderBy: orderBy,
         });
+
+        await this.redis.setJson(cacheKey, results, 300); // 5 minutes cache
+        return results;
     }
 
     async getPublicById(id: string, actor?: UserActor) {
@@ -111,6 +122,10 @@ export class HostelsService {
     }
 
     async getCityStats() {
+        const cacheKey = "city_stats";
+        const cached = await this.redis.getJson<any[]>(cacheKey);
+        if (cached) return cached;
+
         const stats = await this.prisma.hostel.groupBy({
             by: ['city'],
             _count: {
@@ -129,11 +144,14 @@ export class HostelsService {
             "Tamale": "https://images.unsplash.com/photo-1628155930542-3c7a64e2c833?w=400&h=300&fit=crop"
         };
 
-        return stats.map(s => ({
+        const result = stats.map(s => ({
             name: s.city,
             count: `${s._count.id} ${s._count.id === 1 ? 'Hostel' : 'Hostels'}`,
             image: cityImages[s.city] || "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=400&h=300&fit=crop"
         }));
+
+        await this.redis.setJson(cacheKey, result, 3600); // 1 hour cache
+        return result;
     }
 
     async addHostelImages(hostelId: string, userId: string, imageUrls: string[]) {
