@@ -1,17 +1,17 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, Suspense } from "react";
 import Link from "next/link";
 import { useAuth } from "@/lib/auth-context";
 import LogoAnimation from "./LogoAnimation";
-import { Menu, User as UserIcon, LogOut } from "lucide-react";
+import { Menu, User as UserIcon, Globe } from "lucide-react";
 import { useAuthModal } from "@/components/auth/AuthModalProvider";
 import { useRouter } from "next/navigation";
 import RegionSelector from "./RegionSelector";
-import { Suspense } from "react";
+import { cn } from "@/lib/utils";
 
 export default function Navbar() {
-    const { user, logout, isLoading } = useAuth();
+    const { user, logout } = useAuth();
     const { open } = useAuthModal();
     const [isOpen, setIsOpen] = useState(false);
     const menuRef = useRef<HTMLDivElement>(null);
@@ -35,65 +35,49 @@ export default function Navbar() {
     };
 
     return (
-        <header className="sticky top-0 z-50 bg-white border-b h-20">
+        <header className="sticky top-0 z-50 bg-white border-b h-[80px]">
             <div className="container mx-auto px-4 md:px-10 h-full flex items-center justify-between">
                 {/* Logo */}
-                <Link href="/" className="flex items-center gap-2 group relative h-full">
+                <Link href="/" className="flex items-center gap-2 group relative h-full flex-1">
                     <LogoAnimation />
-                    <span className="font-bold text-2xl tracking-tighter text-[#1877F2] flex overflow-hidden">
-                        {"HostelGH".split("").map((char, i) => (
-                            <span
-                                key={i}
-                                className="inline-block animate-letter-reveal"
-                                style={{ animationDelay: `${i * 0.05}s` }}
-                            >
-                                {char}
-                            </span>
-                        ))}
+                    <span className="font-bold text-xl tracking-tighter text-[#FF385C] hidden md:block">
+                        hostelgh
                     </span>
                 </Link>
 
-                {/* Search Bar Link */}
-                <Link href="/hostels" className="hidden md:flex shadow-sm hover:shadow-md transition-shadow border rounded-full px-4 py-2.5 items-center gap-4 cursor-pointer">
-                    <div className="text-sm font-semibold px-2 border-r border-gray-300">Anywhere</div>
-                    <div className="text-sm font-semibold px-2 border-r border-gray-300">Any week</div>
-                    <div className="text-sm text-gray-500 px-2 font-light">Add guests</div>
-                    <div className="bg-[#1877F2] p-2 rounded-full text-white">
-                        <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" role="presentation" focusable="false" style={{ display: 'block', fill: 'none', height: '12px', width: '12px', stroke: 'currentcolor', strokeWidth: '5.33333', overflow: 'visible' }}>
-                            <g fill="none">
-                                <path d="m13 24c6.0751322 0 11-4.9248678 11-11 0-6.07513225-4.9248678-11-11-11-6.07513225 0-11 4.92486775-11 11 0 6.0751322 4.92486775 11 11 11zm8-3 9 9"></path>
-                            </g>
-                        </svg>
-                    </div>
-                </Link>
+                {/* Center Navigation */}
+                <div className="hidden md:flex items-center justify-center flex-1 h-full">
+                    <nav className="flex items-center gap-6 h-full">
+                        <Link href="/" className="font-semibold text-black border-b-2 border-black h-full flex items-center px-2">Homes</Link>
+                        <Link href="/experiences" className="font-medium text-gray-500 hover:text-gray-800 hover:bg-gray-50 rounded-full py-2 px-3 transition-colors">Experiences</Link>
+                        <Link href="/services" className="font-medium text-gray-500 hover:text-gray-800 hover:bg-gray-50 rounded-full py-2 px-3 transition-colors">Services</Link>
+                    </nav>
+                </div>
 
-
-                {/* User Menu */}
-                <div className="flex items-center gap-2">
+                {/* Right Actions */}
+                <div className="flex items-center justify-end gap-2 flex-1">
                     {!user && (
                         <Link
                             href="/auth/register?role=OWNER"
                             className="hidden md:block text-sm font-semibold px-4 py-3 rounded-full hover:bg-gray-100 transition-colors"
                         >
-                            Host your home
+                            Become a Host
                         </Link>
                     )}
-                    <Suspense fallback={<div className="w-10 h-10" />}>
-                        <RegionSelector />
-                    </Suspense>
+
+                    <button className="p-3 rounded-full hover:bg-gray-100 transition-colors">
+                        <Globe size={18} />
+                    </button>
 
                     <div className="relative" ref={menuRef}>
                         <button
                             onClick={() => setIsOpen(!isOpen)}
-                            className="flex items-center gap-3 border rounded-full pl-3 pr-1 py-1 hover:shadow-md transition-shadow ml-1"
+                            className="flex items-center gap-3 border border-gray-300 rounded-full pl-3 pr-1 py-1 hover:shadow-md transition-shadow ml-1 group"
                         >
-                            <Menu size={18} className="ml-1" />
-                            <div
-                                className="bg-gray-500 text-white rounded-full p-1 opacity-80 overflow-hidden cursor-pointer hover:opacity-100 transition-opacity"
-                                onClick={() => router.push("/account")}
-                            >
+                            <Menu size={18} className="ml-1 text-gray-600 group-hover:text-black" />
+                            <div className="bg-gray-500 text-white rounded-full p-1 opacity-80 overflow-hidden">
                                 {user ? (
-                                    <div className="w-6 h-6 bg-black text-white rounded-full flex items-center justify-center text-[10px] font-bold">
+                                    <div className="w-7 h-7 bg-black text-white rounded-full flex items-center justify-center text-[10px] font-bold">
                                         {user.firstName ? user.firstName[0].toUpperCase() : user.email[0].toUpperCase()}
                                     </div>
                                 ) : (
@@ -103,7 +87,7 @@ export default function Navbar() {
                         </button>
 
                         {isOpen && (
-                            <div className="absolute right-0 top-full mt-2 w-64 bg-white rounded-xl shadow-[0_6px_16px_rgba(0,0,0,0.12)] border py-2 animate-in fade-in zoom-in-95 duration-200 overflow-hidden">
+                            <div className="absolute right-0 top-full mt-2 w-64 bg-white rounded-xl shadow-[0_6px_16px_rgba(0,0,0,0.12)] border py-2 animate-in fade-in zoom-in-95 duration-200 overflow-hidden z-50">
                                 {user ? (
                                     <>
                                         <div className="px-4 py-3 border-b mb-1">
@@ -113,7 +97,7 @@ export default function Navbar() {
 
                                         <Link
                                             href={user.role === "ADMIN" ? "/admin" : user.role === "OWNER" ? "/owner" : "/account"}
-                                            className="block px-4 py-3 hover:bg-gray-50 text-sm font-semibold text-blue-600 transition-colors"
+                                            className="block px-4 py-3 hover:bg-gray-50 text-sm font-semibold text-black transition-colors"
                                             onClick={() => setIsOpen(false)}
                                         >
                                             {user.role === "ADMIN" ? "Admin Dashboard" : user.role === "OWNER" ? "Owner Dashboard" : "My Account"}
@@ -127,13 +111,6 @@ export default function Navbar() {
                                             My Bookings
                                         </Link>
                                         <div className="border-t my-1" />
-                                        {/* <Link
-                                            href="/help"
-                                            className="block px-4 py-3 hover:bg-gray-50 text-sm transition-colors"
-                                            onClick={() => setIsOpen(false)}
-                                        >
-                                            Help Center
-                                        </Link> */}
                                         <button
                                             onClick={handleLogout}
                                             className="w-full text-left px-4 py-3 hover:bg-gray-50 text-sm transition-colors flex items-center gap-2"
@@ -169,13 +146,6 @@ export default function Navbar() {
                                         >
                                             Host your home
                                         </Link>
-                                        {/* <Link
-                                            href="/help"
-                                            className="block px-4 py-3 hover:bg-gray-50 text-sm transition-colors"
-                                            onClick={() => setIsOpen(false)}
-                                        >
-                                            Help Center
-                                        </Link> */}
                                     </>
                                 )}
                             </div>

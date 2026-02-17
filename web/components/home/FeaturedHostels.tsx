@@ -35,8 +35,8 @@ export default function FeaturedHostels() {
                     ))}
                 </div>
             ) : (
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-                    {Array.isArray(hostels) && hostels.slice(0, 4).map((hostel: any) => (
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-6 gap-y-10">
+                    {Array.isArray(hostels) && hostels.map((hostel: any) => (
                         <HostelCard key={hostel.id} hostel={hostel} />
                     ))}
                     {(!hostels || hostels.length === 0) && (
