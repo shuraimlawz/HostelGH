@@ -32,12 +32,13 @@ export default function HeroSearch() {
     return (
         <div className="relative w-full h-[500px] md:h-[600px] flex items-center justify-center overflow-hidden rounded-3xl mx-auto my-4 max-w-[95%]">
             {/* Background Image Carousel */}
+            {/* Background Image Carousel */}
             {HERO_IMAGES.map((img, index) => (
                 <div
                     key={img}
                     className={cn(
                         "absolute inset-0 transition-opacity duration-1000 ease-in-out",
-                        index === currentImageIndex ? "opacity-100" : "opacity-0"
+                        index === currentImageIndex ? "opacity-100 z-10" : "opacity-0 z-0"
                     )}
                 >
                     <img
