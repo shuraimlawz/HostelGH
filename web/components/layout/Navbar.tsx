@@ -64,9 +64,7 @@ export default function Navbar() {
                         </Link>
                     )}
 
-                    <button className="p-3 rounded-full hover:bg-gray-100 transition-colors">
-                        <Globe size={18} />
-                    </button>
+                    <RegionSelector />
 
                     <div className="relative" ref={menuRef}>
                         <button
