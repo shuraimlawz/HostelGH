@@ -15,7 +15,9 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 
-export default function DeletionRequestsPage() {
+import { Suspense } from "react";
+
+function DeletionRequestsContent() {
     const queryClient = useQueryClient();
 
     const { data: requests, isLoading } = useQuery({
@@ -108,5 +110,13 @@ export default function DeletionRequestsPage() {
                 </div>
             )}
         </div>
+    );
+}
+
+export default function DeletionRequestsPage() {
+    return (
+        <Suspense fallback={<div className="p-20 text-center"><Loader2 className="animate-spin mx-auto text-gray-400" /></div>}>
+            <DeletionRequestsContent />
+        </Suspense>
     );
 }
