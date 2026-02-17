@@ -40,8 +40,16 @@ export default function Navbar() {
                 {/* Logo */}
                 <Link href="/" className="flex items-center gap-2 group relative h-full">
                     <LogoAnimation />
-                    <span className="font-bold text-2xl tracking-tighter text-[#1877F2] hidden md:block">
-                        hostelgh
+                    <span className="font-bold text-2xl tracking-tighter text-[#1877F2] flex overflow-hidden">
+                        {"HostelGH".split("").map((char, i) => (
+                            <span
+                                key={i}
+                                className="inline-block animate-letter-reveal"
+                                style={{ animationDelay: `${i * 0.05}s` }}
+                            >
+                                {char}
+                            </span>
+                        ))}
                     </span>
                 </Link>
 
