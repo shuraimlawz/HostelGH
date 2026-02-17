@@ -32,12 +32,12 @@ export default function CityCarousel() {
 
     return (
         <div className="py-12">
-            <h3 className="text-2xl font-bold mb-6 tracking-tight text-gray-900">Explore Top Cities</h3>
+            <h3 className="text-xl font-bold mb-6 tracking-tight text-gray-900">Explore Top Cities</h3>
             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
                 {cities.map((city: any) => (
                     <Link key={city.name} href={`/hostels?city=${city.name}`}>
                         <div className="group cursor-pointer">
-                            <div className="relative aspect-square overflow-hidden rounded-xl bg-gray-200 mb-3">
+                            <div className="relative aspect-[16/10] overflow-hidden rounded-lg bg-gray-200 mb-2">
                                 <img
                                     src={city.image}
                                     alt={city.name}
@@ -45,8 +45,8 @@ export default function CityCarousel() {
                                 />
                                 <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors" />
                             </div>
-                            <h4 className="font-semibold text-gray-900">{city.name}</h4>
-                            <p className="text-sm text-gray-500">{city.count}</p>
+                            <h4 className="font-semibold text-sm text-gray-900">{city.name}</h4>
+                            <p className="text-xs text-gray-500">{city.count}</p>
                         </div>
                     </Link>
                 ))}

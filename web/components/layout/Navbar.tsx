@@ -35,33 +35,24 @@ export default function Navbar() {
     };
 
     return (
-        <header className="sticky top-0 z-50 bg-white border-b h-[80px]">
+        <header className="sticky top-0 z-50 bg-white border-b h-16 shadow-sm">
             <div className="container mx-auto px-4 md:px-10 h-full flex items-center justify-between">
                 {/* Logo */}
-                <Link href="/" className="flex items-center gap-2 group relative h-full flex-1">
+                <Link href="/" className="flex items-center gap-2 group relative h-full">
                     <LogoAnimation />
-                    <span className="font-bold text-xl tracking-tighter text-[#FF385C] hidden md:block">
+                    <span className="font-bold text-2xl tracking-tighter text-[#1877F2] hidden md:block">
                         hostelgh
                     </span>
                 </Link>
 
-                {/* Center Navigation */}
-                <div className="hidden md:flex items-center justify-center flex-1 h-full">
-                    <nav className="flex items-center gap-6 h-full">
-                        <Link href="/" className="font-semibold text-black border-b-2 border-black h-full flex items-center px-2">Homes</Link>
-                        <Link href="/experiences" className="font-medium text-gray-500 hover:text-gray-800 hover:bg-gray-50 rounded-full py-2 px-3 transition-colors">Experiences</Link>
-                        <Link href="/services" className="font-medium text-gray-500 hover:text-gray-800 hover:bg-gray-50 rounded-full py-2 px-3 transition-colors">Services</Link>
-                    </nav>
-                </div>
-
                 {/* Right Actions */}
-                <div className="flex items-center justify-end gap-2 flex-1">
+                <div className="flex items-center justify-end gap-3 flex-1">
                     {!user && (
                         <Link
                             href="/auth/register?role=OWNER"
-                            className="hidden md:block text-sm font-semibold px-4 py-3 rounded-full hover:bg-gray-100 transition-colors"
+                            className="hidden md:block text-sm font-semibold px-4 py-2 rounded-lg bg-[#1877F2] text-white hover:bg-[#145CBF] transition-colors"
                         >
-                            Become a Host
+                            List your hostel
                         </Link>
                     )}
 

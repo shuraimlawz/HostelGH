@@ -14,43 +14,30 @@ export default function HeroSearch() {
     };
 
     return (
-        <div className="w-full flex justify-center pt-6 pb-2">
-            <div className="bg-white rounded-full shadow-[0_3px_12px_rgba(0,0,0,0.08),0_3px_6px_rgba(0,0,0,0.12)] border border-gray-200 flex items-center divide-x divide-gray-200 h-[66px] max-w-4xl w-full mx-6 hover:shadow-[0_6px_16px_rgba(0,0,0,0.12)] transition-shadow">
+        <div className="w-full flex justify-center">
+            <div className="bg-white rounded-xl shadow-lg border border-gray-100 flex items-center p-2 max-w-2xl w-full mx-4">
 
-                {/* Where */}
-                <div className="flex-1 px-8 py-3 hover:bg-gray-100 rounded-full cursor-pointer transition-colors relative group">
-                    <div className="text-xs font-bold px-1 mb-0.5">Where</div>
+                {/* Where input */}
+                <div className="flex-1 px-4 py-2 relative group">
+                    <div className="text-xs font-bold text-gray-800 uppercase tracking-wide mb-1">Location</div>
                     <input
                         type="text"
-                        placeholder="Search destinations"
-                        className="w-full text-sm text-gray-600 bg-transparent border-none outline-none placeholder:text-gray-400 truncate"
+                        placeholder="Which school or city?"
+                        className="w-full text-base text-gray-900 placeholder:text-gray-400 border-none outline-none bg-transparent font-medium"
                         value={city}
                         onChange={(e) => setCity(e.target.value)}
                         onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                     />
                 </div>
 
-                {/* When */}
-                <div className="flex-1 px-8 py-3 hover:bg-gray-100 rounded-full cursor-pointer transition-colors relative group">
-                    <div className="text-xs font-bold px-1 mb-0.5">When</div>
-                    <div className="text-sm text-gray-400">Add dates</div>
-                </div>
-
-                {/* Who */}
-                <div className="flex-[0.8] pl-8 pr-2 py-3 hover:bg-gray-100 rounded-full cursor-pointer transition-colors relative group flex items-center">
-                    <div className="flex-1">
-                        <div className="text-xs font-bold px-1 mb-0.5">Who</div>
-                        <div className="text-sm text-gray-400">Add guests</div>
-                    </div>
-
-                    <button
-                        className="bg-[#FF385C] hover:bg-[#D90B3E] text-white p-4 rounded-full transition-all flex items-center justify-center shadow-md ml-4"
-                        onClick={handleSearch}
-                    >
-                        <Search size={16} strokeWidth={3} />
-                        <span className="ml-2 font-semibold hidden lg:block">Search</span>
-                    </button>
-                </div>
+                {/* Search Button */}
+                <button
+                    className="bg-[#1877F2] hover:bg-[#145CBF] text-white px-6 py-3 rounded-lg transition-all flex items-center justify-center shadow-md ml-2"
+                    onClick={handleSearch}
+                >
+                    <Search size={20} strokeWidth={2.5} />
+                    <span className="ml-2 font-bold hidden sm:block">Search</span>
+                </button>
 
             </div>
         </div>
