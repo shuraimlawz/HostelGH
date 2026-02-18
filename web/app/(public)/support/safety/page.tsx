@@ -1,105 +1,109 @@
 "use client";
 
-import { Shield, CheckCircle, AlertTriangle, LifeBuoy, Heart, Search, Bell } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { Shield, Search, CreditCard, Users, AlertTriangle, CheckCircle2 } from "lucide-react";
+import ReportForm from "@/components/support/ReportForm";
+
+const SAFETY_TIPS = [
+    {
+        title: "How to avoid scams",
+        description: "Never pay huge sums of money to agents you haven't met. Real owners on HostelGH only take booking fees through our platform.",
+        icon: Search,
+        color: "text-blue-600",
+        bgColor: "bg-blue-50"
+    },
+    {
+        title: "Verifying Listings",
+        description: "Look for the blue 'Verified' badge. This means our team has visited the hostel and confirmed its existence.",
+        icon: CheckCircle2,
+        color: "text-green-600",
+        bgColor: "bg-green-50"
+    },
+    {
+        title: "Safe Payments",
+        description: "Always use our Paystack-powered checkout. Do not send direct bank transfers or mobile money to personal numbers without our confirmation.",
+        icon: CreditCard,
+        color: "text-orange-600",
+        bgColor: "bg-orange-50"
+    },
+    {
+        title: "Meeting Agents",
+        description: "Always meet hostel agents during daylight hours and try to bring a friend with you for property viewings.",
+        icon: Users,
+        color: "text-purple-600",
+        bgColor: "bg-purple-50"
+    }
+];
 
 export default function SafetyPage() {
     return (
-        <div className="max-w-5xl mx-auto px-6 py-20">
-            {/* Immersive Safety Header */}
-            <div className="text-center space-y-6 mb-24 animate-in fade-in slide-in-from-bottom-4 duration-700">
-                <div className="inline-flex items-center justify-center w-20 h-20 bg-green-50 text-green-600 rounded-[2rem] mb-6 shadow-sm border border-green-100">
-                    <Shield className="w-10 h-10" />
+        <div className="space-y-16 lg:space-y-24">
+            {/* Header Section */}
+            <div className="space-y-6">
+                <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-blue-50 rounded-full text-blue-600 text-[10px] font-black uppercase tracking-widest border border-blue-100">
+                    <Shield size={12} className="fill-blue-600" />
+                    Trust & Safety
                 </div>
-                <h1 className="text-4xl md:text-6xl font-black tracking-tight text-gray-900 leading-tight">
-                    Your safety is our <br className="hidden md:block" />
-                    <span className="text-green-600">top priority.</span>
+                <h1 className="text-4xl md:text-5xl font-black text-gray-900 tracking-tight">
+                    Safety Guidelines
                 </h1>
-                <p className="text-gray-500 text-xl max-w-2xl mx-auto font-medium">
-                    We've built a multi-layered verification system to ensure every student finds a safe and secure home away from home.
+                <p className="text-gray-500 text-lg font-medium max-w-2xl leading-relaxed">
+                    Your security is our priority. We've built these guidelines specifically for the Ghana hostel market to help you avoid scams and find a safe home.
                 </p>
             </div>
 
-            {/* Verification Cards */}
-            <div className="grid md:grid-cols-2 gap-8 mb-32 animate-in fade-in zoom-in-95 duration-700 delay-200">
-                <div className="p-10 rounded-[2.5rem] border-2 border-gray-50 bg-white hover:border-blue-100 hover:shadow-2xl transition-all space-y-6 group">
-                    <div className="w-16 h-16 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center transition-transform group-hover:scale-110 shadow-sm border border-blue-100">
-                        <CheckCircle className="w-8 h-8" />
-                    </div>
-                    <div className="space-y-2">
-                        <h3 className="text-2xl font-black text-gray-900 tracking-tight">Verified Listings</h3>
-                        <p className="text-gray-500 font-medium leading-relaxed">
-                            Every single listing on HostelGH undergoes a mandatory 12-point verification process. We verify property ownership, location, and amenity accuracy before anything goes live.
-                        </p>
-                    </div>
-                </div>
-
-                <div className="p-10 rounded-[2.5rem] border-2 border-gray-50 bg-white hover:border-orange-100 hover:shadow-2xl transition-all space-y-6 group">
-                    <div className="w-16 h-16 bg-orange-50 text-orange-600 rounded-2xl flex items-center justify-center transition-transform group-hover:scale-110 shadow-sm border border-orange-100">
-                        <Shield size={32} />
-                    </div>
-                    <div className="space-y-2">
-                        <h3 className="text-2xl font-black text-gray-900 tracking-tight">Protect Your Data</h3>
-                        <p className="text-gray-500 font-medium leading-relaxed">
-                            Always keep your communication and transactions within the platform. Our secure system is designed to protect your personal details and guarantee your payment.
-                        </p>
-                    </div>
-                </div>
-            </div>
-
-            {/* Interactive Tips Section */}
-            <section className="space-y-12 bg-gray-900 p-10 md:p-20 rounded-[4rem] text-white">
-                <div className="text-center space-y-4 mb-8">
-                    <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-white/10 backdrop-blur-md rounded-full text-white text-xs font-black uppercase tracking-widest mb-4">
-                        <Heart size={14} className="text-red-400 fill-red-400" />
-                        Community Tips
-                    </div>
-                    <h2 className="text-3xl md:text-5xl font-black tracking-tight">Safety Tips for Students</h2>
-                    <p className="text-gray-400 text-lg font-medium max-w-xl mx-auto">Essential advice from our community to ensure you have a secure experience.</p>
-                </div>
-
-                <div className="grid gap-6 max-w-4xl mx-auto">
-                    {[
-                        { tip: "Visit the hostel during daylight if possible before check-in.", icon: Search },
-                        { tip: "Always tell someone where you are going when visiting a new location.", icon: Bell },
-                        { tip: "Inspect the room and common areas meticulously upon arrival.", icon: CheckCircle },
-                        { tip: "Lock your doors consistently and keep valuables in a secure place.", icon: Shield },
-                        { tip: "Report any suspicious behavior or discrepancies immediately.", icon: AlertTriangle }
-                    ].map((item, i) => (
-                        <div key={i} className="flex gap-6 p-6 bg-white/5 border border-white/10 rounded-3xl hover:bg-white/10 transition-all group">
-                            <div className="flex-shrink-0 w-12 h-12 rounded-2xl bg-white text-gray-900 flex items-center justify-center font-black shadow-lg group-hover:scale-110 transition-transform">
-                                <item.icon size={24} />
+            {/* Quick Tips Grid */}
+            <section className="space-y-10">
+                <h2 className="text-xs font-black uppercase tracking-[0.2em] text-gray-400">
+                    Safety Essentials
+                </h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
+                    {SAFETY_TIPS.map((tip) => (
+                        <div
+                            key={tip.title}
+                            className="p-8 rounded-[2rem] bg-white border-2 border-gray-50 flex gap-6 hover:shadow-lg transition-all"
+                        >
+                            <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 ${tip.bgColor} ${tip.color}`}>
+                                <tip.icon size={26} />
                             </div>
-                            <p className="text-lg md:text-xl font-medium leading-relaxed text-gray-100 self-center">{item.tip}</p>
+                            <div className="space-y-2">
+                                <h3 className="text-xl font-bold text-gray-900">{tip.title}</h3>
+                                <p className="text-sm text-gray-500 font-medium leading-relaxed">{tip.description}</p>
+                            </div>
                         </div>
                     ))}
                 </div>
             </section>
 
-            {/* Modern Crisis/Problem UX */}
-            <div className="mt-32 text-center space-y-10 animate-in fade-in duration-1000">
-                <div className="relative inline-block group">
-                    <div className="absolute inset-0 bg-red-100 rounded-full blur-2xl opacity-50 group-hover:opacity-100 transition-opacity" />
-                    <div className="relative w-20 h-20 bg-red-50 text-red-600 rounded-full flex items-center justify-center mx-auto shadow-sm">
-                        <LifeBuoy className="w-10 h-10 animate-pulse" />
+            {/* Report an Issue Section */}
+            <section id="report" className="space-y-10">
+                <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+                    <div className="space-y-2">
+                        <h2 className="text-3xl font-black text-gray-900">Spotted something suspicious?</h2>
+                        <p className="text-gray-500 font-medium max-w-lg">If a listing seems too good to be true or an owner asks for offline payments, let us know immediately.</p>
                     </div>
                 </div>
-                <div className="space-y-4 max-w-2xl mx-auto">
-                    <h3 className="text-3xl font-black text-gray-900 tracking-tight">See something concerning?</h3>
-                    <p className="text-gray-500 text-lg font-medium">
-                        If you encounter a listing or user that violates our community standards, please report it. Our response team reviews reports 24/7.
-                    </p>
+
+                <ReportForm />
+            </section>
+
+            {/* Dispute Resolution Section */}
+            <section className="space-y-8 p-10 md:p-12 bg-gray-50 rounded-[3rem] border border-gray-100">
+                <div className="flex items-center gap-4 mb-4">
+                    <AlertTriangle className="text-orange-600" size={24} />
+                    <h2 className="text-2xl font-black text-gray-900">Dispute Resolution</h2>
                 </div>
-                <div className="pt-4">
-                    <button className="bg-red-600 text-white px-12 py-5 rounded-2xl font-black text-xl hover:bg-red-700 hover:scale-105 active:scale-95 transition-all shadow-2xl flex items-center gap-3 mx-auto">
-                        <AlertTriangle size={24} />
-                        Report an Issue
-                    </button>
-                    <p className="mt-6 text-sm font-bold text-gray-400 uppercase tracking-widest">
-                        Response time: &lt; 30 minutes
+                <div className="space-y-4 text-gray-600 font-medium leading-relaxed">
+                    <p>
+                        HostelGH acts as a mediator for disputes related to booking fee refunds and misrepresentation. If you arrive at a hostel and it does not match the 'Verified' listing:
                     </p>
+                    <ol className="list-decimal pl-6 space-y-3">
+                        <li>Do not pay any remaining rent balance to the owner.</li>
+                        <li>Take clear photos or videos of the discrepancies.</li>
+                        <li>Report the hostel via the form above within 12 hours of arrival.</li>
+                        <li>Our team will investigate and, if valid, process a full refund of your booking fee.</li>
+                    </ol>
                 </div>
-            </div>
+            </section>
         </div>
     );
 }
