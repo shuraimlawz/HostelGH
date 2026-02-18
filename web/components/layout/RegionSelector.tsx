@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
     DropdownMenu,
@@ -33,8 +33,14 @@ const REGIONS = [
 ];
 
 export default function RegionSelector() {
+    const [mounted, setMounted] = useState(false);
     const router = useRouter();
     const searchParams = useSearchParams();
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
+
     const currentRegion = searchParams.get("region");
 
     const handleSelect = (regionName: string) => {
@@ -46,6 +52,8 @@ export default function RegionSelector() {
         }
         router.push(`/hostels?${params.toString()}`);
     };
+
+    if (!mounted) return <div className="hidden md:flex w-10 h-10 mr-1" />;
 
     return (
         <DropdownMenu>
