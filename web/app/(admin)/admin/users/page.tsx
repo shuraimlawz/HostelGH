@@ -99,9 +99,9 @@ function AdminUsersContent() {
     return (
         <div className="space-y-8">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-8 border-b">
-                <div>
-                    <h1 className="text-4xl font-black tracking-tight text-gray-950 mb-2">User Registry</h1>
-                    <p className="text-gray-500 font-medium">Manage permissions and view all registered platform members.</p>
+                <div className="mb-8">
+                    <h1 className="text-2xl font-black tracking-tighter text-gray-950 mb-2">User Registry</h1>
+                    <p className="text-sm font-medium text-gray-500">Detailed overview and management for all platform members.</p>
                 </div>
 
                 <Dialog open={addUserOpen} onOpenChange={setAddUserOpen}>

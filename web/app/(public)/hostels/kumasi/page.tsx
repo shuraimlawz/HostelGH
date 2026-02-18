@@ -18,7 +18,7 @@ export default function KumasiHostelsPage() {
                         <MapPin size={20} />
                         <span className="text-sm font-medium">Kumasi, Ashanti Region</span>
                     </div>
-                    <h1 className="text-4xl md:text-5xl font-bold mb-4">
+                    <h1 className="text-3xl md:text-4xl font-black tracking-tight text-white mb-3">
                         Student Hostels in Kumasi
                     </h1>
                     <p className="text-xl text-green-100 max-w-2xl">

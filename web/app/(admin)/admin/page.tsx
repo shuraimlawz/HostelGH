@@ -107,9 +107,9 @@ export default function AdminDashboardPage() {
 
     return (
         <div className="space-y-12 pb-20">
-            <div>
-                <h1 className="text-4xl font-black tracking-tight text-gray-950 mb-3">Systems Overview</h1>
-                <p className="text-gray-500 text-lg font-medium">Real-time health and performance metrics for HostelGH.</p>
+            <div className="mb-8">
+                <h1 className="text-2xl font-black tracking-tight text-gray-950 mb-2">Systems Overview</h1>
+                <p className="text-sm font-medium text-gray-500">Global performance metrics and platform health diagnostics.</p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">

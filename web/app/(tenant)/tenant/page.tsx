@@ -121,33 +121,33 @@ export default function TenantDashboardPage() {
             <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8 pt-4">
                 <div className="space-y-2">
                     <div className="flex items-center gap-2 mb-2">
-                        <span className="px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-[10px] font-black uppercase tracking-widest border border-blue-100">
+                        <span className="px-2.5 py-1 bg-blue-50 text-blue-600 rounded-full text-[9px] font-black uppercase tracking-widest border border-blue-100">
                             Student Portal
                         </span>
                         {profileCompletion < 100 && (
-                            <Link href="/account" className="px-3 py-1 bg-orange-50 text-orange-600 rounded-full text-[10px] font-black uppercase tracking-widest border border-orange-100 animate-pulse">
+                            <Link href="/account" className="px-2.5 py-1 bg-orange-50 text-orange-600 rounded-full text-[9px] font-black uppercase tracking-widest border border-orange-100 animate-pulse">
                                 Finish Profile
                             </Link>
                         )}
                     </div>
-                    <h1 className="text-4xl md:text-5xl font-black text-gray-900 tracking-tight">
+                    <h1 className="text-3xl font-black text-gray-900 tracking-tight">
                         Hello, {user?.firstName || "Student"} <span className="text-blue-600">.</span>
                     </h1>
-                    <p className="text-gray-500 font-medium text-lg">
+                    <p className="text-gray-500 font-medium text-base">
                         Manage your stays, track payments, and find your next home.
                     </p>
                 </div>
 
                 {/* Quick Profile Summary */}
-                <div className="flex items-center gap-4 bg-white p-3 pr-6 rounded-full border border-gray-100 shadow-sm">
-                    <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center text-white font-black">
+                <div className="flex items-center gap-4 bg-white p-2.5 pr-6 rounded-full border border-gray-100 shadow-sm">
+                    <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white font-black text-xs">
                         {user?.firstName?.[0] || user?.email[0].toUpperCase()}
                     </div>
                     <div>
-                        <p className="text-xs font-black text-gray-400 uppercase tracking-widest leading-none mb-1">Account Safety</p>
-                        <div className="flex items-center gap-2">
-                            <ShieldCheck className="text-green-600" size={14} />
-                            <span className="text-sm font-bold text-gray-900">Verified Tenant</span>
+                        <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest leading-none mb-1">Account Safety</p>
+                        <div className="flex items-center gap-1.5">
+                            <ShieldCheck className="text-green-600" size={12} />
+                            <span className="text-xs font-bold text-gray-900">Verified Tenant</span>
                         </div>
                     </div>
                 </div>
@@ -190,49 +190,49 @@ export default function TenantDashboardPage() {
                 {/* Bookings Section (Left) */}
                 <div className="lg:col-span-8 space-y-8">
                     <div className="flex items-center justify-between mb-2">
-                        <h2 className="text-2xl font-black text-gray-900">Booking Timeline</h2>
-                        <Link href="/bookings" className="text-xs font-black text-blue-600 uppercase tracking-widest hover:underline flex items-center gap-2">
+                        <h2 className="text-xl font-black text-gray-900">Booking Timeline</h2>
+                        <Link href="/bookings" className="text-[10px] font-black text-blue-600 uppercase tracking-widest hover:underline flex items-center gap-2">
                             View Archive <ArrowUpRight size={14} />
                         </Link>
                     </div>
 
                     {nextBooking ? (
-                        <div className="relative group overflow-hidden rounded-[3rem] bg-gray-900 text-white p-8 md:p-12 shadow-2xl">
-                            <div className="absolute top-0 right-0 w-96 h-96 bg-blue-600 rounded-full -mr-32 -mt-32 blur-[100px] opacity-40 group-hover:opacity-60 transition-opacity" />
+                        <div className="relative group overflow-hidden rounded-[2.5rem] bg-gray-900 text-white p-8 md:p-10 shadow-2xl">
+                            <div className="absolute top-0 right-0 w-80 h-80 bg-blue-600 rounded-full -mr-32 -mt-32 blur-[100px] opacity-40 group-hover:opacity-60 transition-opacity" />
 
-                            <div className="relative z-10 space-y-8">
+                            <div className="relative z-10 space-y-6">
                                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-                                    <div className="space-y-4">
-                                        <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/10 backdrop-blur-md rounded-lg text-[10px] font-black uppercase tracking-widest text-blue-300">
+                                    <div className="space-y-3">
+                                        <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/10 backdrop-blur-md rounded-lg text-[9px] font-black uppercase tracking-widest text-blue-300">
                                             Upcoming Check-in
                                         </div>
-                                        <h3 className="text-3xl md:text-4xl font-black">{nextBooking.hostel.name}</h3>
-                                        <div className="flex items-center gap-2 text-gray-400 font-medium">
-                                            <MapPin size={18} className="text-blue-500" />
+                                        <h3 className="text-2xl md:text-3xl font-black">{nextBooking.hostel.name}</h3>
+                                        <div className="flex items-center gap-2 text-gray-400 font-medium text-sm">
+                                            <MapPin size={16} className="text-blue-500" />
                                             {nextBooking.hostel.location}
                                         </div>
                                     </div>
                                     <div className="text-right">
-                                        <div className="text-4xl font-black mb-1">₵{((nextBooking.items?.[0]?.unitPrice * nextBooking.items?.[0]?.quantity || 0) / 100).toLocaleString()}</div>
-                                        <div className="text-xs font-black text-gray-400 uppercase tracking-widest">Total Stay Amount</div>
+                                        <div className="text-3xl font-black mb-1">₵{((nextBooking.items?.[0]?.unitPrice * nextBooking.items?.[0]?.quantity || 0) / 100).toLocaleString()}</div>
+                                        <div className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Total Stay Amount</div>
                                     </div>
                                 </div>
 
-                                <div className="grid grid-cols-2 md:grid-cols-4 gap-8 pt-8 border-t border-white/10">
+                                <div className="grid grid-cols-2 md:grid-cols-4 gap-6 pt-6 border-t border-white/10">
                                     <div>
-                                        <p className="text-[10px] font-black text-gray-500 uppercase tracking-[0.2em] mb-2">Check-in</p>
-                                        <p className="text-lg font-bold">{new Date(nextBooking.items?.[0]?.startDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}</p>
+                                        <p className="text-[9px] font-black text-gray-500 uppercase tracking-[0.2em] mb-1">Check-in</p>
+                                        <p className="text-base font-bold">{new Date(nextBooking.items?.[0]?.startDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}</p>
                                     </div>
                                     <div>
-                                        <p className="text-[10px] font-black text-gray-500 uppercase tracking-[0.2em] mb-2">Check-out</p>
-                                        <p className="text-lg font-bold">{new Date(nextBooking.items?.[0]?.endDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}</p>
+                                        <p className="text-[9px] font-black text-gray-500 uppercase tracking-[0.2em] mb-1">Check-out</p>
+                                        <p className="text-base font-bold">{new Date(nextBooking.items?.[0]?.endDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}</p>
                                     </div>
                                     <div>
-                                        <p className="text-[10px] font-black text-gray-500 uppercase tracking-[0.2em] mb-2">Room No.</p>
-                                        <p className="text-lg font-bold">#204 <span className="text-xs text-gray-500 font-medium">(Standard)</span></p>
+                                        <p className="text-[9px] font-black text-gray-500 uppercase tracking-[0.2em] mb-1">Room No.</p>
+                                        <p className="text-base font-bold">#204 <span className="text-[10px] text-gray-500 font-medium">(Standard)</span></p>
                                     </div>
                                     <div className="flex items-center justify-end">
-                                        <Link href={`/bookings/${nextBooking.id}`} className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-2xl font-black text-sm uppercase tracking-widest transition-all">
+                                        <Link href={`/bookings/${nextBooking.id}`} className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all">
                                             Details
                                         </Link>
                                     </div>
@@ -240,15 +240,15 @@ export default function TenantDashboardPage() {
                             </div>
                         </div>
                     ) : (
-                        <div className="p-16 bg-white rounded-[3rem] border border-gray-100 flex flex-col items-center text-center space-y-4">
-                            <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center text-gray-300">
-                                <Building2 size={40} />
+                        <div className="p-12 bg-white rounded-[2.5rem] border border-gray-100 flex flex-col items-center text-center space-y-1">
+                            <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center text-gray-300">
+                                <Building2 size={32} />
                             </div>
-                            <div className="space-y-2">
-                                <h3 className="text-2xl font-black text-gray-900">No Active Bookings</h3>
-                                <p className="text-gray-500 font-medium">You haven't booked any hostels yet. Start your search now.</p>
+                            <div className="space-y-1">
+                                <h3 className="text-xl font-black text-gray-900">No Active Bookings</h3>
+                                <p className="text-gray-500 font-medium text-sm">You haven't booked any hostels yet. Start your search now.</p>
                             </div>
-                            <Link href="/hostels" className="bg-blue-600 text-white px-10 py-4 rounded-2xl font-black text-sm uppercase tracking-widest hover:scale-105 transition-all">
+                            <Link href="/hostels" className="bg-blue-600 text-white px-8 py-3 rounded-xl font-black text-[10px] uppercase tracking-widest hover:scale-105 transition-all">
                                 Explore Hostels
                             </Link>
                         </div>

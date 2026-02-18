@@ -17,7 +17,7 @@ export default function UGHostelsPage() {
                         <GraduationCap size={20} />
                         <span className="text-sm font-medium">University of Ghana, Legon</span>
                     </div>
-                    <h1 className="text-4xl md:text-5xl font-bold mb-4">
+                    <h1 className="text-3xl md:text-4xl font-black tracking-tight text-white mb-3">
                         Hostels Near UG Legon
                     </h1>
                     <p className="text-xl text-red-100 max-w-2xl">

@@ -81,8 +81,8 @@ export default function AccountPage() {
     return (
         <div className="max-w-4xl mx-auto px-4 py-12">
             <div className="mb-10">
-                <h1 className="text-4xl font-bold tracking-tight mb-2">Personal info</h1>
-                <p className="text-gray-500 text-lg">Manage your account details and how we can reach you.</p>
+                <h1 className="text-2xl font-black tracking-tight text-gray-900 mb-2">Personal info</h1>
+                <p className="text-gray-500 font-medium text-base tracking-tight">Manage the information we use to verify your identity.</p>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">

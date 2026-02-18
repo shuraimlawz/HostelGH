@@ -153,31 +153,31 @@ export default function OwnerDashboardPage() {
             <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8 pt-4">
                 <div className="space-y-2">
                     <div className="flex items-center gap-2 mb-2">
-                        <span className="px-3 py-1 bg-purple-50 text-purple-600 rounded-full text-[10px] font-black uppercase tracking-widest border border-purple-100">
+                        <span className="px-2.5 py-1 bg-purple-50 text-purple-600 rounded-full text-[9px] font-black uppercase tracking-widest border border-purple-100">
                             Proprietor Hub
                         </span>
-                        <div className="flex items-center gap-1.5 text-xs font-bold text-gray-400 ml-2">
-                            <Clock size={14} />
+                        <div className="flex items-center gap-1.5 text-[10px] font-bold text-gray-400 ml-2">
+                            <Clock size={12} />
                             Real-time Sync Active
                         </div>
                     </div>
-                    <h1 className="text-4xl md:text-5xl font-black text-gray-900 tracking-tight">
+                    <h1 className="text-3xl font-black text-gray-900 tracking-tight">
                         Portfolio Insights <span className="text-blue-600">.</span>
                     </h1>
-                    <p className="text-gray-500 font-medium text-lg max-w-xl">
+                    <p className="text-gray-500 font-medium text-base max-w-xl">
                         Monitor revenue metrics, manage check-ins, and optimize your listings performance.
                     </p>
                 </div>
 
                 {/* Primary Wallet Card */}
-                <div className="bg-gray-900 text-white p-6 pr-10 rounded-[2.5rem] relative overflow-hidden flex items-center gap-6 shadow-2xl">
+                <div className="bg-gray-900 text-white p-5 pr-10 rounded-[2rem] relative overflow-hidden flex items-center gap-6 shadow-2xl">
                     <div className="absolute top-0 left-0 w-32 h-32 bg-blue-600 rounded-full -ml-16 -mt-16 blur-2xl opacity-40" />
-                    <div className="relative z-10 w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center border border-white/20">
-                        <Wallet size={24} className="text-blue-400" />
+                    <div className="relative z-10 w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center border border-white/20">
+                        <Wallet size={20} className="text-blue-400" />
                     </div>
                     <div className="relative z-10">
-                        <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1">Settled Balance</p>
-                        <h3 className="text-3xl font-black tracking-tighter">₵{((wallet?.balance || 0) / 100).toLocaleString()}</h3>
+                        <p className="text-[9px] font-black text-gray-500 uppercase tracking-widest mb-1">Settled Balance</p>
+                        <h3 className="text-2xl font-black tracking-tighter">₵{((wallet?.balance || 0) / 100).toLocaleString()}</h3>
                     </div>
                 </div>
             </div>

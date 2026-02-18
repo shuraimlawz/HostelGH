@@ -17,7 +17,7 @@ export default function GCTUHostelsPage() {
                         <GraduationCap size={20} />
                         <span className="text-sm font-medium">Ghana Communication Technology University</span>
                     </div>
-                    <h1 className="text-4xl md:text-5xl font-bold mb-4">
+                    <h1 className="text-3xl md:text-4xl font-black tracking-tight text-white mb-3">
                         Hostels Near GCTU
                     </h1>
                     <p className="text-xl text-purple-100 max-w-2xl">

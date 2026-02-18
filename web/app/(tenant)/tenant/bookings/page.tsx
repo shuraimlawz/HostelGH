@@ -78,9 +78,13 @@ export default function TenantBookingsPage() {
     return (
         <div className="container px-6 py-12">
             <div className="flex justify-between items-center mb-10">
-                <div>
-                    <h1 className="text-4xl font-black tracking-tight uppercase">My Reservations</h1>
-                    <p className="text-muted-foreground mt-2 font-medium">Track your applications and complete payments.</p>
+                <div className="space-y-2 mb-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+                    <h1 className="text-2xl font-black tracking-tight text-gray-900">
+                        My Reservations
+                    </h1>
+                    <p className="text-sm font-medium text-gray-400">
+                        Manage your confirmed bookings and stay history.
+                    </p>
                 </div>
             </div>
 

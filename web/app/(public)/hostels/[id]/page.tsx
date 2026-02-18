@@ -154,8 +154,8 @@ export default function HostelDetailsPage() {
                                             <CheckCircle2 size={12} /> Verified Listing
                                         </span>
                                     </div>
-                                    <h1 className="text-4xl md:text-5xl font-black text-black tracking-tight mb-2">{hostel.name}</h1>
-                                    <div className="flex items-center gap-2 text-gray-500 font-medium">
+                                    <h1 className="text-3xl font-black text-black tracking-tighter mb-2">{hostel.name}</h1>
+                                    <div className="flex items-center gap-2 text-gray-500 text-sm font-medium">
                                         <MapPin size={16} className="text-red-400" />
                                         <span>{hostel.addressLine}, {hostel.city}</span>
                                         {hostel.distanceToCampus && (

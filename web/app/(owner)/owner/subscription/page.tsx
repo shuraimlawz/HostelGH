@@ -71,13 +71,14 @@ export default function SubscriptionPage() {
                 <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 text-blue-600 text-xs font-black uppercase tracking-widest border border-blue-100 mb-4 animate-bounce">
                     <Trophy size={14} /> Scale Your Business
                 </div>
-                <h1 className="text-5xl md:text-6xl font-black tracking-tight text-gray-900 bg-clip-text text-transparent bg-gradient-to-r from-gray-900 via-blue-900 to-gray-900">
-                    Grow Without Limits
-                </h1>
-                <p className="text-gray-500 text-xl max-w-2xl mx-auto font-medium">
-                    Choose the perfect tier to showcase your hostels and streamline your bookings across Ghana.
-                </p>
-
+                <div className="flex flex-col items-center text-center space-y-4 max-w-2xl mx-auto">
+                    <h1 className="text-3xl md:text-4xl font-black tracking-tight text-gray-900">
+                        Elevate Your <span className="text-blue-600">Property Management</span>
+                    </h1>
+                    <p className="text-gray-500 text-base font-medium leading-relaxed">
+                        Choose a plan that scales with your portfolio. Get advanced analytics, priority verification, and better visibility for your hostels.
+                    </p>
+                </div>
                 {/* Billing Toggle */}
                 <div className="flex items-center justify-center gap-4 mt-12">
                     <span className={cn("text-sm font-bold transition-all", billingCycle === "monthly" ? "text-gray-900" : "text-gray-400")}>Monthly</span>
