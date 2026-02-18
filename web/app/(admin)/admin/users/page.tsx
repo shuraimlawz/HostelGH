@@ -20,7 +20,9 @@ import { toast } from "sonner";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useSearchParams } from "next/navigation";
 
-export default function AdminUsersPage() {
+import { Suspense } from "react";
+
+function AdminUsersContent() {
     const queryClient = useQueryClient();
     const searchParams = useSearchParams();
     const [search, setSearch] = useState(searchParams.get("search") || "");
@@ -273,5 +275,17 @@ export default function AdminUsersPage() {
                 </div>
             </div>
         </div>
+    );
+}
+
+export default function AdminUsersPage() {
+    return (
+        <Suspense fallback={
+            <div className="flex h-[60vh] items-center justify-center">
+                <Loader2 className="animate-spin text-blue-600" size={40} />
+            </div>
+        }>
+            <AdminUsersContent />
+        </Suspense>
     );
 }

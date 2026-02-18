@@ -64,7 +64,9 @@ export default function Navbar() {
                         </Link>
                     )}
 
-                    <RegionSelector />
+                    <Suspense fallback={<div className="w-10 h-10" />}>
+                        <RegionSelector />
+                    </Suspense>
 
                     <div className="relative" ref={menuRef}>
                         <button
