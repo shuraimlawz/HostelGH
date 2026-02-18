@@ -1,8 +1,8 @@
 import { Body, Controller, Get, Post, Patch, Param, Query, UseGuards, UsePipes, ValidationPipe, UseInterceptors, ClassSerializerInterceptor } from "@nestjs/common";
 import { AdminService } from "./admin.service";
 import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
-import { RolesGuard } from "../auth/guards/roles.guard";
-import { Roles } from "../auth/decorators/roles.decorator";
+import { RolesGuard } from "../../common/guards/roles.guard";
+import { Roles } from "../../common/decorators/roles.decorator";
 import { UserRole } from "@prisma/client";
 import { ApiBearerAuth, ApiOperation, ApiTags } from "@nestjs/swagger";
 import { CreateInternalUserDto } from "./dto/create-internal-user.dto";
@@ -54,6 +54,12 @@ export class AdminController {
     @ApiOperation({ summary: "Update user role" })
     updateUserRole(@Param("userId") userId: string, @Body("role") role: UserRole) {
         return this.adminService.updateUserRole(userId, role);
+    }
+
+    @Post("users/:userId/delete")
+    @ApiOperation({ summary: "Delete platform user" })
+    deleteUser(@Param("userId") userId: string) {
+        return this.adminService.deleteUser(userId);
     }
 
     @Get("payouts")

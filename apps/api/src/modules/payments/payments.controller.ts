@@ -3,7 +3,7 @@ import { PaymentsService } from "./payments.service";
 import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
 import { RolesGuard } from "../../common/guards/roles.guard";
 import { VerifyPaymentDto } from "./dto/verify-payment.dto";
-import { Roles } from "../auth/decorators/roles.decorator";
+import { Roles } from "../../common/decorators/roles.decorator";
 import { UserRole } from "@prisma/client";
 import { SubmitProofDto } from "./dto/submit-proof.dto";
 

@@ -243,6 +243,15 @@ export class AdminService {
         });
     }
 
+    async deleteUser(userId: string) {
+        const user = await this.prisma.user.findUnique({ where: { id: userId } });
+        if (!user) throw new NotFoundException("User not found");
+
+        return this.prisma.user.delete({
+            where: { id: userId }
+        });
+    }
+
     async updatePayoutStatus(id: string, status: "APPROVED" | "REJECTED" | "PAID") {
         const payout = await this.prisma.payoutRequest.findUnique({
             where: { id },

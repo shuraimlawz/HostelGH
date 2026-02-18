@@ -1,10 +1,10 @@
 "use client";
 
-import { Card } from "@/components/ui/card";
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Map } from "lucide-react";
 
 export default function CityCarousel() {
     const { data: cities, isLoading } = useQuery({
@@ -17,11 +17,13 @@ export default function CityCarousel() {
 
     if (isLoading) {
         return (
-            <div className="py-12">
-                <h3 className="text-3xl font-bold mb-8 tracking-tight">Explore Top Cities</h3>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-                    {[1, 2, 3, 4].map((i) => (
-                        <Skeleton key={i} className="h-48 w-full rounded-2xl" />
+            <div className="py-20">
+                <div className="flex items-center gap-3 mb-10">
+                    <Skeleton className="h-10 w-48 rounded-xl" />
+                </div>
+                <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6">
+                    {[1, 2, 3, 4, 5, 6].map((i) => (
+                        <Skeleton key={i} className="aspect-[4/5] w-full rounded-[2rem]" />
                     ))}
                 </div>
             </div>
@@ -31,22 +33,39 @@ export default function CityCarousel() {
     if (!Array.isArray(cities) || cities.length === 0) return null;
 
     return (
-        <div className="py-12">
-            <h3 className="text-xl font-bold mb-6 tracking-tight text-gray-900">Explore Top Cities</h3>
-            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
+        <div className="py-20">
+            <div className="flex items-center gap-3 mb-10">
+                <div className="p-2.5 rounded-2xl bg-blue-50 text-blue-600">
+                    <Map size={24} strokeWidth={2.5} />
+                </div>
+                <div>
+                    <h3 className="text-2xl md:text-3xl font-black tracking-tighter text-gray-900 leading-none">Popular <span className="text-blue-600">Cities</span></h3>
+                    <p className="text-gray-400 text-xs font-bold uppercase tracking-widest mt-1">Explore by local hubs</p>
+                </div>
+            </div>
+
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6">
                 {cities.map((city: any) => (
                     <Link key={city.name} href={`/hostels?city=${city.name}`}>
-                        <div className="group cursor-pointer">
-                            <div className="relative aspect-[16/10] overflow-hidden rounded-lg bg-gray-200 mb-2">
-                                <img
-                                    src={city.image}
-                                    alt={city.name}
-                                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                                />
-                                <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors" />
+                        <div className="group relative aspect-[4/5] overflow-hidden rounded-[2.5rem] bg-gray-100 cursor-pointer shadow-sm hover:shadow-2xl transition-all duration-500">
+                            <img
+                                src={city.image || `https://images.unsplash.com/photo-1591123120675-6f7f1aae0e5b?q=80&w=400&fit=crop`}
+                                alt={city.name}
+                                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
+                            />
+
+                            {/* Glass Overlay */}
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+
+                            <div className="absolute bottom-6 left-6 right-6">
+                                <h4 className="font-black text-white text-xl tracking-tight mb-1">{city.name}</h4>
+                                <div className="inline-flex items-center px-2 py-0.5 rounded-full bg-white/20 backdrop-blur-md border border-white/20 text-white text-[10px] font-black uppercase tracking-widest">
+                                    {city.count} Properties
+                                </div>
                             </div>
-                            <h4 className="font-semibold text-sm text-gray-900">{city.name}</h4>
-                            <p className="text-xs text-gray-500">{city.count}</p>
+
+                            {/* Hover Border Glow */}
+                            <div className="absolute inset-0 border-2 border-white/0 group-hover:border-white/40 rounded-[2.5rem] transition-all duration-500" />
                         </div>
                     </Link>
                 ))}

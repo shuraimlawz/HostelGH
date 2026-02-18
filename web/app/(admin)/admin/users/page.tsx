@@ -69,6 +69,17 @@ function AdminUsersContent() {
         onError: (err: any) => toast.error(err.response?.data?.message || "Failed to update role")
     });
 
+    const deleteUserMutation = useMutation({
+        mutationFn: async (userId: string) => {
+            return api.post(`/admin/users/${userId}/delete`);
+        },
+        onSuccess: () => {
+            toast.success("User deleted successfully");
+            queryClient.invalidateQueries({ queryKey: ["users"] });
+        },
+        onError: (err: any) => toast.error(err.response?.data?.message || "Failed to delete user")
+    });
+
     const filteredUsers = users?.filter((u: any) =>
         u.email.toLowerCase().includes(search.toLowerCase()) ||
         (u.firstName && u.firstName.toLowerCase().includes(search.toLowerCase())) ||
@@ -109,7 +120,7 @@ function AdminUsersContent() {
                                 <div className="space-y-2">
                                     <label className="text-sm font-medium">First Name</label>
                                     <input
-                                        className="w-full border rounded-lg p-2"
+                                        className="w-full border rounded-lg p-2 outline-none focus:ring-2 focus:ring-blue-100"
                                         value={addUserForm.firstName}
                                         onChange={e => setAddUserForm({ ...addUserForm, firstName: e.target.value })}
                                     />
@@ -117,7 +128,7 @@ function AdminUsersContent() {
                                 <div className="space-y-2">
                                     <label className="text-sm font-medium">Last Name</label>
                                     <input
-                                        className="w-full border rounded-lg p-2"
+                                        className="w-full border rounded-lg p-2 outline-none focus:ring-2 focus:ring-blue-100"
                                         value={addUserForm.lastName}
                                         onChange={e => setAddUserForm({ ...addUserForm, lastName: e.target.value })}
                                     />
@@ -127,7 +138,7 @@ function AdminUsersContent() {
                                 <label className="text-sm font-medium">Email Address</label>
                                 <input
                                     type="email"
-                                    className="w-full border rounded-lg p-2"
+                                    className="w-full border rounded-lg p-2 outline-none focus:ring-2 focus:ring-blue-100"
                                     value={addUserForm.email}
                                     onChange={e => setAddUserForm({ ...addUserForm, email: e.target.value })}
                                 />
@@ -136,7 +147,7 @@ function AdminUsersContent() {
                                 <label className="text-sm font-medium">Password</label>
                                 <input
                                     type="password"
-                                    className="w-full border rounded-lg p-2"
+                                    className="w-full border rounded-lg p-2 outline-none focus:ring-2 focus:ring-blue-100"
                                     value={addUserForm.password}
                                     onChange={e => setAddUserForm({ ...addUserForm, password: e.target.value })}
                                 />
@@ -144,7 +155,7 @@ function AdminUsersContent() {
                             <div className="space-y-2">
                                 <label className="text-sm font-medium">Role</label>
                                 <select
-                                    className="w-full border rounded-lg p-2"
+                                    className="w-full border rounded-lg p-2 outline-none focus:ring-2 focus:ring-blue-100"
                                     value={addUserForm.role}
                                     onChange={e => setAddUserForm({ ...addUserForm, role: e.target.value })}
                                 >
@@ -156,7 +167,7 @@ function AdminUsersContent() {
                             <button
                                 onClick={() => addUserMutation.mutate(addUserForm)}
                                 disabled={addUserMutation.isPending || !addUserForm.email || !addUserForm.password}
-                                className="w-full bg-black text-white p-3 rounded-lg font-bold disabled:opacity-50 mt-2"
+                                className="w-full bg-black text-white p-3 rounded-xl font-bold disabled:opacity-50 mt-2 hover:bg-gray-800 transition-colors"
                             >
                                 {addUserMutation.isPending ? "Creating..." : "Create User"}
                             </button>
@@ -175,7 +186,7 @@ function AdminUsersContent() {
                         placeholder="Search by name, email or ID..."
                     />
                 </div>
-                <div className="bg-white border rounded-[1.5rem] flex items-center justify-center px-6 gap-3">
+                <div className="bg-white border rounded-[1.5rem] flex items-center justify-center px-6 gap-3 shadow-sm shadow-gray-50">
                     <span className="text-xs font-black uppercase tracking-widest text-gray-400">Total Users:</span>
                     <span className="text-xl font-black text-blue-600">{users?.length || 0}</span>
                 </div>
@@ -232,9 +243,25 @@ function AdminUsersContent() {
                                         </div>
                                     </td>
                                     <td className="px-8 py-6 text-right">
-                                        <button className="p-3 bg-gray-50 rounded-xl hover:bg-black hover:text-white transition-all group-hover:shadow-lg group-hover:scale-110">
-                                            <UserCog size={18} />
-                                        </button>
+                                        <div className="flex items-center justify-end gap-2">
+                                            <button
+                                                onClick={() => {
+                                                    if (confirm(`Are you sure you want to delete ${user.email}? This action is permanent.`)) {
+                                                        deleteUserMutation.mutate(user.id);
+                                                    }
+                                                }}
+                                                className="p-3 bg-red-50 text-red-600 rounded-xl hover:bg-red-600 hover:text-white transition-all opacity-0 group-hover:opacity-100"
+                                                title="Delete User"
+                                            >
+                                                <X size={18} />
+                                            </button>
+                                            <button
+                                                className="p-3 bg-gray-50 rounded-xl hover:bg-black hover:text-white transition-all group-hover:shadow-lg"
+                                                onClick={() => toast.info(`Settings for ${user.email} (ID: ${user.id})`)}
+                                            >
+                                                <UserCog size={18} />
+                                            </button>
+                                        </div>
                                     </td>
                                 </tr>
                             ))}

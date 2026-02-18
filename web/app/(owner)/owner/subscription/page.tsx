@@ -26,7 +26,7 @@ export default function SubscriptionPage() {
     });
 
     const upgradeMutation = useMutation({
-        mutationFn: () => api.post("/subscriptions/upgrade"),
+        mutationFn: () => api.post("/subscriptions/upgrade-pro"),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["my-subscription"] });
             toast.success("Successfully upgraded to PRO!");
