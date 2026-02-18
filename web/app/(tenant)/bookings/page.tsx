@@ -15,7 +15,8 @@ import {
     ChevronRight,
     Building2,
     CalendarCheck,
-    ArrowRight
+    ArrowRight,
+    Info
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
