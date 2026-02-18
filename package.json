@@ -10,7 +10,7 @@
   ],
   "scripts": {
     "build": "prisma generate && nest build",
-    "postinstall": "prisma generate",
+    "postinstall": "npx prisma generate",
     "format": "prettier --write \"apps/**/*.ts\" \"libs/**/*.ts\"",
     "start": "nest start",
     "start:dev": "nest start --watch",
