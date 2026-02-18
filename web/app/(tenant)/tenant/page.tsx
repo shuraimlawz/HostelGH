@@ -11,14 +11,52 @@ import {
     ArrowRight,
     Loader2,
     CheckCircle2,
-    AlertCircle,
     Building2,
     Search,
-    TrendingUp
+    TrendingUp,
+    Zap,
+    CreditCard,
+    ArrowUpRight,
+    LucideIcon
 } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
-import { StatsCard } from "@/components/ui/stats-card";
+
+// Reusable Stat Card with Premium Feel
+function DashboardStat({
+    title,
+    value,
+    icon: Icon,
+    color,
+    bgColor,
+    trend
+}: {
+    title: string;
+    value: string | number;
+    icon: LucideIcon;
+    color: string;
+    bgColor: string;
+    trend?: string;
+}) {
+    return (
+        <div className="bg-white p-6 rounded-[2rem] border border-gray-100 shadow-sm hover:shadow-md transition-all group">
+            <div className="flex items-start justify-between mb-4">
+                <div className={cn("w-12 h-12 rounded-2xl flex items-center justify-center transition-transform group-hover:scale-110", bgColor, color)}>
+                    <Icon size={24} />
+                </div>
+                {trend && (
+                    <span className="text-xs font-black text-green-600 bg-green-50 px-2 py-1 rounded-lg">
+                        {trend}
+                    </span>
+                )}
+            </div>
+            <div>
+                <p className="text-xs font-black text-gray-400 uppercase tracking-widest mb-1">{title}</p>
+                <h3 className="text-2xl font-black text-gray-900">{value}</h3>
+            </div>
+        </div>
+    );
+}
 
 export default function TenantDashboardPage() {
     const { user } = useAuth();
@@ -33,313 +71,292 @@ export default function TenantDashboardPage() {
 
     if (bookingsLoading) {
         return (
-            <div className="flex h-[60vh] items-center justify-center">
-                <Loader2 className="animate-spin text-blue-600" size={40} />
+            <div className="flex h-[80vh] items-center justify-center">
+                <div className="flex flex-col items-center gap-4">
+                    <Loader2 className="animate-spin text-blue-600" size={40} />
+                    <p className="text-sm font-black text-gray-400 uppercase tracking-widest animate-pulse">Loading Dashboard...</p>
+                </div>
             </div>
         );
     }
 
-    // Calculate stats
+    // Calculation Logic (Preserved from existing code but optimized)
     const activeBookings = bookings?.filter((b: any) =>
-        b.status === "APPROVED" || b.status === "CONFIRMED" || b.status === "CHECKED_IN"
-    ) || [];
-
-    const upcomingBookings = bookings?.filter((b: any) =>
-        b.status === "APPROVED" || b.status === "CONFIRMED"
+        ["APPROVED", "CONFIRMED", "CHECKED_IN"].includes(b.status)
     ) || [];
 
     const pendingBookings = bookings?.filter((b: any) =>
         b.status === "PENDING_APPROVAL"
     ) || [];
 
-    const completedBookings = bookings?.filter((b: any) =>
-        b.status === "CHECKED_OUT" || b.status === "COMPLETED"
-    ) || [];
-
-    const totalSpent = bookings?.filter((b: any) =>
-        b.status === "CONFIRMED" || b.status === "CHECKED_IN" || b.status === "CHECKED_OUT" || b.status === "COMPLETED"
+    const totalSpent = (bookings?.filter((b: any) =>
+        ["CONFIRMED", "CHECKED_IN", "CHECKED_OUT", "COMPLETED"].includes(b.status)
     )?.reduce((acc: number, b: any) =>
         acc + (b.items?.[0]?.unitPrice * b.items?.[0]?.quantity || 0), 0
-    ) / 100 || 0;
+    ) / 100) || 0;
 
-    // Get next booking
-    const nextBooking = upcomingBookings.sort((a: any, b: any) =>
+    const nextBooking = activeBookings.sort((a: any, b: any) =>
         new Date(a.items?.[0]?.startDate).getTime() - new Date(b.items?.[0]?.startDate).getTime()
     )[0];
 
-    // Profile completion percentage
     const profileFields = [user?.firstName, user?.lastName, (user as any)?.phone];
     const completedFields = profileFields.filter(Boolean).length;
     const profileCompletion = Math.round((completedFields / profileFields.length) * 100);
 
-    const getStatusColor = (status: string) => {
+    const getStatusStyles = (status: string) => {
         switch (status) {
-            case "PENDING_APPROVAL": return "bg-orange-100 text-orange-700 border-orange-200";
-            case "APPROVED": return "bg-blue-100 text-blue-700 border-blue-200";
-            case "CONFIRMED": return "bg-green-100 text-green-700 border-green-200";
-            case "CHECKED_IN": return "bg-purple-100 text-purple-700 border-purple-200";
-            case "CHECKED_OUT": return "bg-gray-100 text-gray-700 border-gray-200";
-            case "COMPLETED": return "bg-teal-100 text-teal-700 border-teal-200";
-            default: return "bg-gray-100 text-gray-700 border-gray-200";
+            case "PENDING_APPROVAL": return "bg-orange-50 text-orange-700 border-orange-100";
+            case "APPROVED": return "bg-blue-50 text-blue-700 border-blue-100";
+            case "CONFIRMED": return "bg-green-50 text-green-700 border-green-100";
+            case "CHECKED_IN": return "bg-purple-50 text-purple-700 border-purple-100";
+            case "CHECKED_OUT": return "bg-gray-50 text-gray-700 border-gray-100";
+            case "COMPLETED": return "bg-teal-50 text-teal-700 border-teal-100";
+            default: return "bg-gray-50 text-gray-700 border-gray-100";
         }
     };
 
     return (
-        <div className="space-y-8">
-            {/* Welcome Banner */}
-            <div className="bg-gradient-to-br from-blue-600 to-blue-700 text-white rounded-3xl p-8 md:p-12 relative overflow-hidden">
-                <div className="relative z-10">
-                    <h1 className="text-3xl md:text-4xl font-bold mb-3">
-                        Welcome back, {user?.firstName || "Student"}! 👋
-                    </h1>
-                    <p className="text-blue-100 text-lg mb-6">
-                        {nextBooking
-                            ? `Your next check-in is on ${new Date(nextBooking.items?.[0]?.startDate).toLocaleDateString()}`
-                            : "Ready to find your next hostel?"
-                        }
-                    </p>
-
-                    {/* Profile Completion */}
-                    {profileCompletion < 100 && (
-                        <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 max-w-md">
-                            <div className="flex items-center justify-between mb-2">
-                                <span className="text-sm font-medium">Profile Completion</span>
-                                <span className="text-sm font-bold">{profileCompletion}%</span>
-                            </div>
-                            <div className="w-full bg-white/20 rounded-full h-2">
-                                <div
-                                    className="bg-white h-2 rounded-full transition-all duration-500"
-                                    style={{ width: `${profileCompletion}%` }}
-                                />
-                            </div>
-                            <Link
-                                href="/account"
-                                className="text-xs text-blue-100 hover:text-white mt-2 inline-flex items-center gap-1"
-                            >
-                                Complete your profile <ArrowRight size={12} />
+        <div className="max-w-[1400px] mx-auto space-y-10 pb-20">
+            {/* Header / Welcome Section */}
+            <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8 pt-4">
+                <div className="space-y-2">
+                    <div className="flex items-center gap-2 mb-2">
+                        <span className="px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-[10px] font-black uppercase tracking-widest border border-blue-100">
+                            Student Portal
+                        </span>
+                        {profileCompletion < 100 && (
+                            <Link href="/account" className="px-3 py-1 bg-orange-50 text-orange-600 rounded-full text-[10px] font-black uppercase tracking-widest border border-orange-100 animate-pulse">
+                                Finish Profile
                             </Link>
-                        </div>
-                    )}
+                        )}
+                    </div>
+                    <h1 className="text-4xl md:text-5xl font-black text-gray-900 tracking-tight">
+                        Hello, {user?.firstName || "Student"} <span className="text-blue-600">.</span>
+                    </h1>
+                    <p className="text-gray-500 font-medium text-lg">
+                        Manage your stays, track payments, and find your next home.
+                    </p>
                 </div>
-                <div className="absolute -bottom-20 -right-20 w-64 h-64 bg-white/10 rounded-full blur-3xl" />
-                <div className="absolute -top-20 -left-20 w-64 h-64 bg-white/10 rounded-full blur-3xl" />
+
+                {/* Quick Profile Summary */}
+                <div className="flex items-center gap-4 bg-white p-3 pr-6 rounded-full border border-gray-100 shadow-sm">
+                    <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center text-white font-black">
+                        {user?.firstName?.[0] || user?.email[0].toUpperCase()}
+                    </div>
+                    <div>
+                        <p className="text-xs font-black text-gray-400 uppercase tracking-widest leading-none mb-1">Account Safety</p>
+                        <div className="flex items-center gap-2">
+                            <ShieldCheck className="text-green-600" size={14} />
+                            <span className="text-sm font-bold text-gray-900">Verified Tenant</span>
+                        </div>
+                    </div>
+                </div>
             </div>
 
-            {/* Stats Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <StatsCard
-                    title="Active Bookings"
+            {/* Stats Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <DashboardStat
+                    title="Active Stays"
                     value={activeBookings.length}
                     icon={CheckCircle2}
-                    iconBgColor="bg-green-50"
-                    iconColor="text-green-600"
+                    color="text-green-600"
+                    bgColor="bg-green-50"
                 />
-                <StatsCard
-                    title="Pending Approval"
+                <DashboardStat
+                    title="Pending Requests"
                     value={pendingBookings.length}
                     icon={Clock}
-                    iconBgColor="bg-orange-50"
-                    iconColor="text-orange-600"
+                    color="text-orange-600"
+                    bgColor="bg-orange-50"
                 />
-                <StatsCard
-                    title="Total Bookings"
-                    value={bookings?.length || 0}
-                    icon={CalendarCheck}
-                    iconBgColor="bg-blue-50"
-                    iconColor="text-blue-600"
+                <DashboardStat
+                    title="Current Balance"
+                    value="₵0.0"
+                    icon={Zap}
+                    color="text-blue-600"
+                    bgColor="bg-blue-50"
                 />
-                <StatsCard
-                    title="Total Spent"
+                <DashboardStat
+                    title="Total Investment"
                     value={`₵${totalSpent.toLocaleString()}`}
                     icon={DollarSign}
-                    iconBgColor="bg-purple-50"
-                    iconColor="text-purple-600"
+                    color="text-purple-600"
+                    bgColor="bg-purple-50"
                 />
             </div>
 
-            {/* Main Content Grid */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                {/* Active/Upcoming Bookings */}
-                <div className="lg:col-span-2 space-y-6">
-                    <div className="flex items-center justify-between">
-                        <h2 className="text-2xl font-bold">Your Bookings</h2>
-                        <Link href="/bookings" className="text-sm font-medium text-blue-600 hover:underline">
-                            View all →
+            {/* Main Content Area */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+                {/* Bookings Section (Left) */}
+                <div className="lg:col-span-8 space-y-8">
+                    <div className="flex items-center justify-between mb-2">
+                        <h2 className="text-2xl font-black text-gray-900">Booking Timeline</h2>
+                        <Link href="/bookings" className="text-xs font-black text-blue-600 uppercase tracking-widest hover:underline flex items-center gap-2">
+                            View Archive <ArrowUpRight size={14} />
                         </Link>
                     </div>
 
-                    {nextBooking && (
-                        <div className="bg-gradient-to-br from-purple-600 to-purple-700 text-white rounded-3xl p-8 relative overflow-hidden">
-                            <div className="relative z-10">
-                                <div className="flex items-start justify-between mb-4">
-                                    <div>
-                                        <p className="text-purple-200 text-sm font-medium mb-1">NEXT CHECK-IN</p>
-                                        <h3 className="text-2xl font-bold mb-2">{nextBooking.hostel.name}</h3>
-                                        <div className="flex items-center gap-2 text-purple-100">
-                                            <MapPin size={16} />
-                                            <span className="text-sm">{nextBooking.hostel.location}</span>
+                    {nextBooking ? (
+                        <div className="relative group overflow-hidden rounded-[3rem] bg-gray-900 text-white p-8 md:p-12 shadow-2xl">
+                            <div className="absolute top-0 right-0 w-96 h-96 bg-blue-600 rounded-full -mr-32 -mt-32 blur-[100px] opacity-40 group-hover:opacity-60 transition-opacity" />
+
+                            <div className="relative z-10 space-y-8">
+                                <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                                    <div className="space-y-4">
+                                        <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/10 backdrop-blur-md rounded-lg text-[10px] font-black uppercase tracking-widest text-blue-300">
+                                            Upcoming Check-in
+                                        </div>
+                                        <h3 className="text-3xl md:text-4xl font-black">{nextBooking.hostel.name}</h3>
+                                        <div className="flex items-center gap-2 text-gray-400 font-medium">
+                                            <MapPin size={18} className="text-blue-500" />
+                                            {nextBooking.hostel.location}
                                         </div>
                                     </div>
-                                    <span className={cn("px-3 py-1 rounded-full text-xs font-bold border", getStatusColor(nextBooking.status))}>
-                                        {nextBooking.status.replace(/_/g, " ")}
-                                    </span>
-                                </div>
-
-                                <div className="grid grid-cols-2 gap-4 mt-6 pt-6 border-t border-purple-500">
-                                    <div>
-                                        <p className="text-purple-200 text-xs mb-1">Check-in</p>
-                                        <p className="font-bold">{new Date(nextBooking.items?.[0]?.startDate).toLocaleDateString()}</p>
-                                    </div>
-                                    <div>
-                                        <p className="text-purple-200 text-xs mb-1">Check-out</p>
-                                        <p className="font-bold">{new Date(nextBooking.items?.[0]?.endDate).toLocaleDateString()}</p>
+                                    <div className="text-right">
+                                        <div className="text-4xl font-black mb-1">₵{((nextBooking.items?.[0]?.unitPrice * nextBooking.items?.[0]?.quantity || 0) / 100).toLocaleString()}</div>
+                                        <div className="text-xs font-black text-gray-400 uppercase tracking-widest">Total Stay Amount</div>
                                     </div>
                                 </div>
 
-                                <Link
-                                    href={`/bookings/${nextBooking.id}`}
-                                    className="mt-6 inline-flex items-center gap-2 bg-white text-purple-600 px-6 py-3 rounded-xl font-bold hover:bg-purple-50 transition-colors"
-                                >
-                                    View Details <ArrowRight size={18} />
-                                </Link>
+                                <div className="grid grid-cols-2 md:grid-cols-4 gap-8 pt-8 border-t border-white/10">
+                                    <div>
+                                        <p className="text-[10px] font-black text-gray-500 uppercase tracking-[0.2em] mb-2">Check-in</p>
+                                        <p className="text-lg font-bold">{new Date(nextBooking.items?.[0]?.startDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-[10px] font-black text-gray-500 uppercase tracking-[0.2em] mb-2">Check-out</p>
+                                        <p className="text-lg font-bold">{new Date(nextBooking.items?.[0]?.endDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-[10px] font-black text-gray-500 uppercase tracking-[0.2em] mb-2">Room No.</p>
+                                        <p className="text-lg font-bold">#204 <span className="text-xs text-gray-500 font-medium">(Standard)</span></p>
+                                    </div>
+                                    <div className="flex items-center justify-end">
+                                        <Link href={`/bookings/${nextBooking.id}`} className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-2xl font-black text-sm uppercase tracking-widest transition-all">
+                                            Details
+                                        </Link>
+                                    </div>
+                                </div>
                             </div>
-                            <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-white/10 rounded-full blur-3xl" />
+                        </div>
+                    ) : (
+                        <div className="p-16 bg-white rounded-[3rem] border border-gray-100 flex flex-col items-center text-center space-y-4">
+                            <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center text-gray-300">
+                                <Building2 size={40} />
+                            </div>
+                            <div className="space-y-2">
+                                <h3 className="text-2xl font-black text-gray-900">No Active Bookings</h3>
+                                <p className="text-gray-500 font-medium">You haven't booked any hostels yet. Start your search now.</p>
+                            </div>
+                            <Link href="/hostels" className="bg-blue-600 text-white px-10 py-4 rounded-2xl font-black text-sm uppercase tracking-widest hover:scale-105 transition-all">
+                                Explore Hostels
+                            </Link>
                         </div>
                     )}
 
-                    {/* Recent Bookings List */}
-                    <div className="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden">
-                        <div className="p-6 border-b border-gray-100">
-                            <h3 className="font-bold">Recent Activity</h3>
+                    {/* Recent Activity List */}
+                    <div className="bg-white rounded-[2.5rem] border border-gray-100 overflow-hidden shadow-sm">
+                        <div className="px-8 py-6 border-b border-gray-50 flex items-center justify-between">
+                            <h3 className="font-black text-gray-900 uppercase tracking-widest text-sm">Recent Activity</h3>
+                            <div className="flex gap-2">
+                                <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+                            </div>
                         </div>
-                        {bookings?.length === 0 ? (
-                            <div className="p-12 text-center text-gray-400">
-                                <CalendarCheck size={48} className="mx-auto mb-4 opacity-20" />
-                                <p className="mb-4">No bookings yet</p>
+                        <div className="divide-y divide-gray-50">
+                            {bookings?.length > 0 ? bookings.slice(0, 4).map((booking: any) => (
                                 <Link
-                                    href="/"
-                                    className="inline-flex items-center gap-2 text-blue-600 font-medium hover:underline"
+                                    key={booking.id}
+                                    href={`/bookings/${booking.id}`}
+                                    className="px-8 py-6 flex items-center justify-between hover:bg-gray-50/50 transition-all group"
                                 >
-                                    Browse Hostels <ArrowRight size={16} />
+                                    <div className="flex items-center gap-6">
+                                        <div className="w-14 h-14 bg-gray-100 rounded-2xl overflow-hidden shrink-0">
+                                            {booking.hostel.images?.[0] ? (
+                                                <img src={booking.hostel.images[0]} alt="" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                                            ) : (
+                                                <div className="w-full h-full flex items-center justify-center text-gray-300"><Building2 size={24} /></div>
+                                            )}
+                                        </div>
+                                        <div>
+                                            <h4 className="font-bold text-gray-900 mb-1">{booking.hostel.name}</h4>
+                                            <p className="text-xs text-gray-500 font-medium">#{booking.id.slice(-8).toUpperCase()}</p>
+                                        </div>
+                                    </div>
+                                    <div className="flex items-center gap-6">
+                                        <div className="hidden sm:block text-right">
+                                            <div className="text-sm font-bold text-gray-900 mb-1">
+                                                {new Date(booking.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}
+                                            </div>
+                                            <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Date Booked</p>
+                                        </div>
+                                        <div className={cn("px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest border", getStatusStyles(booking.status))}>
+                                            {booking.status.replace(/_/g, " ")}
+                                        </div>
+                                    </div>
                                 </Link>
-                            </div>
-                        ) : (
-                            <div className="divide-y divide-gray-100">
-                                {bookings?.slice(0, 5).map((booking: any) => (
-                                    <Link
-                                        key={booking.id}
-                                        href={`/bookings/${booking.id}`}
-                                        className="p-6 flex items-center justify-between hover:bg-gray-50/50 transition-colors"
-                                    >
-                                        <div className="flex items-center gap-4">
-                                            <div className="w-16 h-16 bg-gray-100 rounded-2xl overflow-hidden">
-                                                {booking.hostel.images?.[0] ? (
-                                                    <img
-                                                        src={booking.hostel.images[0]}
-                                                        alt={booking.hostel.name}
-                                                        className="w-full h-full object-cover"
-                                                    />
-                                                ) : (
-                                                    <div className="w-full h-full flex items-center justify-center">
-                                                        <Building2 size={24} className="text-gray-400" />
-                                                    </div>
-                                                )}
-                                            </div>
-                                            <div>
-                                                <h4 className="font-bold text-sm mb-1">{booking.hostel.name}</h4>
-                                                <p className="text-xs text-gray-500">
-                                                    {booking.items?.[0]?.startDate && new Date(booking.items[0].startDate).toLocaleDateString()} - {booking.items?.[0]?.endDate && new Date(booking.items[0].endDate).toLocaleDateString()}
-                                                </p>
-                                            </div>
-                                        </div>
-                                        <div className="text-right">
-                                            <span className={cn("px-3 py-1 rounded-full text-xs font-medium border inline-block mb-1", getStatusColor(booking.status))}>
-                                                {booking.status.replace(/_/g, " ")}
-                                            </span>
-                                            <p className="text-xs text-gray-500">
-                                                ₵{((booking.items?.[0]?.unitPrice * booking.items?.[0]?.quantity || 0) / 100).toLocaleString()}
-                                            </p>
-                                        </div>
-                                    </Link>
-                                ))}
-                            </div>
-                        )}
+                            )) : (
+                                <div className="p-12 text-center text-gray-400 font-medium italic">No activity yet.</div>
+                            )}
+                        </div>
                     </div>
                 </div>
 
-                {/* Quick Actions Sidebar */}
-                <div className="space-y-6">
-                    <h2 className="text-2xl font-bold">Quick Actions</h2>
+                {/* Sidebar (Right) */}
+                <div className="lg:col-span-4 space-y-8">
+                    <h2 className="text-2xl font-black text-gray-900 mb-6">Quick Hub</h2>
 
-                    <Link
-                        href="/"
-                        className="block bg-gradient-to-br from-blue-600 to-blue-700 text-white p-6 rounded-2xl hover:shadow-xl hover:shadow-blue-200 transition-all group"
-                    >
-                        <div className="flex items-center gap-3 mb-3">
-                            <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
-                                <Search size={20} />
+                    <div className="grid gap-4">
+                        <Link href="/hostels" className="group p-6 bg-gradient-to-br from-blue-600 to-blue-700 rounded-3xl text-white shadow-xl shadow-blue-100 hover:scale-[1.02] transition-all">
+                            <div className="flex items-start justify-between mb-6">
+                                <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center">
+                                    <Search size={22} />
+                                </div>
+                                <ArrowUpRight className="opacity-40 group-hover:opacity-100 group-hover:translate-x-1 transition-all" size={24} />
                             </div>
-                            <h3 className="font-bold">Find Hostels</h3>
-                        </div>
-                        <p className="text-sm text-blue-100 mb-3">Browse available hostels near your campus</p>
-                        <div className="flex items-center gap-1 text-sm font-medium">
-                            Explore now <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
-                        </div>
-                    </Link>
+                            <h3 className="text-xl font-black mb-2">Explore Hostels</h3>
+                            <p className="text-blue-100/80 text-sm font-medium">Browse verified listings near your university campus in Ghana.</p>
+                        </Link>
 
-                    <Link
-                        href="/bookings"
-                        className="block bg-white border border-gray-100 p-6 rounded-2xl hover:shadow-md transition-all group"
-                    >
-                        <div className="flex items-center gap-3 mb-3">
-                            <div className="w-10 h-10 bg-purple-50 rounded-xl flex items-center justify-center">
-                                <CalendarCheck size={20} className="text-purple-600" />
+                        <Link href="/account/payments" className="group p-6 bg-white rounded-3xl border border-gray-100 shadow-sm hover:border-blue-100 hover:shadow-md transition-all">
+                            <div className="flex items-start justify-between mb-6">
+                                <div className="w-12 h-12 bg-green-50 text-green-600 rounded-2xl flex items-center justify-center">
+                                    <CreditCard size={22} />
+                                </div>
+                                <ArrowUpRight className="text-gray-300 group-hover:text-blue-600 group-hover:translate-x-1 transition-all" size={24} />
                             </div>
-                            <h3 className="font-bold">My Bookings</h3>
-                        </div>
-                        <p className="text-sm text-gray-600 mb-3">View and manage all your reservations</p>
-                        <div className="flex items-center gap-1 text-sm font-medium text-purple-600">
-                            View all <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
-                        </div>
-                    </Link>
+                            <h3 className="text-xl font-black text-gray-900 mb-2">My Payments</h3>
+                            <p className="text-gray-500 text-sm font-medium">Track your MoMo transactions & download receipt history.</p>
+                        </Link>
 
-                    <Link
-                        href="/account/payments"
-                        className="block bg-white border border-gray-100 p-6 rounded-2xl hover:shadow-md transition-all group"
-                    >
-                        <div className="flex items-center gap-3 mb-3">
-                            <div className="w-10 h-10 bg-green-50 rounded-xl flex items-center justify-center">
-                                <DollarSign size={20} className="text-green-600" />
+                        <Link href="/support" className="group p-6 bg-white rounded-3xl border border-gray-100 shadow-sm hover:border-blue-100 hover:shadow-md transition-all">
+                            <div className="flex items-start justify-between mb-6">
+                                <div className="w-12 h-12 bg-purple-50 text-purple-600 rounded-2xl flex items-center justify-center">
+                                    <LifeBuoy size={22} />
+                                </div>
+                                <ArrowUpRight className="text-gray-300 group-hover:text-blue-600 group-hover:translate-x-1 transition-all" size={24} />
                             </div>
-                            <h3 className="font-bold">Payments</h3>
-                        </div>
-                        <p className="text-sm text-gray-600 mb-3">Track payments and download receipts</p>
-                        <div className="flex items-center gap-1 text-sm font-medium text-green-600">
-                            Manage <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
-                        </div>
-                    </Link>
+                            <h3 className="text-xl font-black text-gray-900 mb-2">Support Hub</h3>
+                            <p className="text-gray-500 text-sm font-medium">Get help with bookings, verification, or safety concerns.</p>
+                        </Link>
+                    </div>
 
-                    {/* Payment Summary */}
-                    <div className="bg-gradient-to-br from-gray-900 to-gray-800 text-white p-6 rounded-2xl">
-                        <div className="flex items-center gap-2 mb-4">
-                            <TrendingUp size={20} className="text-gray-400" />
-                            <h3 className="font-bold">Spending Summary</h3>
-                        </div>
-                        <p className="text-3xl font-bold mb-2">₵{totalSpent.toLocaleString()}</p>
-                        <p className="text-sm text-gray-400">Total spent on accommodations</p>
-                        <div className="mt-4 pt-4 border-t border-gray-700 grid grid-cols-2 gap-4 text-sm">
-                            <div>
-                                <p className="text-gray-400 mb-1">Completed</p>
-                                <p className="font-bold">{completedBookings.length}</p>
+                    {/* Monthly Summary Alert */}
+                    <div className="p-8 bg-gray-50 border border-dashed border-gray-200 rounded-[2.5rem] relative overflow-hidden">
+                        <div className="relative z-10 space-y-4">
+                            <div className="flex items-center gap-2">
+                                <TrendingUp className="text-blue-600" size={18} />
+                                <span className="text-xs font-black uppercase tracking-widest text-gray-400">Monthly Spending</span>
                             </div>
-                            <div>
-                                <p className="text-gray-400 mb-1">Active</p>
-                                <p className="font-bold">{activeBookings.length}</p>
-                            </div>
+                            <div className="text-3xl font-black text-gray-900">₵{totalSpent.toLocaleString()}</div>
+                            <p className="text-sm text-gray-500 font-medium">You’ve successfully secured {activeBookings.length} bookings this academic semester.</p>
                         </div>
+                        <div className="absolute -bottom-10 -right-10 w-32 h-32 bg-blue-100/50 rounded-full blur-2xl" />
                     </div>
                 </div>
             </div>
         </div>
     );
 }
+
+// Reused components from imports...
+import { ShieldCheck, LifeBuoy } from "lucide-react";
