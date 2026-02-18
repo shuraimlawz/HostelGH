@@ -1,47 +1,110 @@
+"use client";
+
+import { FileText, ShieldAlert, ArrowRight } from "lucide-react";
+
 export default function TermsPage() {
     return (
-        <div className="max-w-3xl mx-auto px-4 py-20">
-            <h1 className="text-4xl font-bold mb-8">Terms of Service</h1>
-            <div className="prose prose-gray prose-lg max-w-none space-y-8">
-                <section>
-                    <h2 className="text-2xl font-bold text-black border-l-4 border-primary pl-4">1. Acceptance of Terms</h2>
-                    <p className="text-muted-foreground">
-                        By accessing or using the HostelGH platform, you agree to comply with and be bound by these Terms of Service. If you do not agree to these terms, please do not use our services.
-                    </p>
+        <div className="max-w-4xl mx-auto px-6 py-20">
+            {/* Header section with icon */}
+            <div className="flex flex-col items-center text-center space-y-6 mb-20 animate-in fade-in slide-in-from-bottom-4 duration-700">
+                <div className="w-16 h-16 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center shadow-sm">
+                    <FileText size={32} />
+                </div>
+                <div className="space-y-2">
+                    <h1 className="text-4xl md:text-5xl font-black text-gray-900 tracking-tight">Terms of Service</h1>
+                    <div className="flex items-center justify-center gap-4 pt-2">
+                        <span className="px-3 py-1 bg-gray-100 text-gray-500 rounded-full text-xs font-black uppercase tracking-widest">
+                            Effective Date: Feb 18, 2026
+                        </span>
+                        <span className="px-3 py-1 bg-green-50 text-green-600 rounded-full text-xs font-black uppercase tracking-widest">
+                            Standard v2.1
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <div className="space-y-16">
+                <section className="group animate-in fade-in slide-in-from-bottom-8 duration-700 delay-100">
+                    <div className="flex items-center gap-4 mb-6">
+                        <div className="w-10 h-10 rounded-xl bg-gray-900 text-white flex items-center justify-center font-black text-lg">01</div>
+                        <h2 className="text-2xl font-black text-gray-900 group-hover:text-blue-600 transition-colors">Acceptance of Terms</h2>
+                    </div>
+                    <div className="bg-white border-2 border-gray-50 rounded-[2rem] p-8 hover:border-gray-100 shadow-sm transition-all leading-relaxed">
+                        <p className="text-gray-600 text-lg font-medium">
+                            By accessing or using the HostelGH platform, you agree to comply with and be bound by these Terms of Service. If you do not agree to these terms, please do not use our services. We provide a platform connecting university students with verified accommodation providers.
+                        </p>
+                    </div>
                 </section>
 
-                <section>
-                    <h2 className="text-2xl font-bold text-black border-l-4 border-primary pl-4">2. User Obligations</h2>
-                    <p className="text-muted-foreground">
-                        Users must provide accurate information when creating an account. You are responsible for maintaining the confidentiality of your account credentials and for all activities that occur under your account.
-                    </p>
-                    <ul className="list-disc pl-6 text-muted-foreground space-y-2 mt-4">
-                        <li>You must be at least 18 years old to use our service.</li>
-                        <li>You agree not to use the platform for any illegal or unauthorized purposes.</li>
-                        <li>Hostel owners must ensure that all listing details are accurate and up-to-date.</li>
-                    </ul>
+                <section className="group animate-in fade-in slide-in-from-bottom-8 duration-700 delay-200">
+                    <div className="flex items-center gap-4 mb-6">
+                        <div className="w-10 h-10 rounded-xl bg-gray-900 text-white flex items-center justify-center font-black text-lg">02</div>
+                        <h2 className="text-2xl font-black text-gray-900 group-hover:text-blue-600 transition-colors">User Obligations</h2>
+                    </div>
+                    <div className="bg-white border-2 border-gray-50 rounded-[2rem] p-8 hover:border-gray-100 shadow-sm transition-all space-y-6">
+                        <p className="text-gray-600 text-lg font-medium leading-relaxed">
+                            Users must provide accurate information when creating an account. You are responsible for maintaining the confidentiality of your account credentials and for all activities that occur under your account.
+                        </p>
+                        <div className="grid md:grid-cols-2 gap-4">
+                            {[
+                                "Minimum age of 18 years",
+                                "No illegal or unauthorized use",
+                                "Accurate listing information",
+                                "Compliance with hostel rules"
+                            ].map((item, i) => (
+                                <div key={i} className="flex items-center gap-3 p-4 bg-gray-50 rounded-2xl group/item">
+                                    <div className="w-6 h-6 rounded-full bg-white flex items-center justify-center text-blue-600 shadow-sm group-hover/item:bg-blue-600 group-hover/item:text-white transition-colors">
+                                        <ArrowRight size={14} />
+                                    </div>
+                                    <span className="text-sm font-bold text-gray-700">{item}</span>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
                 </section>
 
-                <section>
-                    <h2 className="text-2xl font-bold text-black border-l-4 border-primary pl-4">3. Booking and Payments</h2>
-                    <p className="text-muted-foreground">
-                        All bookings made through HostelGH are subject to the specific hostel's availability and rules. Payments are processed via Paystack. HostelGH acts as a facilitator and is not responsible for the actual provision of accommodation.
-                    </p>
+                <section className="group animate-in fade-in slide-in-from-bottom-8 duration-700 delay-300">
+                    <div className="flex items-center gap-4 mb-6">
+                        <div className="w-10 h-10 rounded-xl bg-gray-900 text-white flex items-center justify-center font-black text-lg">03</div>
+                        <h2 className="text-2xl font-black text-gray-900 group-hover:text-blue-600 transition-colors">Booking and Payments</h2>
+                    </div>
+                    <div className="bg-white border-2 border-gray-50 rounded-[2rem] p-8 hover:border-gray-100 shadow-sm transition-all leading-relaxed">
+                        <p className="text-gray-600 text-lg font-medium">
+                            All bookings made through HostelGH are subject to the specific hostel's availability and rules. Payments are processed via Paystack. HostelGH acts as a facilitator and is not responsible for the actual provision of accommodation. Fees may apply for certain platform services.
+                        </p>
+                    </div>
                 </section>
 
-                <section>
-                    <h2 className="text-2xl font-bold text-black border-l-4 border-primary pl-4">4. Limitation of Liability</h2>
-                    <p className="text-muted-foreground">
-                        HostelGH shall not be liable for any direct, indirect, incidental, or consequential damages arising from your use of the platform or the services provided by hostel owners.
-                    </p>
+                <section className="group animate-in fade-in slide-in-from-bottom-8 duration-700 delay-400">
+                    <div className="flex items-center gap-4 mb-6">
+                        <div className="w-10 h-10 rounded-xl bg-gray-900 text-white flex items-center justify-center font-black text-lg">04</div>
+                        <h2 className="text-2xl font-black text-gray-900 group-hover:text-blue-600 transition-colors">Limitation of Liability</h2>
+                    </div>
+                    <div className="bg-red-50/30 border-2 border-red-50 rounded-[2rem] p-8 hover:border-red-100 transition-all">
+                        <div className="flex items-start gap-4">
+                            <ShieldAlert className="text-red-600 shrink-0 mt-1" size={24} />
+                            <p className="text-gray-700 text-lg font-medium leading-relaxed italic">
+                                HostelGH shall not be liable for any direct, indirect, incidental, or consequential damages arising from your use of the platform or the services provided by hostel owners. Use the platform at your own risk.
+                            </p>
+                        </div>
+                    </div>
                 </section>
 
-                <section className="bg-gray-50 p-8 rounded-3xl border border-gray-200 mt-12">
-                    <h2 className="text-xl font-bold mb-4">Last Updated</h2>
-                    <p className="text-sm text-muted-foreground">
-                        These terms were last updated on February 13, 2026. We reserve the right to modify these terms at any time.
+                {/* Final Help/Contact Section */}
+                <div className="mt-20 p-12 bg-gray-900 rounded-[3rem] text-center space-y-6">
+                    <h3 className="text-2xl font-bold text-white">Questions about our Terms?</h3>
+                    <p className="text-gray-400 font-medium max-w-lg mx-auto">
+                        If you have any concerns regarding these terms, please contact our legal team for clarification.
                     </p>
-                </section>
+                    <div className="pt-4">
+                        <a
+                            href="mailto:legal@hostelgh.com"
+                            className="inline-flex items-center gap-2 bg-blue-600 text-white px-8 py-4 rounded-2xl font-black hover:bg-blue-700 transition-all shadow-xl"
+                        >
+                            Contact Legal Team
+                        </a>
+                    </div>
+                </div>
             </div>
         </div>
     );

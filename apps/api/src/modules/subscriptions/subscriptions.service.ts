@@ -1,5 +1,8 @@
-import { Injectable, ForbiddenException } from "@nestjs/common";
+import { Injectable, ForbiddenException, NotFoundException, BadRequestException } from "@nestjs/common";
 import { PrismaService } from "../../prisma/prisma.service";
+import { ConfigService } from "@nestjs/config";
+import { PaystackService } from "../payments/paystack.service";
+import { randomBytes } from "crypto";
 
 export enum SubscriptionPlan {
     FREE = "FREE",
@@ -8,7 +11,11 @@ export enum SubscriptionPlan {
 
 @Injectable()
 export class SubscriptionsService {
-    constructor(private readonly prisma: PrismaService) { }
+    constructor(
+        private readonly prisma: PrismaService,
+        private readonly paystack: PaystackService,
+        private readonly config: ConfigService,
+    ) { }
 
     async getOwnerSubscription(ownerId: string) {
         const sub = await this.prisma.subscription.findFirst({
@@ -48,25 +55,67 @@ export class SubscriptionsService {
         return true;
     }
 
-    async subscribeToPro(ownerId: string) {
-        // In a real scenario, this would be called after a successful Paystack payment
+    async initiateProUpgrade(ownerId: string) {
+        const user = await this.prisma.user.findUnique({ where: { id: ownerId } });
+        if (!user) throw new NotFoundException("User not found");
+
+        const PRO_PLAN_PRICE = 9900; // GH₵ 99.00 in pesewas
+        const reference = `SUB_PRO_${randomBytes(8).toString("hex")}`;
+        const appUrl = this.config.get<string>("FRONTEND_URL") || this.config.get<string>("APP_URL");
+
+        const initResponse = await this.paystack.initializeTransaction({
+            email: user.email,
+            amount: PRO_PLAN_PRICE,
+            reference,
+            callback_url: appUrl ? `${appUrl}/owner/subscription` : undefined,
+            metadata: { ownerId, plan: SubscriptionPlan.PRO, type: "subscription_upgrade" },
+        });
+
+        return initResponse.data;
+    }
+
+    async handleSubscriptionWebhook(reference: string, rawData: any) {
+        const metadata = rawData?.metadata;
+        if (!metadata || metadata.type !== "subscription_upgrade") return;
+
+        const ownerId = metadata.ownerId;
+        const plan = metadata.plan;
+
         const expiresAt = new Date();
         expiresAt.setMonth(expiresAt.getMonth() + 1);
 
-        return this.prisma.subscription.upsert({
-            where: { id: `PRO_${ownerId}` }, // Simple unique ID for mock/simplicity
-            update: {
-                active: true,
-                expiresAt,
-                plan: SubscriptionPlan.PRO,
-            },
-            create: {
-                id: `PRO_${ownerId}`,
-                ownerId,
-                active: true,
-                expiresAt,
-                plan: SubscriptionPlan.PRO,
-            },
+        // Update or Create the subscription record
+        // We use a specific ID pattern or find by ownerId to ensure one active sub
+        const existingSub = await this.prisma.subscription.findFirst({
+            where: { ownerId }
+        });
+
+        if (existingSub) {
+            await this.prisma.subscription.update({
+                where: { id: existingSub.id },
+                data: {
+                    active: true,
+                    expiresAt,
+                    plan: plan,
+                }
+            });
+        } else {
+            await this.prisma.subscription.create({
+                data: {
+                    ownerId,
+                    active: true,
+                    expiresAt,
+                    plan: plan,
+                }
+            });
+        }
+    }
+
+    async downgradeToFree(ownerId: string) {
+        // Immediate downgrade for MVP stability
+        return this.prisma.subscription.updateMany({
+            where: { ownerId, plan: SubscriptionPlan.PRO },
+            data: { active: false }
         });
     }
 }

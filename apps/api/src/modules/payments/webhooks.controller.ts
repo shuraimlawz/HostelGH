@@ -1,5 +1,6 @@
 import { BadRequestException, Controller, Headers, Post, Req, HttpCode, HttpStatus, Logger } from "@nestjs/common";
 import { PaymentsService } from "./payments.service";
+import { SubscriptionsService } from "../subscriptions/subscriptions.service";
 import { ConfigService } from "@nestjs/config";
 import { createHmac, timingSafeEqual } from "crypto";
 
@@ -12,6 +13,7 @@ export class WebhooksController {
 
     constructor(
         private payments: PaymentsService,
+        private subscriptions: SubscriptionsService,
         private config: ConfigService
     ) { }
 
@@ -46,7 +48,9 @@ export class WebhooksController {
             const reference = event?.data?.reference;
             const paidAt = event?.data?.paid_at;
 
-            if (reference) {
+            if (reference?.startsWith("SUB_PRO_")) {
+                await this.subscriptions.handleSubscriptionWebhook(reference, event.data);
+            } else if (reference) {
                 await this.payments.markPaidFromWebhook(reference, event, paidAt);
             }
         }

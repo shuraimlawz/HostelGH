@@ -19,7 +19,12 @@ export class SubscriptionsController {
     @Post("upgrade-pro")
     @Roles(UserRole.OWNER, UserRole.ADMIN)
     async upgradeToPro(@Req() req: any) {
-        // This is a simplified "instant upgrade" for MVP/SaaS flow.
-        return this.subscriptions.subscribeToPro(req.user.userId);
+        return this.subscriptions.initiateProUpgrade(req.user.userId);
+    }
+
+    @Post("downgrade-free")
+    @Roles(UserRole.OWNER, UserRole.ADMIN)
+    async downgradeToFree(@Req() req: any) {
+        return this.subscriptions.downgradeToFree(req.user.userId);
     }
 }
