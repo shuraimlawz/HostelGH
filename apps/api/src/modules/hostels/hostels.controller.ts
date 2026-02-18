@@ -97,6 +97,13 @@ export class HostelsController {
         return this.hostels.getCityStats();
     }
 
+    @Public()
+    @Get("trending-locations")
+    @ApiOperation({ summary: "Get real trending locations based on activity" })
+    getTrending() {
+        return this.hostels.getTrendingLocations();
+    }
+
     @Roles(UserRole.OWNER)
     @Post(":id/images")
     @ApiOperation({ summary: "Upload a single hostel image (Owner only)" })

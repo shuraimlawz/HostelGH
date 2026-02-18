@@ -1,16 +1,18 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Search, MapPin, Sparkles, Navigation } from "lucide-react";
+import { Search, MapPin, Sparkles, Navigation, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
+import { useQuery } from "@tanstack/react-query";
+import { api } from "@/lib/api";
 
 const HERO_IMAGES = [
-    "https://graduatehillshostel.com/images/GHH4.jpg", // Graduate Hills Exterior
-    "https://somewherenice.com/wp-content/uploads/2019/06/somewhere-nice-hostel-accra-pool-1.jpg", // Somewhere Nice Pool
-    "https://i.ytimg.com/vi/qY_0_X7eS_8/maxresdefault.jpg", // Pentagon/Legon Area
-    "https://graduatehillshostel.com/images/PHOTO-2022-02-14-17-10-57_1_edited.jpg", // Modern Student Room
-    "https://images.unsplash.com/photo-1555854877-bab0e564b8d5?q=80&w=2069&auto=format&fit=crop" // Premium Lounge
+    "/SRC_hostel_KNUST-Kumasi.jpg",
+    "/evandy-scaled-1.jpg",
+    "/upsahostel.jpg",
+    "/Hostel_Block_B_(GCTU).jpg",
+    "/hall-seven.jpg"
 ];
 
 export default function HeroSearch() {
@@ -25,9 +27,18 @@ export default function HeroSearch() {
         return () => clearInterval(interval);
     }, []);
 
-    const handleSearch = () => {
-        router.push(`/hostels${city ? `?city=${encodeURIComponent(city)}` : ""}`);
+    const handleSearch = (overrideCity?: string) => {
+        const searchCity = overrideCity !== undefined ? overrideCity : city;
+        router.push(`/hostels${searchCity ? `?city=${encodeURIComponent(searchCity)}` : ""}`);
     };
+
+    const { data: trendingLocations, isLoading: isLoadingTrending } = useQuery({
+        queryKey: ["trending-locations"],
+        queryFn: async () => {
+            const { data } = await api.get("/hostels/trending-locations");
+            return Array.isArray(data) ? data : [];
+        },
+    });
 
     return (
         <div className="relative w-full h-[70vh] md:h-[85vh] flex items-center justify-center overflow-hidden rounded-[2.5rem] mx-auto my-6 max-w-[98%] shadow-2xl">
@@ -104,15 +115,21 @@ export default function HeroSearch() {
                     </div>
 
                     {/* Quick Links / Trending */}
-                    <div className="mt-8 flex flex-wrap justify-center gap-4 text-white/60 text-sm font-bold">
-                        <span className="uppercase tracking-widest text-[10px] mt-2 w-full md:w-auto">Trending:</span>
-                        {['East Legon', 'Ayeduase', 'UCC Gate', 'Atomic'].map((loc) => (
+                    <div className="mt-8 flex flex-wrap justify-center gap-3 text-white/60 text-sm font-bold">
+                        <span className="uppercase tracking-widest text-[10px] mt-2.5 w-full md:w-auto flex items-center justify-center gap-2">
+                            {isLoadingTrending && <Loader2 className="animate-spin h-3 w-3" />}
+                            Trending:
+                        </span>
+                        {(trendingLocations && trendingLocations.length > 0 ? trendingLocations : ['East Legon', 'Ayeduase', 'UCC Gate', 'Atomic']).map((loc) => (
                             <button
                                 key={loc}
-                                onClick={() => { setCity(loc); }}
-                                className="px-4 py-2 rounded-full border border-white/10 hover:border-white/30 hover:bg-white/5 hover:text-white transition-all backdrop-blur-sm flex items-center gap-2"
+                                onClick={() => {
+                                    setCity(loc);
+                                    handleSearch(loc);
+                                }}
+                                className="px-5 py-2.5 rounded-full border border-white/10 hover:border-white/40 hover:bg-white/10 hover:text-white transition-all backdrop-blur-md flex items-center gap-2 text-xs md:text-sm active:scale-90"
                             >
-                                <Navigation className="h-3 w-3" />
+                                <Navigation className="h-3 w-3 text-blue-400" />
                                 {loc}
                             </button>
                         ))}

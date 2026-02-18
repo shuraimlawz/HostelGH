@@ -162,6 +162,72 @@ export class HostelsService {
         return result;
     }
 
+    async getTrendingLocations() {
+        const cacheKey = "trending_locations";
+        const cached = await this.redis.getJson<string[]>(cacheKey);
+        if (cached) return cached;
+
+        // Trending Algorithm Logic:
+        // 1. Find locations (University or City) with most bookings in last 30 days
+        // 2. Boost results if a hostel is "Featured"
+        // 3. Fallback to locations with most published hostels
+
+        const thirtyDaysAgo = new Date();
+        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+        // Get bookings activity per hostel
+        const recentActivity = await this.prisma.booking.groupBy({
+            by: ['hostelId'],
+            _count: { id: true },
+            where: { createdAt: { gte: thirtyDaysAgo } }
+        });
+
+        const hostelIds = recentActivity.map(a => a.hostelId);
+        const activeHostels = await this.prisma.hostel.findMany({
+            where: { id: { in: hostelIds }, isPublished: true },
+            select: { city: true, university: true, id: true }
+        });
+
+        const scores: Record<string, number> = {};
+
+        // Aggregate scores by location name
+        activeHostels.forEach(hostel => {
+            const bookingCount = recentActivity.find(a => a.hostelId === hostel.id)?._count.id || 0;
+            const locationNames = [hostel.university, hostel.city].filter(Boolean) as string[];
+
+            locationNames.forEach(name => {
+                scores[name] = (scores[name] || 0) + bookingCount;
+            });
+        });
+
+        // Fallback: If not enough trending from bookings, add locations with most hostels
+        if (Object.keys(scores).length < 4) {
+            const topHostelLocations = await this.prisma.hostel.groupBy({
+                by: ['university', 'city'],
+                _count: { id: true },
+                where: { isPublished: true },
+                orderBy: { _count: { id: 'desc' } },
+                take: 10
+            });
+
+            topHostelLocations.forEach(loc => {
+                const name = loc.university || loc.city;
+                scores[name] = (scores[name] || 0) + (loc._count.id * 0.5); // Lower weight for static count
+            });
+        }
+
+        const trending = Object.entries(scores)
+            .sort(([, a], [, b]) => b - a)
+            .slice(0, 5)
+            .map(([name]) => name);
+
+        // Ultimate Fallback if DB is empty
+        const finalResults = trending.length > 0 ? trending : ['Legon', 'KNUST', 'UCC', 'UPSA', 'Accra'];
+
+        await this.redis.setJson(cacheKey, finalResults, 3600); // 1 hour internal cache
+        return finalResults;
+    }
+
     async addHostelImages(hostelId: string, userId: string, imageUrls: string[]) {
         const hostel = await this.getHostelById(hostelId);
         this.validateOwnership({ userId, role: UserRole.OWNER }, hostel.ownerId);
@@ -233,6 +299,7 @@ interface CreateHostelDto {
     amenities?: string[];
     university?: string;
     isPublished?: boolean;
+    isFeatured?: boolean;
 }
 
 interface UpdateHostelDto extends Partial<CreateHostelDto> { }
