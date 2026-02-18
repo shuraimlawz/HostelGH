@@ -19,7 +19,8 @@ import {
     Layout,
     School,
     DollarSign,
-    MapPin
+    MapPin,
+    Navigation
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
@@ -107,46 +108,53 @@ export default function HostelFilters() {
             </div>
 
             <div className="space-y-8">
-                {/* City Filter */}
-                <div className="space-y-3">
-                    <Label className="text-xs font-bold uppercase tracking-widest text-gray-400 flex items-center gap-2">
-                        <MapPin size={12} className="text-blue-500" /> Location
+                {/* Location Filter */}
+                <div className="space-y-4">
+                    <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 flex items-center gap-2">
+                        <MapPin size={14} className="text-blue-500" /> Location
                     </Label>
-                    <Input
-                        value={city}
-                        onChange={(e) => setCity(e.target.value)}
-                        className="rounded-2xl h-14 bg-white border-gray-100 shadow-sm focus:ring-2 focus:ring-black transition-all"
-                        placeholder="e.g. Accra"
-                    />
+                    <div className="relative group">
+                        <Input
+                            value={city}
+                            onChange={(e) => setCity(e.target.value)}
+                            className="rounded-2xl h-14 bg-white border-gray-100 shadow-sm shadow-gray-100/50 focus:ring-4 focus:ring-blue-50/50 focus:border-blue-200 transition-all font-bold text-gray-900 placeholder:text-gray-300"
+                            placeholder="e.g. Accra"
+                        />
+                    </div>
                 </div>
 
                 {/* University Filter */}
-                <div className="space-y-3">
-                    <Label className="text-xs font-bold uppercase tracking-widest text-gray-400 flex items-center gap-2">
-                        <School size={12} className="text-purple-500" /> University
+                <div className="space-y-4">
+                    <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 flex items-center gap-2">
+                        <School size={14} className="text-purple-500" /> University
                     </Label>
-                    <select
-                        value={university}
-                        onChange={(e) => setUniversity(e.target.value)}
-                        className="w-full h-14 bg-white border border-gray-100 rounded-2xl px-4 outline-none focus:ring-2 focus:ring-black transition-all text-sm font-medium shadow-sm appearance-none"
-                    >
-                        <option value="">Any University</option>
-                        {REGIONAL_UNIVERSITIES.map(group => (
-                            <optgroup key={group.region} label={group.region} className="font-bold text-blue-600 bg-gray-50">
-                                {group.unis.map(u => (
-                                    <option key={u} value={u} className="text-gray-900 bg-white">{u}</option>
-                                ))}
-                            </optgroup>
-                        ))}
-                    </select>
+                    <div className="relative">
+                        <select
+                            value={university}
+                            onChange={(e) => setUniversity(e.target.value)}
+                            className="w-full h-14 bg-white border border-gray-100 rounded-2xl px-5 outline-none focus:ring-4 focus:ring-blue-50/50 focus:border-blue-200 transition-all text-sm font-bold text-gray-900 shadow-sm shadow-gray-100/50 appearance-none cursor-pointer"
+                        >
+                            <option value="">Any University</option>
+                            {REGIONAL_UNIVERSITIES.map(group => (
+                                <optgroup key={group.region} label={group.region} className="font-black text-blue-600 bg-gray-50 uppercase tracking-widest text-[9px]">
+                                    {group.unis.map(u => (
+                                        <option key={u} value={u} className="text-gray-900 bg-white font-bold">{u}</option>
+                                    ))}
+                                </optgroup>
+                            ))}
+                        </select>
+                        <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
+                            <Layout size={14} />
+                        </div>
+                    </div>
                 </div>
 
                 {/* Gender Filter */}
-                <div className="space-y-3">
-                    <Label className="text-xs font-bold uppercase tracking-widest text-gray-400 flex items-center gap-2">
-                        <Users size={12} className="text-pink-500" /> Room For
+                <div className="space-y-4">
+                    <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 flex items-center gap-2">
+                        <Users size={14} className="text-pink-500" /> Room For
                     </Label>
-                    <div className="flex gap-2">
+                    <div className="flex gap-3">
                         {[
                             { id: "MALE", label: "Boys", icon: User },
                             { id: "FEMALE", label: "Girls", icon: UserCheck },
@@ -156,64 +164,75 @@ export default function HostelFilters() {
                                 key={g.id}
                                 onClick={() => setGender(gender === g.id ? "" : g.id)}
                                 className={cn(
-                                    "flex-1 flex flex-col items-center gap-2 py-3 rounded-2xl border text-[10px] font-bold uppercase transition-all",
+                                    "flex-1 flex flex-col items-center gap-3 py-4 rounded-2xl border transition-all active:scale-95",
                                     gender === g.id
-                                        ? "bg-black text-white border-black"
-                                        : "bg-white text-gray-500 border-gray-100 hover:bg-gray-50"
+                                        ? "bg-gray-950 text-white border-gray-950 shadow-xl shadow-gray-200"
+                                        : "bg-white text-gray-500 border-gray-100 hover:border-gray-300 hover:bg-gray-50"
                                 )}
                             >
-                                <g.icon size={14} />
-                                {g.label}
+                                <g.icon size={18} className={cn(gender === g.id ? "text-blue-400" : "text-gray-400")} />
+                                <span className="text-[9px] font-black uppercase tracking-widest">{g.label}</span>
                             </button>
                         ))}
                     </div>
                 </div>
 
                 {/* Room Configuration Filter */}
-                <div className="space-y-3">
-                    <Label className="text-xs font-bold uppercase tracking-widest text-gray-400 flex items-center gap-2">
-                        <Layout size={12} className="text-orange-500" /> Type
+                <div className="space-y-4">
+                    <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 flex items-center gap-2">
+                        <Layout size={14} className="text-orange-500" /> Configuration
                     </Label>
-                    <select
-                        value={roomConfig}
-                        onChange={(e) => setRoomConfig(e.target.value)}
-                        className="w-full h-14 bg-white border border-gray-100 rounded-2xl px-4 outline-none focus:ring-2 focus:ring-black transition-all text-sm font-medium shadow-sm appearance-none"
-                    >
-                        <option value="">Any Configuration</option>
-                        <option value="1 in a room">1 in a room (Single)</option>
-                        <option value="2 in a room">2 in a room</option>
-                        <option value="3 in a room">3 in a room</option>
-                        <option value="4 in a room">4 in a room</option>
-                    </select>
+                    <div className="relative">
+                        <select
+                            value={roomConfig}
+                            onChange={(e) => setRoomConfig(e.target.value)}
+                            className="w-full h-14 bg-white border border-gray-100 rounded-2xl px-5 outline-none focus:ring-4 focus:ring-blue-50/50 focus:border-blue-200 transition-all text-sm font-bold text-gray-900 shadow-sm shadow-gray-100/50 appearance-none cursor-pointer"
+                        >
+                            <option value="">Any Configuration</option>
+                            <option value="1 in a room">1 in a room (Single)</option>
+                            <option value="2 in a room">2 in a room</option>
+                            <option value="3 in a room">3 in a room</option>
+                            <option value="4 in a room">4 in a room</option>
+                        </select>
+                        <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
+                            <Navigation size={14} />
+                        </div>
+                    </div>
                 </div>
 
                 {/* Price Range */}
-                <div className="space-y-3">
-                    <Label className="text-xs font-bold uppercase tracking-widest text-gray-400 flex items-center gap-2">
-                        <DollarSign size={12} className="text-green-500" /> Price Range (₵)
+                <div className="space-y-4">
+                    <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 flex items-center gap-2">
+                        <DollarSign size={14} className="text-emerald-500" /> Price Range (₵)
                     </Label>
-                    <div className="grid grid-cols-2 gap-3">
-                        <Input
-                            type="number"
-                            value={minPrice}
-                            onChange={(e) => setMinPrice(e.target.value)}
-                            className="rounded-2xl h-12 bg-white border-gray-100 placeholder:text-gray-300"
-                            placeholder="Min"
-                        />
-                        <Input
-                            type="number"
-                            value={maxPrice}
-                            onChange={(e) => setMaxPrice(e.target.value)}
-                            className="rounded-2xl h-12 bg-white border-gray-100 placeholder:text-gray-300"
-                            placeholder="Max"
-                        />
+                    <div className="grid grid-cols-2 gap-4">
+                        <div className="relative">
+                            <Input
+                                type="number"
+                                value={minPrice}
+                                onChange={(e) => setMinPrice(e.target.value)}
+                                className="rounded-2xl h-14 bg-white border-gray-100 shadow-sm focus:ring-4 focus:ring-emerald-50 focus:border-emerald-200 transition-all font-bold pl-8"
+                                placeholder="Min"
+                            />
+                            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-300 font-bold text-xs">₵</span>
+                        </div>
+                        <div className="relative">
+                            <Input
+                                type="number"
+                                value={maxPrice}
+                                onChange={(e) => setMaxPrice(e.target.value)}
+                                className="rounded-2xl h-14 bg-white border-gray-100 shadow-sm focus:ring-4 focus:ring-emerald-50 focus:border-emerald-200 transition-all font-bold pl-8"
+                                placeholder="Max"
+                            />
+                            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-300 font-bold text-xs">₵</span>
+                        </div>
                     </div>
                 </div>
 
                 {/* Amenities */}
                 <div className="space-y-4">
-                    <Label className="text-xs font-bold uppercase tracking-widest text-gray-400">Amenities</Label>
-                    <div className="grid grid-cols-2 gap-2">
+                    <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Essential Amenities</Label>
+                    <div className="grid grid-cols-2 gap-3">
                         {AMENITIES.map((a) => {
                             const isSelected = selectedAmenities.includes(a.id);
                             return (
@@ -221,14 +240,14 @@ export default function HostelFilters() {
                                     key={a.id}
                                     onClick={() => toggleAmenity(a.id)}
                                     className={cn(
-                                        "flex items-center gap-2 px-3 py-3 rounded-xl border text-[10px] font-bold uppercase tracking-wider transition-all",
+                                        "flex items-center gap-3 px-3 py-4 rounded-2xl border transition-all active:scale-95 min-h-[64px]",
                                         isSelected
-                                            ? "bg-black text-white border-black shadow-md shadow-black/10 scale-105 z-10"
-                                            : "bg-white text-gray-500 border-gray-100 hover:bg-gray-50"
+                                            ? "bg-blue-600 text-white border-blue-600 shadow-lg shadow-blue-200 scale-[1.02] z-10"
+                                            : "bg-white text-gray-600 border-gray-100 hover:border-gray-300 hover:bg-gray-50"
                                     )}
                                 >
-                                    <a.icon size={14} className={isSelected ? "text-blue-300" : "text-gray-300"} />
-                                    <span className="truncate">{a.id}</span>
+                                    <a.icon size={16} className={cn(isSelected ? "text-blue-200" : "text-gray-300")} />
+                                    <span className="text-[9px] font-black uppercase tracking-[0.1em] text-left leading-tight break-words">{a.id}</span>
                                 </button>
                             );
                         })}
@@ -237,9 +256,9 @@ export default function HostelFilters() {
 
                 <Button
                     onClick={handleApply}
-                    className="w-full rounded-2xl h-14 font-black uppercase tracking-[0.2em] bg-black text-white hover:opacity-90 transition-all active:scale-[0.98] shadow-xl shadow-black/20"
+                    className="w-full rounded-2xl h-16 font-black uppercase tracking-[0.3em] bg-blue-600 text-white hover:bg-blue-700 hover:shadow-2xl hover:shadow-blue-500/30 transition-all active:scale-95 mt-4"
                 >
-                    Show Results
+                    Apply Filters
                 </Button>
             </div>
         </div>

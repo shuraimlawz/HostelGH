@@ -93,14 +93,14 @@ export class HostelsService {
                     gte: minPrice,
                     lte: maxPrice,
                 } : undefined,
-                rooms: (gender || roomConfig) ? {
+                rooms: {
                     some: {
                         isActive: true,
+                        availableSlots: { gt: 0 },
                         gender: gender ? (gender as any) : undefined,
                         roomConfiguration: roomConfig ? { contains: roomConfig, mode: "insensitive" } : undefined,
-                        availableSlots: { gt: 0 }
                     }
-                } : undefined
+                }
             },
             include: { rooms: { where: { isActive: true } } },
             orderBy: orderBy,

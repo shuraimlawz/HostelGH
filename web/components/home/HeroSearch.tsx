@@ -12,7 +12,10 @@ const HERO_IMAGES = [
     "/evandy-scaled-1.jpg",
     "/upsahostel.jpg",
     "/Hostel_Block_B_(GCTU).jpg",
-    "/hall-seven.jpg"
+    "/hall-seven.jpg",
+    "/BfTDaFFIUAAYpK9.jpg",
+    "/FuubNuyWIAAzS0c.jpg",
+    "/ace2fe4f_z.webp"
 ];
 
 export default function HeroSearch() {
@@ -106,7 +109,7 @@ export default function HeroSearch() {
 
                         {/* Search Button */}
                         <button
-                            onClick={handleSearch}
+                            onClick={() => handleSearch()}
                             className="bg-blue-600 hover:bg-blue-500 text-white px-8 h-full min-h-[64px] rounded-2xl transition-all shadow-xl hover:shadow-blue-500/25 flex items-center justify-center gap-3 w-full md:w-auto font-black text-lg group active:scale-95"
                         >
                             <Search size={24} className="group-hover:scale-110 transition-transform" />
@@ -120,19 +123,23 @@ export default function HeroSearch() {
                             {isLoadingTrending && <Loader2 className="animate-spin h-3 w-3" />}
                             Trending:
                         </span>
-                        {(trendingLocations && trendingLocations.length > 0 ? trendingLocations : ['East Legon', 'Ayeduase', 'UCC Gate', 'Atomic']).map((loc) => (
-                            <button
-                                key={loc}
-                                onClick={() => {
-                                    setCity(loc);
-                                    handleSearch(loc);
-                                }}
-                                className="px-5 py-2.5 rounded-full border border-white/10 hover:border-white/40 hover:bg-white/10 hover:text-white transition-all backdrop-blur-md flex items-center gap-2 text-xs md:text-sm active:scale-90"
-                            >
-                                <Navigation className="h-3 w-3 text-blue-400" />
-                                {loc}
-                            </button>
-                        ))}
+                        {trendingLocations && trendingLocations.length > 0 ? (
+                            trendingLocations.map((loc) => (
+                                <button
+                                    key={loc}
+                                    onClick={() => {
+                                        setCity(loc);
+                                        handleSearch(loc);
+                                    }}
+                                    className="px-5 py-2.5 rounded-full border border-white/10 hover:border-white/40 hover:bg-white/10 hover:text-white transition-all backdrop-blur-md flex items-center gap-2 text-xs md:text-sm active:scale-90"
+                                >
+                                    <Navigation className="h-3 w-3 text-blue-400" />
+                                    {loc}
+                                </button>
+                            ))
+                        ) : (
+                            !isLoadingTrending && <span className="text-white/40 italic font-medium px-4">Exploring live activity...</span>
+                        )}
                     </div>
                 </div>
             </div>

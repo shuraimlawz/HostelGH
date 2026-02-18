@@ -52,7 +52,11 @@ export class RoomsService {
 
     private async syncHostelMinPrice(hostelId: string) {
         const rooms = await this.prisma.room.findMany({
-            where: { hostelId, isActive: true },
+            where: {
+                hostelId,
+                isActive: true,
+                availableSlots: { gt: 0 } // Only consider available rooms
+            },
             select: { pricePerTerm: true }
         });
         const minPrice = rooms.length > 0 ? Math.min(...rooms.map(r => r.pricePerTerm)) : null;
