@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Heart, Star } from "lucide-react";
+import { Heart, Star, MessageCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export default function HostelCard({ hostel }: { hostel: any }) {
@@ -36,9 +36,22 @@ export default function HostelCard({ hostel }: { hostel: any }) {
                 </div>
 
                 {/* Heart Button */}
-                <button className="absolute top-2 right-2 text-white/70 hover:scale-110 transition-transform">
+                <button className="absolute top-2 right-2 text-white/70 hover:scale-110 transition-transform z-20">
                     <Heart size={20} className="fill-black/50 stroke-white" />
                 </button>
+
+                {/* WhatsApp Button */}
+                {hostel.whatsappNumber && (
+                    <a
+                        href={`https://wa.me/233${hostel.whatsappNumber.replace(/^0/, '')}?text=Hi, I'm interested in ${hostel.name} on HostelGH.`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={(e) => e.stopPropagation()}
+                        className="absolute bottom-2 right-2 bg-[#25D366] text-white p-2 rounded-full shadow-lg hover:scale-110 transition-transform z-20"
+                    >
+                        <MessageCircle size={18} />
+                    </a>
+                )}
             </div>
 
             <div className="flex justify-between items-start">

@@ -5,6 +5,7 @@ import { bookingApprovedTemplate } from "./templates/booking-approved";
 import { bookingRejectedTemplate } from "./templates/booking-rejected";
 import { paymentConfirmedTemplate } from "./templates/payment-confirmed";
 import { broadcastTemplate } from "./templates/broadcast";
+import { SmsService } from "./sms.service";
 
 interface EmailPayloadBase {
     hostelName: string;
@@ -38,7 +39,10 @@ interface BroadcastPayload {
 
 @Injectable()
 export class NotificationsService {
-    constructor(private email: EmailService) { }
+    constructor(
+        private email: EmailService,
+        private sms: SmsService
+    ) { }
 
     async sendBookingRequestEmail(
         ownerEmail: string,
@@ -82,6 +86,21 @@ export class NotificationsService {
             subject: `Payment confirmed • ${payload.hostelName}`,
             html: paymentConfirmedTemplate(payload),
         });
+    }
+
+    async sendBookingRequestSms(to: string, payload: { tenantName: string; hostelName: string }) {
+        const message = `New booking request for ${payload.hostelName} from ${payload.tenantName}. Log in to HostelGH to approve.`;
+        return this.sms.sendSms(to, message);
+    }
+
+    async sendBookingApprovedSms(to: string, payload: { hostelName: string }) {
+        const message = `Good news! Your booking for ${payload.hostelName} has been approved. Please complete your payment on HostelGH within 24 hours.`;
+        return this.sms.sendSms(to, message);
+    }
+
+    async sendPaymentConfirmedSms(to: string, payload: { hostelName: string; amount: string }) {
+        const message = `Payment of ${payload.amount} for ${payload.hostelName} confirmed. Your slot is now locked. Welcome home!`;
+        return this.sms.sendSms(to, message);
     }
 
     async sendBroadcastEmail(

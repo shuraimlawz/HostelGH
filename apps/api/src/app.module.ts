@@ -16,6 +16,7 @@ import { AdminModule } from './modules/admin/admin.module';
 import { PaymentMethodsModule } from './modules/payment-methods/payment-methods.module';
 import { WalletsModule } from './modules/wallets/wallets.module';
 import { RedisModule } from './modules/redis/redis.module';
+import { SubscriptionsModule } from './modules/subscriptions/subscriptions.module';
 import { ThrottlerModule } from "@nestjs/throttler";
 import { ThrottlerGuard } from "@nestjs/throttler";
 import { ScheduleModule } from "@nestjs/schedule";
@@ -47,6 +48,7 @@ import { AppController } from './app.controller';
         PaymentMethodsModule,
         WalletsModule,
         RedisModule,
+        SubscriptionsModule,
         ScheduleModule.forRoot(),
         ThrottlerModule.forRoot([{
             ttl: 60000,

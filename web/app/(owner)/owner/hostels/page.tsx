@@ -3,7 +3,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 import Link from "next/link";
-import { Plus, Building2, MapPin, Users, MoreVertical, Edit2, Eye, Trash2, CalendarCheck } from "lucide-react";
+import { Plus, Building2, MapPin, Users, MoreVertical, Edit2, Eye, Trash2, CalendarCheck, Star } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
     DropdownMenu,
@@ -140,6 +140,19 @@ export default function OwnerHostelsPage() {
                                                     <span>Edit Details</span>
                                                 </Link>
                                             </DropdownMenuItem>
+                                            {!hostel.isFeatured && (
+                                                <DropdownMenuItem
+                                                    onClick={() => {
+                                                        if (confirm("Promote this hostel to featured for better visibility? (Requires PRO subscription)")) {
+                                                            alert("Promotion feature - call API to set isFeatured: true");
+                                                        }
+                                                    }}
+                                                    className="flex items-center gap-2 text-orange-600 focus:text-orange-600 rounded-lg cursor-pointer"
+                                                >
+                                                    <Star size={16} />
+                                                    <span>Promote to Featured</span>
+                                                </DropdownMenuItem>
+                                            )}
                                             <div className="h-px bg-gray-100 my-1" />
                                             <DropdownMenuItem
                                                 onClick={() => handleDelete(hostel.id, hostel.name)}

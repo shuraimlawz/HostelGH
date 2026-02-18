@@ -175,14 +175,30 @@ export default function TenantBookingsPage() {
 
                                     <div className="space-y-3">
                                         {booking.status === "APPROVED" && (
-                                            <button
-                                                onClick={() => initPaymentMutation.mutate(booking.id)}
-                                                disabled={initPaymentMutation.isPending}
-                                                className="w-full bg-blue-600 text-white py-4 rounded-2xl font-bold text-sm shadow-xl shadow-blue-200 hover:opacity-90 active:scale-95 transition-all flex items-center justify-center gap-2"
-                                            >
-                                                {initPaymentMutation.isPending ? <Loader2 size={18} className="animate-spin" /> : <CreditCard size={18} />}
-                                                Pay Now
-                                            </button>
+                                            <div className="space-y-3">
+                                                <button
+                                                    onClick={() => initPaymentMutation.mutate(booking.id)}
+                                                    disabled={initPaymentMutation.isPending}
+                                                    className="w-full bg-blue-600 text-white py-4 rounded-2xl font-bold text-sm shadow-xl shadow-blue-200 hover:opacity-90 active:scale-95 transition-all flex items-center justify-center gap-2"
+                                                >
+                                                    {initPaymentMutation.isPending ? <Loader2 size={18} className="animate-spin" /> : <CreditCard size={18} />}
+                                                    Pay with Card/Momo
+                                                </button>
+                                                <button
+                                                    onClick={() => {/* Open Offline Modal */ }}
+                                                    className="w-full bg-white text-gray-700 py-4 rounded-2xl font-bold text-sm border shadow-sm hover:bg-gray-50 transition-all flex items-center justify-center gap-2"
+                                                >
+                                                    <Info size={18} className="text-blue-500" />
+                                                    Upload Transfer Receipt
+                                                </button>
+                                            </div>
+                                        )}
+
+                                        {booking.payment?.status === "AWAITING_VERIFICATION" && (
+                                            <div className="bg-blue-50 text-blue-700 p-4 rounded-2xl border border-blue-100 flex items-center justify-center gap-2">
+                                                <Loader2 size={18} className="animate-spin" />
+                                                <span className="font-bold text-sm">Verifying Proof...</span>
+                                            </div>
                                         )}
 
                                         {booking.status === "CONFIRMED" && (

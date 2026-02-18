@@ -81,6 +81,16 @@ export default function OwnerBookingsPage() {
         onError: (err: any) => toast.error(err.response?.data?.message || "Failed to complete")
     });
 
+    const verifyOfflineMutation = useMutation({
+        mutationFn: ({ paymentId, status }: { paymentId: string; status: "SUCCESS" | "FAILED" }) =>
+            api.post(`/payments/offline/verify/${paymentId}`, { status }),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["owner-bookings"] });
+            toast.success("Payment verified and booking confirmed!");
+        },
+        onError: (err: any) => toast.error(err.response?.data?.message || "Verification failed")
+    });
+
     const requestDeletionMutation = useMutation({
         mutationFn: ({ id, reason }: { id: string; reason: string }) =>
             api.patch(`/bookings/${id}/request-deletion`, { reason }),
@@ -225,6 +235,36 @@ export default function OwnerBookingsPage() {
 
                                     {/* Right: Actions */}
                                     <div className="md:w-48 flex flex-col justify-center gap-3">
+                                        {booking.payment?.status === "AWAITING_VERIFICATION" && (
+                                            <div className="space-y-4 p-6 bg-blue-50/50 rounded-[2rem] border border-blue-100">
+                                                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-blue-600 mb-2">Review Payment Proof</p>
+                                                <a
+                                                    href={booking.payment.offlineProofUrl}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="block w-full h-32 rounded-xl bg-gray-100 overflow-hidden relative group/proof"
+                                                >
+                                                    <img src={booking.payment.offlineProofUrl} alt="Proof" className="w-full h-full object-cover group-hover/proof:scale-110 transition-transform" />
+                                                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/proof:opacity-100 transition-opacity flex items-center justify-center text-white text-[10px] font-bold">VIEW FULL IMAGE</div>
+                                                </a>
+                                                <div className="flex gap-2">
+                                                    <button
+                                                        onClick={() => verifyOfflineMutation.mutate({ paymentId: booking.payment.id, status: "SUCCESS" })}
+                                                        disabled={verifyOfflineMutation.isPending}
+                                                        className="flex-1 bg-green-600 text-white py-3 rounded-xl font-bold text-xs hover:opacity-90 active:scale-95 transition-all"
+                                                    >
+                                                        {verifyOfflineMutation.isPending ? "..." : "Approve"}
+                                                    </button>
+                                                    <button
+                                                        onClick={() => verifyOfflineMutation.mutate({ paymentId: booking.payment.id, status: "FAILED" })}
+                                                        disabled={verifyOfflineMutation.isPending}
+                                                        className="flex-1 bg-red-50 text-red-600 py-3 rounded-xl font-bold text-xs hover:bg-red-100 active:scale-95 transition-all"
+                                                    >
+                                                        {verifyOfflineMutation.isPending ? "..." : "Reject"}
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        )}
                                         {booking.status === "PENDING_APPROVAL" && (
                                             <>
                                                 <button

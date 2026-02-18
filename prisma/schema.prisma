@@ -28,11 +28,13 @@ enum BookingStatus {
 
 enum PaymentProvider {
   PAYSTACK
+  OFFLINE
 }
 
 enum PaymentStatus {
   INITIATED
   PENDING
+  AWAITING_VERIFICATION
   SUCCESS
   FAILED
   REFUNDED
@@ -316,6 +318,7 @@ model Payment {
   accessCode       String?
 
   paidAt     DateTime?
+  offlineProofUrl String?
   rawWebhook Json? // store last webhook payload (optional)
 
   createdAt DateTime @default(now())

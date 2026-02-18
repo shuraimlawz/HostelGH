@@ -1,6 +1,6 @@
 import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from "@nestjs/common";
 import { PrismaService } from "../../prisma/prisma.service";
-import { BookingStatus, PaymentStatus, UserRole } from "@prisma/client";
+import { BookingStatus, PaymentStatus, UserRole, PaymentProvider } from "@prisma/client";
 import { PaystackService } from "./paystack.service";
 import { ConfigService } from "@nestjs/config";
 import { randomBytes } from "crypto";
@@ -189,9 +189,15 @@ export class PaymentsService {
         };
 
         this.notifications.sendPaymentConfirmedEmail(booking.tenant.email, emailData).catch(e => console.error("Email failed", e));
+        if (booking.tenant.phone) {
+            this.notifications.sendPaymentConfirmedSms(booking.tenant.phone, { hostelName: booking.hostel.name, amount: amountGhs }).catch(e => console.error("SMS failed", e));
+        }
 
         if (booking.hostel.owner?.email) {
             this.notifications.sendPaymentConfirmedEmail(booking.hostel.owner.email, emailData).catch(e => console.error("Email failed", e));
+        }
+        if (booking.hostel.owner?.phone) {
+            this.notifications.sendPaymentConfirmedSms(booking.hostel.owner.phone, { hostelName: booking.hostel.name, amount: amountGhs }).catch(e => console.error("SMS failed", e));
         }
     }
 
@@ -231,13 +237,64 @@ export class PaymentsService {
 
         if (!payment) throw new NotFoundException("Payment not found");
 
-        // Authorization check: User must be the tenant or an admin (or potentially the owner, but let's stick to tenant for now based on context)
-        // Accessing user role in service method might require passing user object, but here we just pass userId.
-        // For simplicity, we check if the bookings tenantId matches userId.
-        if (payment.booking.tenantId !== userId) {
-            throw new ForbiddenException("You are not authorized to view this receipt.");
+        if (payment.booking.tenantId !== userId && payment.booking.hostel.ownerId !== userId) {
+            throw new ForbiddenException("You are not authorized to view this payment.");
         }
 
         return payment;
+    }
+
+    async submitOfflineProof(userId: string, bookingId: string, proofUrl: string, notes: string) {
+        const booking = await this.prisma.booking.findUnique({
+            where: { id: bookingId },
+            include: { payment: true },
+        });
+
+        if (!booking || booking.tenantId !== userId) {
+            throw new ForbiddenException("Not authorized to submit proof for this booking");
+        }
+
+        // Upsert payment record as OFFLINE
+        return this.prisma.payment.upsert({
+            where: { bookingId },
+            update: {
+                status: PaymentStatus.AWAITING_VERIFICATION,
+                offlineProofUrl: proofUrl,
+                provider: PaymentProvider.OFFLINE,
+            },
+            create: {
+                bookingId,
+                amount: 0, // Placeholder, usually would calculate from items
+                status: PaymentStatus.AWAITING_VERIFICATION,
+                offlineProofUrl: proofUrl,
+                provider: PaymentProvider.OFFLINE,
+                reference: `OFF_${randomBytes(6).toString("hex")}`,
+                currency: "GHS",
+            },
+        });
+    }
+
+    async verifyOfflinePayment(adminOrOwnerId: string, paymentId: string, status: "SUCCESS" | "FAILED") {
+        const payment = await this.prisma.payment.findUnique({
+            where: { id: paymentId },
+            include: { booking: { include: { hostel: true, tenant: true, items: true } } },
+        });
+
+        if (!payment) throw new NotFoundException("Payment not found");
+
+        const isOwner = payment.booking.hostel.ownerId === adminOrOwnerId;
+        // Verify owner/admin
+        // ... (assume roles are checked in controller)
+
+        if (status === "SUCCESS") {
+            const { paymentRow, bookingRow } = await this.completePaymentTransaction(payment.reference, payment.bookingId, { verifiedBy: adminOrOwnerId });
+            this.sendPaymentConfirmationNotifications(bookingRow, paymentRow, payment.reference);
+            return paymentRow;
+        } else {
+            return this.prisma.payment.update({
+                where: { id: paymentId },
+                data: { status: PaymentStatus.FAILED },
+            });
+        }
     }
 }

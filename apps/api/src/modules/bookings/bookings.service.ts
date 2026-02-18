@@ -64,7 +64,7 @@ export class BookingsService {
                 include: { items: true },
             });
 
-            this.sendBookingNotification(hostel.owner.email, {
+            this.sendBookingNotification(hostel.owner.email, hostel.owner.phone, {
                 tenantName: `${tenant.firstName || ''} ${tenant.lastName || ''}`.trim() || tenant.email,
                 hostelName: hostel.name,
                 startDate: start,
@@ -101,12 +101,16 @@ export class BookingsService {
         }
     }
 
-    private sendBookingNotification(ownerEmail: string, payload: { tenantName: string; hostelName: string; startDate: Date; endDate: Date }) {
+    private sendBookingNotification(ownerEmail: string, ownerPhone: string | null, payload: { tenantName: string; hostelName: string; startDate: Date; endDate: Date }) {
         this.notifications.sendBookingRequestEmail(ownerEmail, {
             ...payload,
             startDate: payload.startDate.toDateString(),
             endDate: payload.endDate.toDateString(),
         }).catch(e => console.error("Email failed", e));
+
+        if (ownerPhone) {
+            this.notifications.sendBookingRequestSms(ownerPhone, payload).catch(e => console.error("SMS failed", e));
+        }
     }
 
     async updateStatus(actor: { userId: string; role: UserRole }, bookingId: string, status: BookingStatus, allowedSourceStatuses: BookingStatus[]) {
@@ -177,6 +181,12 @@ export class BookingsService {
                 startDate: updated.startDate.toDateString(),
                 endDate: updated.endDate.toDateString(),
             }).catch(e => console.error("Email failed", e));
+
+            if (updated.tenant.phone) {
+                this.notifications.sendBookingApprovedSms(updated.tenant.phone, {
+                    hostelName: updated.hostel.name
+                }).catch(e => console.error("SMS failed", e));
+            }
 
             return updated;
         });

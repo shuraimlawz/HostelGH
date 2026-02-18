@@ -2,15 +2,19 @@ import { ForbiddenException, Injectable, NotFoundException } from "@nestjs/commo
 import { PrismaService } from "../../prisma/prisma.service";
 import { UserRole } from "@prisma/client";
 import { RedisService } from "../redis/redis.service";
+import { SubscriptionsService } from "../subscriptions/subscriptions.service";
 
 @Injectable()
 export class HostelsService {
     constructor(
         private readonly prisma: PrismaService,
-        private readonly redis: RedisService
+        private readonly redis: RedisService,
+        private readonly subscriptions: SubscriptionsService
     ) { }
 
     async create(ownerId: string, dto: CreateHostelDto) {
+        await this.subscriptions.checkLimit(ownerId, "max_hostels");
+
         return this.prisma.hostel.create({
             data: { ...dto, ownerId },
         });
@@ -19,6 +23,10 @@ export class HostelsService {
     async update(actor: UserActor, hostelId: string, dto: UpdateHostelDto) {
         const hostel = await this.getHostelById(hostelId);
         this.validateOwnership(actor, hostel.ownerId);
+
+        if (dto.isFeatured) {
+            await this.subscriptions.checkLimit(hostel.ownerId, "featured_listings");
+        }
 
         return this.prisma.hostel.update({
             where: { id: hostelId },
