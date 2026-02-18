@@ -1,6 +1,6 @@
 "use client";
 
-import { Eye, ShieldCheck, Database, Share2, Mail, ExternalLink } from "lucide-react";
+import { Eye, ShieldCheck, Database, Share2, Mail, ExternalLink, Clock, Lock } from "lucide-react";
 
 export default function PrivacyPage() {
     return (
@@ -10,9 +10,13 @@ export default function PrivacyPage() {
                 <div className="w-16 h-16 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center shadow-sm">
                     <Eye size={32} />
                 </div>
-                <div className="space-y-2">
+                <div className="space-y-4">
                     <h1 className="text-4xl md:text-5xl font-black text-gray-900 tracking-tight">Privacy Policy</h1>
-                    <div className="flex items-center justify-center gap-4 pt-2">
+                    <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
+                        <span className="px-3 py-1 bg-gray-100 text-gray-500 rounded-full text-xs font-black uppercase tracking-widest flex items-center gap-1.5">
+                            <Clock size={12} />
+                            4 min read
+                        </span>
                         <span className="px-3 py-1 bg-gray-100 text-gray-500 rounded-full text-xs font-black uppercase tracking-widest">
                             Updated: Feb 18, 2026
                         </span>
@@ -23,8 +27,33 @@ export default function PrivacyPage() {
                 </div>
             </div>
 
+            {/* Privacy Promise / Quick Summary */}
+            <div className="mb-20 p-8 md:p-10 bg-green-600 rounded-[3rem] text-white overflow-hidden relative group animate-in fade-in zoom-in-95 duration-700 delay-100">
+                <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -mr-32 -mt-32 blur-3xl group-hover:bg-white/20 transition-colors" />
+                <div className="relative space-y-6">
+                    <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-white/20 backdrop-blur-md rounded-full text-xs font-black uppercase tracking-widest">
+                        <Lock size={14} className="fill-white text-white" />
+                        Our Privacy Promise
+                    </div>
+                    <div className="grid md:grid-cols-3 gap-8">
+                        <div className="space-y-2">
+                            <h3 className="text-xl font-black">No Selling Data</h3>
+                            <p className="text-green-50 font-medium">We never sell your personal information to third-party advertisers or data brokers.</p>
+                        </div>
+                        <div className="space-y-2">
+                            <h3 className="text-xl font-black">Data Control</h3>
+                            <p className="text-green-50 font-medium">You have full control over your profile and can request data deletion at any time.</p>
+                        </div>
+                        <div className="space-y-2">
+                            <h3 className="text-xl font-black">Encrypted Flow</h3>
+                            <p className="text-green-50 font-medium">Your sensitive details and payment info are protected by 256-bit SSL encryption.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div className="space-y-16">
-                <section className="group animate-in fade-in slide-in-from-bottom-8 duration-700 delay-100">
+                <section className="group animate-in fade-in slide-in-from-bottom-8 duration-700 delay-200">
                     <div className="flex items-center gap-4 mb-6">
                         <div className="w-10 h-10 rounded-xl bg-gray-900 text-white flex items-center justify-center">
                             <Database size={20} />

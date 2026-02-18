@@ -57,6 +57,13 @@ const CATEGORIES = [
     }
 ];
 
+const POPULAR_ARTICLES = [
+    { title: "Booking a hostel for the first time", href: "#booking" },
+    { title: "Accepted payment methods in Ghana", href: "#payments" },
+    { title: "How to report a fraudulent listing", href: "#safety" },
+    { title: "Refund policy for cancellations", href: "#payments" },
+];
+
 export default function HelpCenterPage() {
     const [searchQuery, setSearchQuery] = useState("");
     const [expandedIndex, setExpandedIndex] = useState<string | null>(null);
@@ -72,7 +79,7 @@ export default function HelpCenterPage() {
     return (
         <div className="max-w-6xl mx-auto px-6 py-16">
             {/* Modern Hero Section */}
-            <div className="text-center space-y-6 mb-20 animate-in fade-in slide-in-from-bottom-4 duration-700">
+            <div className="text-center space-y-6 mb-16 animate-in fade-in slide-in-from-bottom-4 duration-700">
                 <h1 className="text-5xl md:text-6xl font-black tracking-tight text-gray-900">
                     We're here to <span className="text-blue-600">help.</span>
                 </h1>
@@ -94,25 +101,52 @@ export default function HelpCenterPage() {
                 </div>
             </div>
 
-            {/* Category Grid */}
+            {/* Popular Articles List - NEW SECTION */}
             {!searchQuery && (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-24 animate-in fade-in zoom-in-95 duration-700 delay-200">
-                    {CATEGORIES.map((cat) => (
-                        <button
-                            key={cat.id}
-                            onClick={() => {
-                                const element = document.getElementById(cat.id);
-                                element?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                            }}
-                            className="p-8 rounded-[2rem] bg-gray-50 border-2 border-transparent hover:border-blue-100 hover:bg-white hover:shadow-xl transition-all text-left group"
-                        >
-                            <div className={cn("w-14 h-14 rounded-2xl flex items-center justify-center mb-6 transition-transform group-hover:scale-110", cat.bgColor, cat.color)}>
-                                <cat.icon size={28} />
-                            </div>
-                            <h3 className="text-lg font-black text-gray-900 mb-2">{cat.title}</h3>
-                            <p className="text-sm text-gray-500 font-medium leading-relaxed">{cat.description}</p>
-                        </button>
-                    ))}
+                <div className="mb-20 animate-in fade-in slide-in-from-bottom-8 duration-700 delay-100">
+                    <h3 className="text-xs font-black uppercase tracking-[0.2em] text-gray-400 mb-6 text-center">Popular Support Articles</h3>
+                    <div className="flex flex-wrap justify-center gap-3">
+                        {POPULAR_ARTICLES.map((article, i) => (
+                            <button
+                                key={i}
+                                onClick={() => {
+                                    const element = document.querySelector(article.href);
+                                    element?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                                }}
+                                className="px-5 py-2.5 bg-gray-50 hover:bg-white hover:text-blue-600 border-2 border-transparent hover:border-blue-100 rounded-full text-sm font-bold text-gray-600 transition-all shadow-sm hover:shadow-md active:scale-95"
+                            >
+                                {article.title}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+            )}
+
+            {/* Category Grid - Improved for Mobile */}
+            {!searchQuery && (
+                <div className="relative mb-24 animate-in fade-in zoom-in-95 duration-700 delay-200">
+                    {/* Shadow indicators for mobile scroll */}
+                    <div className="md:hidden absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-white to-transparent z-10 pointer-events-none" />
+                    <div className="md:hidden absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-white to-transparent z-10 pointer-events-none" />
+
+                    <div className="flex md:grid md:grid-cols-2 lg:grid-cols-4 gap-6 overflow-x-auto no-scrollbar px-2 pb-4 snap-x snap-mandatory">
+                        {CATEGORIES.map((cat) => (
+                            <button
+                                key={cat.id}
+                                onClick={() => {
+                                    const element = document.getElementById(cat.id);
+                                    element?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                                }}
+                                className="min-w-[280px] md:min-w-0 p-8 rounded-[2rem] bg-gray-50 border-2 border-transparent hover:border-blue-100 hover:bg-white hover:shadow-xl transition-all text-left group snap-start"
+                            >
+                                <div className={cn("w-14 h-14 rounded-2xl flex items-center justify-center mb-6 transition-transform group-hover:scale-110", cat.bgColor, cat.color)}>
+                                    <cat.icon size={28} />
+                                </div>
+                                <h3 className="text-lg font-black text-gray-900 mb-2">{cat.title}</h3>
+                                <p className="text-sm text-gray-500 font-medium leading-relaxed">{cat.description}</p>
+                            </button>
+                        ))}
+                    </div>
                 </div>
             )}
 
