@@ -304,119 +304,110 @@ function AdminHostelsContent() {
                 </div>
             ) : (
                 <>
-                    <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-8">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-10">
                         {hostels.map((hostel: any) => (
-                            <div key={hostel.id} className="bg-white rounded-[2.5rem] border border-gray-100 overflow-hidden shadow-sm hover:shadow-2xl transition-all group flex flex-col">
-                                <div className="relative h-48 bg-gray-100 overflow-hidden">
+                            <div key={hostel.id} className="group flex flex-col gap-3">
+                                {/* Image & overlays */}
+                                <div className="relative aspect-square rounded-xl overflow-hidden bg-gray-100">
                                     {hostel.images?.[0] ? (
-                                        <img src={hostel.images[0]} alt={hostel.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+                                        <img src={hostel.images[0]} alt={hostel.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                                     ) : (
-                                        <div className="w-full h-full flex items-center justify-center text-gray-300">
-                                            <Building2 size={48} />
+                                        <div className="w-full h-full flex flex-col items-center justify-center text-gray-400 gap-2">
+                                            <Building2 size={32} />
+                                            <span className="text-xs font-medium">No Image</span>
                                         </div>
                                     )}
-                                    <div className="absolute top-4 left-4 flex gap-2">
+
+                                    {/* Status Badge */}
+                                    <div className="absolute top-3 left-3 flex flex-col gap-2">
                                         <span className={cn(
-                                            "px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest border backdrop-blur-md shadow-sm",
+                                            "px-2.5 py-1 rounded-md text-xs font-semibold backdrop-blur-md shadow-sm",
                                             hostel.isPublished
-                                                ? "bg-emerald-500/90 text-white border-emerald-400"
-                                                : "bg-gray-900/90 text-gray-400 border-gray-800"
+                                                ? "bg-white/90 text-emerald-700"
+                                                : "bg-black/70 text-white"
                                         )}>
                                             {hostel.isPublished ? "Live" : "Draft"}
                                         </span>
                                         {hostel.isFeatured && (
-                                            <span className="bg-blue-600/90 text-white border-blue-500 px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest border backdrop-blur-md shadow-sm flex items-center gap-1">
-                                                <Star size={10} fill="currentColor" /> Featured
+                                            <span className="bg-white/90 backdrop-blur-md text-blue-700 px-2.5 py-1 rounded-md text-xs font-semibold shadow-sm">
+                                                Featured
                                             </span>
                                         )}
                                     </div>
-                                </div>
 
-                                <div className="p-8 flex-1 flex flex-col">
-                                    <div className="flex items-start justify-between mb-2">
-                                        <h3 className="text-xl font-black text-gray-950 tracking-tight leading-tight group-hover:text-emerald-600 transition-colors line-clamp-1">
-                                            {hostel.name}
-                                        </h3>
+                                    {/* Admin Actions */}
+                                    <div className="absolute top-3 right-3">
                                         <DropdownMenu>
                                             <DropdownMenuTrigger asChild>
-                                                <button className="p-2 hover:bg-gray-50 rounded-xl transition-colors text-gray-400">
-                                                    <MoreVertical size={18} />
+                                                <button className="p-2 rounded-full bg-white/90 hover:bg-white backdrop-blur-sm transition-all shadow-sm">
+                                                    <MoreVertical size={16} className="text-gray-700" />
                                                 </button>
                                             </DropdownMenuTrigger>
-                                            <DropdownMenuContent align="end" className="rounded-2xl border-gray-100 p-2 shadow-xl">
-                                                <DropdownMenuLabel className="text-[10px] font-black uppercase tracking-widest text-gray-400 px-3 py-2">
-                                                    Moderation Mode
+                                            <DropdownMenuContent align="end" className="rounded-xl border-gray-100 p-1 shadow-xl min-w-[180px]">
+                                                <DropdownMenuLabel className="text-[10px] font-bold uppercase tracking-widest text-gray-400 px-3 py-2">
+                                                    Manage Asset
                                                 </DropdownMenuLabel>
                                                 <DropdownMenuItem
                                                     onClick={() => updateHostelMutation.mutate({ id: hostel.id, data: { published: !hostel.isPublished } })}
-                                                    className="rounded-lg font-bold text-xs gap-3 py-2.5 cursor-pointer"
+                                                    className="rounded-lg font-medium text-xs gap-2 py-2.5 cursor-pointer"
                                                 >
-                                                    {hostel.isPublished ? <XCircle size={16} className="text-orange-500" /> : <CheckCircle2 size={16} className="text-emerald-500" />}
-                                                    {hostel.isPublished ? "Unpublish Asset" : "Publish Asset"}
+                                                    {hostel.isPublished ? <XCircle size={14} className="text-orange-500" /> : <CheckCircle2 size={14} className="text-emerald-500" />}
+                                                    {hostel.isPublished ? "Unpublish" : "Publish"}
                                                 </DropdownMenuItem>
                                                 <DropdownMenuItem
                                                     onClick={() => toggleFeatureMutation.mutate({ id: hostel.id, featured: !hostel.isFeatured })}
-                                                    className="rounded-lg font-bold text-xs gap-3 py-2.5 cursor-pointer"
+                                                    className="rounded-lg font-medium text-xs gap-2 py-2.5 cursor-pointer"
                                                 >
-                                                    <Star size={16} className="text-blue-500" />
-                                                    {hostel.isFeatured ? "Remove Featured" : "Feature Asset"}
+                                                    <Star size={14} className="text-blue-500" />
+                                                    {hostel.isFeatured ? "Unfeature" : "Feature"}
                                                 </DropdownMenuItem>
                                                 <DropdownMenuSeparator className="bg-gray-50 my-1" />
                                                 <DropdownMenuItem asChild>
-                                                    <Link href={`/hostels/${hostel.slug || hostel.id}`} target="_blank" className="rounded-lg font-bold text-xs gap-3 py-2.5 flex items-center cursor-pointer">
-                                                        <ExternalLink size={16} className="text-gray-400" />
-                                                        Review Listing
+                                                    <Link href={`/hostels/${hostel.slug || hostel.id}`} target="_blank" className="rounded-lg font-medium text-xs gap-2 py-2.5 flex items-center cursor-pointer">
+                                                        <ExternalLink size={14} className="text-gray-400" />
+                                                        View Details
                                                     </Link>
                                                 </DropdownMenuItem>
                                                 <DropdownMenuItem
                                                     onClick={() => {
-                                                        if (confirm(`Completely purge ${hostel.name}? This cannot be undone.`)) {
+                                                        if (confirm(`Delete ${hostel.name}?`)) {
                                                             deleteHostelMutation.mutate(hostel.id);
                                                         }
                                                     }}
-                                                    className="rounded-lg font-bold text-xs gap-3 py-2.5 text-red-600 hover:bg-red-50 cursor-pointer"
+                                                    className="rounded-lg font-medium text-xs gap-2 py-2.5 text-red-600 hover:bg-red-50 cursor-pointer"
                                                 >
-                                                    <XCircle size={16} />
-                                                    Terminate Listing
+                                                    <XCircle size={14} />
+                                                    Delete
                                                 </DropdownMenuItem>
                                             </DropdownMenuContent>
                                         </DropdownMenu>
                                     </div>
+                                </div>
 
-                                    <div className="flex items-center gap-2 text-gray-500 text-[11px] font-bold uppercase tracking-widest mb-6 border-b border-gray-50 pb-4">
-                                        <MapPin size={12} className="text-emerald-400" /> {hostel.city}, {hostel.region}
-                                    </div>
-
-                                    <div className="grid grid-cols-2 gap-4 mb-8">
-                                        <div className="p-4 bg-gray-50 rounded-2xl border border-transparent hover:border-emerald-100 hover:bg-white transition-all">
-                                            <div className="flex items-center gap-2 text-gray-400 mb-1">
-                                                <Bed size={14} />
-                                                <span className="text-[9px] font-black uppercase tracking-widest">Inventory</span>
-                                            </div>
-                                            <p className="text-lg font-black text-gray-950 tracking-tighter">{hostel._count?.rooms || 0} Types</p>
-                                        </div>
-                                        <div className="p-4 bg-gray-50 rounded-2xl border border-transparent hover:border-emerald-100 hover:bg-white transition-all">
-                                            <div className="flex items-center gap-2 text-gray-400 mb-1">
-                                                <UsersIcon size={14} />
-                                                <span className="text-[9px] font-black uppercase tracking-widest">Demand</span>
-                                            </div>
-                                            <p className="text-lg font-black text-gray-950 tracking-tighter">{hostel._count?.bookings || 0} Bookings</p>
+                                {/* Content Details */}
+                                <div className="space-y-0.5">
+                                    <div className="flex justify-between items-start">
+                                        <h3 className="font-semibold text-gray-900 truncate pr-2 text-[15px]">
+                                            {hostel.name}
+                                        </h3>
+                                        <div className="flex items-center gap-1 text-sm text-gray-900 font-medium whitespace-nowrap">
+                                            <Star size={12} className="fill-black stroke-black" />
+                                            <span>4.9</span>
                                         </div>
                                     </div>
 
-                                    <div className="mt-auto pt-6 border-t border-gray-50">
-                                        <p className="text-[9px] font-black uppercase tracking-widest text-gray-400 mb-1">Proprietor Identity</p>
-                                        <div className="flex items-center gap-3">
-                                            <div className="w-8 h-8 bg-emerald-50 rounded-lg flex items-center justify-center text-emerald-600 font-black text-[10px]">
-                                                {hostel.owner?.firstName?.[0]}
-                                            </div>
-                                            <div className="flex-1 min-w-0">
-                                                <p className="text-xs font-black text-gray-950 truncate">
-                                                    {hostel.owner?.firstName} {hostel.owner?.lastName}
-                                                </p>
-                                                <p className="text-[10px] text-gray-400 font-medium truncate">{hostel.owner?.email}</p>
-                                            </div>
-                                        </div>
+                                    <div className="text-[15px] text-gray-500 leading-snug">
+                                        <p className="truncate">{hostel._count?.rooms || 0} Room Types</p>
+                                        <p className="truncate">{hostel.city}, {hostel.region}</p>
+                                    </div>
+
+                                    <div className="flex items-center gap-1 mt-1.5 pt-1">
+                                        <span className="font-semibold text-gray-900 text-[15px]">
+                                            {hostel._count?.bookings || 0}
+                                        </span>
+                                        <span className="text-gray-900 font-normal text-[15px]">
+                                            active bookings
+                                        </span>
                                     </div>
                                 </div>
                             </div>
@@ -425,10 +416,12 @@ function AdminHostelsContent() {
 
                     {/* No Assets */}
                     {hostels.length === 0 && (
-                        <div className="text-center py-32 bg-white rounded-[3rem] border border-dashed border-gray-200">
-                            <Building2 className="mx-auto text-gray-200 mb-6" size={64} />
-                            <h3 className="text-2xl font-black text-gray-950 italic uppercase tracking-tighter mb-2">Zero Infrastructure Located</h3>
-                            <p className="text-gray-400 text-sm font-medium">Platform inventory is currently offline or search returned empty.</p>
+                        <div className="text-center py-32">
+                            <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <Building2 className="text-gray-300" size={32} />
+                            </div>
+                            <h3 className="text-lg font-semibold text-gray-900 mb-1">No properties found</h3>
+                            <p className="text-gray-500 text-sm">Inventory is currently empty.</p>
                         </div>
                     )}
 
