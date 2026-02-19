@@ -1,21 +1,37 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 import Link from "next/link";
-import { Plus, Building2, MapPin, Users, MoreVertical, Edit2, Eye, Trash2, CalendarCheck, Star } from "lucide-react";
+import {
+    Plus,
+    Building2,
+    MapPin,
+    Users,
+    MoreVertical,
+    Edit2,
+    Eye,
+    Trash2,
+    CalendarCheck,
+    Star,
+    Loader2,
+    Search
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
+    DropdownMenuSeparator,
     DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
 
 export default function OwnerHostelsPage() {
     const queryClient = useQueryClient();
+    const [search, setSearch] = useState("");
+
     const { data: hostels, isLoading } = useQuery({
         queryKey: ["owner-hostels"],
         queryFn: async () => {
@@ -28,157 +44,184 @@ export default function OwnerHostelsPage() {
         mutationFn: (id: string) => api.delete(`/hostels/${id}`),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["owner-hostels"] });
-            toast.success("Hostel deleted successfully");
+            toast.success("Property removed from your portfolio");
         },
         onError: (err: any) => toast.error(err.response?.data?.message || "Failed to delete hostel")
     });
 
     const handleDelete = (id: string, name: string) => {
-        if (confirm(`Are you sure you want to delete ${name}? This will remove all associated rooms and data.`)) {
+        if (confirm(`Permanently remove ${name}? This action cannot be undone.`)) {
             deleteMutation.mutate(id);
         }
     };
 
+    const filteredHostels = hostels?.filter((h: any) =>
+        h.name.toLowerCase().includes(search.toLowerCase()) ||
+        h.city.toLowerCase().includes(search.toLowerCase())
+    );
+
     if (isLoading) {
         return (
-            <div className="space-y-6">
-                <div className="h-10 w-48 bg-gray-200 animate-pulse rounded-lg"></div>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {[1, 2, 3].map(i => (
-                        <div key={i} className="h-64 bg-gray-100 animate-pulse rounded-3xl"></div>
-                    ))}
+            <div className="flex h-[60vh] items-center justify-center">
+                <div className="flex flex-col items-center gap-4">
+                    <Loader2 className="animate-spin text-blue-600" size={40} />
+                    <p className="text-sm font-black text-gray-400 uppercase tracking-widest animate-pulse">Syncing Properties...</p>
                 </div>
             </div>
         );
     }
 
     return (
-        <div className="space-y-8">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="max-w-[1600px] mx-auto space-y-10 pb-20">
+            {/* Command Header */}
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
                 <div>
-                    <h1 className="text-3xl font-bold tracking-tight mb-1">My Hostels</h1>
-                    <p className="text-gray-500">Manage and track all your hostel properties.</p>
+                    <div className="flex items-center gap-3 mb-4">
+                        <span className="px-2.5 py-1 bg-blue-50 text-blue-600 rounded-full text-[9px] font-black uppercase tracking-widest border border-blue-100">
+                            Proprietor Hub
+                        </span>
+                    </div>
+                    <h1 className="text-4xl font-black text-gray-950 tracking-tight leading-none mb-3">
+                        My Hostels <span className="text-blue-600">.</span>
+                    </h1>
+                    <p className="text-gray-500 font-medium text-lg">Manage and track your property portfolio performance.</p>
                 </div>
                 <Link
                     href="/owner/hostels/new"
-                    className="flex items-center justify-center gap-2 bg-black text-white px-6 py-3 rounded-2xl font-bold hover:opacity-90 transition-all active:scale-[0.98] shadow-md shadow-black/10"
+                    className="flex items-center gap-3 bg-gray-950 text-white px-8 py-4 rounded-2xl font-black text-[11px] uppercase tracking-widest hover:bg-black transition-all shadow-xl shadow-gray-200 group active:scale-[0.98]"
                 >
-                    <Plus size={20} />
-                    <span>Add New Hostel</span>
+                    <Plus size={16} className="group-hover:rotate-90 transition-transform" />
+                    <span>List New Property</span>
                 </Link>
             </div>
 
-            {hostels?.length === 0 ? (
-                <div className="bg-white border border-dashed border-gray-300 rounded-[2rem] p-12 text-center space-y-4">
-                    <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto">
-                        <Building2 className="text-gray-400" size={32} />
+            {/* Search & Controls */}
+            {hostels?.length > 0 && (
+                <div className="relative max-w-lg">
+                    <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+                    <input
+                        value={search}
+                        onChange={(e) => setSearch(e.target.value)}
+                        className="w-full bg-white border border-gray-100 rounded-[2rem] py-5 pl-16 pr-8 outline-none focus:ring-4 focus:ring-blue-50 transition-all font-bold text-gray-950 placeholder:text-gray-400 shadow-sm"
+                        placeholder="Search your properties..."
+                    />
+                </div>
+            )}
+
+            {/* Grid */}
+            {filteredHostels?.length === 0 ? (
+                <div className="bg-white border-2 border-dashed border-gray-100 rounded-[3rem] p-20 text-center space-y-6">
+                    <div className="w-20 h-20 bg-gray-50 rounded-[2rem] flex items-center justify-center mx-auto mb-6 transform rotate-3">
+                        <Building2 className="text-gray-300" size={40} />
                     </div>
-                    <div className="max-w-xs mx-auto">
-                        <h3 className="text-lg font-bold">No hostels found</h3>
-                        <p className="text-gray-500 text-sm mt-1">Start by adding your first hostel property to start receiving bookings.</p>
+                    <div className="max-w-md mx-auto">
+                        <h3 className="text-2xl font-black text-gray-950 tracking-tight mb-2">No properties found</h3>
+                        <p className="text-gray-500 font-medium">Start building your portfolio by adding your first hostel property to the platform.</p>
                     </div>
-                    <Link
-                        href="/owner/hostels/new"
-                        className="inline-flex items-center gap-2 text-blue-600 font-bold hover:underline"
-                    >
-                        Create your first listing
-                    </Link>
+                    {hostels?.length === 0 && (
+                        <Link
+                            href="/owner/hostels/new"
+                            className="inline-flex items-center gap-2 text-blue-600 font-black text-sm uppercase tracking-widest hover:underline mt-4"
+                        >
+                            Create first listing <Plus size={14} />
+                        </Link>
+                    )}
                 </div>
             ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 text-2xl font-bold">
-                    {hostels?.map((hostel: any) => (
-                        <div key={hostel.id} className="group bg-white rounded-[2rem] border overflow-hidden hover:shadow-xl hover:shadow-gray-200/50 transition-all duration-300 flex flex-col">
-                            {/* Image Placeholder or Actual */}
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+                    {filteredHostels?.map((hostel: any) => (
+                        <div key={hostel.id} className="group bg-white rounded-[2.5rem] border border-gray-100 overflow-hidden hover:shadow-2xl hover:shadow-gray-200/50 transition-all duration-500 flex flex-col relative">
+                            {/* Image Area */}
                             <div className="aspect-[4/3] bg-gray-100 relative overflow-hidden">
                                 {hostel.images?.[0] ? (
                                     <img
                                         src={hostel.images[0]}
                                         alt={hostel.name}
-                                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                                     />
                                 ) : (
-                                    <div className="w-full h-full flex items-center justify-center text-gray-300">
+                                    <div className="w-full h-full flex items-center justify-center text-gray-300 bg-gray-50">
                                         <Building2 size={48} />
                                     </div>
                                 )}
-                                <div className="absolute top-4 right-4">
-                                    <span className={cn(
-                                        "px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider shadow-sm",
-                                        hostel.isPublished ? "bg-green-500 text-white" : "bg-gray-500 text-white"
-                                    )}>
-                                        {hostel.isPublished ? "Published" : "Draft"}
-                                    </span>
-                                </div>
-                            </div>
 
-                            <div className="p-6 flex-1 flex flex-col">
-                                <div className="flex justify-between items-start mb-4">
-                                    <div>
-                                        <h3 className="text-lg font-bold line-clamp-1">{hostel.name}</h3>
-                                        <div className="flex items-center gap-1 text-gray-500 text-sm mt-1">
-                                            <MapPin size={14} />
-                                            <span>{hostel.city}, {hostel.addressLine}</span>
-                                        </div>
-                                    </div>
+                                <div className="absolute top-5 left-5 right-5 flex justify-between items-start">
+                                    <span className={cn(
+                                        "px-3 py-1.5 rounded-xl text-[9px] font-black uppercase tracking-widest border backdrop-blur-md shadow-sm",
+                                        hostel.isPublished
+                                            ? "bg-emerald-500/90 text-white border-emerald-400"
+                                            : "bg-gray-900/90 text-gray-400 border-gray-800"
+                                    )}>
+                                        {hostel.isPublished ? "Live" : "Draft"}
+                                    </span>
 
                                     <DropdownMenu>
                                         <DropdownMenuTrigger asChild>
-                                            <button className="p-2 hover:bg-gray-100 rounded-full transition-colors">
-                                                <MoreVertical size={18} />
+                                            <button className="w-8 h-8 flex items-center justify-center bg-white/90 backdrop-blur-sm rounded-full hover:bg-white transition-colors text-gray-900 shadow-sm border border-white/20">
+                                                <MoreVertical size={16} />
                                             </button>
                                         </DropdownMenuTrigger>
-                                        <DropdownMenuContent align="end" className="w-48 rounded-xl p-1 shadow-lg border">
-                                            <DropdownMenuItem asChild className="rounded-lg">
-                                                <Link href={`/hostels/${hostel.id}`} target="_blank" className="flex items-center gap-2 cursor-pointer">
-                                                    <Eye size={16} />
-                                                    <span>View Listing</span>
+                                        <DropdownMenuContent align="end" className="w-56 rounded-2xl p-2 shadow-xl border-gray-100">
+                                            <DropdownMenuItem asChild className="rounded-xl p-3 font-bold text-xs cursor-pointer focus:bg-gray-50">
+                                                <Link href={`/hostels/${hostel.id}`} target="_blank" className="flex items-center gap-3">
+                                                    <Eye size={16} className="text-blue-500" />
+                                                    View Public Listing
                                                 </Link>
                                             </DropdownMenuItem>
-                                            <DropdownMenuItem asChild className="rounded-lg">
-                                                <Link href={`/owner/hostels/${hostel.id}/edit`} className="flex items-center gap-2 cursor-pointer">
-                                                    <Edit2 size={16} />
-                                                    <span>Edit Details</span>
+                                            <DropdownMenuItem asChild className="rounded-xl p-3 font-bold text-xs cursor-pointer focus:bg-gray-50">
+                                                <Link href={`/owner/hostels/${hostel.id}/edit`} className="flex items-center gap-3">
+                                                    <Edit2 size={16} className="text-gray-900" />
+                                                    Edit Details
                                                 </Link>
                                             </DropdownMenuItem>
                                             {!hostel.isFeatured && (
                                                 <DropdownMenuItem
-                                                    onClick={() => {
-                                                        if (confirm("Promote this hostel to featured for better visibility? (Requires PRO subscription)")) {
-                                                            alert("Promotion feature - call API to set isFeatured: true");
-                                                        }
-                                                    }}
-                                                    className="flex items-center gap-2 text-orange-600 focus:text-orange-600 rounded-lg cursor-pointer"
+                                                    onClick={() => toast.info("Upgrade to Pro to unlock featured listings!")}
+                                                    className="rounded-xl p-3 font-bold text-xs cursor-pointer focus:bg-orange-50 text-orange-600 focus:text-orange-700"
                                                 >
-                                                    <Star size={16} />
-                                                    <span>Promote to Featured</span>
+                                                    <Star size={16} className="mr-3" />
+                                                    Promote to Featured
                                                 </DropdownMenuItem>
                                             )}
-                                            <div className="h-px bg-gray-100 my-1" />
+                                            <DropdownMenuSeparator className="bg-gray-50" />
                                             <DropdownMenuItem
                                                 onClick={() => handleDelete(hostel.id, hostel.name)}
-                                                className="flex items-center gap-2 text-red-600 focus:text-red-600 rounded-lg cursor-pointer"
+                                                className="rounded-xl p-3 font-bold text-xs cursor-pointer focus:bg-red-50 text-red-600 focus:text-red-700"
                                             >
-                                                <Trash2 size={16} />
-                                                <span>Delete Hostel</span>
+                                                <Trash2 size={16} className="mr-3" />
+                                                Delete Property
                                             </DropdownMenuItem>
                                         </DropdownMenuContent>
                                     </DropdownMenu>
                                 </div>
+                            </div>
+
+                            {/* Content */}
+                            <div className="p-8 flex-1 flex flex-col">
+                                <div className="mb-6">
+                                    <h3 className="text-xl font-black text-gray-950 tracking-tight leading-tight mb-2 group-hover:text-blue-600 transition-colors">
+                                        {hostel.name}
+                                    </h3>
+                                    <div className="flex items-center gap-2 text-gray-500 text-[11px] font-bold uppercase tracking-widest">
+                                        <MapPin size={12} className="text-blue-500" />
+                                        <span>{hostel.city}, {hostel.addressLine}</span>
+                                    </div>
+                                </div>
 
                                 <div className="mt-auto grid grid-cols-2 gap-4">
-                                    <div className="bg-gray-50 rounded-2xl p-3">
+                                    <div className="bg-gray-50 rounded-2xl p-4 border border-transparent hover:border-gray-200 transition-all">
                                         <div className="flex items-center gap-2 text-gray-400 mb-1">
                                             <Users size={14} />
-                                            <span className="text-[10px] font-bold uppercase tracking-wider">Rooms</span>
+                                            <span className="text-[9px] font-black uppercase tracking-widest">Inventory</span>
                                         </div>
-                                        <p className="font-bold">{hostel._count.rooms}</p>
+                                        <p className="text-xl font-black text-gray-950 tracking-tighter">{hostel._count.rooms}</p>
                                     </div>
-                                    <div className="bg-gray-50 rounded-2xl p-3">
+                                    <div className="bg-gray-50 rounded-2xl p-4 border border-transparent hover:border-gray-200 transition-all">
                                         <div className="flex items-center gap-2 text-gray-400 mb-1">
                                             <CalendarCheck size={14} />
-                                            <span className="text-[10px] font-bold uppercase tracking-wider">Bookings</span>
+                                            <span className="text-[9px] font-black uppercase tracking-widest">Bookings</span>
                                         </div>
-                                        <p className="font-bold">{hostel._count.bookings}</p>
+                                        <p className="text-xl font-black text-gray-950 tracking-tighter">{hostel._count.bookings}</p>
                                     </div>
                                 </div>
                             </div>
@@ -189,4 +232,3 @@ export default function OwnerHostelsPage() {
         </div>
     );
 }
-

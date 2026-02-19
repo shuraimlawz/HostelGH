@@ -40,8 +40,8 @@ export default function OwnerSidebar({ isOpen = false, onClose = () => { } }: Ow
         <div className="flex flex-col h-full bg-white">
             {/* Header */}
             <div className="mb-10 px-2 pt-2">
-                <div className="flex items-center gap-3 px-4 py-2 bg-purple-50/50 rounded-2xl border border-purple-100/50">
-                    <div className="w-8 h-8 bg-purple-600 rounded-lg flex items-center justify-center text-white">
+                <div className="flex items-center gap-3 px-4 py-2 bg-blue-50/50 rounded-2xl border border-blue-100/50">
+                    <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white">
                         <Zap size={18} />
                     </div>
                     <div>
@@ -68,16 +68,16 @@ export default function OwnerSidebar({ isOpen = false, onClose = () => { } }: Ow
                             )}
                         >
                             {isActive && (
-                                <div className="absolute inset-0 bg-gradient-to-r from-purple-600/20 to-transparent opacity-50" />
+                                <div className="absolute inset-0 bg-gradient-to-r from-blue-600/20 to-transparent opacity-40" />
                             )}
                             <div className="flex items-center gap-3 relative z-10">
                                 <link.icon size={18} className={cn(
                                     "transition-colors",
-                                    isActive ? "text-purple-400" : "text-gray-400 group-hover:text-gray-900"
+                                    isActive ? "text-blue-300" : "text-gray-400 group-hover:text-gray-900"
                                 )} />
                                 <span className="font-bold text-[13px] tracking-tight">{link.name}</span>
                             </div>
-                            {isActive && <ChevronRight size={14} className="text-purple-400 relative z-10" />}
+                            {isActive && <ChevronRight size={14} className="text-blue-300 relative z-10" />}
                         </Link>
                     );
                 })}
@@ -87,16 +87,16 @@ export default function OwnerSidebar({ isOpen = false, onClose = () => { } }: Ow
             <div className="mt-auto space-y-6">
                 {/* PRO Card */}
                 <div className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-[2rem] p-5 text-white relative overflow-hidden group/pro shadow-xl shadow-gray-200">
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-purple-600/20 rounded-full -mr-16 -mt-16 blur-2xl group-hover/pro:scale-110 transition-transform duration-500" />
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-blue-600/20 rounded-full -mr-16 -mt-16 blur-2xl group-hover/pro:scale-110 transition-transform duration-500" />
                     <div className="relative z-10">
                         <div className="w-8 h-8 bg-white/10 backdrop-blur-md rounded-xl flex items-center justify-center border border-white/20 mb-3">
-                            <Zap size={16} className="text-purple-400" />
+                            <Zap size={16} className="text-blue-400" />
                         </div>
-                        <h3 className="text-xs font-black mb-1 italic uppercase tracking-wider text-purple-200">Go Premium</h3>
+                        <h3 className="text-xs font-black mb-1 italic uppercase tracking-wider text-blue-200">Go Premium</h3>
                         <p className="text-[10px] text-gray-400 font-medium leading-relaxed mb-4">
                             Unlock advanced analytics and featured listing status.
                         </p>
-                        <Link href="/owner/subscription" className="inline-flex items-center gap-2 text-[10px] font-black text-white hover:text-purple-400 transition-colors">
+                        <Link href="/owner/subscription" className="inline-flex items-center gap-2 text-[10px] font-black text-white hover:text-blue-400 transition-colors">
                             VIEW PLANS <ChevronRight size={12} />
                         </Link>
                     </div>
@@ -106,7 +106,7 @@ export default function OwnerSidebar({ isOpen = false, onClose = () => { } }: Ow
                 <div className="pt-6 border-t border-gray-100">
                     <div className="flex items-center justify-between p-2 pl-3 bg-gray-50 rounded-2xl border border-gray-100">
                         <div className="flex items-center gap-3">
-                            <div className="w-9 h-9 bg-purple-600 rounded-xl flex items-center justify-center text-white text-xs font-black">
+                            <div className="w-9 h-9 bg-blue-600 rounded-xl flex items-center justify-center text-white text-xs font-black">
                                 {user?.firstName?.[0] || user?.email?.[0].toUpperCase()}
                             </div>
                             <div className="min-w-0">

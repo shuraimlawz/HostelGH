@@ -21,19 +21,17 @@ import {
     Car,
     ShieldCheck,
     Coffee,
-    School,
-    Trash2,
-    Image as ImageIcon,
     MessageSquare,
     Zap,
     Droplets,
     Flame,
-    Clock
+    Clock,
+    Image as ImageIcon,
+    Trash2
 } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import ImageUpload from "@/components/common/ImageUpload";
-import { REGIONAL_UNIVERSITIES } from "@/lib/constants";
 
 const formSchema = z.object({
     name: z.string().min(3, "Name must be at least 3 characters"),
@@ -49,29 +47,27 @@ const formSchema = z.object({
 });
 
 const AMENITIES = [
-    { id: "WiFi", icon: Wifi },
-    { id: "AC", icon: Wind },
-    { id: "Laundry", icon: Utensils },
-    { id: "Swimming Pool", icon: Waves },
-    { id: "Parking", icon: Car },
-    { id: "Security", icon: ShieldCheck },
-    { id: "Study Room", icon: Coffee },
-    { id: "Generator", icon: Building2 },
+    { id: "WiFi", label: "Wi-Fi", icon: Wifi },
+    { id: "AC", label: "Air Con", icon: Wind },
+    { id: "Laundry", label: "Laundry", icon: Utensils },
+    { id: "Swimming Pool", label: "Pool", icon: Waves },
+    { id: "Parking", label: "Parking", icon: Car },
+    { id: "Security", label: "Security", icon: ShieldCheck },
+    { id: "Study Room", label: "Study Room", icon: Coffee },
+    { id: "Generator", label: "Generator", icon: Building2 },
 ];
 
-const UNIVERSITIES = [
-    "University of Ghana",
-    "KNUST",
-    "UCC",
-    "University of Education, Winneba",
-    "GIMPA",
-    "Ashesi University",
-    "Valley View University",
+const STEPS = [
+    { id: 1, label: "Basic Info", icon: Info },
+    { id: 2, label: "Location", icon: MapPin },
+    { id: 3, label: "Features", icon: Zap },
+    { id: 4, label: "Photos", icon: ImageIcon },
 ];
 
 export default function NewHostelPage() {
     const router = useRouter();
     const [loading, setLoading] = useState(false);
+    const [currentStep, setCurrentStep] = useState(1);
     const [selectedAmenities, setSelectedAmenities] = useState<string[]>([]);
 
     const form = useForm<z.infer<typeof formSchema>>({
@@ -98,17 +94,11 @@ export default function NewHostelPage() {
         form.setValue("amenities", updated);
     };
 
-    const removeImage = (index: number) => {
-        const currentImages = form.getValues("images");
-        const updated = currentImages.filter((_, i) => i !== index);
-        form.setValue("images", updated);
-    };
-
     const onSubmit = async (values: z.infer<typeof formSchema>) => {
         setLoading(true);
         try {
             await api.post("/hostels", { ...values, isPublished: true });
-            toast.success("Hostel created and published successfully!");
+            toast.success("Hostel created and live!");
             router.push("/owner/hostels");
         } catch (error: any) {
             toast.error(error.response?.data?.message || "Failed to create hostel");
@@ -118,231 +108,316 @@ export default function NewHostelPage() {
     };
 
     return (
-        <div className="max-w-4xl mx-auto pb-20">
+        <div className="max-w-5xl mx-auto pb-20">
+            {/* Back & Header */}
             <Link
                 href="/owner/hostels"
-                className="inline-flex items-center gap-2 text-sm font-semibold text-gray-500 hover:text-black mb-8 transition-colors group"
+                className="inline-flex items-center gap-2 text-xs font-black text-gray-400 hover:text-gray-900 mb-10 transition-colors group uppercase tracking-widest"
             >
                 <ChevronLeft size={16} className="group-hover:-translate-x-1 transition-transform" />
                 Back to Hostels
             </Link>
 
-            <div className="mb-10">
-                <h1 className="text-4xl font-bold tracking-tight mb-2">Create New Hostel</h1>
-                <p className="text-gray-500 text-lg">List your property and start hosting students today.</p>
+            <div className="mb-12">
+                <div className="flex items-center gap-3 mb-4">
+                    <span className="px-2.5 py-1 bg-blue-50 text-blue-600 rounded-full text-[9px] font-black uppercase tracking-widest border border-blue-100">
+                        New Listing
+                    </span>
+                </div>
+                <h1 className="text-4xl font-black text-gray-950 tracking-tight leading-none mb-3">
+                    List a Property <span className="text-blue-600">.</span>
+                </h1>
+                <p className="text-gray-500 font-medium text-lg">Add your hostel and start receiving bookings from students.</p>
             </div>
 
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-12">
-                {/* Basic Info Section */}
-                <section className="bg-white rounded-[2rem] border p-8 md:p-10 shadow-sm space-y-8">
-                    <div className="flex items-center gap-3 pb-6 border-b">
-                        <div className="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center text-blue-600">
-                            <Info size={20} />
-                        </div>
-                        <h2 className="text-xl font-bold">Basic Information</h2>
+            {/* Step Indicator */}
+            <div className="flex items-center gap-2 mb-12">
+                {STEPS.map((step, i) => (
+                    <div key={step.id} className="flex items-center gap-2">
+                        <button
+                            type="button"
+                            onClick={() => setCurrentStep(step.id)}
+                            className={cn(
+                                "flex items-center gap-2.5 px-5 py-3 rounded-2xl text-[11px] font-black uppercase tracking-widest transition-all border",
+                                currentStep === step.id
+                                    ? "bg-gray-950 text-white border-gray-950 shadow-lg shadow-gray-200"
+                                    : currentStep > step.id
+                                        ? "bg-blue-50 text-blue-600 border-blue-100"
+                                        : "bg-white text-gray-400 border-gray-100 hover:border-gray-200"
+                            )}
+                        >
+                            {currentStep > step.id ? (
+                                <Check size={12} />
+                            ) : (
+                                <step.icon size={12} />
+                            )}
+                            {step.label}
+                        </button>
+                        {i < STEPS.length - 1 && (
+                            <div className={cn(
+                                "h-px flex-1 max-w-8 transition-all",
+                                currentStep > step.id ? "bg-blue-300" : "bg-gray-100"
+                            )} />
+                        )}
                     </div>
+                ))}
+            </div>
 
-                    <div className="grid grid-cols-1 gap-8">
-                        <div className="space-y-2">
-                            <label className="text-sm font-bold text-gray-700 ml-1 uppercase tracking-wider">Hostel Name</label>
-                            <div className="relative">
-                                <Building2 className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                {/* Step 1: Basic Info */}
+                {currentStep === 1 && (
+                    <div className="bg-white rounded-[2.5rem] border border-gray-100 p-8 md:p-12 shadow-sm space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-300">
+                        <div className="flex items-center gap-4 pb-6 border-b border-gray-100">
+                            <div className="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600">
+                                <Info size={22} />
+                            </div>
+                            <div>
+                                <h2 className="text-xl font-black text-gray-950 tracking-tight">Basic Information</h2>
+                                <p className="text-sm text-gray-400 font-medium mt-0.5">Name and describe your property</p>
+                            </div>
+                        </div>
+
+                        <div className="space-y-6">
+                            <div className="space-y-2">
+                                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Hostel Name</label>
+                                <div className="relative">
+                                    <Building2 className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+                                    <input
+                                        {...form.register("name")}
+                                        className="w-full pl-14 pr-5 py-5 bg-gray-50 rounded-2xl outline-none focus:ring-4 focus:ring-blue-100 transition-all font-bold text-gray-950 placeholder:text-gray-300 text-lg"
+                                        placeholder="e.g. Sunrise Ridge Hostel"
+                                    />
+                                </div>
+                                {form.formState.errors.name && (
+                                    <p className="text-xs text-red-500 ml-1 font-bold">{form.formState.errors.name.message}</p>
+                                )}
+                            </div>
+
+                            <div className="space-y-2">
+                                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Description</label>
+                                <textarea
+                                    {...form.register("description")}
+                                    rows={5}
+                                    className="w-full px-6 py-5 bg-gray-50 rounded-2xl outline-none focus:ring-4 focus:ring-blue-100 transition-all font-medium text-gray-950 placeholder:text-gray-300 resize-none"
+                                    placeholder="What makes your hostel special? Describe the atmosphere, location benefits, and what students will love about it..."
+                                />
+                                {form.formState.errors.description && (
+                                    <p className="text-xs text-red-500 ml-1 font-bold">{form.formState.errors.description.message}</p>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {/* Step 2: Location */}
+                {currentStep === 2 && (
+                    <div className="bg-white rounded-[2.5rem] border border-gray-100 p-8 md:p-12 shadow-sm space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-300">
+                        <div className="flex items-center gap-4 pb-6 border-b border-gray-100">
+                            <div className="w-12 h-12 bg-green-50 rounded-2xl flex items-center justify-center text-green-600">
+                                <MapPin size={22} />
+                            </div>
+                            <div>
+                                <h2 className="text-xl font-black text-gray-950 tracking-tight">Location & Proximity</h2>
+                                <p className="text-sm text-gray-400 font-medium mt-0.5">Help students find you easily</p>
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="space-y-2">
+                                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">City</label>
                                 <input
-                                    {...form.register("name")}
-                                    className="w-full pl-12 pr-5 py-4 bg-gray-50 rounded-2xl outline-none focus:ring-2 focus:ring-black transition-all font-medium"
-                                    placeholder="e.g. Sunny Ridge Hostel"
+                                    {...form.register("city")}
+                                    className="w-full px-6 py-5 bg-gray-50 rounded-2xl outline-none focus:ring-4 focus:ring-blue-100 transition-all font-bold text-gray-950 placeholder:text-gray-300"
+                                    placeholder="e.g. Kumasi"
+                                />
+                                {form.formState.errors.city && (
+                                    <p className="text-xs text-red-500 ml-1 font-bold">{form.formState.errors.city.message}</p>
+                                )}
+                            </div>
+
+                            <div className="space-y-2">
+                                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Address Line</label>
+                                <input
+                                    {...form.register("addressLine")}
+                                    className="w-full px-6 py-5 bg-gray-50 rounded-2xl outline-none focus:ring-4 focus:ring-blue-100 transition-all font-bold text-gray-950 placeholder:text-gray-300"
+                                    placeholder="e.g. 12th Lane, East Legon"
+                                />
+                                {form.formState.errors.addressLine && (
+                                    <p className="text-xs text-red-500 ml-1 font-bold">{form.formState.errors.addressLine.message}</p>
+                                )}
+                            </div>
+
+                            <div className="space-y-2">
+                                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1 flex items-center gap-2">
+                                    <MessageSquare size={12} className="text-green-500" /> WhatsApp Number
+                                </label>
+                                <input
+                                    {...form.register("whatsappNumber")}
+                                    className="w-full px-6 py-5 bg-gray-50 rounded-2xl outline-none focus:ring-4 focus:ring-blue-100 transition-all font-bold text-gray-950 placeholder:text-gray-300"
+                                    placeholder="e.g. 0541234567"
+                                />
+                                <p className="text-[10px] text-gray-400 ml-1 font-bold">Students contact you via WhatsApp</p>
+                                {form.formState.errors.whatsappNumber && (
+                                    <p className="text-xs text-red-500 ml-1 font-bold">{form.formState.errors.whatsappNumber.message}</p>
+                                )}
+                            </div>
+
+                            <div className="space-y-2">
+                                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1 flex items-center gap-2">
+                                    <Clock size={12} className="text-blue-500" /> Distance to Campus
+                                </label>
+                                <input
+                                    {...form.register("distanceToCampus")}
+                                    className="w-full px-6 py-5 bg-gray-50 rounded-2xl outline-none focus:ring-4 focus:ring-blue-100 transition-all font-bold text-gray-950 placeholder:text-gray-300"
+                                    placeholder="e.g. 5 mins walk / 10 mins trotro"
                                 />
                             </div>
-                            {form.formState.errors.name && (
-                                <p className="text-xs text-red-500 ml-1 font-medium">{form.formState.errors.name.message}</p>
-                            )}
-                        </div>
-
-                        <div className="space-y-2">
-                            <label className="text-sm font-bold text-gray-700 ml-1 uppercase tracking-wider">Description</label>
-                            <textarea
-                                {...form.register("description")}
-                                rows={4}
-                                className="w-full px-5 py-4 bg-gray-50 rounded-2xl outline-none focus:ring-2 focus:ring-black transition-all font-medium resize-none"
-                                placeholder="Describe what makes your hostel unique..."
-                            />
-                            {form.formState.errors.description && (
-                                <p className="text-xs text-red-500 ml-1 font-medium">{form.formState.errors.description.message}</p>
-                            )}
                         </div>
                     </div>
-                </section>
+                )}
 
-                {/* Location Section */}
-                <section className="bg-white rounded-[2rem] border p-8 md:p-10 shadow-sm space-y-8">
-                    <div className="flex items-center gap-3 pb-6 border-b">
-                        <div className="w-10 h-10 bg-green-50 rounded-xl flex items-center justify-center text-green-600">
-                            <MapPin size={20} />
+                {/* Step 3: Features */}
+                {currentStep === 3 && (
+                    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-300">
+                        {/* Utilities */}
+                        <div className="bg-white rounded-[2.5rem] border border-gray-100 p-8 md:p-12 shadow-sm space-y-8">
+                            <div className="flex items-center gap-4 pb-6 border-b border-gray-100">
+                                <div className="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600">
+                                    <Zap size={22} />
+                                </div>
+                                <div>
+                                    <h2 className="text-xl font-black text-gray-950 tracking-tight">Included Utilities</h2>
+                                    <p className="text-sm text-gray-400 font-medium mt-0.5">What's covered in the rent?</p>
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                                {[
+                                    { id: "water", label: "Water", icon: Droplets, color: "text-blue-500", bg: "bg-blue-50" },
+                                    { id: "light", label: "Electricity", icon: Zap, color: "text-yellow-500", bg: "bg-yellow-50" },
+                                    { id: "gas", label: "Gas / Cooking", icon: Flame, color: "text-orange-500", bg: "bg-orange-50" }
+                                ].map((util) => {
+                                    const isSelected = form.watch("utilitiesIncluded")?.includes(util.id);
+                                    return (
+                                        <button
+                                            key={util.id}
+                                            type="button"
+                                            onClick={() => {
+                                                const current = form.getValues("utilitiesIncluded") || [];
+                                                const updated = isSelected
+                                                    ? current.filter(u => u !== util.id)
+                                                    : [...current, util.id];
+                                                form.setValue("utilitiesIncluded", updated);
+                                            }}
+                                            className={cn(
+                                                "flex items-center gap-4 p-6 rounded-2xl border-2 transition-all",
+                                                isSelected
+                                                    ? "border-gray-950 bg-gray-950 text-white"
+                                                    : "border-gray-100 bg-gray-50 text-gray-500 hover:border-gray-200"
+                                            )}
+                                        >
+                                            <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center", isSelected ? "bg-white/10" : util.bg)}>
+                                                <util.icon size={20} className={isSelected ? "text-white" : util.color} />
+                                            </div>
+                                            <span className="text-sm font-black uppercase tracking-wider">{util.label}</span>
+                                        </button>
+                                    );
+                                })}
+                            </div>
                         </div>
-                        <h2 className="text-xl font-bold">Location & Proximity</h2>
-                    </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                        <div className="space-y-2">
-                            <label className="text-sm font-bold text-gray-700 ml-1 uppercase tracking-wider">City</label>
-                            <input
-                                {...form.register("city")}
-                                className="w-full px-5 py-4 bg-gray-50 rounded-2xl outline-none focus:ring-2 focus:ring-black transition-all font-medium"
-                                placeholder="e.g. Accra"
-                            />
-                            {form.formState.errors.city && (
-                                <p className="text-xs text-red-500 ml-1 font-medium">{form.formState.errors.city.message}</p>
-                            )}
-                        </div>
+                        {/* Amenities */}
+                        <div className="bg-white rounded-[2.5rem] border border-gray-100 p-8 md:p-12 shadow-sm space-y-8">
+                            <div className="flex items-center gap-4 pb-6 border-b border-gray-100">
+                                <div className="w-12 h-12 bg-orange-50 rounded-2xl flex items-center justify-center text-orange-600">
+                                    <Check size={22} />
+                                </div>
+                                <div>
+                                    <h2 className="text-xl font-black text-gray-950 tracking-tight">Amenities</h2>
+                                    <p className="text-sm text-gray-400 font-medium mt-0.5">Select all available facilities</p>
+                                </div>
+                            </div>
 
-                        <div className="space-y-2">
-                            <label className="text-sm font-bold text-gray-700 ml-1 uppercase tracking-wider">Address Line</label>
-                            <input
-                                {...form.register("addressLine")}
-                                className="w-full px-5 py-4 bg-gray-50 rounded-2xl outline-none focus:ring-2 focus:ring-black transition-all font-medium"
-                                placeholder="e.g. 12th Lane, East Legon"
-                            />
-                            {form.formState.errors.addressLine && (
-                                <p className="text-xs text-red-500 ml-1 font-medium">{form.formState.errors.addressLine.message}</p>
-                            )}
-                        </div>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                        <div className="space-y-2">
-                            <label className="text-sm font-bold text-gray-700 ml-1 uppercase tracking-wider flex items-center gap-2">
-                                <MessageSquare size={14} className="text-green-500" /> WhatsApp Number
-                            </label>
-                            <input
-                                {...form.register("whatsappNumber")}
-                                className="w-full px-5 py-4 bg-gray-50 rounded-2xl outline-none focus:ring-2 focus:ring-black transition-all font-medium"
-                                placeholder="e.g. 0541234567"
-                            />
-                            <p className="text-[10px] text-gray-400 ml-1 uppercase font-bold tracking-tighter">Students will contact you via this number</p>
-                            {form.formState.errors.whatsappNumber && (
-                                <p className="text-xs text-red-500 ml-1 font-medium">{form.formState.errors.whatsappNumber.message}</p>
-                            )}
-                        </div>
-
-                        <div className="space-y-2">
-                            <label className="text-sm font-bold text-gray-700 ml-1 uppercase tracking-wider flex items-center gap-2">
-                                <Clock size={14} className="text-blue-500" /> Distance to Campus
-                            </label>
-                            <input
-                                {...form.register("distanceToCampus")}
-                                className="w-full px-5 py-4 bg-gray-50 rounded-2xl outline-none focus:ring-2 focus:ring-black transition-all font-medium"
-                                placeholder="e.g. 5 mins walk / 10 mins trotro"
-                            />
-                            {form.formState.errors.distanceToCampus && (
-                                <p className="text-xs text-red-500 ml-1 font-medium">{form.formState.errors.distanceToCampus.message}</p>
-                            )}
+                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                                {AMENITIES.map((item) => {
+                                    const isSelected = selectedAmenities.includes(item.id);
+                                    return (
+                                        <button
+                                            key={item.id}
+                                            type="button"
+                                            onClick={() => toggleAmenity(item.id)}
+                                            className={cn(
+                                                "flex flex-col items-center gap-3 p-6 rounded-3xl border-2 transition-all active:scale-95 cursor-pointer",
+                                                isSelected
+                                                    ? "border-gray-950 bg-gray-950 text-white shadow-xl shadow-gray-200"
+                                                    : "border-gray-100 bg-gray-50 text-gray-400 hover:border-gray-200 hover:text-gray-600"
+                                            )}
+                                        >
+                                            <item.icon size={24} />
+                                            <span className="text-[10px] font-black uppercase tracking-widest">{item.label}</span>
+                                        </button>
+                                    );
+                                })}
+                            </div>
                         </div>
                     </div>
-                </section>
+                )}
 
-                {/* Utilities Section */}
-                <section className="bg-white rounded-[2rem] border p-8 md:p-10 shadow-sm space-y-8">
-                    <div className="flex items-center gap-3 pb-6 border-b">
-                        <div className="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center text-blue-600">
-                            <Zap size={20} />
+                {/* Step 4: Photos */}
+                {currentStep === 4 && (
+                    <div className="bg-white rounded-[2.5rem] border border-gray-100 p-8 md:p-12 shadow-sm space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-300">
+                        <div className="flex items-center gap-4 pb-6 border-b border-gray-100">
+                            <div className="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600">
+                                <ImageIcon size={22} />
+                            </div>
+                            <div>
+                                <h2 className="text-xl font-black text-gray-950 tracking-tight">Property Photos</h2>
+                                <p className="text-sm text-gray-400 font-medium mt-0.5">Good photos attract 3x more bookings</p>
+                            </div>
                         </div>
-                        <h2 className="text-xl font-bold">Included Utilities</h2>
-                    </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                        {[
-                            { id: "water", label: "Water Included", icon: Droplets, color: "text-blue-500" },
-                            { id: "light", label: "Electricity Included", icon: Zap, color: "text-yellow-500" },
-                            { id: "gas", label: "Gas/Cooking Included", icon: Flame, color: "text-orange-500" }
-                        ].map((util) => {
-                            const isSelected = form.watch("utilitiesIncluded")?.includes(util.id);
-                            return (
-                                <button
-                                    key={util.id}
-                                    type="button"
-                                    onClick={() => {
-                                        const current = form.getValues("utilitiesIncluded") || [];
-                                        const updated = isSelected
-                                            ? current.filter(u => u !== util.id)
-                                            : [...current, util.id];
-                                        form.setValue("utilitiesIncluded", updated);
-                                    }}
-                                    className={cn(
-                                        "flex items-center gap-4 p-5 rounded-2xl border-2 transition-all",
-                                        isSelected
-                                            ? "border-black bg-black text-white"
-                                            : "border-gray-100 bg-gray-50 text-gray-500 hover:border-gray-200"
-                                    )}
-                                >
-                                    <util.icon size={20} className={isSelected ? "text-white" : util.color} />
-                                    <span className="text-xs font-bold uppercase tracking-wider">{util.label}</span>
-                                </button>
-                            );
-                        })}
-                    </div>
-                </section>
-
-                {/* Amenities Section */}
-                <section className="bg-white rounded-[2rem] border p-8 md:p-10 shadow-sm space-y-8">
-                    <div className="flex items-center gap-3 pb-6 border-b">
-                        <div className="w-10 h-10 bg-orange-50 rounded-xl flex items-center justify-center text-orange-600">
-                            <Check size={20} />
-                        </div>
-                        <h2 className="text-xl font-bold">Amenities</h2>
-                    </div>
-
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                        {AMENITIES.map((item) => {
-                            const isSelected = selectedAmenities.includes(item.id);
-                            return (
-                                <button
-                                    key={item.id}
-                                    type="button"
-                                    onClick={() => toggleAmenity(item.id)}
-                                    className={cn(
-                                        "flex flex-col items-center gap-3 p-6 rounded-3xl border-2 transition-all active:scale-95",
-                                        isSelected
-                                            ? "border-black bg-black text-white shadow-xl shadow-black/10"
-                                            : "border-gray-100 bg-gray-50 text-gray-500 hover:border-gray-200"
-                                    )}
-                                >
-                                    <item.icon size={24} />
-                                    <span className="text-[10px] font-bold uppercase tracking-wider">{item.id}</span>
-                                </button>
-                            );
-                        })}
-                    </div>
-                </section>
-
-                {/* Images Section */}
-                <section className="bg-white rounded-[2rem] border p-8 md:p-10 shadow-sm space-y-8">
-                    <div className="flex items-center gap-3 pb-6 border-b">
-                        <div className="w-10 h-10 bg-purple-50 rounded-xl flex items-center justify-center text-purple-600">
-                            <ImageIcon size={20} />
-                        </div>
-                        <h2 className="text-xl font-bold">Property Photos</h2>
-                    </div>
-
-                    <div className="space-y-6">
                         <ImageUpload
                             value={form.watch("images")}
                             onChange={(urls) => form.setValue("images", urls)}
                         />
                         {form.formState.errors.images && (
-                            <p className="text-xs text-red-500 font-medium">{form.formState.errors.images.message}</p>
+                            <p className="text-xs text-red-500 font-bold">{form.formState.errors.images.message}</p>
                         )}
                     </div>
-                </section>
+                )}
 
-                <div className="pt-8">
-                    <button
-                        type="submit"
-                        disabled={loading}
-                        className="w-full py-5 bg-black text-white rounded-[1.5rem] font-bold text-lg hover:opacity-90 transition-all active:scale-[0.98] disabled:opacity-60 flex items-center justify-center gap-3 shadow-xl shadow-black/20"
-                    >
-                        {loading ? <Loader2 className="animate-spin" size={24} /> : null}
-                        {loading ? "Creating Hostel..." : "Publish My Hostel"}
-                    </button>
+                {/* Navigation */}
+                <div className="flex items-center justify-between gap-4 pt-4">
+                    {currentStep > 1 ? (
+                        <button
+                            type="button"
+                            onClick={() => setCurrentStep(s => s - 1)}
+                            className="px-8 py-4 bg-white border border-gray-200 text-gray-900 rounded-2xl font-black text-[11px] uppercase tracking-widest hover:bg-gray-50 transition-all"
+                        >
+                            ← Previous
+                        </button>
+                    ) : (
+                        <div />
+                    )}
+
+                    {currentStep < STEPS.length ? (
+                        <button
+                            type="button"
+                            onClick={() => setCurrentStep(s => s + 1)}
+                            className="px-8 py-4 bg-gray-950 text-white rounded-2xl font-black text-[11px] uppercase tracking-widest shadow-xl shadow-gray-200 hover:bg-black transition-all active:scale-[0.98]"
+                        >
+                            Continue →
+                        </button>
+                    ) : (
+                        <button
+                            type="submit"
+                            disabled={loading}
+                            className="px-12 py-4 bg-blue-600 text-white rounded-2xl font-black text-[11px] uppercase tracking-widest shadow-xl shadow-blue-200 hover:bg-blue-700 transition-all active:scale-[0.98] flex items-center gap-3 disabled:opacity-60"
+                        >
+                            {loading ? <Loader2 className="animate-spin" size={18} /> : null}
+                            {loading ? "Publishing..." : "Publish My Hostel →"}
+                        </button>
+                    )}
                 </div>
             </form>
         </div>
