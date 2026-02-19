@@ -7,6 +7,12 @@ export enum BroadcastType {
     ALERT = 'alert',
 }
 
+export enum BroadcastTarget {
+    ALL = 'all',
+    TENANTS = 'tenants',
+    OWNERS = 'owners',
+}
+
 export class BroadcastMessageDto {
     @ApiProperty({ example: 'System Maintenance' })
     @IsString()
@@ -22,4 +28,9 @@ export class BroadcastMessageDto {
     @IsEnum(BroadcastType)
     @IsNotEmpty()
     type: BroadcastType;
+
+    @ApiProperty({ enum: BroadcastTarget, example: BroadcastTarget.ALL })
+    @IsEnum(BroadcastTarget)
+    @IsNotEmpty()
+    target: BroadcastTarget;
 }

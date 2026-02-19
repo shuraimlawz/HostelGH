@@ -12,15 +12,29 @@ import {
     Shield,
     UserCog,
     X,
-    Check
+    Check,
+    Mail,
+    Fingerprint,
+    ShieldCheck,
+    MoreHorizontal,
+    Trash2,
+    ShieldAlert
 } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState, Suspense } from "react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { useSearchParams } from "next/navigation";
-
-import { Suspense } from "react";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 function AdminUsersContent() {
     const queryClient = useQueryClient();
@@ -49,13 +63,13 @@ function AdminUsersContent() {
             return api.post("/admin/users", data);
         },
         onSuccess: () => {
-            toast.success("Internal user created successfully");
+            toast.success("Internal operative created");
             setAddUserOpen(false);
             setAddUserForm({ email: "", password: "", firstName: "", lastName: "", role: "ADMIN" });
             queryClient.invalidateQueries({ queryKey: ["users"] });
             queryClient.invalidateQueries({ queryKey: ["admin-stats"] });
         },
-        onError: (err: any) => toast.error(err.response?.data?.message || "Failed to create user")
+        onError: (err: any) => toast.error(err.response?.data?.message || "Creation failed")
     });
 
     const updateRoleMutation = useMutation({
@@ -63,10 +77,10 @@ function AdminUsersContent() {
             return api.patch(`/admin/users/${userId}/role`, { role });
         },
         onSuccess: () => {
-            toast.success("User role updated");
+            toast.success("Access level modified");
             queryClient.invalidateQueries({ queryKey: ["users"] });
         },
-        onError: (err: any) => toast.error(err.response?.data?.message || "Failed to update role")
+        onError: (err: any) => toast.error(err.response?.data?.message || "Modification failed")
     });
 
     const deleteUserMutation = useMutation({
@@ -74,10 +88,10 @@ function AdminUsersContent() {
             return api.post(`/admin/users/${userId}/delete`);
         },
         onSuccess: () => {
-            toast.success("User deleted successfully");
+            toast.success("User purged from registry");
             queryClient.invalidateQueries({ queryKey: ["users"] });
         },
-        onError: (err: any) => toast.error(err.response?.data?.message || "Failed to delete user")
+        onError: (err: any) => toast.error(err.response?.data?.message || "Purge failed")
     });
 
     const filteredUsers = users?.filter((u: any) =>
@@ -91,71 +105,86 @@ function AdminUsersContent() {
     const paginatedUsers = filteredUsers?.slice((page - 1) * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE);
 
     if (isLoading) return (
-        <div className="flex h-[60vh] items-center justify-center">
-            <Loader2 className="animate-spin text-blue-600" size={40} />
+        <div className="flex h-[80vh] items-center justify-center">
+            <div className="flex flex-col items-center gap-4">
+                <Loader2 className="animate-spin text-blue-600" size={40} />
+                <p className="text-sm font-black text-gray-400 uppercase tracking-widest animate-pulse">Syncing User Registry...</p>
+            </div>
         </div>
     );
 
     return (
-        <div className="space-y-8">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-8 border-b">
-                <div className="mb-8">
-                    <h1 className="text-2xl font-black tracking-tighter text-gray-950 mb-2">User Registry</h1>
-                    <p className="text-sm font-medium text-gray-500">Detailed overview and management for all platform members.</p>
+        <div className="max-w-[1600px] mx-auto space-y-10 pb-20">
+            {/* Header */}
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 pt-4">
+                <div>
+                    <div className="flex items-center gap-3 mb-4">
+                        <span className="px-2.5 py-1 bg-blue-50 text-blue-600 rounded-full text-[9px] font-black uppercase tracking-widest border border-blue-100">
+                            Access Control
+                        </span>
+                        <div className="flex items-center gap-2 text-[10px] font-bold text-gray-400">
+                            <ShieldCheck size={12} className="text-blue-400" /> Identity Management
+                        </div>
+                    </div>
+                    <h1 className="text-4xl font-black text-gray-950 tracking-tight leading-none mb-3">
+                        Member Registry <span className="text-blue-600">.</span>
+                    </h1>
+                    <p className="text-gray-500 font-medium text-lg">Manage all platform members, adjust privileges, and verify credentials.</p>
                 </div>
 
                 <Dialog open={addUserOpen} onOpenChange={setAddUserOpen}>
                     <DialogTrigger asChild>
-                        <button className="bg-black text-white px-8 py-4 rounded-2xl font-bold flex items-center gap-2 hover:opacity-90 active:scale-95 transition-all shadow-xl shadow-gray-200">
-                            <UserPlus size={18} />
-                            Add Internal User
+                        <button className="bg-gray-950 text-white px-8 py-4 rounded-2xl font-black text-[11px] uppercase tracking-widest hover:bg-black transition-all shadow-xl shadow-gray-200 flex items-center gap-3 group active:scale-[0.98]">
+                            <UserPlus size={16} />
+                            Register Internal Operative
                         </button>
                     </DialogTrigger>
-                    <DialogContent className="sm:max-w-md">
+                    <DialogContent className="sm:max-w-md rounded-[2.5rem] border-gray-100 shadow-2xl">
                         <DialogHeader>
-                            <DialogTitle>Add Internal User</DialogTitle>
+                            <DialogTitle className="text-2xl font-black italic uppercase tracking-wider">Internal Registry</DialogTitle>
+                            <p className="text-xs font-medium text-gray-500">Create administrative or support accounts.</p>
                         </DialogHeader>
-                        <div className="space-y-4 py-4">
+                        <div className="space-y-6 py-6">
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="space-y-2">
-                                    <label className="text-sm font-medium">First Name</label>
+                                    <Label className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">First Name</Label>
                                     <input
-                                        className="w-full border rounded-lg p-2 outline-none focus:ring-2 focus:ring-blue-100"
+                                        className="w-full bg-gray-50 border-transparent rounded-2xl p-4 font-bold text-gray-900 focus:bg-white focus:border-blue-600 transition-all outline-none text-sm"
                                         value={addUserForm.firstName}
                                         onChange={e => setAddUserForm({ ...addUserForm, firstName: e.target.value })}
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-sm font-medium">Last Name</label>
+                                    <Label className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">Last Name</Label>
                                     <input
-                                        className="w-full border rounded-lg p-2 outline-none focus:ring-2 focus:ring-blue-100"
+                                        className="w-full bg-gray-50 border-transparent rounded-2xl p-4 font-bold text-gray-900 focus:bg-white focus:border-blue-600 transition-all outline-none text-sm"
                                         value={addUserForm.lastName}
                                         onChange={e => setAddUserForm({ ...addUserForm, lastName: e.target.value })}
                                     />
                                 </div>
                             </div>
                             <div className="space-y-2">
-                                <label className="text-sm font-medium">Email Address</label>
+                                <Label className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">Email Identifier</Label>
                                 <input
                                     type="email"
-                                    className="w-full border rounded-lg p-2 outline-none focus:ring-2 focus:ring-blue-100"
+                                    className="w-full bg-gray-50 border-transparent rounded-2xl p-4 font-bold text-gray-900 focus:bg-white focus:border-blue-600 transition-all outline-none text-sm"
                                     value={addUserForm.email}
                                     onChange={e => setAddUserForm({ ...addUserForm, email: e.target.value })}
                                 />
                             </div>
                             <div className="space-y-2">
-                                <label className="text-sm font-medium">Password</label>
+                                <Label className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">Access Credential</Label>
                                 <input
                                     type="password"
-                                    className="w-full border rounded-lg p-2 outline-none focus:ring-2 focus:ring-blue-100"
+                                    className="w-full bg-gray-50 border-transparent rounded-2xl p-4 font-bold text-gray-900 focus:bg-white focus:border-blue-600 transition-all outline-none text-sm"
                                     value={addUserForm.password}
                                     onChange={e => setAddUserForm({ ...addUserForm, password: e.target.value })}
                                 />
                             </div>
                             <div className="space-y-2">
-                                <label className="text-sm font-medium">Role</label>
+                                <Label className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">Assigned Role</Label>
                                 <select
-                                    className="w-full border rounded-lg p-2 outline-none focus:ring-2 focus:ring-blue-100"
+                                    className="w-full bg-gray-50 border-transparent rounded-2xl p-4 font-bold text-gray-900 focus:bg-white focus:border-blue-600 transition-all outline-none text-sm appearance-none cursor-pointer"
                                     value={addUserForm.role}
                                     onChange={e => setAddUserForm({ ...addUserForm, role: e.target.value })}
                                 >
@@ -164,104 +193,129 @@ function AdminUsersContent() {
                                     <option value="TENANT">Tenant</option>
                                 </select>
                             </div>
-                            <button
+                        </div>
+                        <DialogFooter>
+                            <Button
                                 onClick={() => addUserMutation.mutate(addUserForm)}
                                 disabled={addUserMutation.isPending || !addUserForm.email || !addUserForm.password}
-                                className="w-full bg-black text-white p-3 rounded-xl font-bold disabled:opacity-50 mt-2 hover:bg-gray-800 transition-colors"
+                                className="w-full bg-gray-950 hover:bg-black text-white rounded-2xl py-6 font-black uppercase tracking-widest text-[11px] shadow-xl"
                             >
-                                {addUserMutation.isPending ? "Creating..." : "Create User"}
-                            </button>
-                        </div>
+                                {addUserMutation.isPending ? <Loader2 className="animate-spin mr-2" /> : <UserPlus size={16} className="mr-2" />}
+                                Authorize Operative
+                            </Button>
+                        </DialogFooter>
                     </DialogContent>
                 </Dialog>
             </div>
 
+            {/* Registry Search */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                 <div className="md:col-span-3 relative">
-                    <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+                    <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
                     <input
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
-                        className="w-full bg-white border rounded-[1.5rem] py-5 pl-14 pr-6 outline-none focus:ring-4 focus:ring-blue-100 transition-all font-medium text-gray-900"
-                        placeholder="Search by name, email or ID..."
+                        className="w-full bg-white border border-gray-100 rounded-[2rem] py-5 pl-16 pr-8 outline-none focus:ring-4 focus:ring-blue-100 transition-all font-bold text-gray-950 placeholder:text-gray-400 shadow-sm"
+                        placeholder="Search by name, email or ID identifier..."
                     />
                 </div>
-                <div className="bg-white border rounded-[1.5rem] flex items-center justify-center px-6 gap-3 shadow-sm shadow-gray-50">
-                    <span className="text-xs font-black uppercase tracking-widest text-gray-400">Total Users:</span>
-                    <span className="text-xl font-black text-blue-600">{users?.length || 0}</span>
+                <div className="bg-white border border-gray-100 rounded-[2rem] flex items-center justify-center px-8 gap-4 shadow-sm">
+                    <div className="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center text-blue-600">
+                        <Users size={20} />
+                    </div>
+                    <div>
+                        <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 leading-none mb-1">Total Members</p>
+                        <p className="text-2xl font-black text-gray-950 tracking-tighter">{users?.length || 0}</p>
+                    </div>
                 </div>
             </div>
 
-            <div className="bg-white rounded-[2.5rem] border shadow-sm overflow-hidden">
+            {/* Registry Table */}
+            <div className="bg-white rounded-[3rem] border border-gray-100 shadow-sm overflow-hidden">
                 <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse">
                         <thead>
-                            <tr className="bg-gray-50/50 border-b">
-                                <th className="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-gray-400">User Details</th>
-                                <th className="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-gray-400">Assigned Role</th>
-                                <th className="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-gray-400">Internal status</th>
-                                <th className="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-gray-400 text-right">Settings</th>
+                            <tr className="bg-gray-50/50 border-b border-gray-50">
+                                <th className="px-10 py-8 text-[10px] font-black uppercase tracking-widest text-gray-400">Identity Details</th>
+                                <th className="px-10 py-8 text-[10px] font-black uppercase tracking-widest text-gray-400">Access Level</th>
+                                <th className="px-10 py-8 text-[10px] font-black uppercase tracking-widest text-gray-400">Security Status</th>
+                                <th className="px-10 py-8 text-[10px] font-black uppercase tracking-widest text-gray-400 text-right">Audit Options</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y">
+                        <tbody className="divide-y divide-gray-50">
                             {paginatedUsers?.map((user: any) => (
-                                <tr key={user.id} className="hover:bg-gray-50/50 transition-colors group">
-                                    <td className="px-8 py-6">
-                                        <div className="flex items-center gap-4">
-                                            <div className="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600 font-black shrink-0 relative overflow-hidden">
+                                <tr key={user.id} className="hover:bg-gray-50/50 transition-all group">
+                                    <td className="px-10 py-8">
+                                        <div className="flex items-center gap-5">
+                                            <div className="w-14 h-14 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600 font-black text-xl shadow-lg shadow-blue-50 transition-transform group-hover:scale-110">
                                                 {user.firstName ? user.firstName.charAt(0).toUpperCase() : user.email.charAt(0).toUpperCase()}
                                             </div>
                                             <div>
-                                                <p className="font-bold text-gray-900 leading-tight">{user.firstName} {user.lastName} {!user.firstName && !user.lastName && "Anonymous User"}</p>
-                                                <p className="text-xs text-gray-400 font-medium">{user.email}</p>
+                                                <p className="font-black text-gray-950 text-base italic tracking-tight leading-tight">
+                                                    {user.firstName} {user.lastName} {!user.firstName && !user.lastName && "Anonymous Operative"}
+                                                </p>
+                                                <p className="text-[11px] text-gray-400 font-bold uppercase tracking-widest mt-1 flex items-center gap-1.5">
+                                                    <Mail size={10} className="text-gray-300" /> {user.email}
+                                                </p>
                                             </div>
                                         </div>
                                     </td>
-                                    <td className="px-8 py-6">
-                                        <div className="flex items-center gap-2">
+                                    <td className="px-10 py-8">
+                                        <div className="flex items-center gap-3">
                                             <div className={cn(
-                                                "w-2 h-2 rounded-full",
-                                                user.role === "ADMIN" ? "bg-red-500" : user.role === "OWNER" ? "bg-blue-500" : "bg-gray-400"
+                                                "w-2.5 h-2.5 rounded-full ring-4",
+                                                user.role === "ADMIN" ? "bg-red-500 ring-red-50" : user.role === "OWNER" ? "bg-blue-500 ring-blue-50" : "bg-emerald-500 ring-emerald-50"
                                             )} />
                                             <select
                                                 value={user.role}
                                                 onChange={(e) => updateRoleMutation.mutate({ userId: user.id, role: e.target.value })}
-                                                className="bg-transparent font-bold text-xs uppercase tracking-widest outline-none cursor-pointer hover:text-blue-600 transition-colors"
+                                                className="bg-transparent font-black text-[11px] uppercase tracking-widest text-gray-900 outline-none cursor-pointer hover:text-blue-600 transition-colors"
                                             >
                                                 <option value="TENANT">Tenant</option>
                                                 <option value="OWNER">Owner</option>
-                                                <option value="ADMIN">Admin</option>
+                                                <option value="ADMIN">Administrator</option>
                                             </select>
                                         </div>
                                     </td>
-                                    <td className="px-8 py-6">
-                                        <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-gray-100 bg-white w-fit shadow-sm">
-                                            {user.emailVerified ? <Check size={10} className="text-emerald-500" /> : <Shield size={10} className="text-gray-400" />}
-                                            <span className="text-[10px] font-black uppercase tracking-widest text-gray-500">
-                                                {user.emailVerified ? "Verified" : "Unverified"}
+                                    <td className="px-10 py-8">
+                                        <div className={cn(
+                                            "flex items-center gap-2 px-4 py-2 rounded-xl border w-fit shadow-sm",
+                                            user.emailVerified ? "bg-emerald-50 border-emerald-100 text-emerald-600" : "bg-gray-50 border-gray-100 text-gray-400"
+                                        )}>
+                                            {user.emailVerified ? <ShieldCheck size={14} /> : <Shield size={14} />}
+                                            <span className="text-[10px] font-black uppercase tracking-widest">
+                                                {user.emailVerified ? "Verified" : "Pending"}
                                             </span>
                                         </div>
                                     </td>
-                                    <td className="px-8 py-6 text-right">
-                                        <div className="flex items-center justify-end gap-2">
-                                            <button
-                                                onClick={() => {
-                                                    if (confirm(`Are you sure you want to delete ${user.email}? This action is permanent.`)) {
-                                                        deleteUserMutation.mutate(user.id);
-                                                    }
-                                                }}
-                                                className="p-3 bg-red-50 text-red-600 rounded-xl hover:bg-red-600 hover:text-white transition-all opacity-0 group-hover:opacity-100"
-                                                title="Delete User"
-                                            >
-                                                <X size={18} />
-                                            </button>
-                                            <button
-                                                className="p-3 bg-gray-50 rounded-xl hover:bg-black hover:text-white transition-all group-hover:shadow-lg"
-                                                onClick={() => toast.info(`Settings for ${user.email} (ID: ${user.id})`)}
-                                            >
-                                                <UserCog size={18} />
-                                            </button>
-                                        </div>
+                                    <td className="px-10 py-8 text-right">
+                                        <DropdownMenu>
+                                            <DropdownMenuTrigger asChild>
+                                                <button className="p-3 hover:bg-white hover:shadow-lg rounded-2xl transition-all text-gray-400 hover:text-gray-900 border border-transparent hover:border-gray-100">
+                                                    <MoreHorizontal size={20} />
+                                                </button>
+                                            </DropdownMenuTrigger>
+                                            <DropdownMenuContent align="end" className="rounded-2xl border-gray-100 p-2 shadow-xl">
+                                                <DropdownMenuLabel className="text-[10px] font-black uppercase tracking-widest text-gray-400 px-3 py-2">Audit Controls</DropdownMenuLabel>
+                                                <DropdownMenuItem onClick={() => toast.info(`Accessing logs for ${user.email}`)} className="rounded-lg font-bold text-xs gap-3 py-2.5">
+                                                    <Fingerprint size={16} className="text-blue-500" /> View User Intel
+                                                </DropdownMenuItem>
+                                                <DropdownMenuItem onClick={() => updateRoleMutation.mutate({ userId: user.id, role: user.role })} className="rounded-lg font-bold text-xs gap-3 py-2.5">
+                                                    <UserCog size={16} className="text-purple-500" /> Advanced Settings
+                                                </DropdownMenuItem>
+                                                <DropdownMenuSeparator className="bg-gray-50 my-1" />
+                                                <DropdownMenuItem
+                                                    onClick={() => {
+                                                        if (confirm(`Authorize permanent purge of ${user.email}?`)) {
+                                                            deleteUserMutation.mutate(user.id);
+                                                        }
+                                                    }}
+                                                    className="rounded-lg font-bold text-xs gap-3 py-2.5 text-red-600 hover:bg-red-50"
+                                                >
+                                                    <Trash2 size={16} /> Purge Identity
+                                                </DropdownMenuItem>
+                                            </DropdownMenuContent>
+                                        </DropdownMenu>
                                     </td>
                                 </tr>
                             ))}
@@ -270,33 +324,34 @@ function AdminUsersContent() {
                 </div>
 
                 {paginatedUsers?.length === 0 && (
-                    <div className="p-20 text-center">
-                        <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-6">
-                            <Users className="text-gray-200" size={40} />
+                    <div className="p-32 text-center">
+                        <div className="w-20 h-20 bg-gray-50 rounded-[2rem] flex items-center justify-center mx-auto mb-8 text-gray-200">
+                            <Users size={40} />
                         </div>
-                        <h3 className="text-2xl font-bold text-gray-900 mb-2">No users found</h3>
-                        <p className="text-gray-500">Adjust your search parameters to find the member you're looking for.</p>
+                        <h3 className="text-2xl font-black text-gray-950 italic uppercase tracking-tighter mb-2">Zero Identifiers Found</h3>
+                        <p className="text-gray-400 font-medium">Platform registry is currently empty or search parameters are too restrictive.</p>
                     </div>
                 )}
 
-                <div className="px-8 py-6 bg-gray-50/50 border-t flex items-center justify-between">
+                {/* Pagination */}
+                <div className="px-10 py-8 bg-gray-50/30 border-t border-gray-50 flex items-center justify-between">
                     <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">
-                        Showing {paginatedUsers?.length} of {filteredUsers?.length} Users
+                        Analyzing {paginatedUsers?.length} of {filteredUsers?.length} Active Identifiers
                     </p>
-                    <div className="flex gap-2">
+                    <div className="flex gap-3">
                         <button
                             onClick={() => setPage(p => Math.max(1, p - 1))}
                             disabled={page === 1}
-                            className="p-2 border rounded-lg hover:bg-white transition-colors disabled:opacity-30"
+                            className="w-12 h-12 rounded-2xl border border-gray-100 flex items-center justify-center text-gray-400 hover:bg-gray-950 hover:text-white transition-all disabled:opacity-30"
                         >
-                            <ChevronLeft size={16} />
+                            <ChevronLeft size={20} />
                         </button>
                         <button
                             onClick={() => setPage(p => Math.min(totalPages, p + 1))}
                             disabled={page === totalPages || totalPages === 0}
-                            className="p-2 border rounded-lg hover:bg-white transition-colors disabled:opacity-30"
+                            className="w-12 h-12 rounded-2xl border border-gray-100 flex items-center justify-center text-gray-400 hover:bg-gray-950 hover:text-white transition-all disabled:opacity-30"
                         >
-                            <ChevronRight size={16} />
+                            <ChevronRight size={20} />
                         </button>
                     </div>
                 </div>
@@ -308,8 +363,11 @@ function AdminUsersContent() {
 export default function AdminUsersPage() {
     return (
         <Suspense fallback={
-            <div className="flex h-[60vh] items-center justify-center">
-                <Loader2 className="animate-spin text-blue-600" size={40} />
+            <div className="flex h-[80vh] items-center justify-center">
+                <div className="flex flex-col items-center gap-4">
+                    <Loader2 className="animate-spin text-blue-600" size={40} />
+                    <p className="text-sm font-black text-gray-400 uppercase tracking-widest animate-pulse">Initializing Security Protocol...</p>
+                </div>
             </div>
         }>
             <AdminUsersContent />

@@ -24,12 +24,12 @@ import { cn } from "@/lib/utils";
 import { useState } from "react";
 
 const adminLinks = [
-    { name: "Overview", href: "/admin", icon: LayoutDashboard },
-    { name: "Manage Users", href: "/admin/users", icon: Users },
-    { name: "All Hostels", href: "/admin/hostels", icon: Building2 },
+    { name: "Command Center", href: "/admin", icon: LayoutDashboard },
+    { name: "User Registry", href: "/admin/users", icon: Users },
+    { name: "Asset Control", href: "/admin/hostels", icon: Building2 },
     { name: "System Stats", href: "/admin/stats", icon: BarChart3 },
     { name: "System Logs", href: "/admin/logs", icon: Activity },
-    { name: "Settings", href: "/admin/settings", icon: Settings },
+    { name: "Settings Hub", href: "/admin/settings", icon: Settings },
 ];
 
 const deletionLink = { name: "Deletion Requests", href: "/admin/deletions", icon: Trash2 };

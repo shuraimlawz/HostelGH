@@ -18,54 +18,14 @@ import {
     ArrowRight,
     LayoutDashboard,
     Activity,
-    Landmark
+    Landmark,
+    PlusCircle,
+    Zap
 } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from "recharts";
-
-// Reusable Stat Card for Owner
-function OwnerStat({
-    title,
-    value,
-    subtitle,
-    icon: Icon,
-    color,
-    bgColor,
-    trend
-}: {
-    title: string;
-    value: string | number;
-    subtitle?: string;
-    icon: LucideIcon;
-    color: string;
-    bgColor: string;
-    trend?: { value: number; isPositive: boolean };
-}) {
-    return (
-        <div className="bg-white p-6 rounded-[2rem] border border-gray-100 shadow-sm hover:shadow-md transition-all group">
-            <div className="flex items-start justify-between mb-4">
-                <div className={cn("w-12 h-12 rounded-2xl flex items-center justify-center transition-transform group-hover:scale-110", bgColor, color)}>
-                    <Icon size={24} />
-                </div>
-                {trend && (
-                    <span className={cn(
-                        "text-[10px] font-black px-2 py-1 rounded-lg flex items-center gap-1",
-                        trend.isPositive ? "text-green-600 bg-green-50" : "text-red-600 bg-red-50"
-                    )}>
-                        {trend.isPositive ? "↑" : "↓"} {trend.value}%
-                    </span>
-                )}
-            </div>
-            <div>
-                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">{title}</p>
-                <h3 className="text-2xl font-black text-gray-900 leading-none mb-1">{value}</h3>
-                {subtitle && <p className="text-xs text-gray-500 font-medium">{subtitle}</p>}
-            </div>
-        </div>
-    );
-}
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 
 export default function OwnerDashboardPage() {
     const [selectedTab, setSelectedTab] = useState<"all" | "pending" | "active" | "completed">("all");
@@ -113,18 +73,18 @@ export default function OwnerDashboardPage() {
         );
     }
 
-    // Logic Preserved
+    // Modernized logic
     const totalHostels = hostels?.length || 0;
     const totalRooms = hostels?.reduce((acc: number, h: any) => acc + (h._count?.rooms || 0), 0) || 0;
-    const pendingBookings = bookings?.filter((b: any) => b.status === "PENDING_APPROVAL")?.length || 0;
-    const activeBookings = bookings?.filter((b: any) => ["APPROVED", "CONFIRMED", "CHECKED_IN"].includes(b.status))?.length || 0;
-    const completedBookings = bookings?.filter((b: any) => ["CHECKED_OUT", "COMPLETED"].includes(b.status))?.length || 0;
 
-    const totalRevenue = (bookings?.filter((b: any) => ["CONFIRMED", "CHECKED_IN", "CHECKED_OUT", "COMPLETED"].includes(b.status))
-        ?.reduce((acc: number, b: any) => acc + (b.items?.[0]?.unitPrice * b.items?.[0]?.quantity || 0), 0) / 100) * 0.95 || 0;
+    const stats = {
+        totalHostels,
+        totalApprovedBookings: bookings?.filter((b: any) => ["APPROVED", "CONFIRMED", "CHECKED_IN"].includes(b.status))?.length || 0,
+        totalPendingBookings: bookings?.filter((b: any) => b.status === "PENDING_APPROVAL")?.length || 0,
+    };
 
+    const walletBalance = (wallet?.balance || 0) / 100;
     const bookingTrendData = analytics?.monthlyTrends || [];
-    const bookingTrend = analytics?.trends?.bookings || 0;
 
     const filteredBookings = bookings?.filter((b: any) => {
         if (selectedTab === "all") return true;
@@ -148,87 +108,121 @@ export default function OwnerDashboardPage() {
     };
 
     return (
-        <div className="max-w-[1400px] mx-auto space-y-10 pb-20">
-            {/* Header / Intro */}
-            <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8 pt-4">
-                <div className="space-y-2">
-                    <div className="flex items-center gap-2 mb-2">
-                        <span className="px-2.5 py-1 bg-purple-50 text-purple-600 rounded-full text-[9px] font-black uppercase tracking-widest border border-purple-100">
-                            Proprietor Hub
-                        </span>
-                        <div className="flex items-center gap-1.5 text-[10px] font-bold text-gray-400 ml-2">
-                            <Clock size={12} />
-                            Real-time Sync Active
+        <div className="max-w-[1600px] mx-auto space-y-10 pb-20">
+            {/* Header / Portfolio Insights */}
+            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8 pt-4">
+                <div className="space-y-3">
+                    <div className="flex items-center gap-3 mb-2">
+                        <div className="flex -space-x-2">
+                            {[1, 2, 3].map((i) => (
+                                <div key={i} className="w-8 h-8 rounded-full border-2 border-white bg-gray-100 flex items-center justify-center overflow-hidden">
+                                    <div className="w-full h-full bg-gradient-to-br from-blue-400 to-purple-400 opacity-50" />
+                                </div>
+                            ))}
                         </div>
+                        <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest border-l pl-3 border-gray-200">
+                            Proprietor Hub <span className="text-blue-600 ml-1">Live</span>
+                        </span>
                     </div>
                     <h1 className="text-3xl font-black text-gray-900 tracking-tight">
-                        Portfolio Insights <span className="text-blue-600">.</span>
+                        Portfolio Insights <span className="text-purple-600">.</span>
                     </h1>
-                    <p className="text-gray-500 font-medium text-base max-w-xl">
-                        Monitor revenue metrics, manage check-ins, and optimize your listings performance.
+                    <p className="text-gray-500 font-medium text-base">
+                        Real-time performance metrics for your hostel portfolio.
                     </p>
                 </div>
 
-                {/* Primary Wallet Card */}
-                <div className="bg-gray-900 text-white p-5 pr-10 rounded-[2rem] relative overflow-hidden flex items-center gap-6 shadow-2xl">
-                    <div className="absolute top-0 left-0 w-32 h-32 bg-blue-600 rounded-full -ml-16 -mt-16 blur-2xl opacity-40" />
-                    <div className="relative z-10 w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center border border-white/20">
-                        <Wallet size={20} className="text-blue-400" />
+                <div className="flex items-center gap-4">
+                    <div className="hidden sm:flex items-center gap-2 px-4 py-2 bg-white rounded-2xl border border-gray-100 shadow-sm animate-in fade-in duration-500">
+                        <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+                        <span className="text-[10px] font-black uppercase tracking-widest text-gray-500">Real-time Sync Active</span>
                     </div>
+                    <Link
+                        href="/owner/hostels/new"
+                        className="bg-gray-950 text-white px-6 py-3 rounded-2xl font-black text-[11px] uppercase tracking-widest hover:bg-black transition-all shadow-xl shadow-gray-200 flex items-center gap-2 group"
+                    >
+                        <PlusCircle size={16} className="group-hover:rotate-90 transition-transform" /> Add Property
+                    </Link>
+                </div>
+            </div>
+
+            {/* Stats Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div className="bg-white p-6 rounded-[2.5rem] border border-gray-100 shadow-sm relative overflow-hidden group">
+                    <div className="absolute top-0 right-0 w-24 h-24 bg-blue-50 rounded-full -mr-12 -mt-12 group-hover:scale-110 transition-transform" />
                     <div className="relative z-10">
-                        <p className="text-[9px] font-black text-gray-500 uppercase tracking-widest mb-1">Settled Balance</p>
-                        <h3 className="text-2xl font-black tracking-tighter">₵{((wallet?.balance || 0) / 100).toLocaleString()}</h3>
+                        <div className="flex items-center justify-between mb-6">
+                            <div className="w-12 h-12 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center">
+                                <Building2 size={24} />
+                            </div>
+                            <TrendingUp size={20} className="text-green-500" />
+                        </div>
+                        <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Total Assets</p>
+                        <h3 className="text-2xl font-black text-gray-900">{stats.totalHostels} Hostels</h3>
+                    </div>
+                </div>
+
+                <div className="bg-white p-6 rounded-[2.5rem] border border-gray-100 shadow-sm relative overflow-hidden group">
+                    <div className="absolute top-0 right-0 w-24 h-24 bg-purple-50 rounded-full -mr-12 -mt-12 group-hover:scale-110 transition-transform" />
+                    <div className="relative z-10">
+                        <div className="flex items-center justify-between mb-6">
+                            <div className="w-12 h-12 bg-purple-50 text-purple-600 rounded-2xl flex items-center justify-center">
+                                <Users size={24} />
+                            </div>
+                            <span className="text-[10px] font-black text-purple-600 bg-purple-50/50 px-2 py-1 rounded-lg">High Demand</span>
+                        </div>
+                        <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Active Tenants</p>
+                        <h3 className="text-2xl font-black text-gray-900">{stats.totalApprovedBookings} Students</h3>
+                    </div>
+                </div>
+
+                <div className="bg-white p-6 rounded-[2.5rem] border border-gray-100 shadow-sm relative overflow-hidden group">
+                    <div className="absolute top-0 right-0 w-24 h-24 bg-orange-50 rounded-full -mr-12 -mt-12 group-hover:scale-110 transition-transform" />
+                    <div className="relative z-10">
+                        <div className="flex items-center justify-between mb-6">
+                            <div className="w-12 h-12 bg-orange-50 text-orange-600 rounded-2xl flex items-center justify-center">
+                                <Zap size={24} />
+                            </div>
+                            <span className="text-[10px] font-black text-orange-600 bg-orange-50/50 px-2 py-1 rounded-lg">Action Needed</span>
+                        </div>
+                        <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Queue Size</p>
+                        <h3 className="text-2xl font-black text-gray-900">{stats.totalPendingBookings} Pending</h3>
+                    </div>
+                </div>
+
+                {/* Primary Wallet Card */}
+                <div className="bg-gradient-to-br from-gray-900 to-black p-6 rounded-[2.5rem] shadow-2xl relative overflow-hidden group">
+                    <div className="absolute top-0 right-0 w-40 h-40 bg-blue-600/20 rounded-full -mr-20 -mt-20 blur-3xl group-hover:scale-110 transition-transform" />
+                    <div className="relative z-10">
+                        <div className="flex items-center justify-between mb-6">
+                            <div className="w-10 h-10 bg-white/10 backdrop-blur-md rounded-xl flex items-center justify-center border border-white/20">
+                                <DollarSign size={20} className="text-blue-400" />
+                            </div>
+                            <Link href="/owner/payouts" className="text-[9px] font-black text-blue-400 uppercase tracking-widest hover:underline">Withdraw</Link>
+                        </div>
+                        <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1 italic">Settled Balance</p>
+                        <h3 className="text-3xl font-black text-white tracking-tighter">₵{walletBalance.toLocaleString()}</h3>
+                        <p className="text-[9px] text-gray-400 font-medium mt-4 flex items-center gap-1">
+                            <CheckCircle2 size={10} className="text-green-500" /> Auto-payout enabled
+                        </p>
                     </div>
                 </div>
             </div>
 
-            {/* Core Stats */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                <OwnerStat
-                    title="Total Bookings"
-                    value={bookings?.length || 0}
-                    icon={CalendarCheck}
-                    color="text-blue-600"
-                    bgColor="bg-blue-50"
-                    trend={{ value: Math.abs(bookingTrend), isPositive: bookingTrend >= 0 }}
-                />
-                <OwnerStat
-                    title="Attention Required"
-                    value={pendingBookings}
-                    subtitle="Pending Approvals"
-                    icon={Clock}
-                    color="text-orange-600"
-                    bgColor="bg-orange-50"
-                />
-                <OwnerStat
-                    title="Occupancy"
-                    value={activeBookings}
-                    subtitle="Currently Checked-in"
-                    icon={Users}
-                    color="text-purple-600"
-                    bgColor="bg-purple-50"
-                />
-                <OwnerStat
-                    title="Gross Revenue"
-                    value={`₵${totalRevenue.toLocaleString()}`}
-                    subtitle="Lifetime Earnings (95%)"
-                    icon={Landmark}
-                    color="text-green-600"
-                    bgColor="bg-green-50"
-                />
-            </div>
-
-            {/* Visualization Grid */}
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-                {/* Revenue & Growth Chart (Left) */}
-                <div className="lg:col-span-8 bg-white rounded-[3rem] p-8 md:p-10 border border-gray-100 shadow-sm space-y-8">
-                    <div className="flex items-center justify-between">
+            {/* Analytics & Management */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+                {/* Revenue Visualization */}
+                <div className="lg:col-span-8 bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm relative">
+                    <div className="flex items-center justify-between mb-10">
                         <div className="space-y-1">
-                            <h3 className="text-xl font-black text-gray-900">Revenue Performance</h3>
-                            <p className="text-sm text-gray-500 font-medium">Visualizing your monthly earnings and growth trends.</p>
+                            <h2 className="text-xl font-black text-gray-900 italic uppercase tracking-wider">Revenue Drift</h2>
+                            <p className="text-xs text-gray-400 font-medium">Monthly performance across all properties.</p>
                         </div>
-                        <div className="flex gap-2">
-                            <div className="px-4 py-2 bg-gray-50 border border-gray-100 rounded-xl text-xs font-black text-gray-500">6 Months</div>
+                        <div className="flex items-center gap-4">
+                            <div className="flex items-center gap-2">
+                                <div className="w-2 h-2 rounded-full bg-blue-600" />
+                                <span className="text-[10px] font-black uppercase text-gray-500">Revenue</span>
+                            </div>
                         </div>
                     </div>
 
@@ -323,8 +317,7 @@ export default function OwnerDashboardPage() {
                                     selectedTab === tab.key
                                         ? "bg-white text-blue-600 shadow-sm border border-gray-100"
                                         : "text-gray-400 hover:text-gray-600"
-                                )}
-                            >
+                                )}>
                                 {tab.label}
                             </button>
                         ))}
@@ -354,11 +347,11 @@ export default function OwnerDashboardPage() {
                                         <td className="px-8 py-5">
                                             <div className="flex items-center gap-4">
                                                 <div className="w-10 h-10 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center font-black text-sm">
-                                                    {booking.tenant.firstName?.[0] || booking.tenant.email[0].toUpperCase()}
+                                                    {booking.user.firstName?.[0] || booking.user.email[0].toUpperCase()}
                                                 </div>
                                                 <div>
-                                                    <p className="font-bold text-gray-900 text-sm">{booking.tenant.firstName} {booking.tenant.lastName}</p>
-                                                    <p className="text-xs text-gray-500 font-medium">{booking.tenant.email}</p>
+                                                    <p className="font-bold text-gray-900 text-sm">{booking.user.firstName} {booking.user.lastName}</p>
+                                                    <p className="text-xs text-gray-500 font-medium">{booking.user.email}</p>
                                                 </div>
                                             </div>
                                         </td>
@@ -390,6 +383,11 @@ export default function OwnerDashboardPage() {
                             </tbody>
                         </table>
                     )}
+                </div>
+                <div className="p-8 bg-gray-50 border-t border-gray-100">
+                    <Link href="/owner/bookings" className="text-[10px] font-black text-blue-600 uppercase tracking-[0.2em] hover:underline flex items-center gap-2">
+                        View Complete Booking Ledger <ArrowRight size={14} />
+                    </Link>
                 </div>
             </div>
         </div>

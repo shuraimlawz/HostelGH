@@ -14,7 +14,7 @@ import {
     DialogTitle,
     DialogTrigger
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
+import { PasswordField } from "@/components/ui/PasswordField";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 
@@ -96,92 +96,92 @@ export default function TenantSettingsPage() {
 
     return (
         <div className="max-w-3xl mx-auto px-4 py-8">
-            <div className="mb-8">
-                <h1 className="text-3xl font-bold tracking-tight mb-2">Account Settings</h1>
-                <p className="text-gray-500">Manage your preferences and security settings.</p>
+            <div className="mb-8 font-black">
+                <h1 className="text-3xl font-black tracking-tight mb-2 uppercase italic tracking-wider">Account Settings</h1>
+                <p className="text-gray-500 font-medium">Manage your preferences and security settings.</p>
             </div>
 
             <div className="space-y-6">
                 {/* Notifications */}
-                <div className="bg-white rounded-3xl border p-6 shadow-sm">
-                    <h3 className="flex items-center gap-2 font-bold text-lg mb-4">
-                        <Bell size={20} className="text-gray-400" /> Notifications
+                <div className="bg-white rounded-3xl border border-gray-100 p-8 shadow-sm">
+                    <h3 className="flex items-center gap-3 font-black text-gray-900 uppercase tracking-widest text-sm mb-6">
+                        <Bell size={20} className="text-blue-600" /> Notifications
                     </h3>
                     <div className="flex items-center justify-between py-2">
                         <div>
-                            <p className="font-medium text-gray-900">Email Notifications</p>
-                            <p className="text-sm text-gray-500">Receive updates about your bookings and payments.</p>
+                            <p className="font-bold text-gray-900">Email Notifications</p>
+                            <p className="text-sm text-gray-400 font-medium">Receive updates about your bookings and payments.</p>
                         </div>
                         <button
                             onClick={handleNotificationToggle}
-                            className={`w-12 h-6 rounded-full transition-colors flex items-center px-1 ${emailNotifications ? 'bg-blue-600' : 'bg-gray-200'}`}
+                            className={`w-12 h-6 rounded-full transition-all duration-300 flex items-center px-1 shadow-inner ${emailNotifications ? 'bg-blue-600' : 'bg-gray-200'}`}
                         >
-                            <div className={`w-4 h-4 bg-white rounded-full transition-transform ${emailNotifications ? 'translate-x-6' : 'translate-x-0'}`} />
+                            <div className={`w-4 h-4 bg-white rounded-full shadow-md transition-transform duration-300 ${emailNotifications ? 'translate-x-6' : 'translate-x-0'}`} />
                         </button>
                     </div>
                 </div>
 
                 {/* Security */}
-                <div className="bg-white rounded-3xl border p-6 shadow-sm">
-                    <h3 className="flex items-center gap-2 font-bold text-lg mb-4">
-                        <Shield size={20} className="text-gray-400" /> Security
+                <div className="bg-white rounded-3xl border border-gray-100 p-8 shadow-sm">
+                    <h3 className="flex items-center gap-3 font-black text-gray-900 uppercase tracking-widest text-sm mb-6">
+                        <Shield size={20} className="text-blue-600" /> Security
                     </h3>
                     <div className="space-y-4">
                         <div className="flex items-center justify-between py-2">
                             <div>
-                                <p className="font-medium text-gray-900">Password</p>
-                                <p className="text-sm text-gray-500">Secure your account with a strong password.</p>
+                                <p className="font-bold text-gray-900">Password Control</p>
+                                <p className="text-sm text-gray-400 font-medium">Secure your account with a strong, rotated password.</p>
                             </div>
 
                             <Dialog open={isPasswordModalOpen} onOpenChange={setIsPasswordModalOpen}>
                                 <DialogTrigger asChild>
-                                    <button className="text-sm font-bold text-blue-600 hover:bg-blue-50 px-4 py-2 rounded-lg transition-colors">
-                                        Change
+                                    <button className="text-[10px] font-black uppercase tracking-widest text-blue-600 hover:bg-blue-50 px-6 py-2.5 rounded-xl border border-blue-100 transition-all">
+                                        Update
                                     </button>
                                 </DialogTrigger>
-                                <DialogContent className="sm:max-w-md">
+                                <DialogContent className="sm:max-w-md rounded-[2.5rem] border-gray-100 shadow-2xl">
                                     <DialogHeader>
-                                        <DialogTitle>Change Password</DialogTitle>
-                                        <DialogDescription>
+                                        <DialogTitle className="font-black italic uppercase tracking-wider">Change Password</DialogTitle>
+                                        <DialogDescription className="text-xs font-medium text-gray-500">
                                             Enter your current password to verify your identity, then create a new one.
                                         </DialogDescription>
                                     </DialogHeader>
-                                    <form onSubmit={handleChangePassword} className="space-y-4 py-4">
+                                    <form onSubmit={handleChangePassword} className="space-y-6 py-4">
                                         <div className="space-y-2">
-                                            <Label htmlFor="current">Current Password</Label>
-                                            <Input
+                                            <Label htmlFor="current" className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">Current Password</Label>
+                                            <PasswordField
                                                 id="current"
-                                                type="password"
                                                 value={passwordData.oldPassword}
                                                 onChange={(e) => setPasswordData({ ...passwordData, oldPassword: e.target.value })}
                                                 required
+                                                className="rounded-2xl border-gray-100"
                                             />
                                         </div>
                                         <div className="space-y-2">
-                                            <Label htmlFor="new">New Password</Label>
-                                            <Input
+                                            <Label htmlFor="new" className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">New Password</Label>
+                                            <PasswordField
                                                 id="new"
-                                                type="password"
                                                 value={passwordData.newPassword}
                                                 onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })}
                                                 required
+                                                className="rounded-2xl border-gray-100"
                                             />
                                         </div>
                                         <div className="space-y-2">
-                                            <Label htmlFor="confirm">Confirm New Password</Label>
-                                            <Input
+                                            <Label htmlFor="confirm" className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">Confirm New Password</Label>
+                                            <PasswordField
                                                 id="confirm"
-                                                type="password"
                                                 value={passwordData.confirmPassword}
                                                 onChange={(e) => setPasswordData({ ...passwordData, confirmPassword: e.target.value })}
                                                 required
+                                                className="rounded-2xl border-gray-100"
                                             />
                                         </div>
-                                        <DialogFooter>
-                                            <Button type="button" variant="outline" onClick={() => setIsPasswordModalOpen(false)}>Cancel</Button>
-                                            <Button type="submit" disabled={isChangingPassword}>
+                                        <DialogFooter className="gap-2">
+                                            <Button type="button" variant="outline" onClick={() => setIsPasswordModalOpen(false)} className="rounded-xl font-black uppercase tracking-widest text-[10px]">Back</Button>
+                                            <Button type="submit" disabled={isChangingPassword} className="rounded-xl font-black uppercase tracking-widest text-[10px] bg-blue-600 hover:bg-blue-700">
                                                 {isChangingPassword ? <Loader2 className="animate-spin mr-2" size={16} /> : null}
-                                                Update Password
+                                                Confirm Change
                                             </Button>
                                         </DialogFooter>
                                     </form>

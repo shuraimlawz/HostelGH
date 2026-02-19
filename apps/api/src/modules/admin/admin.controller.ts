@@ -3,7 +3,7 @@ import { AdminService } from "./admin.service";
 import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
 import { RolesGuard } from "../../common/guards/roles.guard";
 import { Roles } from "../../common/decorators/roles.decorator";
-import { UserRole } from "@prisma/client";
+import { UserRole, BroadcastTarget } from "@prisma/client";
 import { ApiBearerAuth, ApiOperation, ApiTags } from "@nestjs/swagger";
 import { CreateInternalUserDto } from "./dto/create-internal-user.dto";
 import { BroadcastMessageDto } from "./dto/broadcast-message.dto";
@@ -81,8 +81,14 @@ export class AdminController {
     }
 
     @Post("broadcast")
-    @ApiOperation({ summary: "Send a broadcast message to all users" })
+    @ApiOperation({ summary: "Send a broadcast message to targeted users" })
     broadcastMessage(@Body() dto: BroadcastMessageDto) {
         return this.adminService.broadcastMessage(dto);
+    }
+
+    @Get("hostels")
+    @ApiOperation({ summary: "Get all hostels for management" })
+    getHostels() {
+        return this.adminService.getHostels();
     }
 }

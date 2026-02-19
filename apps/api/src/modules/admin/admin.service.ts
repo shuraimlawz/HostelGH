@@ -269,20 +269,41 @@ export class AdminService {
         });
     }
 
-    async getPendingPayouts() {
-        return this.prisma.payoutRequest.findMany({
-            where: { status: "PENDING" },
-            include: { owner: true },
-            orderBy: { createdAt: "desc" }
+    async getHostels() {
+        return this.prisma.hostel.findMany({
+            orderBy: { createdAt: 'desc' },
+            include: {
+                owner: {
+                    select: {
+                        id: true,
+                        firstName: true,
+                        lastName: true,
+                        email: true
+                    }
+                },
+                _count: {
+                    select: {
+                        bookings: true,
+                        rooms: true
+                    }
+                }
+            }
         });
     }
 
     async broadcastMessage(dto: BroadcastMessageDto) {
         try {
-            console.log('[Broadcast] Starting broadcast with:', { title: dto.title, type: dto.type });
+            console.log('[Broadcast] Starting broadcast with:', { title: dto.title, type: dto.type, target: dto.target });
+
+            const where: any = { emailNotifications: true };
+            if (dto.target === 'tenants') {
+                where.role = UserRole.TENANT;
+            } else if (dto.target === 'owners') {
+                where.role = UserRole.OWNER;
+            }
 
             const users = await this.prisma.user.findMany({
-                where: { emailNotifications: true },
+                where,
                 select: { email: true, firstName: true }
             });
 
