@@ -15,8 +15,46 @@ export class HostelsService {
     async create(ownerId: string, dto: CreateHostelDto) {
         await this.subscriptions.checkLimit(ownerId, "max_hostels");
 
-        return this.prisma.hostel.create({
-            data: { ...dto, ownerId },
+        // Check if owner already has a previously published hostel (verified)
+        const existingVerified = await this.prisma.hostel.findFirst({
+            where: { ownerId, isPublished: true },
+        });
+
+        // First hostel always requires admin verification; subsequent hostels auto-publish
+        const isFirstHostel = !existingVerified;
+
+        const hostel = await this.prisma.hostel.create({
+            data: {
+                ...dto,
+                ownerId,
+                isPublished: !isFirstHostel,         // auto-publish if already verified
+                pendingVerification: isFirstHostel,   // flag first-timers for admin review
+            },
+        });
+
+        return {
+            ...hostel,
+            requiresVerification: isFirstHostel,
+        };
+    }
+
+    async verifyHostel(hostelId: string) {
+        const hostel = await this.prisma.hostel.findUnique({ where: { id: hostelId } });
+        if (!hostel) throw new NotFoundException("Hostel not found");
+
+        return this.prisma.hostel.update({
+            where: { id: hostelId },
+            data: { isPublished: true, pendingVerification: false },
+        });
+    }
+
+    async rejectHostel(hostelId: string, reason?: string) {
+        const hostel = await this.prisma.hostel.findUnique({ where: { id: hostelId } });
+        if (!hostel) throw new NotFoundException("Hostel not found");
+
+        return this.prisma.hostel.update({
+            where: { id: hostelId },
+            data: { isPublished: false, pendingVerification: false },
         });
     }
 

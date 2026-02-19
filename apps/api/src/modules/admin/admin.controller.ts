@@ -3,10 +3,13 @@ import { AdminService } from "./admin.service";
 import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
 import { RolesGuard } from "../../common/guards/roles.guard";
 import { Roles } from "../../common/decorators/roles.decorator";
-import { UserRole, BroadcastTarget } from "@prisma/client";
+import { UserRole } from "@prisma/client";
 import { ApiBearerAuth, ApiOperation, ApiTags } from "@nestjs/swagger";
 import { CreateInternalUserDto } from "./dto/create-internal-user.dto";
 import { BroadcastMessageDto } from "./dto/broadcast-message.dto";
+import { AdminQueryDto } from "./dto/admin-query.dto";
+import { AdminActionDto } from "./dto/admin-action.dto";
+import { User } from "../../common/decorators/user.decorator";
 
 @ApiTags("Admin")
 @Controller("admin")
@@ -25,11 +28,8 @@ export class AdminController {
 
     @Get("activity")
     @ApiOperation({ summary: "Get recent system activity" })
-    getActivity(
-        @Query("page") page?: number,
-        @Query("limit") limit?: number
-    ) {
-        return this.adminService.getActivity(page ? Number(page) : 1, limit ? Number(limit) : 10);
+    getActivity(@Query() query: AdminQueryDto) {
+        return this.adminService.getActivity(query.page, query.limit);
     }
 
     @Get("analytics")
@@ -44,23 +44,101 @@ export class AdminController {
         return this.adminService.getSecurityAlerts();
     }
 
+    // --- USERS ---
+
     @Get("users")
-    @ApiOperation({ summary: "Get all platform users" })
-    getUsers() {
-        return this.adminService.getUsers();
+    @ApiOperation({ summary: "Get all platform users with filtering" })
+    getUsers(@Query() query: AdminQueryDto) {
+        return this.adminService.getUsers(query);
     }
 
     @Patch("users/:userId/role")
     @ApiOperation({ summary: "Update user role" })
-    updateUserRole(@Param("userId") userId: string, @Body("role") role: UserRole) {
-        return this.adminService.updateUserRole(userId, role);
+    updateUserRole(
+        @Param("userId") userId: string,
+        @Body() dto: AdminActionDto,
+        @User() admin
+    ) {
+        return this.adminService.updateUserRole(admin.id, userId, dto.role);
     }
 
-    @Post("users/:userId/delete")
-    @ApiOperation({ summary: "Delete platform user" })
-    deleteUser(@Param("userId") userId: string) {
-        return this.adminService.deleteUser(userId);
+    @Patch("users/:userId/status")
+    @ApiOperation({ summary: "Suspend or unsurepend user" })
+    toggleUserStatus(
+        @Param("userId") userId: string,
+        @Body() dto: AdminActionDto,
+        @User() admin
+    ) {
+        return this.adminService.toggleUserSuspension(admin.id, userId, dto.suspended);
     }
+
+    @Post("users")
+    @ApiOperation({ summary: "Create an internal user (Admin/Support)" })
+    createInternalUser(@Body() dto: CreateInternalUserDto) {
+        return this.adminService.createInternalUser(dto);
+    }
+
+    // --- HOSTELS ---
+
+    @Get("hostels")
+    @ApiOperation({ summary: "Get all hostels for management" })
+    getHostels(@Query() query: AdminQueryDto) {
+        return this.adminService.getHostels(query);
+    }
+
+    @Patch("hostels/:id/verify")
+    @ApiOperation({ summary: "Verify and publish a hostel" })
+    verifyHostel(@Param("id") id: string, @User() admin) {
+        return this.adminService.verifyHostel(admin.id, id);
+    }
+
+    @Patch("hostels/:id/reject")
+    @ApiOperation({ summary: "Reject a hostel submission" })
+    rejectHostel(
+        @Param("id") id: string,
+        @Body() dto: AdminActionDto,
+        @User() admin
+    ) {
+        return this.adminService.rejectHostel(admin.id, id, dto.reason);
+    }
+
+    @Patch("hostels/:id/feature")
+    @ApiOperation({ summary: "Toggle featured status" })
+    toggleHostelFeature(
+        @Param("id") id: string,
+        @Body() dto: AdminActionDto,
+        @User() admin
+    ) {
+        return this.adminService.toggleHostelFeature(admin.id, id, dto.featured);
+    }
+
+    @Patch("hostels/:id")
+    @ApiOperation({ summary: "Update hostel details" })
+    updateHostel(
+        @Param("id") id: string,
+        @Body() dto: AdminActionDto,
+        @User() admin
+    ) {
+        return this.adminService.updateHostel(admin.id, id, { published: dto.published });
+    }
+
+    // --- BOOKINGS ---
+
+    @Get("bookings")
+    @ApiOperation({ summary: "Get all bookings" })
+    getBookings(@Query() query: AdminQueryDto) {
+        return this.adminService.getBookings(query);
+    }
+
+    // --- PAYMENTS ---
+
+    @Get("payments")
+    @ApiOperation({ summary: "Get all payments" })
+    getPayments(@Query() query: AdminQueryDto) {
+        return this.adminService.getPayments(query);
+    }
+
+    // --- PAYOUTS ---
 
     @Get("payouts")
     @ApiOperation({ summary: "Get pending payout requests" })
@@ -74,21 +152,9 @@ export class AdminController {
         return this.adminService.updatePayoutStatus(id, status);
     }
 
-    @Post("users")
-    @ApiOperation({ summary: "Create an internal user (Admin/Support)" })
-    createInternalUser(@Body() dto: CreateInternalUserDto) {
-        return this.adminService.createInternalUser(dto);
-    }
-
     @Post("broadcast")
-    @ApiOperation({ summary: "Send a broadcast message to targeted users" })
+    @ApiOperation({ summary: "Send a broadcast message to user segments" })
     broadcastMessage(@Body() dto: BroadcastMessageDto) {
         return this.adminService.broadcastMessage(dto);
-    }
-
-    @Get("hostels")
-    @ApiOperation({ summary: "Get all hostels for management" })
-    getHostels() {
-        return this.adminService.getHostels();
     }
 }

@@ -94,21 +94,130 @@ export default function NewHostelPage() {
         form.setValue("amenities", updated);
     };
 
+    const [publishStage, setPublishStage] = useState<'idle' | 'uploading' | 'verifying' | 'done' | 'error'>('idle');
+    const [publishResult, setPublishResult] = useState<{ requiresVerification: boolean } | null>(null);
+
     const onSubmit = async (values: z.infer<typeof formSchema>) => {
-        setLoading(true);
+        setPublishStage('uploading');
         try {
-            await api.post("/hostels", { ...values, isPublished: true });
-            toast.success("Hostel created and live!");
-            router.push("/owner/hostels");
+            // Stage 1: simulate upload/transmission feel
+            await new Promise(r => setTimeout(r, 900));
+            setPublishStage('verifying');
+
+            // Stage 2: actual API call
+            const res = await api.post("/hostels", values);
+            await new Promise(r => setTimeout(r, 700));
+
+            setPublishStage('done');
+            setPublishResult({ requiresVerification: res.data?.requiresVerification ?? true });
         } catch (error: any) {
-            toast.error(error.response?.data?.message || "Failed to create hostel");
-        } finally {
-            setLoading(false);
+            setPublishStage('error');
+            toast.error(error.response?.data?.message || "Failed to submit hostel");
         }
     };
 
+    const isPublishing = publishStage !== 'idle' && publishStage !== 'error';
+
+    const stages = [
+        { key: 'uploading', label: 'Transmitting property data...' },
+        { key: 'verifying', label: 'Queuing for admin verification...' },
+        { key: 'done', label: 'Submission complete!' },
+    ];
+
     return (
-        <div className="max-w-5xl mx-auto pb-20">
+        <div className="max-w-5xl mx-auto pb-20 relative">
+
+            {/* ─── Publishing Full-Page Overlay ─── */}
+            {(publishStage !== 'idle') && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center">
+                    {/* Backdrop blur */}
+                    <div className="absolute inset-0 bg-white/60 backdrop-blur-md" />
+
+                    <div className="relative z-10 bg-white border border-gray-100 rounded-[3rem] shadow-2xl shadow-gray-200 p-12 max-w-md w-full mx-4 text-center animate-in zoom-in-95 duration-300">
+
+                        {publishStage === 'done' && publishResult ? (
+                            // ── Success State ──
+                            <>
+                                <div className="w-20 h-20 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-6 border-2 border-blue-100">
+                                    <Check className="text-blue-600" size={36} />
+                                </div>
+                                <h2 className="text-2xl font-black text-gray-950 tracking-tight mb-3">
+                                    {publishResult.requiresVerification ? 'Under Review' : 'Hostel Published!'}
+                                </h2>
+                                {publishResult.requiresVerification ? (
+                                    <p className="text-gray-500 text-sm font-medium leading-relaxed mb-8">
+                                        Your hostel has been submitted. Because this is your <strong className="text-gray-900">first listing</strong>, our team needs to verify your property before it goes live. We'll notify you once approved — usually within 24 hours.
+                                    </p>
+                                ) : (
+                                    <p className="text-gray-500 text-sm font-medium leading-relaxed mb-8">
+                                        Your hostel is now live and discoverable by students!
+                                    </p>
+                                )}
+                                {publishResult.requiresVerification && (
+                                    <div className="bg-blue-50 border border-blue-100 rounded-2xl p-4 mb-8 text-left">
+                                        <p className="text-[11px] font-black text-blue-700 uppercase tracking-widest mb-2">What happens next?</p>
+                                        <ul className="space-y-1.5 text-xs text-blue-600 font-medium">
+                                            <li className="flex items-center gap-2"><Check size={10} className="shrink-0" />Admin team reviews your listing</li>
+                                            <li className="flex items-center gap-2"><Check size={10} className="shrink-0" />You get notified on approval</li>
+                                            <li className="flex items-center gap-2"><Check size={10} className="shrink-0" />Future hostels auto-publish</li>
+                                        </ul>
+                                    </div>
+                                )}
+                                <button
+                                    onClick={() => router.push('/owner/hostels')}
+                                    className="w-full bg-gray-950 text-white py-4 rounded-2xl font-black text-[11px] uppercase tracking-widest hover:bg-black transition-all shadow-xl shadow-gray-200"
+                                >
+                                    View My Hostels →
+                                </button>
+                            </>
+                        ) : (
+                            // ── Loading / Progress State ──
+                            <>
+                                {/* Animated ring */}
+                                <div className="relative w-24 h-24 mx-auto mb-8">
+                                    <div className="absolute inset-0 rounded-full border-4 border-blue-100" />
+                                    <div className="absolute inset-0 rounded-full border-4 border-blue-600 border-t-transparent animate-spin" />
+                                    <div className="absolute inset-0 flex items-center justify-center">
+                                        <Building2 className="text-blue-600" size={28} />
+                                    </div>
+                                </div>
+
+                                <h2 className="text-xl font-black text-gray-950 tracking-tight mb-2">Publishing Your Hostel</h2>
+                                <p className="text-gray-400 text-sm font-medium mb-8">Please wait — do not close this page.</p>
+
+                                <div className="space-y-3 text-left">
+                                    {stages.map((s, i) => {
+                                        const stageOrder = ['uploading', 'verifying', 'done'];
+                                        const currentIdx = stageOrder.indexOf(publishStage);
+                                        const stageIdx = stageOrder.indexOf(s.key);
+                                        const isDone = stageIdx < currentIdx;
+                                        const isActive = stageIdx === currentIdx;
+
+                                        return (
+                                            <div key={s.key} className={cn(
+                                                "flex items-center gap-3 p-3 rounded-xl transition-all",
+                                                isActive ? "bg-blue-50 border border-blue-100" : "bg-gray-50"
+                                            )}>
+                                                <div className={cn(
+                                                    "w-6 h-6 rounded-full flex items-center justify-center shrink-0 text-[10px] font-black",
+                                                    isDone ? "bg-blue-600 text-white" : isActive ? "bg-blue-100 text-blue-600" : "bg-gray-200 text-gray-400"
+                                                )}>
+                                                    {isDone ? <Check size={10} /> : i + 1}
+                                                </div>
+                                                <p className={cn(
+                                                    "text-xs font-bold",
+                                                    isActive ? "text-blue-700" : isDone ? "text-gray-600" : "text-gray-400"
+                                                )}>{s.label}</p>
+                                                {isActive && <div className="ml-auto w-3 h-3 rounded-full bg-blue-400 animate-pulse" />}
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            </>
+                        )}
+                    </div>
+                </div>
+            )}
             {/* Back & Header */}
             <Link
                 href="/owner/hostels"
@@ -387,7 +496,7 @@ export default function NewHostelPage() {
                 )}
 
                 {/* Navigation */}
-                <div className="flex items-center justify-between gap-4 pt-4">
+                <div className={cn("flex items-center justify-between gap-4 pt-4", isPublishing && "pointer-events-none opacity-30")}>
                     {currentStep > 1 ? (
                         <button
                             type="button"
@@ -411,11 +520,11 @@ export default function NewHostelPage() {
                     ) : (
                         <button
                             type="submit"
-                            disabled={loading}
-                            className="px-12 py-4 bg-blue-600 text-white rounded-2xl font-black text-[11px] uppercase tracking-widest shadow-xl shadow-blue-200 hover:bg-blue-700 transition-all active:scale-[0.98] flex items-center gap-3 disabled:opacity-60"
+                            disabled={publishStage !== 'idle'}
+                            className="px-12 py-4 bg-blue-600 text-white rounded-2xl font-black text-[11px] uppercase tracking-widest shadow-xl shadow-blue-200 hover:bg-blue-700 transition-all active:scale-[0.98] flex items-center gap-3 disabled:opacity-60 disabled:cursor-not-allowed"
                         >
-                            {loading ? <Loader2 className="animate-spin" size={18} /> : null}
-                            {loading ? "Publishing..." : "Publish My Hostel →"}
+                            <Building2 size={16} />
+                            Publish My Hostel →
                         </button>
                     )}
                 </div>

@@ -12,14 +12,11 @@ import {
     ArrowUpRight,
     ArrowDownRight,
     Loader2,
-    X,
     Send,
     ShieldAlert,
     Zap,
-    LifeBuoy,
-    ChevronRight,
-    Bell,
-    Globe
+    Globe,
+    DollarSign
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
@@ -27,6 +24,7 @@ import { toast } from "sonner";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 export default function AdminDashboardPage() {
     const { data: stats, isLoading: statsLoading } = useQuery({
@@ -37,11 +35,19 @@ export default function AdminDashboardPage() {
         }
     });
 
+    const { data: analytics, isLoading: analyticsLoading } = useQuery({
+        queryKey: ["admin-analytics"],
+        queryFn: async () => {
+            const res = await api.get("/admin/analytics");
+            return res.data;
+        }
+    });
+
     const { data: activity, isLoading: activityLoading } = useQuery({
         queryKey: ["admin-activity"],
         queryFn: async () => {
             const res = await api.get("/admin/activity");
-            return res.data;
+            return res.data; // Expecting array or { data: [] }
         }
     });
 
@@ -107,7 +113,7 @@ export default function AdminDashboardPage() {
         },
     ];
 
-    if (statsLoading || activityLoading || payoutsLoading) return (
+    if (statsLoading || activityLoading || payoutsLoading || analyticsLoading) return (
         <div className="flex h-[80vh] items-center justify-center">
             <div className="flex flex-col items-center gap-4">
                 <Loader2 className="animate-spin text-blue-600" size={40} />
@@ -116,9 +122,12 @@ export default function AdminDashboardPage() {
         </div>
     );
 
+    // Helper to safely get activity list
+    const activityList = Array.isArray(activity) ? activity : (activity?.data || []);
+
     return (
-        <div className="max-w-[1600px] mx-auto space-y-12 pb-20">
-            {/* Header / Portfolio Insights */}
+        <div className="max-w-[1600px] mx-auto space-y-10 pb-20">
+            {/* Header */}
             <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8 pt-4">
                 <div>
                     <div className="flex items-center gap-3 mb-4">
@@ -148,7 +157,6 @@ export default function AdminDashboardPage() {
                         <DialogContent className="sm:max-w-lg rounded-[2.5rem] border-gray-100 shadow-2xl">
                             <DialogHeader>
                                 <DialogTitle className="text-2xl font-black italic uppercase tracking-wider">Strategic Broadcast</DialogTitle>
-                                <p className="text-xs font-medium text-gray-500">Alert specific user segments across the platform.</p>
                             </DialogHeader>
                             <div className="space-y-6 py-6">
                                 <div className="space-y-2">
@@ -170,7 +178,6 @@ export default function AdminDashboardPage() {
                                         ))}
                                     </div>
                                 </div>
-
                                 <div className="space-y-2">
                                     <Label className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">Message Header</Label>
                                     <input
@@ -180,7 +187,6 @@ export default function AdminDashboardPage() {
                                         onChange={e => setBroadcastForm({ ...broadcastForm, title: e.target.value })}
                                     />
                                 </div>
-
                                 <div className="space-y-2">
                                     <Label className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">Detailed Intel</Label>
                                     <textarea
@@ -190,28 +196,11 @@ export default function AdminDashboardPage() {
                                         onChange={e => setBroadcastForm({ ...broadcastForm, message: e.target.value })}
                                     />
                                 </div>
-
-                                <div className="grid grid-cols-3 gap-2">
-                                    {['info', 'warning', 'alert'].map((type) => (
-                                        <button
-                                            key={type}
-                                            onClick={() => setBroadcastForm({ ...broadcastForm, type })}
-                                            className={cn(
-                                                "py-2.5 rounded-xl border text-[9px] font-black uppercase tracking-widest transition-all",
-                                                broadcastForm.type === type
-                                                    ? "bg-gray-900 text-white border-gray-900"
-                                                    : "bg-white text-gray-400 border-gray-100"
-                                            )}
-                                        >
-                                            {type}
-                                        </button>
-                                    ))}
-                                </div>
                             </div>
                             <DialogFooter>
                                 <Button
                                     onClick={() => broadcastMutation.mutate(broadcastForm)}
-                                    disabled={broadcastMutation.isPending || !broadcastForm.title || !broadcastForm.message}
+                                    disabled={broadcastMutation.isPending || !broadcastForm.title}
                                     className="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-2xl py-6 font-black uppercase tracking-widest text-[11px] shadow-xl shadow-blue-100"
                                 >
                                     {broadcastMutation.isPending ? <Loader2 className="animate-spin mr-2" /> : <Send size={16} className="mr-2" />}
@@ -248,8 +237,47 @@ export default function AdminDashboardPage() {
                 ))}
             </div>
 
+            {/* Main Content Grid */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+                {/* Left Column: Analytics & Activity */}
                 <div className="lg:col-span-8 space-y-10">
+
+                    {/* Analytics Chart */}
+                    <div className="bg-white rounded-[3rem] border border-gray-100 p-10 shadow-sm space-y-6">
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-4">
+                                <div className="w-12 h-12 bg-indigo-50 rounded-xl flex items-center justify-center text-indigo-600">
+                                    <DollarSign size={20} />
+                                </div>
+                                <div>
+                                    <h2 className="text-xl font-black italic uppercase tracking-tighter">Revenue Flow</h2>
+                                    <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">6 Month Trend</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="h-[300px] w-full">
+                            <ResponsiveContainer width="100%" height="100%">
+                                <AreaChart data={analytics?.monthlyData || []}>
+                                    <defs>
+                                        <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
+                                            <stop offset="5%" stopColor="#4f46e5" stopOpacity={0.1} />
+                                            <stop offset="95%" stopColor="#4f46e5" stopOpacity={0} />
+                                        </linearGradient>
+                                    </defs>
+                                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f3f4f6" />
+                                    <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#9ca3af', fontWeight: 600 }} dy={10} />
+                                    <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#9ca3af', fontWeight: 600 }} tickFormatter={(value) => `₵${value}`} dx={-10} />
+                                    <Tooltip
+                                        contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 40px rgba(0,0,0,0.1)' }}
+                                        itemStyle={{ fontSize: '12px', fontWeight: 'bold', color: '#1f2937' }}
+                                        labelStyle={{ fontSize: '10px', fontWeight: 'bold', color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '1px' }}
+                                    />
+                                    <Area type="monotone" dataKey="revenue" stroke="#4f46e5" strokeWidth={3} fillOpacity={1} fill="url(#colorRevenue)" />
+                                </AreaChart>
+                            </ResponsiveContainer>
+                        </div>
+                    </div>
+
                     {/* Activity Logs */}
                     <div className="bg-white rounded-[3rem] border border-gray-100 p-10 shadow-sm space-y-8">
                         <div className="flex items-center justify-between border-b border-gray-50 pb-8">
@@ -268,7 +296,7 @@ export default function AdminDashboardPage() {
                         </div>
 
                         <div className="space-y-4">
-                            {activity?.activities?.map((log: any, i: number) => (
+                            {activityList.map((log: any, i: number) => (
                                 <div key={i} className="flex items-center gap-6 p-6 rounded-[2rem] hover:bg-gray-50 transition-all border border-transparent hover:border-gray-100 group">
                                     <div className={cn(
                                         "w-2 h-10 rounded-full shrink-0",
@@ -278,28 +306,18 @@ export default function AdminDashboardPage() {
                                     )} />
                                     <div className="flex-1">
                                         <p className="text-sm font-black text-gray-950 italic">
-                                            <span className="text-blue-600 not-italic uppercase tracking-widest text-[11px] mr-2">{log.user}</span>
-                                            <span className="text-gray-600">{log.action}</span>
+                                            <span className="text-blue-600 not-italic uppercase tracking-widest text-[11px] mr-2">{log.user?.firstName || 'System'}</span>
+                                            <span className="text-gray-600">{log.action || log.details}</span>
                                         </p>
                                         <div className="flex items-center gap-3 mt-1.5">
                                             <p className="text-[9px] text-gray-400 font-black uppercase tracking-widest flex items-center gap-1">
-                                                <CalendarCheck size={10} /> {new Date(log.time).toLocaleTimeString()}
-                                            </p>
-                                            <div className="w-1 h-1 bg-gray-200 rounded-full" />
-                                            <p className="text-[9px] text-gray-400 font-black uppercase tracking-widest">
-                                                {new Date(log.time).toLocaleDateString()}
+                                                <CalendarCheck size={10} /> {new Date(log.createdAt || log.time).toLocaleTimeString()}
                                             </p>
                                         </div>
                                     </div>
-                                    <Link
-                                        href={log.targetUrl || "#"}
-                                        className="opacity-0 group-hover:opacity-100 px-5 py-2.5 bg-white border border-gray-100 text-[9px] font-black text-gray-900 rounded-xl hover:bg-gray-950 hover:text-white hover:border-gray-950 transition-all shadow-sm"
-                                    >
-                                        Audit
-                                    </Link>
                                 </div>
                             ))}
-                            {(!activity?.activities || activity.activities.length === 0) && (
+                            {activityList.length === 0 && (
                                 <div className="text-center py-20 bg-gray-50/50 rounded-[2rem] border border-dashed border-gray-200">
                                     <Activity className="mx-auto text-gray-300 mb-4" size={32} />
                                     <p className="text-gray-400 text-[10px] font-black uppercase tracking-widest italic">Zero activity detected</p>
@@ -307,53 +325,9 @@ export default function AdminDashboardPage() {
                             )}
                         </div>
                     </div>
-
-                    {/* Pending Payouts */}
-                    <div className="bg-white rounded-[3rem] border border-gray-100 p-10 shadow-sm space-y-8">
-                        <div className="flex items-center gap-4 border-b border-gray-50 pb-8">
-                            <div className="w-14 h-14 bg-orange-50 rounded-2xl flex items-center justify-center text-orange-600 border border-orange-100 shadow-xl shadow-orange-50">
-                                <TrendingUp size={24} />
-                            </div>
-                            <div>
-                                <h2 className="text-2xl font-black italic uppercase tracking-tighter">Settlement Queue</h2>
-                                <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Financial Clearances</p>
-                            </div>
-                        </div>
-
-                        <div className="space-y-4">
-                            {payouts?.map((payout: any) => (
-                                <div key={payout.id} className="flex items-center justify-between p-6 rounded-[2rem] hover:bg-gray-50 transition-all border border-transparent hover:border-gray-100">
-                                    <div className="flex items-center gap-4">
-                                        <div className="w-12 h-12 bg-white rounded-xl border border-gray-100 flex items-center justify-center text-gray-900 font-black text-sm">
-                                            {payout.owner.firstName?.[0]}
-                                        </div>
-                                        <div>
-                                            <p className="text-sm font-black text-gray-950 italic">
-                                                ₵{(payout.amount / 100).toLocaleString()}
-                                                <span className="text-gray-400 font-medium not-italic ml-2 text-[11px] uppercase tracking-widest">Clearance for {payout.owner.firstName}</span>
-                                            </p>
-                                            <p className="text-[9px] text-gray-400 font-black uppercase tracking-widest mt-1">
-                                                Requested {new Date(payout.createdAt).toLocaleDateString()}
-                                            </p>
-                                        </div>
-                                    </div>
-                                    <button
-                                        onClick={() => api.patch(`/admin/payouts/${payout.id}`, { status: "PAID" }).then(() => toast.success("Settlement verified"))}
-                                        className="px-6 py-2.5 bg-emerald-600 text-white text-[9px] font-black uppercase tracking-widest rounded-xl hover:bg-emerald-700 transition-all shadow-lg shadow-emerald-100 active:scale-95"
-                                    >
-                                        Mark Paid
-                                    </button>
-                                </div>
-                            ))}
-                            {(!payouts || payouts.length === 0) && (
-                                <div className="text-center py-12">
-                                    <p className="text-gray-400 text-[10px] font-black uppercase tracking-widest italic leading-relaxed">Financial queue is clear.</p>
-                                </div>
-                            )}
-                        </div>
-                    </div>
                 </div>
 
+                {/* Right Column: Strategic Hub & Payouts */}
                 <div className="lg:col-span-4 space-y-10">
                     <div className="bg-gray-950 rounded-[3rem] p-10 flex flex-col justify-between relative overflow-hidden min-h-[450px] shadow-2xl">
                         <div className="relative z-10 space-y-8">
@@ -409,6 +383,51 @@ export default function AdminDashboardPage() {
                         {/* Background Accents */}
                         <div className="absolute top-0 right-0 w-80 h-80 bg-blue-600/10 rounded-full blur-[120px] -mr-40 -mt-40" />
                         <div className="absolute bottom-0 left-0 w-80 h-80 bg-purple-600/10 rounded-full blur-[120px] -ml-40 -mb-40" />
+                    </div>
+
+                    {/* Pending Payouts (moved to right col) */}
+                    <div className="bg-white rounded-[3rem] border border-gray-100 p-10 shadow-sm space-y-8">
+                        <div className="flex items-center gap-4 border-b border-gray-50 pb-8">
+                            <div className="w-14 h-14 bg-orange-50 rounded-2xl flex items-center justify-center text-orange-600 border border-orange-100 shadow-xl shadow-orange-50">
+                                <TrendingUp size={24} />
+                            </div>
+                            <div>
+                                <h2 className="text-2xl font-black italic uppercase tracking-tighter">Settlement Queue</h2>
+                                <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Financial Clearances</p>
+                            </div>
+                        </div>
+
+                        <div className="space-y-4">
+                            {payouts?.map((payout: any) => (
+                                <div key={payout.id} className="flex items-center justify-between p-6 rounded-[2rem] hover:bg-gray-50 transition-all border border-transparent hover:border-gray-100">
+                                    <div className="flex items-center gap-4">
+                                        <div className="w-12 h-12 bg-white rounded-xl border border-gray-100 flex items-center justify-center text-gray-900 font-black text-sm">
+                                            {payout.owner.firstName?.[0]}
+                                        </div>
+                                        <div>
+                                            <p className="text-sm font-black text-gray-950 italic">
+                                                ₵{(payout.amount / 100).toLocaleString()}
+                                                <span className="text-gray-400 font-medium not-italic ml-2 text-[11px] uppercase tracking-widest">For {payout.owner.firstName}</span>
+                                            </p>
+                                            <p className="text-[9px] text-gray-400 font-black uppercase tracking-widest mt-1">
+                                                {new Date(payout.createdAt).toLocaleDateString()}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <button
+                                        onClick={() => api.patch(`/admin/payouts/${payout.id}`, { status: "PAID" }).then(() => toast.success("Settlement verified"))}
+                                        className="px-6 py-2.5 bg-emerald-600 text-white text-[9px] font-black uppercase tracking-widest rounded-xl hover:bg-emerald-700 transition-all shadow-lg shadow-emerald-100 active:scale-95"
+                                    >
+                                        Pay
+                                    </button>
+                                </div>
+                            ))}
+                            {(!payouts || payouts.length === 0) && (
+                                <div className="text-center py-12">
+                                    <p className="text-gray-400 text-[10px] font-black uppercase tracking-widest italic leading-relaxed">Financial queue is clear.</p>
+                                </div>
+                            )}
+                        </div>
                     </div>
                 </div>
             </div>

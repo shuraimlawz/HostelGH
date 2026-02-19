@@ -18,7 +18,8 @@ import {
     Trash2,
     CheckCircle2,
     Menu,
-    X
+    X,
+    CreditCard
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
@@ -27,6 +28,8 @@ const adminLinks = [
     { name: "Command Center", href: "/admin", icon: LayoutDashboard },
     { name: "User Registry", href: "/admin/users", icon: Users },
     { name: "Asset Control", href: "/admin/hostels", icon: Building2 },
+    { name: "Reservations", href: "/admin/bookings", icon: CalendarCheck },
+    { name: "Financials", href: "/admin/payments", icon: CreditCard },
     { name: "System Stats", href: "/admin/stats", icon: BarChart3 },
     { name: "System Logs", href: "/admin/logs", icon: Activity },
     { name: "Settings Hub", href: "/admin/settings", icon: Settings },

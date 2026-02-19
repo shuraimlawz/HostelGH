@@ -86,6 +86,7 @@ model User {
   wallets       Wallet[]
   payoutRequests PayoutRequest[]
   subscriptions  Subscription[]
+  adminAuditLogs AdminAuditLog[]
 
   paystackSubaccountCode String? // For automated split payments
 
@@ -166,9 +167,10 @@ model Hostel {
   utilitiesIncluded String[]            @default([]) // ["water", "light", "gas"]
   bookingStatus     HostelBookingStatus @default(OPEN)
 
-  isPublished Boolean  @default(false)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  isPublished          Boolean  @default(false)
+  pendingVerification  Boolean  @default(false) // Awaiting admin review before first publish
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
 
   owner    User      @relation("HostelOwner", fields: [ownerId], references: [id], onDelete: Restrict)
   rooms    Room[]
@@ -328,4 +330,24 @@ model Payment {
 
   @@index([status])
   @@index([provider])
+}
+
+model AdminAuditLog {
+  id           String   @id @default(cuid())
+  adminId      String
+  actionType   String // CREATE, UPDATE, DELETE, APPROVE, REJECT
+  entityType   String // USER, HOSTEL, BOOKING, PAYMENT, etc.
+  entityId     String?
+  details      String? // Human readable summary
+  metadata     Json?   // Store before/after state
+  ipAddress    String?
+  userAgent    String?
+
+  createdAt    DateTime @default(now())
+
+  admin        User     @relation(fields: [adminId], references: [id])
+
+  @@index([adminId])
+  @@index([entityType])
+  @@index([createdAt])
 }

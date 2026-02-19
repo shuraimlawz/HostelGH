@@ -8,5 +8,6 @@ import { UploadModule } from '../upload/upload.module';
     imports: [PrismaModule, UploadModule],
     providers: [HostelsService],
     controllers: [HostelsController],
+    exports: [HostelsService],
 })
 export class HostelsModule { }
