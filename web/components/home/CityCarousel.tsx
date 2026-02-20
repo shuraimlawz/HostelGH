@@ -35,19 +35,19 @@ export default function CityCarousel() {
     return (
         <div className="py-20">
             <div className="flex items-center gap-3 mb-10">
-                <div className="p-2.5 rounded-2xl bg-blue-50 text-blue-600">
+                <div className="p-2.5 rounded-2xl bg-primary/10 text-primary">
                     <Map size={24} strokeWidth={2.5} />
                 </div>
                 <div>
-                    <h3 className="text-2xl md:text-3xl font-black tracking-tighter text-gray-900 leading-none">Popular <span className="text-blue-600">Cities</span></h3>
-                    <p className="text-gray-400 text-xs font-bold uppercase tracking-widest mt-1">Explore by local hubs</p>
+                    <h3 className="text-2xl md:text-3xl font-black tracking-tighter text-foreground leading-none">Popular <span className="text-primary">Cities</span></h3>
+                    <p className="text-muted-foreground text-xs font-bold uppercase tracking-widest mt-1">Explore by local hubs</p>
                 </div>
             </div>
 
             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6">
                 {cities.map((city: any) => (
                     <Link key={city.name} href={`/hostels?city=${city.name}`}>
-                        <div className="group relative aspect-[4/5] overflow-hidden rounded-[2.5rem] bg-gray-100 cursor-pointer shadow-sm hover:shadow-2xl transition-all duration-500">
+                        <div className="group relative aspect-[4/5] overflow-hidden rounded-[2.5rem] bg-muted cursor-pointer shadow-sm hover:shadow-2xl transition-all duration-500">
                             <img
                                 src={city.image || `https://images.unsplash.com/photo-1591123120675-6f7f1aae0e5b?q=80&w=400&fit=crop`}
                                 alt={city.name}

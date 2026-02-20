@@ -77,10 +77,10 @@ export default function RegisterForm({ onSuccess }: { onSuccess?: () => void }) 
         <div className="space-y-4">
             <form onSubmit={submit} className="space-y-4">
                 <div className="space-y-1">
-                    <label className="text-xs font-semibold text-gray-500 px-1">Email</label>
+                    <label className="text-xs font-semibold text-muted-foreground px-1">Email</label>
                     <input
                         type="email"
-                        className="w-full px-4 py-3 bg-gray-50 rounded-xl outline-none border border-transparent focus:border-black focus:bg-white transition-all text-sm"
+                        className="w-full px-4 py-3 bg-muted/50 rounded-xl outline-none border border-transparent focus:border-primary focus:bg-background transition-all text-sm"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         placeholder="your@email.com"
@@ -89,11 +89,11 @@ export default function RegisterForm({ onSuccess }: { onSuccess?: () => void }) 
                 </div>
 
                 <div className="space-y-1">
-                    <label className="text-xs font-semibold text-gray-500 px-1">Password</label>
+                    <label className="text-xs font-semibold text-muted-foreground px-1">Password</label>
                     <div className="relative">
                         <input
                             type={showPassword ? "text" : "password"}
-                            className="w-full px-4 py-3 bg-gray-50 rounded-xl outline-none border border-transparent focus:border-black focus:bg-white transition-all text-sm pr-12"
+                            className="w-full px-4 py-3 bg-muted/50 rounded-xl outline-none border border-transparent focus:border-primary focus:bg-background transition-all text-sm pr-12"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             placeholder="••••••••"
@@ -102,7 +102,7 @@ export default function RegisterForm({ onSuccess }: { onSuccess?: () => void }) 
                         <button
                             type="button"
                             onClick={() => setShowPassword(!showPassword)}
-                            className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-black transition-colors outline-none"
+                            className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors outline-none"
                         >
                             {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                         </button>
@@ -110,10 +110,10 @@ export default function RegisterForm({ onSuccess }: { onSuccess?: () => void }) 
                 </div>
 
                 <div className="space-y-1">
-                    <label className="text-xs font-semibold text-gray-500 px-1">Account Type</label>
+                    <label className="text-xs font-semibold text-muted-foreground px-1">Account Type</label>
                     <div className="relative">
                         <select
-                            className="w-full px-4 py-3 bg-gray-50 rounded-xl outline-none border border-transparent focus:border-black focus:bg-white transition-all text-sm appearance-none"
+                            className="w-full px-4 py-3 bg-muted/50 rounded-xl outline-none border border-transparent focus:border-primary focus:bg-background transition-all text-sm appearance-none"
                             value={role}
                             onChange={(e) => setRole(e.target.value as any)}
                         >
@@ -138,7 +138,7 @@ export default function RegisterForm({ onSuccess }: { onSuccess?: () => void }) 
                 <div className="pt-1">
                     <button
                         disabled={loading}
-                        className="group relative w-full rounded-xl bg-black text-white font-bold py-3.5 hover:opacity-90 transition-all active:scale-[0.98] disabled:opacity-60 text-sm shadow-md shadow-black/10 overflow-hidden"
+                        className="group relative w-full rounded-xl bg-foreground text-background font-bold py-3.5 hover:opacity-90 transition-all active:scale-[0.98] disabled:opacity-60 text-sm shadow-md shadow-foreground/10 overflow-hidden"
                     >
                         {loading ? (
                             <div className="flex items-center justify-center gap-2">
@@ -159,17 +159,17 @@ export default function RegisterForm({ onSuccess }: { onSuccess?: () => void }) 
 
             <div className="relative py-1">
                 <div className="absolute inset-0 flex items-center">
-                    <div className="w-full border-t border-gray-100"></div>
+                    <div className="w-full border-t border-border/50"></div>
                 </div>
                 <div className="relative flex justify-center text-[10px] uppercase tracking-widest font-bold">
-                    <span className="bg-white px-2 text-gray-400">or</span>
+                    <span className="bg-card px-2 text-muted-foreground">or</span>
                 </div>
             </div>
 
             <button
                 onClick={handleGoogleLogin}
                 type="button"
-                className="w-full flex items-center justify-center gap-3 rounded-xl border border-gray-200 bg-white text-gray-700 font-semibold py-3 hover:bg-gray-50 transition-all active:scale-[0.98] text-sm"
+                className="w-full flex items-center justify-center gap-3 rounded-xl border border-border bg-card text-foreground font-semibold py-3 hover:bg-accent transition-all active:scale-[0.98] text-sm"
             >
                 <svg viewBox="0 0 18 18" width="18" height="18" xmlns="http://www.w3.org/2000/svg">
                     <path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z" />
@@ -180,8 +180,8 @@ export default function RegisterForm({ onSuccess }: { onSuccess?: () => void }) 
                 Continue with Google
             </button>
 
-            <div className="text-center text-xs text-gray-500 pt-1">
-                Already have an account? <a href="/auth/login" className="font-bold text-black border-b border-black hover:opacity-70 transition-opacity ml-1">Log In</a>
+            <div className="text-center text-xs text-muted-foreground pt-1">
+                Already have an account? <a href="/auth/login" className="font-bold text-foreground border-b border-foreground hover:opacity-70 transition-opacity ml-1">Log In</a>
             </div>
         </div>
     );

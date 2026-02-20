@@ -45,14 +45,14 @@ export default function AuthModal({
 
             {/* Modal Content */}
             <div
-                className={`relative w-full max-w-[420px] bg-white rounded-2xl shadow-2xl border overflow-hidden transition-all duration-300 transform ${open ? "translate-y-0 scale-100" : "translate-y-8 scale-95"
+                className={`relative w-full max-w-[420px] bg-card text-card-foreground rounded-2xl shadow-2xl border overflow-hidden transition-all duration-300 transform ${open ? "translate-y-0 scale-100" : "translate-y-8 scale-95"
                     }`}
             >
                 {/* Header */}
                 <div className="px-6 py-4 border-b flex items-center justify-between">
                     <button
                         onClick={onClose}
-                        className="rounded-full p-2 hover:bg-gray-100 transition-colors"
+                        className="rounded-full p-2 hover:bg-accent transition-colors"
                     >
                         <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" role="presentation" focusable="false" style={{ display: 'block', fill: 'none', height: '16px', width: '16px', stroke: 'currentcolor', strokeWidth: '3', overflow: 'visible' }}>
                             <path d="m6 6 20 20M26 6 6 26"></path>
@@ -69,7 +69,7 @@ export default function AuthModal({
                         <h1 className="text-xl font-bold mb-1">
                             {mode === "login" ? "Welcome back" : "Create an account"}
                         </h1>
-                        <p className="text-sm text-gray-500">
+                        <p className="text-sm text-muted-foreground">
                             {mode === "login" ? "Enter your details to sign in." : "Join us to start booking."}
                         </p>
                     </div>
@@ -82,7 +82,7 @@ export default function AuthModal({
                 </div>
 
                 {/* Footer info (optional for Airbnb style) */}
-                <div className="px-6 py-4 bg-gray-50 border-t text-[11px] text-gray-500 leading-tight">
+                <div className="px-6 py-4 bg-muted/50 border-t text-[11px] text-muted-foreground leading-tight">
                     By continuing, you agree to our <span className="underline cursor-pointer">Terms of Service</span>, <span className="underline cursor-pointer">Privacy Policy</span>, and <span className="underline cursor-pointer">Guest Refund Policy</span>.
                 </div>
             </div>

@@ -13,7 +13,7 @@ export default function HostelCard({ hostel }: { hostel: any }) {
 
     return (
         <Link href={`/hostels/${hostel.id}`} className="group block cursor-pointer space-y-3">
-            <div className="relative aspect-square overflow-hidden rounded-xl bg-gray-200">
+            <div className="relative aspect-square overflow-hidden rounded-xl bg-muted">
                 {hostel.images?.[0] ? (
                     <img
                         src={hostel.images[0]}
@@ -21,7 +21,7 @@ export default function HostelCard({ hostel }: { hostel: any }) {
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                     />
                 ) : (
-                    <div className="w-full h-full flex flex-col items-center justify-center text-gray-400 bg-gray-100">
+                    <div className="w-full h-full flex flex-col items-center justify-center text-muted-foreground bg-muted/50">
                         <span className="text-xs font-medium">No Image</span>
                     </div>
                 )}
@@ -33,33 +33,33 @@ export default function HostelCard({ hostel }: { hostel: any }) {
 
                 {/* Guest Favorite / Featured Badge (Airbnb style top left) */}
                 {hostel.isFeatured && (
-                    <div className="absolute top-3 left-3 bg-white/95 backdrop-blur-sm px-2.5 py-1 rounded-full shadow-sm">
-                        <span className="text-xs font-semibold text-gray-900">Guest favorite</span>
+                    <div className="absolute top-3 left-3 bg-background/95 backdrop-blur-sm px-2.5 py-1 rounded-full shadow-sm border border-border">
+                        <span className="text-xs font-semibold text-foreground">Guest favorite</span>
                     </div>
                 )}
             </div>
 
             <div className="space-y-1">
                 <div className="flex justify-between items-start">
-                    <h3 className="font-semibold text-gray-900 truncate pr-4 text-[15px]">
+                    <h3 className="font-semibold text-foreground truncate pr-4 text-[15px]">
                         {hostel.name}
                     </h3>
                     <div className="flex items-center gap-1 text-sm">
-                        <Star size={12} className="fill-black stroke-black" />
+                        <Star size={12} className="fill-foreground stroke-foreground" />
                         <span>4.9</span>
                     </div>
                 </div>
 
-                <div className="text-[15px] text-gray-500 leading-snug">
+                <div className="text-[15px] text-muted-foreground leading-snug">
                     <p className="truncate">{hostel.distanceToCampus || "Near Campus"}</p>
                     <p className="truncate">{hostel.city}, {hostel.region}</p>
                 </div>
 
                 <div className="flex items-baseline gap-1 mt-1.5">
-                    <span className="font-semibold text-gray-900 text-[15px]">
+                    <span className="font-semibold text-foreground text-[15px]">
                         ₵{minPrice ? minPrice.toLocaleString() : "N/A"}
                     </span>
-                    <span className="text-gray-900 font-normal text-[15px]">per term</span>
+                    <span className="text-muted-foreground font-normal text-[15px]">per term</span>
                 </div>
             </div>
         </Link>
