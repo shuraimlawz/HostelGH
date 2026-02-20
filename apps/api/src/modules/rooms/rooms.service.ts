@@ -82,7 +82,7 @@ export class RoomsService {
     }
 
     private validateOwnership(actor: UserActor, ownerId: string) {
-        const isAuthorized = actor.role === UserRole.ADMIN || actor.userId === ownerId;
+        const isAuthorized = actor.role === UserRole.ADMIN || actor.id === ownerId;
         if (!isAuthorized) throw new ForbiddenException("Not allowed to modify this room");
     }
 
@@ -98,9 +98,9 @@ export class RoomsService {
         }
     }
 
-    async addRoomImages(roomId: string, userId: string, imageUrls: string[]) {
+    async addRoomImages(roomId: string, id: string, imageUrls: string[]) {
         const room = await this.getRoomWithHostel(roomId);
-        this.validateOwnership({ userId, role: UserRole.OWNER }, room.hostel.ownerId);
+        this.validateOwnership({ id, role: UserRole.OWNER }, room.hostel.ownerId);
 
         return this.prisma.room.update({
             where: { id: roomId },
@@ -112,9 +112,9 @@ export class RoomsService {
         });
     }
 
-    async removeRoomImage(roomId: string, userId: string, imageUrl: string) {
+    async removeRoomImage(roomId: string, id: string, imageUrl: string) {
         const room = await this.getRoomWithHostel(roomId);
-        this.validateOwnership({ userId, role: UserRole.OWNER }, room.hostel.ownerId);
+        this.validateOwnership({ id, role: UserRole.OWNER }, room.hostel.ownerId);
 
         const updatedImages = room.images.filter(img => img !== imageUrl);
 
@@ -128,6 +128,6 @@ export class RoomsService {
 }
 
 interface UserActor {
-    userId: string;
+    id: string;
     role: UserRole;
 }

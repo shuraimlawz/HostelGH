@@ -113,14 +113,14 @@ export class BookingsService {
         }
     }
 
-    async updateStatus(actor: { userId: string; role: UserRole }, bookingId: string, status: BookingStatus, allowedSourceStatuses: BookingStatus[]) {
+    async updateStatus(actor: { id: string; role: UserRole }, bookingId: string, status: BookingStatus, allowedSourceStatuses: BookingStatus[]) {
         const booking = await this.prisma.booking.findUnique({
             where: { id: bookingId },
             include: { hostel: true },
         });
         if (!booking) throw new NotFoundException("Booking not found");
 
-        const isOwnerOfHostel = booking.hostel.ownerId === actor.userId;
+        const isOwnerOfHostel = booking.hostel.ownerId === actor.id;
         if (!(actor.role === UserRole.ADMIN || isOwnerOfHostel)) throw new ForbiddenException("Not authorized to update this booking");
 
         if (!allowedSourceStatuses.includes(booking.status)) {
@@ -134,7 +134,7 @@ export class BookingsService {
         });
     }
 
-    async approveBooking(actor: { userId: string; role: UserRole }, bookingId: string) {
+    async approveBooking(actor: { id: string; role: UserRole }, bookingId: string) {
         return await this.prisma.$transaction(async (tx) => {
             const booking = await tx.booking.findUnique({
                 where: { id: bookingId },
@@ -147,7 +147,7 @@ export class BookingsService {
             }
 
             // Verify ownership
-            if (actor.role !== UserRole.ADMIN && booking.hostel.ownerId !== actor.userId) {
+            if (actor.role !== UserRole.ADMIN && booking.hostel.ownerId !== actor.id) {
                 throw new ForbiddenException("Not authorized to approve this booking");
             }
 
@@ -192,14 +192,14 @@ export class BookingsService {
         });
     }
 
-    async rejectBooking(actor: { userId: string; role: UserRole }, bookingId: string, reason?: string) {
+    async rejectBooking(actor: { id: string; role: UserRole }, bookingId: string, reason?: string) {
         const booking = await this.prisma.booking.findUnique({
             where: { id: bookingId },
             include: { hostel: true },
         });
         if (!booking) throw new NotFoundException("Booking not found");
 
-        const isOwnerOfHostel = booking.hostel.ownerId === actor.userId;
+        const isOwnerOfHostel = booking.hostel.ownerId === actor.id;
         if (!(actor.role === UserRole.ADMIN || isOwnerOfHostel)) throw new ForbiddenException("Not authorized to reject this booking");
 
         if (booking.status !== BookingStatus.PENDING_APPROVAL) {
@@ -237,19 +237,19 @@ export class BookingsService {
         });
     }
 
-    async checkIn(actor: { userId: string; role: UserRole }, bookingId: string) {
+    async checkIn(actor: { id: string; role: UserRole }, bookingId: string) {
         return this.updateStatus(actor, bookingId, BookingStatus.CHECKED_IN, [BookingStatus.CONFIRMED, BookingStatus.APPROVED]); // Allow from APPROVED if payment is handled offline
     }
 
-    async checkOut(actor: { userId: string; role: UserRole }, bookingId: string) {
+    async checkOut(actor: { id: string; role: UserRole }, bookingId: string) {
         return this.updateStatus(actor, bookingId, BookingStatus.CHECKED_OUT, [BookingStatus.CHECKED_IN]);
     }
 
-    async complete(actor: { userId: string; role: UserRole }, bookingId: string) {
+    async complete(actor: { id: string; role: UserRole }, bookingId: string) {
         return this.updateStatus(actor, bookingId, BookingStatus.COMPLETED, [BookingStatus.CHECKED_OUT]);
     }
 
-    async requestDeletion(actor: { userId: string; role: UserRole }, bookingId: string, reason: string) {
+    async requestDeletion(actor: { id: string; role: UserRole }, bookingId: string, reason: string) {
         const booking = await this.prisma.booking.findUnique({
             where: { id: bookingId },
             include: { hostel: true },
@@ -257,7 +257,7 @@ export class BookingsService {
 
         if (!booking) throw new NotFoundException("Booking not found");
 
-        const isOwner = booking.hostel.ownerId === actor.userId;
+        const isOwner = booking.hostel.ownerId === actor.id;
         if (!isOwner && actor.role !== UserRole.ADMIN) {
             throw new ForbiddenException("Not authorized to request deletion");
         }

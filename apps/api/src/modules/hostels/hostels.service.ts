@@ -173,7 +173,7 @@ export class HostelsService {
         if (!hostel) throw new NotFoundException("Hostel not found");
 
         if (!hostel.isPublished) {
-            const isOwner = actor && (actor.role === UserRole.ADMIN || actor.userId === hostel.ownerId);
+            const isOwner = actor && (actor.role === UserRole.ADMIN || actor.id === hostel.ownerId);
             if (!isOwner) throw new NotFoundException("Hostel not found or not published");
         }
 
@@ -279,9 +279,9 @@ export class HostelsService {
         return finalResults;
     }
 
-    async addHostelImages(hostelId: string, userId: string, imageUrls: string[]) {
+    async addHostelImages(hostelId: string, id: string, imageUrls: string[]) {
         const hostel = await this.getHostelById(hostelId);
-        this.validateOwnership({ userId, role: UserRole.OWNER }, hostel.ownerId);
+        this.validateOwnership({ id, role: UserRole.OWNER }, hostel.ownerId);
 
         return this.prisma.hostel.update({
             where: { id: hostelId },
@@ -293,9 +293,9 @@ export class HostelsService {
         });
     }
 
-    async removeHostelImage(hostelId: string, userId: string, imageUrl: string) {
+    async removeHostelImage(hostelId: string, id: string, imageUrl: string) {
         const hostel = await this.getHostelById(hostelId);
-        this.validateOwnership({ userId, role: UserRole.OWNER }, hostel.ownerId);
+        this.validateOwnership({ id, role: UserRole.OWNER }, hostel.ownerId);
 
         const updatedImages = hostel.images.filter(img => img !== imageUrl);
 
@@ -345,13 +345,13 @@ export class HostelsService {
     }
 
     private validateOwnership(actor: UserActor, ownerId: string) {
-        const isAuthorized = actor.role === UserRole.ADMIN || actor.userId === ownerId;
+        const isAuthorized = actor.role === UserRole.ADMIN || actor.id === ownerId;
         if (!isAuthorized) throw new ForbiddenException("Not allowed to modify this hostel");
     }
 }
 
 interface UserActor {
-    userId: string;
+    id: string;
     role: UserRole;
 }
 

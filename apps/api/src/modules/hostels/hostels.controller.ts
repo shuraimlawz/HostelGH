@@ -25,34 +25,34 @@ export class HostelsController {
     @Post()
     @ApiOperation({ summary: "Create a new hostel (Owner only)" })
     create(@Req() req: any, @Body() dto: CreateHostelDto) {
-        return this.hostels.create(req.user.userId, dto);
+        return this.hostels.create(req.user.id, dto);
     }
 
     @Roles(UserRole.OWNER, UserRole.ADMIN)
     @Patch(":id")
     @ApiOperation({ summary: "Update hostel details (Owner/Admin only)" })
     update(@Req() req: any, @Param("id") id: string, @Body() dto: UpdateHostelDto) {
-        return this.hostels.update({ userId: req.user.userId, role: req.user.role }, id, dto);
+        return this.hostels.update({ id: req.user.id, role: req.user.role }, id, dto);
     }
 
     @Roles(UserRole.OWNER, UserRole.ADMIN)
     @Delete(":id")
     delete(@Req() req: any, @Param("id") id: string) {
-        return this.hostels.delete({ userId: req.user.userId, role: req.user.role }, id);
+        return this.hostels.delete({ id: req.user.id, role: req.user.role }, id);
     }
 
     @Roles(UserRole.OWNER, UserRole.ADMIN)
     @Get(":id")
     @ApiOperation({ summary: "Get single hostel details (Owner/Admin only)" })
     getById(@Req() req: any, @Param("id") id: string) {
-        return this.hostels.getById({ userId: req.user.userId, role: req.user.role }, id);
+        return this.hostels.getById({ id: req.user.id, role: req.user.role }, id);
     }
 
     @Roles(UserRole.OWNER)
     @Get("my-hostels")
     @ApiOperation({ summary: "Get all hostels owned by the user" })
     getMyHostels(@Req() req: any) {
-        return this.hostels.findMyHostels(req.user.userId);
+        return this.hostels.findMyHostels(req.user.id);
     }
 
     @Public()
@@ -87,7 +87,7 @@ export class HostelsController {
     @Get("public/:id")
     @ApiOperation({ summary: "Public get hostel details" })
     getPublicById(@Req() req: any, @Param("id") id: string) {
-        return this.hostels.getPublicById(id, req.user ? { userId: req.user.userId, role: req.user.role } : undefined);
+        return this.hostels.getPublicById(id, req.user ? { id: req.user.id, role: req.user.role } : undefined);
     }
 
     @Public()
@@ -137,7 +137,7 @@ export class HostelsController {
         }
 
         const result = await this.upload.uploadImageWithMetadata(file, 'hostelgh/hostels');
-        await this.hostels.addHostelImages(hostelId, req.user.userId, [result.url]);
+        await this.hostels.addHostelImages(hostelId, req.user.id, [result.url]);
 
         return {
             url: result.url,
@@ -161,7 +161,7 @@ export class HostelsController {
 
         const results = await this.upload.uploadMultipleWithMetadata(files, 'hostelgh/hostels');
         const urls = results.map(r => r.url);
-        await this.hostels.addHostelImages(hostelId, req.user.userId, urls);
+        await this.hostels.addHostelImages(hostelId, req.user.id, urls);
 
         return {
             images: results.map(r => ({
@@ -190,7 +190,7 @@ export class HostelsController {
         }
 
         // Remove from database
-        await this.hostels.removeHostelImage(hostelId, req.user.userId, imageUrl);
+        await this.hostels.removeHostelImage(hostelId, req.user.id, imageUrl);
 
         return { message: 'Image deleted successfully' };
     }

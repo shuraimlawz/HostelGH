@@ -24,7 +24,7 @@ export class RoomsController {
     @Post(":hostelId")
     @ApiOperation({ summary: "Add a room type to a hostel (Owner only)" })
     create(@Req() req: any, @Param("hostelId") hostelId: string, @Body() dto: CreateRoomDto) {
-        return this.rooms.create(req.user.userId, hostelId, dto);
+        return this.rooms.create(req.user.id, hostelId, dto);
     }
 
     @Get("hostel/:hostelId")
@@ -37,13 +37,13 @@ export class RoomsController {
     @Patch(":id")
     @ApiOperation({ summary: "Update room details (Owner/Admin only)" })
     update(@Req() req: any, @Param("id") id: string, @Body() dto: UpdateRoomDto) {
-        return this.rooms.update({ userId: req.user.userId, role: req.user.role }, id, dto);
+        return this.rooms.update({ id: req.user.id, role: req.user.role }, id, dto);
     }
 
     @Roles(UserRole.OWNER, UserRole.ADMIN)
     @Delete(":id")
     delete(@Req() req: any, @Param("id") id: string) {
-        return this.rooms.delete({ userId: req.user.userId, role: req.user.role }, id);
+        return this.rooms.delete({ id: req.user.id, role: req.user.role }, id);
     }
 
     @Roles(UserRole.OWNER)
@@ -72,7 +72,7 @@ export class RoomsController {
         }
 
         const result = await this.upload.uploadImageWithMetadata(file, 'hostelgh/rooms');
-        await this.rooms.addRoomImages(roomId, req.user.userId, [result.url]);
+        await this.rooms.addRoomImages(roomId, req.user.id, [result.url]);
 
         return {
             url: result.url,
@@ -96,7 +96,7 @@ export class RoomsController {
 
         const results = await this.upload.uploadMultipleWithMetadata(files, 'hostelgh/rooms');
         const urls = results.map(r => r.url);
-        await this.rooms.addRoomImages(roomId, req.user.userId, urls);
+        await this.rooms.addRoomImages(roomId, req.user.id, urls);
 
         return {
             images: results.map(r => ({
@@ -125,7 +125,7 @@ export class RoomsController {
         }
 
         // Remove from database
-        await this.rooms.removeRoomImage(roomId, req.user.userId, imageUrl);
+        await this.rooms.removeRoomImage(roomId, req.user.id, imageUrl);
 
         return { message: 'Image deleted successfully' };
     }
