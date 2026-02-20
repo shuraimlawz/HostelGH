@@ -172,6 +172,12 @@ export default function OwnerHostelsPage() {
                                                 </Link>
                                             </DropdownMenuItem>
                                             <DropdownMenuItem asChild className="rounded-xl p-3 font-bold text-xs cursor-pointer focus:bg-gray-50">
+                                                <Link href={`/owner/hostels/${hostel.id}/rooms`} className="flex items-center gap-3">
+                                                    <LayoutDashboard size={16} className="text-purple-500" />
+                                                    Manage Rooms
+                                                </Link>
+                                            </DropdownMenuItem>
+                                            <DropdownMenuItem asChild className="rounded-xl p-3 font-bold text-xs cursor-pointer focus:bg-gray-50">
                                                 <Link href={`/owner/hostels/${hostel.id}/edit`} className="flex items-center gap-3">
                                                     <Edit2 size={16} className="text-gray-900" />
                                                     Edit Details
@@ -238,6 +244,15 @@ export default function OwnerHostelsPage() {
                                         </div>
                                         <p className="text-xl font-black text-gray-950 tracking-tighter">{hostel._count.bookings}</p>
                                     </div>
+                                </div>
+                                <div className="mt-6">
+                                    <Link
+                                        href={`/owner/hostels/${hostel.id}/rooms`}
+                                        className="w-full bg-blue-600 text-white py-3 rounded-2xl flex items-center justify-center font-black text-[10px] uppercase tracking-widest hover:bg-blue-700 transition-all gap-2"
+                                    >
+                                        <Zap size={14} />
+                                        Manage Pricing & Rooms
+                                    </Link>
                                 </div>
                             </div>
                         </div>

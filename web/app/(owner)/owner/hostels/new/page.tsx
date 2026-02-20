@@ -141,6 +141,16 @@ export default function NewHostelPage() {
     const [publishStage, setPublishStage] = useState<'idle' | 'uploading' | 'verifying' | 'done' | 'error'>('idle');
     const [publishResult, setPublishResult] = useState<{ requiresVerification: boolean } | null>(null);
 
+    // Close overlay on error to allow user to see toast and fix issues (e.g. subscription limits)
+    useEffect(() => {
+        if (publishStage === 'error') {
+            const timer = setTimeout(() => {
+                setPublishStage('idle');
+            }, 500);
+            return () => clearTimeout(timer);
+        }
+    }, [publishStage]);
+
     const onSubmit = async (values: z.infer<typeof formSchema>) => {
         setPublishStage('uploading');
         try {
