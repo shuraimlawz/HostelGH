@@ -28,10 +28,10 @@ export default function FeaturedHostels() {
                             <span>Trending Now</span>
                         </div>
                     </div>
-                    <h3 className="text-4xl md:text-5xl font-black tracking-tighter text-foreground">
+                    <h3 className="text-3xl md:text-4xl font-black tracking-tighter text-foreground">
                         Top Rated <span className="text-primary">Spaces</span>
                     </h3>
-                    <p className="text-muted-foreground mt-3 max-w-xl font-medium">
+                    <p className="text-muted-foreground mt-3 max-w-xl font-medium text-sm">
                         Explore the highest-rated student residences across Ghana, vetted for safety, comfort, and proximity to campus.
                     </p>
                 </div>

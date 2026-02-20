@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Req, UseGuards } from "@nestjs/common";
+import { Controller, Get, Post, Req, Body, UseGuards } from "@nestjs/common";
 import { SubscriptionsService } from "./subscriptions.service";
 import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
 import { RolesGuard } from "../../common/guards/roles.guard";
@@ -8,7 +8,7 @@ import { UserRole } from "@prisma/client";
 @Controller("subscriptions")
 @UseGuards(JwtAuthGuard, RolesGuard)
 export class SubscriptionsController {
-  constructor(private readonly subscriptions: SubscriptionsService) {}
+  constructor(private readonly subscriptions: SubscriptionsService) { }
 
   @Get("my")
   @Roles(UserRole.OWNER, UserRole.ADMIN)
@@ -18,8 +18,11 @@ export class SubscriptionsController {
 
   @Post("upgrade-pro")
   @Roles(UserRole.OWNER, UserRole.ADMIN)
-  async upgradeToPro(@Req() req: any) {
-    return this.subscriptions.initiateProUpgrade(req.user.userId);
+  async upgradeToPro(
+    @Req() req: any,
+    @Body("billingCycle") billingCycle: "monthly" | "yearly",
+  ) {
+    return this.subscriptions.initiateProUpgrade(req.user.userId, billingCycle);
   }
 
   @Post("downgrade-free")

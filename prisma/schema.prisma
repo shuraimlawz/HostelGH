@@ -172,7 +172,7 @@ model Hostel {
   createdAt            DateTime @default(now())
   updatedAt            DateTime @updatedAt
 
-  owner    User      @relation("HostelOwner", fields: [ownerId], references: [id], onDelete: Restrict)
+  owner    User      @relation("HostelOwner", fields: [ownerId], references: [id], onDelete: Cascade)
   rooms    Room[]
   bookings Booking[]
   wallets  Wallet[]
@@ -189,7 +189,7 @@ model Wallet {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  owner User @relation(fields: [ownerId], references: [id])
+  owner User @relation(fields: [ownerId], references: [id], onDelete: Cascade)
   hostelId String?
   hostel   Hostel? @relation(fields: [hostelId], references: [id])
 }
@@ -202,7 +202,7 @@ model PayoutRequest {
   createdAt   DateTime     @default(now())
   processedAt DateTime?
 
-  owner User @relation(fields: [ownerId], references: [id])
+  owner User @relation(fields: [ownerId], references: [id], onDelete: Cascade)
 }
 
 enum PayoutStatus {
@@ -218,8 +218,10 @@ model Subscription {
   plan      String
   active    Boolean   @default(false)
   expiresAt DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 
-  owner User @relation(fields: [ownerId], references: [id])
+  owner User @relation(fields: [ownerId], references: [id], onDelete: Cascade)
 }
 
 model Room {
@@ -277,7 +279,7 @@ model Booking {
   updatedAt DateTime @updatedAt
 
   hostel Hostel @relation(fields: [hostelId], references: [id], onDelete: Restrict)
-  tenant User   @relation("BookingTenant", fields: [tenantId], references: [id], onDelete: Restrict)
+  tenant User   @relation("BookingTenant", fields: [tenantId], references: [id], onDelete: Cascade)
 
   items   BookingItem[]
   payment Payment?

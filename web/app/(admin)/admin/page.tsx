@@ -138,10 +138,10 @@ export default function AdminDashboardPage() {
                             <Globe size={12} className="text-primary" /> Platform Governance
                         </div>
                     </div>
-                    <h1 className="text-4xl font-black text-foreground tracking-tight leading-none mb-3">
+                    <h1 className="text-3xl font-black text-foreground tracking-tight leading-none mb-3">
                         Command Center <span className="text-primary">.</span>
                     </h1>
-                    <p className="text-muted-foreground font-medium text-lg max-w-xl">
+                    <p className="text-muted-foreground font-medium text-base max-w-xl">
                         Monitor global activity, manage strategic assets, and deploy platform-wide broadcasts.
                     </p>
                 </div>
@@ -231,7 +231,7 @@ export default function AdminDashboardPage() {
                                 </div>
                             </div>
                             <h3 className="text-muted-foreground text-[10px] font-black uppercase tracking-widest mb-1">{stat.label}</h3>
-                            <p className="text-4xl font-black text-foreground tracking-tighter">{stat.value}</p>
+                            <p className="text-3xl font-black text-foreground tracking-tighter">{stat.value}</p>
                         </div>
                     </div>
                 ))}
@@ -286,7 +286,7 @@ export default function AdminDashboardPage() {
                                     <Activity size={24} />
                                 </div>
                                 <div>
-                                    <h2 className="text-2xl font-black italic uppercase tracking-tighter">System Pulse</h2>
+                                    <h2 className="text-xl font-black italic uppercase tracking-tighter">System Pulse</h2>
                                     <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest">Global Activity Stream</p>
                                 </div>
                             </div>
@@ -332,7 +332,7 @@ export default function AdminDashboardPage() {
                     <div className="bg-foreground rounded-[3rem] p-10 flex flex-col justify-between relative overflow-hidden min-h-[450px] shadow-2xl">
                         <div className="relative z-10 space-y-8">
                             <div>
-                                <h2 className="text-2xl font-black text-background italic uppercase tracking-tighter mb-1">Strategic Hub</h2>
+                                <h2 className="text-xl font-black text-background italic uppercase tracking-tighter mb-1">Strategic Hub</h2>
                                 <p className="text-[10px] text-background/50 font-bold uppercase tracking-widest">System Overrides</p>
                             </div>
 
@@ -392,7 +392,7 @@ export default function AdminDashboardPage() {
                                 <TrendingUp size={24} />
                             </div>
                             <div>
-                                <h2 className="text-2xl font-black italic uppercase tracking-tighter">Settlement Queue</h2>
+                                <h2 className="text-xl font-black italic uppercase tracking-tighter">Settlement Queue</h2>
                                 <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest">Financial Clearances</p>
                             </div>
                         </div>

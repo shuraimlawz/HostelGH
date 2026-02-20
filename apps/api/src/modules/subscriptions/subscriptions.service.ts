@@ -19,12 +19,12 @@ export class SubscriptionsService {
     private readonly prisma: PrismaService,
     private readonly paystack: PaystackService,
     private readonly config: ConfigService,
-  ) {}
+  ) { }
 
   async getOwnerSubscription(ownerId: string) {
     const sub = await this.prisma.subscription.findFirst({
-      where: { ownerId, active: true },
-      orderBy: { expiresAt: "desc" },
+      where: { ownerId },
+      orderBy: { createdAt: "desc" },
     });
 
     if (!sub) {
@@ -35,22 +35,43 @@ export class SubscriptionsService {
       };
     }
 
+    // Lazy Deactivation: Check if subscription has expired
+    if (sub.active && sub.expiresAt && new Date(sub.expiresAt) < new Date()) {
+      await this.prisma.subscription.update({
+        where: { id: sub.id },
+        data: { active: false },
+      });
+      return { ...sub, active: false };
+    }
+
     return sub;
   }
 
   async checkLimit(
     ownerId: string,
-    feature: "max_hostels" | "featured_listings",
+    feature: "max_hostels" | "featured_listings" | "max_rooms",
+    hostelId?: string,
   ) {
     const sub = await this.getOwnerSubscription(ownerId);
     const isPro = sub.plan === SubscriptionPlan.PRO;
 
     if (feature === "max_hostels") {
       const count = await this.prisma.hostel.count({ where: { ownerId } });
-      const limit = isPro ? 50 : 1; // 1 for Free, 50 for Pro
+      const limit = isPro ? 50 : 3; // 3 for Free, 50 for Pro
       if (count >= limit) {
         throw new ForbiddenException(
           `Your ${sub.plan} plan limit for hostels (${limit}) has been reached. Please upgrade to Pro.`,
+        );
+      }
+    }
+
+    if (feature === "max_rooms") {
+      if (!hostelId) throw new NotFoundException("Hostel context required for room limits");
+      const count = await this.prisma.room.count({ where: { hostelId } });
+      const limit = isPro ? 100 : 3; // 3 per hostel for Free
+      if (count >= limit) {
+        throw new ForbiddenException(
+          `Your ${sub.plan} plan limit for rooms per property (${limit}) has been reached. Please upgrade to Pro.`,
         );
       }
     }
@@ -66,7 +87,10 @@ export class SubscriptionsService {
     return true;
   }
 
-  async initiateProUpgrade(ownerId: string) {
+  async initiateProUpgrade(
+    ownerId: string,
+    billingCycle: "monthly" | "yearly" = "monthly",
+  ) {
     const user = await this.prisma.user.findUnique({ where: { id: ownerId } });
     if (!user) throw new NotFoundException("User not found");
 
@@ -85,6 +109,7 @@ export class SubscriptionsService {
         ownerId,
         plan: SubscriptionPlan.PRO,
         type: "subscription_upgrade",
+        billingCycle,
       },
     });
 
@@ -97,9 +122,14 @@ export class SubscriptionsService {
 
     const ownerId = metadata.ownerId;
     const plan = metadata.plan;
+    const billingCycle = metadata.billingCycle || "monthly";
 
     const expiresAt = new Date();
-    expiresAt.setMonth(expiresAt.getMonth() + 1);
+    if (billingCycle === "yearly") {
+      expiresAt.setFullYear(expiresAt.getFullYear() + 1);
+    } else {
+      expiresAt.setMonth(expiresAt.getMonth() + 1);
+    }
 
     // Update or Create the subscription record
     // We use a specific ID pattern or find by ownerId to ensure one active sub

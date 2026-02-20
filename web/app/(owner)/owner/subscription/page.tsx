@@ -33,7 +33,7 @@ export default function SubscriptionPage() {
 
     const upgradeMutation = useMutation({
         mutationFn: async () => {
-            const res = await api.post("/subscriptions/upgrade-pro");
+            const res = await api.post("/subscriptions/upgrade-pro", { billingCycle });
             return res.data;
         },
         onSuccess: (data) => {
@@ -103,45 +103,45 @@ export default function SubscriptionPage() {
             </div>
 
             {/* Plan Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-stretch">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto items-stretch">
                 {/* Basic Plan */}
                 <div className={cn(
-                    "relative transition-all duration-500",
-                    !isPro ? "scale-[1.02]" : "opacity-70 hover:opacity-100"
+                    "relative group",
+                    !isPro ? "scale-100" : "opacity-80 hover:opacity-100 transition-all"
                 )}>
                     <div className={cn(
-                        "h-full p-10 rounded-[3rem] border-2 transition-all bg-white flex flex-col justify-between",
-                        !isPro ? "border-gray-950 shadow-[0_32px_80px_-20px_rgba(0,0,0,0.08)]" : "border-gray-100"
+                        "h-full p-8 rounded-[2.5rem] border-2 transition-all bg-card/50 backdrop-blur-md flex flex-col justify-between",
+                        !isPro ? "border-foreground shadow-2xl shadow-foreground/5" : "border-border"
                     )}>
                         <div>
-                            <div className="flex justify-between items-start mb-8">
+                            <div className="flex justify-between items-start mb-6">
                                 <div>
-                                    <h3 className="text-3xl font-black text-gray-950 tracking-tight mb-1">Basic</h3>
-                                    <p className="text-gray-400 font-bold text-xs uppercase tracking-widest">Starting Out</p>
+                                    <h3 className="text-2xl font-black text-foreground tracking-tight mb-0.5">Basic</h3>
+                                    <p className="text-muted-foreground font-black text-[9px] uppercase tracking-widest">Entry Tier</p>
                                 </div>
                                 {!isPro && (
-                                    <div className="bg-gray-950 text-white px-4 py-2 rounded-2xl text-[10px] font-black uppercase tracking-widest">Active</div>
+                                    <div className="bg-foreground text-background px-3 py-1 rounded-xl text-[8px] font-black uppercase tracking-widest">Active</div>
                                 )}
                             </div>
 
-                            <div className="flex items-baseline gap-1 mb-10">
-                                <span className="text-gray-300 font-black text-lg">₵</span>
-                                <span className="text-7xl font-black tracking-tighter text-gray-950">0</span>
-                                <span className="text-gray-400 font-black ml-2 text-xs uppercase tracking-wider">/forever</span>
+                            <div className="flex items-baseline gap-1 mb-8">
+                                <span className="text-muted-foreground font-black text-base">₵</span>
+                                <span className="text-5xl font-black tracking-tighter text-foreground">0</span>
+                                <span className="text-muted-foreground font-black ml-1.5 text-[10px] uppercase tracking-wider">/mo</span>
                             </div>
 
-                            <ul className="space-y-5">
+                            <ul className="space-y-4">
                                 {[
                                     "1 Hostel Listing",
-                                    "Standard Dashboard",
-                                    "Email Notifications",
-                                    "Standard Support"
+                                    "Standard Analytics",
+                                    "Direct WhatsApp",
+                                    "Email Support"
                                 ].map((item, idx) => (
-                                    <li key={idx} className="flex items-center gap-3 text-gray-600">
-                                        <div className="w-5 h-5 rounded-full bg-gray-100 flex items-center justify-center shrink-0">
-                                            <Check size={10} className="text-gray-500" />
+                                    <li key={idx} className="flex items-center gap-3 text-foreground/80">
+                                        <div className="w-4 h-4 rounded-full bg-muted flex items-center justify-center shrink-0">
+                                            <Check size={9} className="text-muted-foreground" />
                                         </div>
-                                        <span className="font-bold text-sm">{item}</span>
+                                        <span className="font-bold text-xs">{item}</span>
                                     </li>
                                 ))}
                             </ul>
@@ -151,116 +151,109 @@ export default function SubscriptionPage() {
                             onClick={() => isPro && downgradeMutation.mutate()}
                             disabled={!isPro || downgradeMutation.isPending}
                             className={cn(
-                                "w-full py-5 rounded-[2rem] font-black text-xs tracking-[0.2em] uppercase transition-all mt-10 flex items-center justify-center gap-2",
+                                "w-full py-4 rounded-2xl font-black text-[10px] tracking-[0.2em] uppercase transition-all mt-8 flex items-center justify-center gap-2",
                                 isPro
-                                    ? "bg-white text-gray-900 border-2 border-gray-200 hover:border-gray-950"
-                                    : "bg-gray-50 text-gray-400 cursor-default"
+                                    ? "bg-card text-foreground border border-border hover:border-foreground"
+                                    : "bg-muted text-muted-foreground cursor-default"
                             )}
                         >
-                            {downgradeMutation.isPending ? <Loader2 className="animate-spin" size={18} /> : null}
-                            {isPro ? "Switch to Basic" : "Current Plan"}
+                            {downgradeMutation.isPending ? <Loader2 className="animate-spin" size={14} /> : null}
+                            {isPro ? "Switch to Basic" : "Current Protocol"}
                         </button>
                     </div>
                 </div>
 
                 {/* PRO Plan */}
                 <div className={cn(
-                    "relative transition-all duration-500",
-                    isPro ? "scale-[1.02]" : "hover:scale-[1.01]"
+                    "relative group",
+                    isPro ? "scale-100" : "hover:scale-[1.01] transition-all"
                 )}>
-                    {/* Glow */}
-                    <div className="absolute -top-12 -right-12 w-56 h-56 bg-blue-500/10 rounded-full blur-[80px] pointer-events-none" />
-                    <div className="absolute -bottom-12 -left-12 w-56 h-56 bg-blue-400/10 rounded-full blur-[80px] pointer-events-none" />
+                    {/* Glow effect */}
+                    <div className="absolute -inset-1 bg-gradient-to-r from-primary to-purple-600 rounded-[2.6rem] blur opacity-10 group-hover:opacity-20 transition duration-500" />
 
                     <div className={cn(
-                        "relative h-full p-10 rounded-[3rem] border-[3px] transition-all duration-500 flex flex-col justify-between overflow-hidden",
+                        "relative h-full p-8 rounded-[2.5rem] border-2 transition-all duration-500 flex flex-col justify-between overflow-hidden",
                         isPro
-                            ? "bg-white border-blue-600 shadow-[0_32px_80px_-20px_rgba(37,99,235,0.25)]"
-                            : "bg-gradient-to-br from-white to-blue-50/30 border-gray-100 hover:border-blue-200"
+                            ? "bg-background border-primary shadow-2xl shadow-primary/10"
+                            : "bg-background/80 backdrop-blur-xl border-border hover:border-primary/50"
                     )}>
-                        {/* Top glow line */}
-                        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-blue-500/60 to-transparent" />
-
                         <div>
-                            <div className="flex justify-between items-start mb-8">
+                            <div className="flex justify-between items-start mb-6">
                                 <div>
-                                    <div className="flex items-center gap-3 mb-1">
-                                        <h3 className="text-4xl font-black text-gray-950 tracking-tighter">Pro</h3>
-                                        <div className="bg-blue-600 text-white px-3 py-1 rounded-xl text-[9px] font-black uppercase tracking-widest shadow-lg shadow-blue-200">Popular</div>
+                                    <div className="flex items-center gap-2 mb-0.5">
+                                        <h3 className="text-2xl font-black text-foreground tracking-tight">Pro</h3>
+                                        <div className="bg-primary text-background px-2 py-0.5 rounded-lg text-[8px] font-black uppercase tracking-widest">Popular</div>
                                     </div>
-                                    <p className="text-blue-500 font-black text-xs uppercase tracking-widest flex items-center gap-1.5 mt-1">
-                                        <TrendingUp size={12} /> Maximum Visibility
+                                    <p className="text-primary font-black text-[9px] uppercase tracking-widest flex items-center gap-1.5">
+                                        <TrendingUp size={10} /> Scaling Fast
                                     </p>
                                 </div>
                                 {isPro && (
-                                    <div className="w-12 h-12 rounded-2xl bg-blue-600 text-white flex items-center justify-center shadow-xl shadow-blue-200">
-                                        <ShieldCheck size={22} />
+                                    <div className="w-10 h-10 rounded-xl bg-primary text-background flex items-center justify-center shadow-lg shadow-primary/20">
+                                        <ShieldCheck size={18} />
                                     </div>
                                 )}
                             </div>
 
-                            <div className="flex items-baseline gap-1 mb-10">
-                                <span className="text-blue-200 font-black text-lg">₵</span>
-                                <span className="text-8xl font-black tracking-tighter text-gray-950">
+                            <div className="flex items-baseline gap-1 mb-8">
+                                <span className="text-primary/50 font-black text-base">₵</span>
+                                <span className="text-6xl font-black tracking-tighter text-foreground">
                                     {billingCycle === "monthly" ? monthlyPrice : yearlyPrice}
                                 </span>
-                                <div className="ml-2">
-                                    <p className="text-gray-400 font-black text-[10px] uppercase tracking-[0.2em] leading-tight">
-                                        {billingCycle === "monthly" ? "Per Month" : "Per Year"}
+                                <div className="ml-1.5 text-left">
+                                    <p className="text-muted-foreground font-black text-[9px] uppercase tracking-widest leading-tight">
+                                        {billingCycle === "monthly" ? "Month" : "Year"}
                                     </p>
                                     {billingCycle === "yearly" && (
-                                        <p className="text-emerald-500 font-black text-[10px] uppercase tracking-tight leading-tight mt-0.5">Save ₵198</p>
+                                        <p className="text-emerald-500 font-black text-[9px] uppercase tracking-tight leading-tight mt-0.5">Save 20%</p>
                                     )}
                                 </div>
                             </div>
 
-                            <ul className="space-y-5">
+                            <ul className="space-y-4">
                                 {[
-                                    { text: "Unlimited Hostel Listings", icon: Zap, color: "text-blue-500" },
-                                    { text: "Featured (Recommended) Badge", icon: Star, color: "text-amber-500" },
-                                    { text: "Advanced Analytics & Insights", icon: BarChart3, color: "text-blue-500" },
-                                    { text: "Priority Approval & Support", icon: Zap, color: "text-blue-500" },
-                                    { text: "SMS & WhatsApp Direct Alerts", icon: CheckCircle2, color: "text-blue-500" }
+                                    { text: "Unlimited Hostels", icon: Zap, color: "text-primary" },
+                                    { text: "Featured Badging", icon: Star, color: "text-amber-500" },
+                                    { text: "Pro Analytics Hub", icon: BarChart3, color: "text-primary" },
+                                    { text: "Priority Verification", icon: ShieldCheck, color: "text-primary" },
+                                    { text: "Smart Alert Matrix", icon: CheckCircle2, color: "text-primary" }
                                 ].map((item, idx) => (
-                                    <li key={idx} className="flex items-center gap-4 text-gray-700">
+                                    <li key={idx} className="flex items-center gap-3 text-foreground/90">
                                         <div className={cn(
-                                            "w-8 h-8 rounded-xl flex items-center justify-center shrink-0 border shadow-sm",
-                                            isPro ? "bg-blue-50 border-blue-100" : "bg-white border-gray-100"
+                                            "w-6 h-6 rounded-lg flex items-center justify-center shrink-0 border border-border bg-card shadow-sm",
                                         )}>
-                                            <item.icon size={14} className={item.color} />
+                                            <item.icon size={11} className={item.color} />
                                         </div>
-                                        <span className="font-bold text-sm">{item.text}</span>
+                                        <span className="font-bold text-xs">{item.text}</span>
                                     </li>
                                 ))}
                             </ul>
                         </div>
 
-                        <div className="mt-10 space-y-3">
+                        <div className="mt-8 space-y-3">
                             <button
                                 onClick={() => !isPro && upgradeMutation.mutate()}
                                 disabled={isPro || upgradeMutation.isPending}
                                 className={cn(
-                                    "w-full py-6 rounded-[2rem] font-black text-xs tracking-[0.25em] uppercase transition-all flex items-center justify-center gap-3 group/btn",
+                                    "w-full py-4 rounded-2xl font-black text-[10px] tracking-[0.2em] uppercase transition-all flex items-center justify-center gap-3 group/btn",
                                     isPro
-                                        ? "bg-blue-50 text-blue-600 border-2 border-blue-100 cursor-default"
-                                        : "bg-blue-600 text-white hover:bg-blue-700 shadow-xl shadow-blue-200 active:scale-[0.98]"
+                                        ? "bg-primary/10 text-primary cursor-default border border-primary/20"
+                                        : "bg-primary text-background hover:opacity-90 shadow-xl shadow-primary/10"
                                 )}
                             >
                                 {upgradeMutation.isPending ? (
-                                    <Loader2 className="animate-spin" size={20} />
+                                    <Loader2 className="animate-spin" size={16} />
                                 ) : (
                                     <>
-                                        {isPro ? "Active Plan ✓" : "Upgrade to Pro"}
-                                        {!isPro && <ArrowRight size={18} className="group-hover/btn:translate-x-1 transition-transform" />}
+                                        {isPro ? "Protocol Active ✓" : "Initialize Upgrade"}
+                                        {!isPro && <ArrowRight size={14} className="group-hover/btn:translate-x-1 transition-transform" />}
                                     </>
                                 )}
                             </button>
-                            <div className="flex items-center justify-center gap-4 py-1">
-                                <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] flex items-center gap-2">
-                                    <CreditCard size={12} /> Secured by Paystack
+                            <div className="flex items-center justify-center gap-3 py-1">
+                                <p className="text-[8px] font-black text-muted-foreground uppercase tracking-widest flex items-center gap-1.5">
+                                    <CreditCard size={10} /> Secured Logic
                                 </p>
-                                <div className="h-1 w-1 rounded-full bg-gray-200" />
-                                <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Cancel Anytime</p>
                             </div>
                         </div>
                     </div>

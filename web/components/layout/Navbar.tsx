@@ -41,7 +41,7 @@ export default function Navbar() {
                 {/* Logo */}
                 <Link href="/" className="flex items-center gap-2 group relative h-full">
                     <LogoAnimation />
-                    <span className="font-bold text-2xl tracking-tighter text-[#1877F2] flex overflow-hidden">
+                    <span className="font-bold text-xl tracking-tighter text-[#1877F2] flex overflow-hidden">
                         {"HostelGH".split("").map((char, i) => (
                             <span
                                 key={i}
@@ -59,7 +59,7 @@ export default function Navbar() {
                     {!user && (
                         <Link
                             href="/auth/register?role=OWNER"
-                            className="hidden md:block text-sm font-semibold px-4 py-2 rounded-lg bg-[#1877F2] text-white hover:bg-[#145CBF] transition-colors"
+                            className="hidden md:block text-base font-semibold px-4 py-2 rounded-lg bg-[#1877F2] text-white hover:bg-[#145CBF] transition-colors"
                         >
                             List your hostel
                         </Link>

@@ -113,8 +113,8 @@ export default function OwnerAccountPage() {
         return (
             <div className="flex h-[80vh] items-center justify-center">
                 <div className="flex flex-col items-center gap-4">
-                    <Loader2 className="animate-spin text-purple-600" size={40} />
-                    <p className="text-sm font-black text-gray-400 uppercase tracking-widest animate-pulse">Syncing Proprietor Data...</p>
+                    <Loader2 className="animate-spin text-primary" size={40} />
+                    <p className="text-sm font-black text-muted-foreground uppercase tracking-widest animate-pulse">Syncing Proprietor Data...</p>
                 </div>
             </div>
         );
@@ -123,8 +123,8 @@ export default function OwnerAccountPage() {
     if (!user) {
         return (
             <div className="text-center py-20">
-                <h1 className="text-2xl font-black uppercase tracking-tight text-gray-900 mb-2">Unauthorized Access</h1>
-                <p className="text-gray-500 font-medium">Please log in to manage your hub.</p>
+                <h1 className="text-2xl font-black uppercase tracking-tight text-foreground mb-2">Unauthorized Access</h1>
+                <p className="text-muted-foreground font-medium">Please log in to manage your hub.</p>
             </div>
         );
     }
@@ -134,41 +134,41 @@ export default function OwnerAccountPage() {
             {/* Header */}
             <div className="mb-10">
                 <div className="flex items-center gap-3 mb-4">
-                    <span className="px-2.5 py-1 bg-purple-50 text-purple-600 rounded-full text-[9px] font-black uppercase tracking-widest border border-purple-100">
+                    <span className="px-2.5 py-1 bg-primary/10 text-primary rounded-full text-[9px] font-black uppercase tracking-widest border border-primary/20">
                         Management
                     </span>
-                    <div className="flex items-center gap-2 text-[10px] font-bold text-gray-400">
-                        <Shield size={12} className="text-purple-400" /> Secure Hub
+                    <div className="flex items-center gap-2 text-[10px] font-bold text-muted-foreground">
+                        <Shield size={12} className="text-primary/60" /> Secure Hub
                     </div>
                 </div>
-                <h1 className="text-3xl font-black text-gray-900 tracking-tight mb-2">
-                    Account Settings <span className="text-purple-600">.</span>
+                <h1 className="text-3xl font-black text-foreground tracking-tight mb-2">
+                    Account Settings <span className="text-primary">.</span>
                 </h1>
-                <p className="text-gray-500 font-medium text-base">Manage your proprietor profile and security preferences.</p>
+                <p className="text-muted-foreground font-medium text-base">Manage your proprietor profile and security preferences.</p>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
                 {/* Profile Avatar Card */}
                 <div className="lg:col-span-4 space-y-6">
-                    <div className="bg-white rounded-[2.5rem] border border-gray-100 p-8 shadow-sm text-center relative overflow-hidden group">
-                        <div className="absolute top-0 right-0 w-24 h-24 bg-purple-50 rounded-full -mr-8 -mt-8 grayscale group-hover:grayscale-0 transition-all opacity-50" />
+                    <div className="bg-card rounded-[2.5rem] border border-border p-8 shadow-sm text-center relative overflow-hidden group">
+                        <div className="absolute top-0 right-0 w-24 h-24 bg-primary/10 rounded-full -mr-8 -mt-8 transition-all opacity-50" />
                         <div className="relative z-10 space-y-4">
                             <div className="relative inline-block">
-                                <div className="w-24 h-24 bg-gradient-to-br from-purple-600 to-purple-800 text-white rounded-[2rem] flex items-center justify-center text-3xl font-black shadow-xl rotate-3 group-hover:rotate-0 transition-transform">
+                                <div className="w-24 h-24 bg-gradient-to-br from-primary to-primary-foreground text-background rounded-[2rem] flex items-center justify-center text-3xl font-black shadow-xl rotate-3 group-hover:rotate-0 transition-transform">
                                     {formData.firstName ? formData.firstName[0] : (user.email ? user.email[0].toUpperCase() : "O")}
                                 </div>
-                                <button className="absolute -bottom-2 -right-2 bg-white border border-gray-100 shadow-xl rounded-xl p-2.5 hover:scale-110 transition-all text-gray-400 hover:text-purple-600">
+                                <button className="absolute -bottom-2 -right-2 bg-card border border-border shadow-xl rounded-xl p-2.5 hover:scale-110 transition-all text-muted-foreground hover:text-primary">
                                     <Camera size={16} />
                                 </button>
                             </div>
                             <div>
-                                <h2 className="text-xl font-black text-gray-900 italic uppercase tracking-tight">
+                                <h2 className="text-xl font-black text-foreground italic uppercase tracking-tight">
                                     {formData.firstName ? `${formData.firstName} ${formData.lastName}` : "Proprietor"}
                                 </h2>
-                                <p className="text-xs text-gray-400 font-bold uppercase tracking-widest mt-1">{user.email}</p>
+                                <p className="text-xs text-muted-foreground font-bold uppercase tracking-widest mt-1">{user.email}</p>
                             </div>
                             <div className="pt-4">
-                                <div className="inline-flex items-center gap-2 px-4 py-2 bg-purple-50 text-purple-700 rounded-xl text-[10px] font-black uppercase tracking-widest border border-purple-100/50">
+                                <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 text-primary rounded-xl text-[10px] font-black uppercase tracking-widest border border-primary/20">
                                     {user.role} Partner
                                 </div>
                             </div>
@@ -179,23 +179,22 @@ export default function OwnerAccountPage() {
                 {/* Forms Section */}
                 <div className="lg:col-span-8 space-y-8">
                     {/* General Settings */}
-                    <form onSubmit={handleUpdate} className="bg-white rounded-[2.5rem] border border-gray-100 p-8 shadow-sm space-y-8">
-                        <div className="flex items-center justify-between border-b border-gray-50 pb-6">
-                            <h3 className="text-sm font-black text-gray-900 uppercase tracking-widest italic">General Identity</h3>
+                    <form onSubmit={handleUpdate} className="bg-card rounded-[2.5rem] border border-border p-8 shadow-sm space-y-8">
+                        <div className="flex items-center justify-between border-b border-border pb-6">
+                            <h3 className="text-sm font-black text-foreground uppercase tracking-widest italic">General Identity</h3>
                             <div className="flex items-center gap-2">
-                                <div className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
-                                <span className="text-[10px] font-bold text-gray-400">Identity Mode</span>
+                                <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+                                <span className="text-[10px] font-bold text-muted-foreground">Identity Mode</span>
                             </div>
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                             <div className="space-y-2">
-                                <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">First Name</label>
+                                <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">First/Last/Contact</label>
                                 <div className="relative">
-                                    <User className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
                                     <input
                                         type="text"
-                                        className="w-full pl-12 pr-5 py-4 bg-gray-50 border border-transparent rounded-2xl outline-none focus:bg-white focus:border-purple-600 transition-all font-bold text-gray-900 text-sm"
+                                        className="w-full pl-5 pr-5 py-4 bg-muted/30 border border-transparent rounded-2xl outline-none focus:bg-background focus:border-primary transition-all font-bold text-foreground text-sm"
                                         value={formData.firstName}
                                         onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
                                         placeholder="Add first name"
@@ -236,30 +235,30 @@ export default function OwnerAccountPage() {
                             <button
                                 type="submit"
                                 disabled={updating}
-                                className="w-full md:w-auto px-10 py-4 bg-gray-950 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-black transition-all shadow-xl shadow-gray-200 flex items-center justify-center gap-3 active:scale-[0.98]"
+                                className="w-full md:w-auto px-10 py-4 bg-foreground text-background rounded-2xl font-black text-[10px] uppercase tracking-widest hover:opacity-90 transition-all shadow-xl shadow-foreground/5 flex items-center justify-center gap-3 active:scale-[0.98]"
                             >
-                                {updating ? <Loader2 className="animate-spin text-purple-400" size={18} /> : null}
+                                {updating ? <Loader2 className="animate-spin text-primary" size={18} /> : null}
                                 {updating ? "Securing Changes..." : "Secure Profile"}
                             </button>
                         </div>
                     </form>
 
                     {/* Security Hub */}
-                    <div className="bg-white rounded-[2.5rem] border border-gray-100 p-8 shadow-sm space-y-6">
-                        <div className="flex items-center justify-between border-b border-gray-50 pb-6">
-                            <h3 className="text-sm font-black text-gray-900 uppercase tracking-widest italic">Security Hub</h3>
-                            <Shield size={20} className="text-blue-600" />
+                    <div className="bg-card rounded-[2.5rem] border border-border p-8 shadow-sm space-y-6">
+                        <div className="flex items-center justify-between border-b border-border pb-6">
+                            <h3 className="text-sm font-black text-foreground uppercase tracking-widest italic">Security Hub</h3>
+                            <Shield size={20} className="text-primary" />
                         </div>
 
-                        <div className="flex items-center justify-between p-6 bg-gray-50 rounded-[2rem] border border-gray-100">
+                        <div className="flex items-center justify-between p-6 bg-muted/30 rounded-[2rem] border border-border">
                             <div>
-                                <p className="font-black text-gray-900 uppercase tracking-widest text-[11px] mb-1">System Password</p>
-                                <p className="text-xs text-gray-400 font-medium">Rotate your password periodically.</p>
+                                <p className="font-black text-foreground uppercase tracking-widest text-[11px] mb-1">System Password</p>
+                                <p className="text-xs text-muted-foreground font-medium">Rotate your password periodically.</p>
                             </div>
 
                             <Dialog open={isPasswordModalOpen} onOpenChange={setIsPasswordModalOpen}>
                                 <DialogTrigger asChild>
-                                    <button className="text-[10px] font-black uppercase tracking-widest text-purple-600 hover:bg-white px-6 py-3 rounded-xl border border-purple-100 bg-white shadow-sm transition-all hover:shadow-md">
+                                    <button className="text-[10px] font-black uppercase tracking-widest text-primary hover:bg-background px-6 py-3 rounded-xl border border-primary/10 bg-background shadow-sm transition-all hover:shadow-md">
                                         Update
                                     </button>
                                 </DialogTrigger>
@@ -303,7 +302,7 @@ export default function OwnerAccountPage() {
                                         </div>
                                         <DialogFooter className="gap-2">
                                             <Button type="button" variant="outline" onClick={() => setIsPasswordModalOpen(false)} className="rounded-xl font-black uppercase tracking-widest text-[10px]">Back</Button>
-                                            <Button type="submit" disabled={isChangingPassword} className="rounded-xl font-black uppercase tracking-widest text-[10px] bg-purple-600 hover:bg-purple-700">
+                                            <Button type="submit" disabled={isChangingPassword} className="rounded-xl font-black uppercase tracking-widest text-[10px] bg-primary text-background hover:bg-primary/90">
                                                 {isChangingPassword ? <Loader2 className="animate-spin mr-2" size={16} /> : null}
                                                 Verify & Change
                                             </Button>
@@ -315,16 +314,16 @@ export default function OwnerAccountPage() {
                     </div>
 
                     {/* Preferences Hub */}
-                    <div className="bg-white rounded-[2.5rem] border border-gray-100 p-8 shadow-sm space-y-6">
-                        <h3 className="text-sm font-black text-gray-900 uppercase tracking-widest italic">Preference Hub</h3>
-                        <div className="flex items-center justify-between p-6 bg-gray-50 rounded-[2rem] border border-gray-100">
+                    <div className="bg-card rounded-[2.5rem] border border-border p-8 shadow-sm space-y-6">
+                        <h3 className="text-sm font-black text-foreground uppercase tracking-widest italic">Preference Hub</h3>
+                        <div className="flex items-center justify-between p-6 bg-muted/30 rounded-[2rem] border border-border">
                             <div className="flex items-center gap-4">
-                                <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center border shadow-sm text-purple-600 group-hover:scale-110 transition-transform">
+                                <div className="w-12 h-12 bg-background rounded-2xl flex items-center justify-center border shadow-sm text-primary group-hover:scale-110 transition-transform">
                                     <Bell size={24} />
                                 </div>
                                 <div>
-                                    <p className="font-black text-gray-900 uppercase tracking-widest text-[11px] mb-1">Email Drifts</p>
-                                    <p className="text-xs text-gray-400 font-medium">System alerts & booking notifications.</p>
+                                    <p className="font-black text-foreground uppercase tracking-widest text-[11px] mb-1">Email Drifts</p>
+                                    <p className="text-xs text-muted-foreground font-medium">System alerts & booking notifications.</p>
                                 </div>
                             </div>
                             <button
@@ -340,9 +339,9 @@ export default function OwnerAccountPage() {
                                         setFormData({ ...formData, emailNotifications: previousValue });
                                     }
                                 }}
-                                className={`w-12 h-6 rounded-full transition-all duration-300 flex items-center px-1 shadow-inner ${formData.emailNotifications ? 'bg-purple-600' : 'bg-gray-200'}`}
+                                className={`w-12 h-6 rounded-full transition-all duration-300 flex items-center px-1 shadow-inner ${formData.emailNotifications ? 'bg-primary' : 'bg-muted'}`}
                             >
-                                <div className={`w-4 h-4 bg-white rounded-full shadow-md transition-transform duration-300 ${formData.emailNotifications ? 'translate-x-6' : 'translate-x-0'}`} />
+                                <div className={`w-4 h-4 bg-background rounded-full shadow-md transition-transform duration-300 ${formData.emailNotifications ? 'translate-x-6' : 'translate-x-0'}`} />
                             </button>
                         </div>
                     </div>

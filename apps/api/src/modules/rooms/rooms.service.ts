@@ -6,12 +6,17 @@ import {
 import { PrismaService } from "../../prisma/prisma.service";
 import { UserRole, BookingStatus } from "@prisma/client";
 import { CreateRoomDto, UpdateRoomDto } from "./dto/create-room.dto";
+import { SubscriptionsService } from "../subscriptions/subscriptions.service";
 
 @Injectable()
 export class RoomsService {
-  constructor(private readonly prisma: PrismaService) { }
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly subscriptions: SubscriptionsService,
+  ) { }
 
   async create(ownerId: string, hostelId: string, dto: CreateRoomDto) {
+    await this.subscriptions.checkLimit(ownerId, "max_rooms", hostelId);
     const hostel = await this.prisma.hostel.findUnique({
       where: { id: hostelId },
     });

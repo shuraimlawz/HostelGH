@@ -62,7 +62,15 @@ export default function OwnerDashboardPage() {
         }
     });
 
-    if (hostelsLoading || bookingsLoading || analyticsLoading || walletLoading) {
+    const { data: sub, isLoading: subLoading } = useQuery({
+        queryKey: ["my-subscription"],
+        queryFn: async () => {
+            const res = await api.get("/subscriptions/my");
+            return res.data;
+        }
+    });
+
+    if (hostelsLoading || bookingsLoading || analyticsLoading || walletLoading || subLoading) {
         return (
             <div className="flex h-[80vh] items-center justify-center bg-background transition-colors duration-300">
                 <div className="flex flex-col items-center gap-4">
@@ -124,15 +132,24 @@ export default function OwnerDashboardPage() {
                             Proprietor Hub <span className="text-primary ml-1">Live</span>
                         </span>
                     </div>
-                    <h1 className="text-3xl font-black text-foreground tracking-tight">
+                    <h1 className="text-2xl font-black text-foreground tracking-tight">
                         Portfolio Insights <span className="text-primary">.</span>
                     </h1>
-                    <p className="text-muted-foreground font-medium text-base">
+                    <p className="text-muted-foreground font-medium text-sm">
                         Real-time performance metrics for your hostel portfolio.
                     </p>
                 </div>
 
                 <div className="flex items-center gap-4">
+                    {sub?.plan === "PRO" && sub.expiresAt && (
+                        <div className="hidden xl:flex items-center gap-2 px-4 py-2 bg-primary/5 rounded-2xl border border-primary/10">
+                            <Zap size={14} className="text-primary" />
+                            <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mr-1">Pro Status</span>
+                            <span className="text-[10px] font-bold text-primary italic">
+                                Expires {new Date(sub.expiresAt).toLocaleDateString()}
+                            </span>
+                        </div>
+                    )}
                     <div className="hidden sm:flex items-center gap-2 px-4 py-2 bg-card rounded-2xl border border-border shadow-sm animate-in fade-in duration-500">
                         <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
                         <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Real-time Sync Active</span>
@@ -158,7 +175,7 @@ export default function OwnerDashboardPage() {
                             <TrendingUp size={20} className="text-green-500" />
                         </div>
                         <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-1">Total Assets</p>
-                        <h3 className="text-2xl font-black text-foreground">{stats.totalHostels} Hostels</h3>
+                        <h3 className="text-xl font-black text-foreground">{stats.totalHostels} Hostels</h3>
                     </div>
                 </div>
 
@@ -172,7 +189,7 @@ export default function OwnerDashboardPage() {
                             <span className="text-[10px] font-black text-purple-600 bg-purple-500/20 px-2 py-1 rounded-lg">High Demand</span>
                         </div>
                         <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-1">Active Tenants</p>
-                        <h3 className="text-2xl font-black text-foreground">{stats.totalApprovedBookings} Students</h3>
+                        <h3 className="text-xl font-black text-foreground">{stats.totalApprovedBookings} Students</h3>
                     </div>
                 </div>
 
@@ -186,23 +203,25 @@ export default function OwnerDashboardPage() {
                             <span className="text-[10px] font-black text-orange-600 bg-orange-500/20 px-2 py-1 rounded-lg">Action Needed</span>
                         </div>
                         <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-1">Queue Size</p>
-                        <h3 className="text-2xl font-black text-foreground">{stats.totalPendingBookings} Pending</h3>
+                        <h3 className="text-xl font-black text-foreground">{stats.totalPendingBookings} Pending</h3>
                     </div>
                 </div>
 
                 {/* Primary Wallet Card */}
-                <div className="bg-gradient-to-br from-foreground to-foreground/80 p-6 rounded-[2.5rem] shadow-2xl relative overflow-hidden group">
-                    <div className="absolute top-0 right-0 w-40 h-40 bg-primary/20 rounded-full -mr-20 -mt-20 blur-3xl group-hover:scale-110 transition-transform" />
+                <div className="bg-card p-6 rounded-[2.5rem] border border-border shadow-sm relative overflow-hidden group">
+                    <div className="absolute top-0 right-0 w-40 h-40 bg-primary/10 rounded-full -mr-20 -mt-20 blur-3xl group-hover:scale-110 transition-transform" />
                     <div className="relative z-10">
                         <div className="flex items-center justify-between mb-6">
-                            <div className="w-10 h-10 bg-background/10 backdrop-blur-md rounded-xl flex items-center justify-center border border-background/20">
-                                <DollarSign size={20} className="text-primary" />
+                            <div className="w-12 h-12 bg-primary/10 text-primary rounded-2xl flex items-center justify-center">
+                                <DollarSign size={24} />
                             </div>
-                            <Link href="/owner/payouts" className="text-[9px] font-black text-primary uppercase tracking-widest hover:underline">Withdraw</Link>
+                            <Link href="/owner/payouts" className="text-[10px] font-black text-primary uppercase tracking-widest hover:underline flex items-center gap-1">
+                                Withdraw <ArrowUpRight size={12} />
+                            </Link>
                         </div>
-                        <p className="text-[10px] font-black text-background/50 uppercase tracking-widest mb-1 italic">Settled Balance</p>
-                        <h3 className="text-3xl font-black text-background tracking-tighter">₵{walletBalance.toLocaleString()}</h3>
-                        <p className="text-[9px] text-background/70 font-medium mt-4 flex items-center gap-1">
+                        <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-1 italic">Settled Balance</p>
+                        <h3 className="text-2xl font-black text-foreground tracking-tighter">₵{walletBalance.toLocaleString()}</h3>
+                        <p className="text-[9px] text-muted-foreground font-medium mt-4 flex items-center gap-1">
                             <CheckCircle2 size={10} className="text-green-500" /> Auto-payout enabled
                         </p>
                     </div>
@@ -270,10 +289,10 @@ export default function OwnerDashboardPage() {
 
                         <div className="relative z-10">
                             <div className="w-12 h-12 bg-background/20 rounded-2xl flex items-center justify-center mb-6">
-                                <Building2 size={24} />
+                                <Building2 size={20} />
                             </div>
-                            <h3 className="text-3xl font-black mb-2">My Properties</h3>
-                            <p className="text-background/80 font-medium">You are currently managing {totalHostels} hostels with {totalRooms} total units.</p>
+                            <h3 className="text-2xl font-black mb-2">My Properties</h3>
+                            <p className="text-background/80 font-medium text-xs">You are currently managing {totalHostels} hostels with {totalRooms} total units.</p>
                         </div>
 
                         <div className="relative z-10 space-y-4">
