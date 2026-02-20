@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -64,6 +64,8 @@ const STEPS = [
     { id: 4, label: "Photos", icon: ImageIcon },
 ];
 
+const DRAFT_KEY = "hostel_listing_draft";
+
 export default function NewHostelPage() {
     const router = useRouter();
     const [loading, setLoading] = useState(false);
@@ -86,6 +88,48 @@ export default function NewHostelPage() {
         }
     });
 
+    // ─── Draft Persistence: Load ───
+    useEffect(() => {
+        const savedDraft = localStorage.getItem(DRAFT_KEY);
+        if (savedDraft) {
+            try {
+                const draft = JSON.parse(savedDraft);
+                // Restore form fields
+                if (draft.formData) {
+                    Object.keys(draft.formData).forEach((key) => {
+                        form.setValue(key as any, draft.formData[key]);
+                    });
+                    if (draft.formData.amenities) {
+                        setSelectedAmenities(draft.formData.amenities);
+                    }
+                }
+                // Restore UI State
+                if (draft.currentStep) {
+                    setCurrentStep(draft.currentStep);
+                }
+
+                toast.success("Draft restored", {
+                    description: "We've recovered your previous progress."
+                });
+            } catch (e) {
+                console.error("Failed to restore draft", e);
+            }
+        }
+    }, [form]);
+
+    // ─── Draft Persistence: Save ───
+    useEffect(() => {
+        const subscription = form.watch((value) => {
+            const draft = {
+                formData: value,
+                currentStep: currentStep,
+                updatedAt: new Date().toISOString()
+            };
+            localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
+        });
+        return () => subscription.unsubscribe();
+    }, [form.watch, currentStep]);
+
     const toggleAmenity = (id: string) => {
         const updated = selectedAmenities.includes(id)
             ? selectedAmenities.filter(a => a !== id)
@@ -107,6 +151,9 @@ export default function NewHostelPage() {
             // Stage 2: actual API call
             const res = await api.post("/hostels", values);
             await new Promise(r => setTimeout(r, 700));
+
+            // Clear draft on success
+            localStorage.removeItem(DRAFT_KEY);
 
             setPublishStage('done');
             setPublishResult({ requiresVerification: res.data?.requiresVerification ?? true });

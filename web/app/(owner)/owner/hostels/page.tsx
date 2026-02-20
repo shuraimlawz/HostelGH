@@ -15,7 +15,8 @@ import {
     CalendarCheck,
     Star,
     Loader2,
-    Search
+    Search,
+    Clock
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
@@ -150,9 +151,11 @@ export default function OwnerHostelsPage() {
                                         "px-3 py-1.5 rounded-xl text-[9px] font-black uppercase tracking-widest border backdrop-blur-md shadow-sm",
                                         hostel.isPublished
                                             ? "bg-emerald-500/90 text-white border-emerald-400"
-                                            : "bg-gray-900/90 text-gray-400 border-gray-800"
+                                            : hostel.pendingVerification
+                                                ? "bg-amber-500/90 text-white border-amber-400"
+                                                : "bg-gray-900/90 text-gray-400 border-gray-800"
                                     )}>
-                                        {hostel.isPublished ? "Live" : "Draft"}
+                                        {hostel.isPublished ? "Live" : hostel.pendingVerification ? "Pending Approval" : "Draft"}
                                     </span>
 
                                     <DropdownMenu>
@@ -208,7 +211,19 @@ export default function OwnerHostelsPage() {
                                     </div>
                                 </div>
 
-                                <div className="mt-auto grid grid-cols-2 gap-4">
+                                {hostel.pendingVerification && (
+                                    <div className="mt-4 p-4 rounded-2xl bg-amber-50 border border-amber-100 flex items-center gap-3">
+                                        <div className="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center text-amber-600 shrink-0">
+                                            <Clock size={16} />
+                                        </div>
+                                        <div className="flex-1">
+                                            <p className="text-[10px] font-black text-amber-900 uppercase tracking-widest leading-tight">Waiting for Verification</p>
+                                            <p className="text-[10px] font-bold text-amber-700">An admin will review your listing shortly.</p>
+                                        </div>
+                                    </div>
+                                )}
+
+                                <div className="mt-auto grid grid-cols-2 gap-4 pt-4">
                                     <div className="bg-gray-50 rounded-2xl p-4 border border-transparent hover:border-gray-200 transition-all">
                                         <div className="flex items-center gap-2 text-gray-400 mb-1">
                                             <Users size={14} />
