@@ -105,6 +105,13 @@ export class HostelsController {
     }
 
     @Roles(UserRole.OWNER)
+    @Get("owner/counts")
+    @ApiOperation({ summary: "Get owner notification counts" })
+    getOwnerCounts(@Req() req: any) {
+        return this.hostels.getOwnerNotificationCounts(req.user.id);
+    }
+
+    @Roles(UserRole.OWNER)
     @Post(":id/images")
     @ApiOperation({ summary: "Upload a single hostel image (Owner only)" })
     @UseInterceptors(FileInterceptor('image'))

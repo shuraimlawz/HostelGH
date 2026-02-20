@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useQuery } from "@tanstack/react-query";
+import { api } from "@/lib/api";
 import {
     LayoutDashboard,
     Home,
@@ -35,6 +37,16 @@ interface OwnerSidebarProps {
 export default function OwnerSidebar({ isOpen = false, onClose = () => { } }: OwnerSidebarProps) {
     const pathname = usePathname();
     const { user, logout } = useAuth();
+
+    const { data: counts } = useQuery({
+        queryKey: ["owner-notifications-counts"],
+        queryFn: async () => {
+            const res = await api.get("/hostels/owner/counts");
+            return res.data;
+        },
+        enabled: !!user,
+        refetchInterval: 30000
+    });
 
     const SidebarContent = () => (
         <div className="flex flex-col h-full bg-white">
@@ -76,6 +88,9 @@ export default function OwnerSidebar({ isOpen = false, onClose = () => { } }: Ow
                                     isActive ? "text-blue-300" : "text-gray-400 group-hover:text-gray-900"
                                 )} />
                                 <span className="font-bold text-[13px] tracking-tight">{link.name}</span>
+                                {link.href === "/owner/bookings" && counts?.bookings > 0 && (
+                                    <span className="flex h-2 w-2 rounded-full bg-red-500" />
+                                )}
                             </div>
                             {isActive && <ChevronRight size={14} className="text-blue-300 relative z-10" />}
                         </Link>

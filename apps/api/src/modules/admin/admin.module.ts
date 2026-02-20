@@ -5,7 +5,7 @@ import { PrismaModule } from "../../prisma/prisma.module";
 import { NotificationsModule } from "../notifications/notifications.module";
 import { HostelsModule } from "../hostels/hostels.module";
 import { UsersModule } from "../users/users.module";
-import { AdminAuditLogService } from "./admin-audit.service";
+import { AuditModule } from "../audit/audit.module";
 
 @Module({
     imports: [
@@ -13,9 +13,9 @@ import { AdminAuditLogService } from "./admin-audit.service";
         NotificationsModule,
         HostelsModule,
         UsersModule,
+        AuditModule,
     ],
     controllers: [AdminController],
-    providers: [AdminService, AdminAuditLogService],
-    exports: [AdminAuditLogService]
+    providers: [AdminService],
 })
 export class AdminModule { }

@@ -152,6 +152,18 @@ export class AdminController {
         return this.adminService.updatePayoutStatus(admin.id, id, status);
     }
 
+    @Get("notifications/counts")
+    @ApiOperation({ summary: "Get counts of items needing attention" })
+    getNotificationCounts() {
+        return this.adminService.getNotificationCounts();
+    }
+
+    @Get("alerts")
+    @ApiOperation({ summary: "Get system alerts" })
+    getAlerts() {
+        return this.adminService.getAlerts();
+    }
+
     @Post("broadcast")
     @ApiOperation({ summary: "Send a broadcast message to user segments" })
     broadcastMessage(@Body() dto: BroadcastMessageDto, @User() admin) {

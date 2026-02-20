@@ -451,4 +451,28 @@ export class AdminService {
     async createInternalUser(dto: any) { return {}; }
     async deleteUser(id: string) { return {}; } // Deprecated in favor of toggleUserSuspension
 
+    async getNotificationCounts() {
+        const [pendingHostels, pendingPayouts] = await Promise.all([
+            this.prisma.hostel.count({ where: { pendingVerification: true } }),
+            this.prisma.payoutRequest.count({ where: { status: "PENDING" } })
+        ]);
+
+        return {
+            hostels: pendingHostels,
+            payouts: pendingPayouts,
+            total: pendingHostels + pendingPayouts
+        };
+    }
+
+    async getAlerts() {
+        const counts = await this.getNotificationCounts();
+        const alerts = [];
+        if (counts.hostels > 0) {
+            alerts.push({ message: `${counts.hostels} hostels pending verification`, type: 'info' });
+        }
+        if (counts.payouts > 0) {
+            alerts.push({ message: `${counts.payouts} payout requests pending`, type: 'warning' });
+        }
+        return alerts;
+    }
 }

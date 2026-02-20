@@ -3,13 +3,15 @@ import { PrismaService } from "../../prisma/prisma.service";
 import { UserRole } from "@prisma/client";
 import { RedisService } from "../redis/redis.service";
 import { SubscriptionsService } from "../subscriptions/subscriptions.service";
+import { AdminAuditLogService, AdminAction, AdminEntity } from "../admin/admin-audit.service";
 
 @Injectable()
 export class HostelsService {
     constructor(
         private readonly prisma: PrismaService,
         private readonly redis: RedisService,
-        private readonly subscriptions: SubscriptionsService
+        private readonly subscriptions: SubscriptionsService,
+        private readonly audit: AdminAuditLogService,
     ) { }
 
     async create(ownerId: string, dto: CreateHostelDto) {
@@ -30,7 +32,18 @@ export class HostelsService {
                 isPublished: !isFirstHostel,         // auto-publish if already verified
                 pendingVerification: isFirstHostel,   // flag first-timers for admin review
             },
+            include: { owner: { select: { email: true } } }
         });
+
+        // Log for admin awareness
+        await this.audit.log(
+            null, // System-triggered (by user action)
+            AdminAction.CREATE,
+            AdminEntity.HOSTEL,
+            hostel.id,
+            `New property listed: ${hostel.name} by ${hostel.owner.email}`,
+            { requiresVerification: isFirstHostel }
+        );
 
         return {
             ...hostel,
@@ -313,6 +326,22 @@ export class HostelsService {
         const hostel = await this.prisma.hostel.findUnique({ where: { id } });
         if (!hostel) throw new NotFoundException("Hostel not found");
         return hostel;
+    }
+
+    async getOwnerNotificationCounts(ownerId: string) {
+        const [pendingBookings] = await Promise.all([
+            this.prisma.booking.count({
+                where: {
+                    hostel: { ownerId },
+                    status: "PENDING" as any
+                }
+            })
+        ]);
+
+        return {
+            bookings: pendingBookings,
+            total: pendingBookings
+        };
     }
 
     private validateOwnership(actor: UserActor, ownerId: string) {

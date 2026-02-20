@@ -21,6 +21,7 @@ export const envSchema = Joi.object({
     CLOUDINARY_API_SECRET: Joi.string().optional(),
     REDIS_HOST: Joi.string().default('localhost'),
     REDIS_PORT: Joi.number().default(6379),
+    REDIS_URL: Joi.string().optional(),
 });
 
 export default () => ({
@@ -51,6 +52,7 @@ export default () => ({
     redis: {
         host: process.env.REDIS_HOST || 'localhost',
         port: parseInt(process.env.REDIS_PORT || '6379', 10),
+        url: process.env.REDIS_URL,
     },
 });
 

@@ -38,7 +38,7 @@ export class AdminAuditLogService {
      * Errors here should not fail the main request.
      */
     async log(
-        admin: User,
+        admin: User | null,
         action: AdminAction,
         entity: AdminEntity,
         entityId: string | null,
@@ -52,12 +52,12 @@ export class AdminAuditLogService {
 
             await this.prisma.adminAuditLog.create({
                 data: {
-                    adminId: admin.id,
+                    adminId: admin?.id || null,
                     actionType: action,
                     entityType: entity,
                     entityId: entityId,
                     details,
-                    metadata: metadata ? JSON.parse(JSON.stringify(metadata)) : undefined, // Ensure serializable
+                    metadata: metadata ? JSON.parse(JSON.stringify(metadata)) : undefined,
                     ipAddress,
                     userAgent,
                 },

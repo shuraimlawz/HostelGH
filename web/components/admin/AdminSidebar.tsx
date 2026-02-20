@@ -56,6 +56,15 @@ export default function AdminSidebar({ isOpen = false, onClose = () => { } }: Ad
         refetchInterval: 30000
     });
 
+    const { data: counts } = useQuery({
+        queryKey: ["admin-notifications-counts"],
+        queryFn: async () => {
+            const res = await api.get("/admin/notifications/counts");
+            return res.data;
+        },
+        refetchInterval: 30000
+    });
+
     const hasCriticalAlerts = alerts && alerts.length > 0;
     const activeAlert = hasCriticalAlerts ? alerts[0] : null;
 
@@ -87,6 +96,12 @@ export default function AdminSidebar({ isOpen = false, onClose = () => { } }: Ad
                             <div className="flex items-center gap-3">
                                 <link.icon size={20} className={cn(isActive ? "text-white" : "text-gray-500 group-hover:text-blue-400")} />
                                 <span className="font-bold text-sm tracking-tight">{link.name}</span>
+                                {link.href === "/admin/hostels" && counts?.hostels > 0 && (
+                                    <span className="flex h-2 w-2 rounded-full bg-red-500" />
+                                )}
+                                {link.href === "/admin/payments" && counts?.payouts > 0 && (
+                                    <span className="flex h-2 w-2 rounded-full bg-red-500" />
+                                )}
                             </div>
                             {isActive && <ChevronRight size={14} className="text-white/60" />}
                         </Link>
