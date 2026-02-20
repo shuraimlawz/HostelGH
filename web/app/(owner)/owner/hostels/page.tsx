@@ -16,7 +16,9 @@ import {
     Star,
     Loader2,
     Search,
-    Clock
+    Clock,
+    LayoutDashboard,
+    Zap
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
