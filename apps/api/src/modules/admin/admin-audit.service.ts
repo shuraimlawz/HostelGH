@@ -13,6 +13,7 @@ export enum AdminAction {
     SUSPEND = "SUSPEND",
     UNSUSPEND = "UNSUSPEND",
     VERIFY = "VERIFY",
+    SYSTEM = "SYSTEM",
 }
 
 export enum AdminEntity {
@@ -29,7 +30,7 @@ export enum AdminEntity {
 export class AdminAuditLogService {
     private readonly logger = new Logger(AdminAuditLogService.name);
 
-    constructor(private readonly prisma: PrismaService) {}
+    constructor(private readonly prisma: PrismaService) { }
 
     /**
      * Log an admin action safely.

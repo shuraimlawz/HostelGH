@@ -336,17 +336,99 @@ export class AdminService {
     }
 
     async getActivity(page: number = 1, limit: number = 10) {
-        // ... (Keep existing activity logic) ...
-        return []; // returning empty for now to save space, user can re-implement if needed or I can keep it if I have space
+        const skip = (page - 1) * limit;
+        const [data, total] = await Promise.all([
+            this.prisma.adminAuditLog.findMany({
+                skip,
+                take: limit,
+                orderBy: { createdAt: 'desc' },
+                include: {
+                    admin: {
+                        select: {
+                            firstName: true,
+                            lastName: true,
+                            email: true
+                        }
+                    }
+                }
+            }),
+            this.prisma.adminAuditLog.count()
+        ]);
+
+        return {
+            activities: data.map(log => ({
+                type: this.getLogType(log.actionType),
+                user: `${log.admin.firstName} ${log.admin.lastName}`,
+                action: log.details,
+                time: log.createdAt,
+                targetUrl: log.entityType === 'HOSTEL' ? `/admin/hostels?id=${log.entityId}` : undefined
+            })),
+            meta: {
+                total,
+                page,
+                limit,
+                totalPages: Math.ceil(total / limit)
+            }
+        };
     }
 
-    // ... (Keep other existing methods like createInternalUser, broadcastMessage if they are still needed) ...
-    async broadcastMessage(dto: BroadcastMessageDto) {
-        // ... existing implementation ...
+    private getLogType(action: string): string {
+        switch (action) {
+            case 'SUSPEND':
+            case 'REJECT':
+                return 'warning';
+            case 'DELETE':
+                return 'critical';
+            case 'CREATE':
+            case 'PUBLISH':
+            case 'APPROVE':
+            case 'VERIFY':
+                return 'success';
+            default:
+                return 'info';
+        }
+    }
+
+    async updatePayoutStatus(adminId: string, id: string, status: any) {
+        const admin = await this.prisma.user.findUnique({ where: { id: adminId } });
+        const payout = await this.prisma.payoutRequest.update({
+            where: { id },
+            data: {
+                status: status,
+                processedAt: status === 'PAID' || status === 'APPROVED' ? new Date() : undefined
+            },
+            include: { owner: { select: { email: true } } }
+        });
+
+        await this.audit.log(
+            admin!,
+            status === 'PAID' ? AdminAction.APPROVE : (status === 'REJECTED' ? AdminAction.REJECT : AdminAction.UPDATE),
+            AdminEntity.PAYOUT,
+            id,
+            `Payout request for ${payout.owner.email} updated to ${status}`,
+            { status }
+        );
+
+        return payout;
+    }
+
+    async broadcastMessage(adminId: string, dto: BroadcastMessageDto) {
+        const admin = await this.prisma.user.findUnique({ where: { id: adminId } });
+        // Simulating broadcast - in real app this would send notifications/emails
+        await this.audit.log(
+            admin!,
+            AdminAction.SYSTEM,
+            AdminEntity.SYSTEM,
+            null,
+            `Broadcast message sent: ${dto.title}`,
+            dto
+        );
         return { success: true };
     }
 
-    async getSecurityAlerts() { return []; }
+    async getSecurityAlerts() {
+        return [];
+    }
 
     async getPendingPayouts() {
         return this.prisma.payoutRequest.findMany({
@@ -366,24 +448,7 @@ export class AdminService {
         });
     }
 
-    async updatePayoutStatus(id: string, status: any) {
-        // status cast to string if needed, expecting "APPROVED" | "REJECTED" | "PAID"
-        // Validating status if possible, but for now assuming controller passes valid string or enum
-        const payout = await this.prisma.payoutRequest.update({
-            where: { id },
-            data: {
-                status: status,
-                processedAt: status === 'PAID' || status === 'APPROVED' ? new Date() : undefined
-            },
-            include: { owner: { select: { email: true } } }
-        });
-
-        // Notify owner if possible (not implemented here but good practice)
-
-        return payout;
-    }
-
     async createInternalUser(dto: any) { return {}; }
-    async deleteUser(id: string) { return {}; } // Deprecated in favor of toggleUserSuspension but kept for compatibility
+    async deleteUser(id: string) { return {}; } // Deprecated in favor of toggleUserSuspension
 
 }

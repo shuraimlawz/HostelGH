@@ -148,13 +148,13 @@ export class AdminController {
 
     @Patch("payouts/:id")
     @ApiOperation({ summary: "Approve/Reject/Pay payout request" })
-    updatePayoutStatus(@Param("id") id: string, @Body("status") status: any) {
-        return this.adminService.updatePayoutStatus(id, status);
+    updatePayoutStatus(@Param("id") id: string, @Body("status") status: any, @User() admin) {
+        return this.adminService.updatePayoutStatus(admin.id, id, status);
     }
 
     @Post("broadcast")
     @ApiOperation({ summary: "Send a broadcast message to user segments" })
-    broadcastMessage(@Body() dto: BroadcastMessageDto) {
-        return this.adminService.broadcastMessage(dto);
+    broadcastMessage(@Body() dto: BroadcastMessageDto, @User() admin) {
+        return this.adminService.broadcastMessage(admin.id, dto);
     }
 }

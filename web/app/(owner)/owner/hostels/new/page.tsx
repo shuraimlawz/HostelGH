@@ -512,15 +512,39 @@ export default function NewHostelPage() {
                     {currentStep < STEPS.length ? (
                         <button
                             type="button"
-                            onClick={() => setCurrentStep(s => s + 1)}
+                            onClick={async () => {
+                                let fieldsToValidate: any[] = [];
+                                if (currentStep === 1) fieldsToValidate = ["name", "description"];
+                                if (currentStep === 2) fieldsToValidate = ["city", "addressLine", "whatsappNumber"];
+                                if (currentStep === 3) fieldsToValidate = []; // Optional
+
+                                const isValid = await form.trigger(fieldsToValidate);
+                                if (isValid) {
+                                    setCurrentStep(s => s + 1);
+                                } else {
+                                    toast.error("Please fix errors before continuing");
+                                }
+                            }}
                             className="px-8 py-4 bg-gray-950 text-white rounded-2xl font-black text-[11px] uppercase tracking-widest shadow-xl shadow-gray-200 hover:bg-black transition-all active:scale-[0.98]"
                         >
                             Continue →
                         </button>
                     ) : (
                         <button
-                            type="submit"
+                            type="button" // Change to button to manually trigger submit with validation check
                             disabled={publishStage !== 'idle'}
+                            onClick={async () => {
+                                const isValid = await form.trigger();
+                                if (isValid) {
+                                    form.handleSubmit(onSubmit)();
+                                } else {
+                                    toast.error("Please fill in all required fields", {
+                                        description: Object.values(form.formState.errors).map((e: any) => e.message).join(", ")
+                                    });
+                                    // Debug log
+                                    console.error("Form Validation Errors:", form.formState.errors);
+                                }
+                            }}
                             className="px-12 py-4 bg-blue-600 text-white rounded-2xl font-black text-[11px] uppercase tracking-widest shadow-xl shadow-blue-200 hover:bg-blue-700 transition-all active:scale-[0.98] flex items-center gap-3 disabled:opacity-60 disabled:cursor-not-allowed"
                         >
                             <Building2 size={16} />
