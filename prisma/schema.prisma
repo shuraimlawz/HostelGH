@@ -68,6 +68,7 @@ model User {
 
   firstName String?
   lastName  String?
+  avatarUrl String?
 
   isActive           Boolean @default(true)
   emailVerified      Boolean @default(false)
@@ -87,6 +88,7 @@ model User {
   payoutRequests PayoutRequest[]
   subscriptions  Subscription[]
   adminAuditLogs AdminAuditLog[]
+  processedPayouts PayoutRequest[] @relation("PayoutProcessor")
 
   paystackSubaccountCode String? // For automated split payments
 
@@ -200,7 +202,9 @@ model PayoutRequest {
   amount      Int
   status      PayoutStatus @default(PENDING)
   createdAt   DateTime     @default(now())
-  processedAt DateTime?
+  payoutMethodDetails Json?     // Snapshot of default payout method at time of request
+  processedBy         String?
+  processedById       User?    @relation("PayoutProcessor", fields: [processedBy], references: [id])
 
   owner User @relation(fields: [ownerId], references: [id], onDelete: Cascade)
 }

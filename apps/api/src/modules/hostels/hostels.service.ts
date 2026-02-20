@@ -20,7 +20,7 @@ export class HostelsService {
     private readonly redis: RedisService,
     private readonly subscriptions: SubscriptionsService,
     private readonly audit: AdminAuditLogService,
-  ) {}
+  ) { }
 
   async create(ownerId: string, dto: CreateHostelDto) {
     await this.subscriptions.checkLimit(ownerId, "max_hostels");
@@ -170,9 +170,9 @@ export class HostelsService {
         minPrice:
           minPrice !== undefined || maxPrice !== undefined
             ? {
-                gte: minPrice,
-                lte: maxPrice,
-              }
+              gte: minPrice,
+              lte: maxPrice,
+            }
             : undefined,
         rooms: {
           some: {
@@ -198,7 +198,7 @@ export class HostelsService {
       where: { id },
       include: {
         rooms: { where: { isActive: true }, orderBy: { createdAt: "asc" } },
-        owner: { select: { id: true, firstName: true, lastName: true } },
+        owner: { select: { id: true, firstName: true, lastName: true, avatarUrl: true } },
       },
     });
 
@@ -417,4 +417,4 @@ interface CreateHostelDto {
   isFeatured?: boolean;
 }
 
-interface UpdateHostelDto extends Partial<CreateHostelDto> {}
+interface UpdateHostelDto extends Partial<CreateHostelDto> { }

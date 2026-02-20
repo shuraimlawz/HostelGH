@@ -308,10 +308,14 @@ function AdminUsersContent() {
                                     <tr key={user.id} className={cn("hover:bg-gray-50/50 transition-all group", !user.isActive && "bg-red-50/10")}>
                                         <td className="px-10 py-8">
                                             <div className="flex items-center gap-5">
-                                                <div className="w-14 h-14 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600 font-black text-xl shadow-lg shadow-blue-50 transition-transform group-hover:scale-110 relative">
-                                                    {user.firstName ? user.firstName.charAt(0).toUpperCase() : user.email.charAt(0).toUpperCase()}
+                                                <div className="w-14 h-14 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600 font-black text-xl shadow-lg shadow-blue-50 transition-transform group-hover:scale-110 relative overflow-hidden">
+                                                    {user.avatarUrl ? (
+                                                        <img src={user.avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
+                                                    ) : (
+                                                        user.firstName ? user.firstName.charAt(0).toUpperCase() : user.email.charAt(0).toUpperCase()
+                                                    )}
                                                     {!user.isActive && (
-                                                        <div className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full border-2 border-white" title="Suspended" />
+                                                        <div className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full border-2 border-white z-10" title="Suspended" />
                                                     )}
                                                 </div>
                                                 <div>

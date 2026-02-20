@@ -22,7 +22,7 @@ import { ApiTags, ApiBearerAuth, ApiOperation } from "@nestjs/swagger";
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Controller("payouts")
 export class PayoutsController {
-  constructor(private payouts: PayoutsService) {}
+  constructor(private payouts: PayoutsService) { }
 
   @Roles(UserRole.OWNER)
   @Post()
@@ -64,5 +64,23 @@ export class PayoutsController {
   @ApiOperation({ summary: "Get payout request history (Owner only)" })
   getHistory(@Req() req: any) {
     return this.payouts.getPayoutHistory(req.user.userId);
+  }
+
+  @Roles(UserRole.ADMIN)
+  @Get("requests/all")
+  @ApiOperation({ summary: "Get all payout requests (Admin only)" })
+  getAllRequests() {
+    return this.payouts.findAllRequests();
+  }
+
+  @Roles(UserRole.ADMIN)
+  @Patch("requests/:id/process")
+  @ApiOperation({ summary: "Approve or Reject a payout (Admin only)" })
+  processPayout(
+    @Req() req: any,
+    @Param("id") requestId: string,
+    @Body() body: { action: "APPROVE" | "REJECT" },
+  ) {
+    return this.payouts.processPayout(req.user.userId, requestId, body.action);
   }
 }

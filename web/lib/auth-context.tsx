@@ -9,6 +9,8 @@ type User = {
     role: "ADMIN" | "TENANT" | "OWNER";
     firstName?: string;
     lastName?: string;
+    avatarUrl?: string;
+    phone?: string;
     isOnboarded?: boolean;
 };
 

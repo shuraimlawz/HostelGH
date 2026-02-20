@@ -121,8 +121,12 @@ export default function OwnerSidebar({ isOpen = false, onClose = () => { } }: Ow
                 <div className="pt-6 border-t border-border">
                     <div className="flex items-center justify-between p-2 pl-3 bg-muted/50 rounded-2xl border border-border">
                         <div className="flex items-center gap-3">
-                            <div className="w-9 h-9 bg-primary rounded-xl flex items-center justify-center text-background text-xs font-black">
-                                {user?.firstName?.[0] || user?.email?.[0].toUpperCase()}
+                            <div className="w-9 h-9 bg-primary rounded-xl flex items-center justify-center text-background text-xs font-black overflow-hidden">
+                                {user?.avatarUrl ? (
+                                    <img src={user.avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
+                                ) : (
+                                    user?.firstName?.[0] || user?.email?.[0].toUpperCase()
+                                )}
                             </div>
                             <div className="min-w-0">
                                 <p className="text-[11px] font-black text-foreground truncate tracking-tight">{user?.firstName || "Proprietor"}</p>

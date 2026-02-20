@@ -83,17 +83,18 @@ function AdminPaymentsContent() {
     const { data: pendingPayouts, isLoading: payoutsLoading } = useQuery({
         queryKey: ["admin-payouts-pending"],
         queryFn: async () => {
-            const res = await api.get("/admin/payouts");
-            return res.data;
+            const res = await api.get("/payouts/requests/all"); // New real endpoint
+            // Filter only pending for the top queue
+            return res.data.filter((r: any) => r.status === "PENDING");
         }
     });
 
     const updatePayoutMutation = useMutation({
-        mutationFn: async ({ id, status }: { id: string; status: string }) => {
-            return api.patch(`/admin/payouts/${id}`, { status });
+        mutationFn: async ({ id, action }: { id: string; action: "APPROVE" | "REJECT" }) => {
+            return api.patch(`/payouts/requests/${id}/process`, { action }); // New real endpoint
         },
         onSuccess: (_, variables) => {
-            toast.success(`Payout request ${variables.status.toLowerCase()}`);
+            toast.success(`Payout request ${variables.action === 'APPROVE' ? 'approved' : 'rejected'}`);
             queryClient.invalidateQueries({ queryKey: ["admin-payouts-pending"] });
         },
         onError: () => toast.error("Failed to update payout status")
@@ -173,35 +174,39 @@ function AdminPaymentsContent() {
 
                                 <div className="space-y-4 mb-8">
                                     <div className="flex items-center gap-3 p-3 bg-gray-900/50 rounded-xl">
-                                        <div className="w-8 h-8 bg-gray-800 rounded-lg flex items-center justify-center text-gray-400 font-bold text-xs uppercase">
-                                            {payout.owner?.firstName?.[0] || 'O'}
+                                        <div className="w-8 h-8 bg-gray-800 rounded-lg flex items-center justify-center text-emerald-400 font-black text-xs uppercase overflow-hidden">
+                                            {payout.owner?.avatarUrl ? (
+                                                <img src={payout.owner.avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
+                                            ) : (
+                                                payout.owner?.firstName?.[0] || 'O'
+                                            )}
                                         </div>
                                         <div>
                                             <p className="text-sm font-bold text-white">{payout.owner?.firstName} {payout.owner?.lastName}</p>
                                             <p className="text-[10px] text-gray-400">{payout.owner?.email}</p>
                                         </div>
                                     </div>
-                                    {payout.owner?.payoutMethods?.[0] && (
+                                    {payout.payoutMethodDetails && (
                                         <div className="p-3 bg-gray-900/50 rounded-xl space-y-1">
-                                            <p className="text-[9px] text-gray-500 font-black uppercase tracking-widest">Destination</p>
+                                            <p className="text-[9px] text-gray-500 font-black uppercase tracking-widest">Destination Snapshot</p>
                                             <p className="text-xs font-bold text-gray-300">
-                                                {payout.owner.payoutMethods[0].provider} - {payout.owner.payoutMethods[0].accountNumber}
+                                                {payout.payoutMethodDetails.provider} - {payout.payoutMethodDetails.accountNumber}
                                             </p>
-                                            <p className="text-[10px] text-gray-500 uppercase">{payout.owner.payoutMethods[0].accountName}</p>
+                                            <p className="text-[10px] text-gray-500 uppercase">{payout.payoutMethodDetails.accountName}</p>
                                         </div>
                                     )}
                                 </div>
 
                                 <div className="grid grid-cols-2 gap-3">
                                     <button
-                                        onClick={() => updatePayoutMutation.mutate({ id: payout.id, status: "PAID" })}
+                                        onClick={() => updatePayoutMutation.mutate({ id: payout.id, action: "APPROVE" })}
                                         disabled={updatePayoutMutation.isPending}
                                         className="bg-emerald-500 hover:bg-emerald-400 text-black rounded-xl py-3 font-black text-[10px] uppercase tracking-widest transition-all shadow-lg shadow-emerald-500/20 disabled:opacity-50"
                                     >
-                                        {updatePayoutMutation.isPending ? "..." : "Mark Paid"}
+                                        {updatePayoutMutation.isPending ? "..." : "Approve"}
                                     </button>
                                     <button
-                                        onClick={() => updatePayoutMutation.mutate({ id: payout.id, status: "REJECTED" })}
+                                        onClick={() => updatePayoutMutation.mutate({ id: payout.id, action: "REJECT" })}
                                         disabled={updatePayoutMutation.isPending}
                                         className="bg-gray-700 hover:bg-gray-600 text-white rounded-xl py-3 font-black text-[10px] uppercase tracking-widest transition-all disabled:opacity-50"
                                     >

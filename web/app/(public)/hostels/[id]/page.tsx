@@ -344,7 +344,26 @@ export default function HostelDetailsPage() {
                                 </div>
                             </div>
 
-                            <div className="p-4 bg-gray-50 rounded-2xl border text-[10px] font-bold text-gray-400 uppercase tracking-widest leading-relaxed">
+                            <div className="pt-8 border-t space-y-4">
+                                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Property Manager</p>
+                                <div className="flex items-center gap-4 group/owner cursor-pointer">
+                                    <div className="w-14 h-14 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600 font-black text-xl shadow-lg shadow-blue-50 overflow-hidden transition-transform group-hover/owner:scale-110">
+                                        {hostel.owner?.avatarUrl ? (
+                                            <img src={hostel.owner.avatarUrl} alt="Owner" className="w-full h-full object-cover" />
+                                        ) : (
+                                            hostel.owner?.firstName?.[0] || 'O'
+                                        )}
+                                    </div>
+                                    <div>
+                                        <p className="font-black text-gray-950 italic tracking-tight uppercase leading-none mb-1 group-hover/owner:text-blue-600 transition-colors">
+                                            {hostel.owner?.firstName} {hostel.owner?.lastName}
+                                        </p>
+                                        <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">HostelGH Verified Partner</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="mt-8 p-4 bg-gray-50 rounded-2xl border text-[10px] font-bold text-gray-400 uppercase tracking-widest leading-relaxed">
                                 <span className="text-gray-800">NOTICE:</span> Only make payments via the platform's Paystack portal after your booking has been approved.
                             </div>
                         </div>

@@ -79,8 +79,12 @@ export default function Navbar() {
                             <Menu size={18} className="ml-1 text-gray-600 group-hover:text-black" />
                             <div className="bg-gray-500 text-white rounded-full p-1 opacity-80 overflow-hidden">
                                 {user ? (
-                                    <div className="w-7 h-7 bg-foreground text-background rounded-full flex items-center justify-center text-[10px] font-bold">
-                                        {user.firstName ? user.firstName[0].toUpperCase() : user.email[0].toUpperCase()}
+                                    <div className="w-7 h-7 bg-foreground text-background rounded-full flex items-center justify-center text-[10px] font-bold overflow-hidden">
+                                        {user.avatarUrl ? (
+                                            <img src={user.avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
+                                        ) : (
+                                            user.firstName ? user.firstName[0].toUpperCase() : user.email[0].toUpperCase()
+                                        )}
                                     </div>
                                 ) : (
                                     <UserIcon size={24} className="fill-current text-muted-foreground relative -bottom-1" />

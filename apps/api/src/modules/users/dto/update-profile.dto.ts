@@ -23,4 +23,9 @@ export class UpdateProfileDto {
   @IsOptional()
   @IsBoolean()
   emailNotifications?: boolean;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsString()
+  avatarUrl?: string;
 }

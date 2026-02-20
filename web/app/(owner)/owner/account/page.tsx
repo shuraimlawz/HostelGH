@@ -154,18 +154,53 @@ export default function OwnerAccountPage() {
                         <div className="absolute top-0 right-0 w-24 h-24 bg-primary/10 rounded-full -mr-8 -mt-8 transition-all opacity-50" />
                         <div className="relative z-10 space-y-4">
                             <div className="relative inline-block">
-                                <div className="w-24 h-24 bg-gradient-to-br from-primary to-primary-foreground text-background rounded-[2rem] flex items-center justify-center text-3xl font-black shadow-xl rotate-3 group-hover:rotate-0 transition-transform">
-                                    {formData.firstName ? formData.firstName[0] : (user.email ? user.email[0].toUpperCase() : "O")}
+                                <div className="w-24 h-24 bg-gradient-to-br from-primary to-primary-foreground text-background rounded-[2rem] flex items-center justify-center text-3xl font-black shadow-xl rotate-3 group-hover:rotate-0 transition-transform relative z-0">
+                                    {user.avatarUrl ? (
+                                        <img src={user.avatarUrl} alt="Avatar" className="w-full h-full object-cover rounded-[2rem]" />
+                                    ) : (
+                                        formData.firstName ? formData.firstName[0] : (user.email ? user.email[0].toUpperCase() : "O")
+                                    )}
                                 </div>
-                                <button className="absolute -bottom-2 -right-2 bg-card border border-border shadow-xl rounded-xl p-2.5 hover:scale-110 transition-all text-muted-foreground hover:text-primary">
+                                <button
+                                    onClick={() => document.getElementById('avatar-upload')?.click()}
+                                    className="absolute -bottom-2 -right-2 bg-card border border-border shadow-xl rounded-xl p-2.5 hover:scale-110 transition-all text-muted-foreground hover:text-primary"
+                                >
                                     <Camera size={16} />
                                 </button>
+                                <input
+                                    id="avatar-upload"
+                                    type="file"
+                                    accept="image/*"
+                                    className="hidden"
+                                    onChange={async (e) => {
+                                        const file = e.target.files?.[0];
+                                        if (!file) return;
+                                        const loadingToast = toast.loading("Uploading avatar...");
+                                        try {
+                                            const formData = new FormData();
+                                            formData.append('file', file);
+                                            // Using the same upload endpoint as hostels 
+                                            const res = await api.post("/hostels/upload", formData);
+                                            const imageUrl = res.data.url;
+
+                                            await api.patch("/users/me", { avatarUrl: imageUrl });
+                                            updateUser({ ...user!, avatarUrl: imageUrl });
+                                            toast.success("Avatar updated!", { id: loadingToast });
+                                        } catch (error: any) {
+                                            toast.error("Upload failed", { id: loadingToast });
+                                        }
+                                    }}
+                                />
                             </div>
-                            <div>
+                            <div className="space-y-1">
                                 <h2 className="text-xl font-black text-foreground italic uppercase tracking-tight">
                                     {formData.firstName ? `${formData.firstName} ${formData.lastName}` : "Proprietor"}
                                 </h2>
-                                <p className="text-xs text-muted-foreground font-bold uppercase tracking-widest mt-1">{user.email}</p>
+                                {user.avatarUrl && (
+                                    <div className="absolute inset-0 w-24 h-24 rounded-[2rem] overflow-hidden rotate-3 group-hover:rotate-0 transition-transform">
+                                        <img src={user.avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
+                                    </div>
+                                )}
                             </div>
                             <div className="pt-4">
                                 <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 text-primary rounded-xl text-[10px] font-black uppercase tracking-widest border border-primary/20">
@@ -203,12 +238,12 @@ export default function OwnerAccountPage() {
                             </div>
 
                             <div className="space-y-2">
-                                <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">Last Name</label>
+                                <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Last Name</label>
                                 <div className="relative">
-                                    <User className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+                                    <User className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
                                     <input
                                         type="text"
-                                        className="w-full pl-12 pr-5 py-4 bg-gray-50 border border-transparent rounded-2xl outline-none focus:bg-white focus:border-purple-600 transition-all font-bold text-gray-900 text-sm"
+                                        className="w-full pl-12 pr-5 py-4 bg-muted/30 border border-transparent rounded-2xl outline-none focus:bg-background focus:border-primary transition-all font-bold text-foreground text-sm"
                                         value={formData.lastName}
                                         onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
                                         placeholder="Add last name"
@@ -220,10 +255,10 @@ export default function OwnerAccountPage() {
                         <div className="space-y-2">
                             <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">Business Contact</label>
                             <div className="relative">
-                                <Phone className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+                                <Phone className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
                                 <input
                                     type="tel"
-                                    className="w-full pl-12 pr-5 py-4 bg-gray-50 border border-transparent rounded-2xl outline-none focus:bg-white focus:border-purple-600 transition-all font-bold text-gray-900 text-sm"
+                                    className="w-full pl-12 pr-5 py-4 bg-muted/30 border border-transparent rounded-2xl outline-none focus:bg-background focus:border-primary transition-all font-bold text-foreground text-sm"
                                     value={formData.phone}
                                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                                     placeholder="+233 XXX XXX XXX"
