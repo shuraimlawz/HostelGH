@@ -9,6 +9,7 @@ import { useAuthModal } from "@/components/auth/AuthModalProvider";
 import { useRouter } from "next/navigation";
 import RegionSelector from "./RegionSelector";
 import { cn } from "@/lib/utils";
+import { ThemeToggle } from "./ThemeToggle";
 
 export default function Navbar() {
     const { user, logout } = useAuth();
@@ -35,7 +36,7 @@ export default function Navbar() {
     };
 
     return (
-        <header className="sticky top-0 z-50 bg-white border-b h-16 shadow-sm">
+        <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-md border-b h-16 shadow-sm transition-colors duration-300">
             <div className="container mx-auto px-4 md:px-10 h-full flex items-center justify-between">
                 {/* Logo */}
                 <Link href="/" className="flex items-center gap-2 group relative h-full">
@@ -68,6 +69,8 @@ export default function Navbar() {
                         <RegionSelector />
                     </Suspense>
 
+                    <ThemeToggle />
+
                     <div className="relative" ref={menuRef}>
                         <button
                             onClick={() => setIsOpen(!isOpen)}
@@ -76,17 +79,17 @@ export default function Navbar() {
                             <Menu size={18} className="ml-1 text-gray-600 group-hover:text-black" />
                             <div className="bg-gray-500 text-white rounded-full p-1 opacity-80 overflow-hidden">
                                 {user ? (
-                                    <div className="w-7 h-7 bg-black text-white rounded-full flex items-center justify-center text-[10px] font-bold">
+                                    <div className="w-7 h-7 bg-foreground text-background rounded-full flex items-center justify-center text-[10px] font-bold">
                                         {user.firstName ? user.firstName[0].toUpperCase() : user.email[0].toUpperCase()}
                                     </div>
                                 ) : (
-                                    <UserIcon size={24} className="fill-white text-gray-400 relative -bottom-1" />
+                                    <UserIcon size={24} className="fill-current text-muted-foreground relative -bottom-1" />
                                 )}
                             </div>
                         </button>
 
                         {isOpen && (
-                            <div className="absolute right-0 top-full mt-2 w-64 bg-white rounded-xl shadow-[0_6px_16px_rgba(0,0,0,0.12)] border py-2 animate-in fade-in zoom-in-95 duration-200 overflow-hidden z-50">
+                            <div className="absolute right-0 top-full mt-2 w-64 bg-card text-card-foreground rounded-xl shadow-[0_6px_16px_rgba(0,0,0,0.12)] border py-2 animate-in fade-in zoom-in-95 duration-200 overflow-hidden z-50">
                                 {user ? (
                                     <>
                                         <div className="px-4 py-3 border-b mb-1">
@@ -96,7 +99,7 @@ export default function Navbar() {
 
                                         <Link
                                             href={user.role === "ADMIN" ? "/admin" : user.role === "OWNER" ? "/owner" : "/account"}
-                                            className="block px-4 py-3 hover:bg-gray-50 text-sm font-semibold text-black transition-colors"
+                                            className="block px-4 py-3 hover:bg-accent text-sm font-semibold text-foreground transition-colors"
                                             onClick={() => setIsOpen(false)}
                                         >
                                             {user.role === "ADMIN" ? "Admin Dashboard" : user.role === "OWNER" ? "Owner Dashboard" : "My Account"}
@@ -124,7 +127,7 @@ export default function Navbar() {
                                                 setIsOpen(false);
                                                 open("login");
                                             }}
-                                            className="w-full text-left px-4 py-3 hover:bg-gray-50 text-sm font-semibold transition-colors"
+                                            className="w-full text-left px-4 py-3 hover:bg-accent text-sm font-semibold transition-colors"
                                         >
                                             Log in
                                         </button>
@@ -133,14 +136,14 @@ export default function Navbar() {
                                                 setIsOpen(false);
                                                 open("register");
                                             }}
-                                            className="w-full text-left px-4 py-3 hover:bg-gray-50 text-sm transition-colors"
+                                            className="w-full text-left px-4 py-3 hover:bg-accent text-sm transition-colors"
                                         >
                                             Sign up
                                         </button>
                                         <div className="border-t my-1" />
                                         <Link
                                             href="/auth/register?role=OWNER"
-                                            className="block px-4 py-3 hover:bg-gray-50 text-sm transition-colors"
+                                            className="block px-4 py-3 hover:bg-accent text-sm transition-colors"
                                             onClick={() => setIsOpen(false)}
                                         >
                                             Host your home

@@ -58,7 +58,7 @@ export default function RegionSelector() {
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
-                <div className="hidden md:flex items-center justify-center w-10 h-10 rounded-full hover:bg-gray-100 cursor-pointer transition-colors mr-1 group">
+                <div className="hidden md:flex items-center justify-center w-10 h-10 rounded-full hover:bg-accent cursor-pointer transition-colors mr-1 group">
                     <div className="relative">
                         <Globe size={18} className={cn(
                             "transition-all duration-300",
@@ -70,10 +70,10 @@ export default function RegionSelector() {
                     </div>
                 </div>
             </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-64 bg-white rounded-2xl shadow-[0_6px_16px_rgba(0,0,0,0.12)] border py-2 mt-2 animate-in fade-in zoom-in-95 duration-200">
+            <DropdownMenuContent className="w-64 bg-card text-card-foreground rounded-2xl shadow-[0_6px_16px_rgba(0,0,0,0.12)] border py-2 mt-2 animate-in fade-in zoom-in-95 duration-200">
                 <DropdownMenuLabel className="px-4 py-3">
-                    <div className="text-xs font-black uppercase tracking-[0.2em] text-gray-400 flex items-center gap-2">
-                        <MapPin size={12} className="text-blue-600" />
+                    <div className="text-xs font-black uppercase tracking-[0.2em] text-muted-foreground flex items-center gap-2">
+                        <MapPin size={12} className="text-primary" />
                         Select Region
                     </div>
                 </DropdownMenuLabel>
@@ -83,14 +83,14 @@ export default function RegionSelector() {
                         onClick={() => handleSelect("All")}
                         className={cn(
                             "px-4 py-3 cursor-pointer flex items-center justify-between transition-colors",
-                            !currentRegion ? "bg-blue-50 text-blue-700 font-bold" : "hover:bg-gray-50"
+                            !currentRegion ? "bg-primary/10 text-primary font-bold" : "hover:bg-accent"
                         )}
                     >
                         <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-[10px] font-black italic">GH</div>
+                            <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center text-[10px] font-black italic">GH</div>
                             <span className="text-sm">All of Ghana</span>
                         </div>
-                        {!currentRegion && <Check size={14} className="text-blue-600" />}
+                        {!currentRegion && <Check size={14} className="text-primary" />}
                     </DropdownMenuItem>
 
                     <DropdownMenuSeparator className="my-1 bg-gray-100" />
@@ -101,16 +101,16 @@ export default function RegionSelector() {
                             onClick={() => handleSelect(r.name)}
                             className={cn(
                                 "px-4 py-3 cursor-pointer flex items-center justify-between transition-colors",
-                                currentRegion === r.name ? "bg-blue-50 text-blue-700 font-bold" : "hover:bg-gray-50"
+                                currentRegion === r.name ? "bg-primary/10 text-primary font-bold" : "hover:bg-accent"
                             )}
                         >
                             <div className="flex items-center gap-3">
-                                <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-[10px] font-black italic uppercase text-gray-400 group-hover:text-blue-600">
+                                <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center text-[10px] font-black italic uppercase text-muted-foreground group-hover:text-primary">
                                     {r.code}
                                 </div>
                                 <span className="text-sm">{r.name}</span>
                             </div>
-                            {currentRegion === r.name && <Check size={14} className="text-blue-600" />}
+                            {currentRegion === r.name && <Check size={14} className="text-primary" />}
                         </DropdownMenuItem>
                     ))}
                 </div>
