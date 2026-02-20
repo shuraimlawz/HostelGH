@@ -132,7 +132,7 @@ export default function SubscriptionPage() {
 
                             <ul className="space-y-4">
                                 {[
-                                    "1 Hostel Listing",
+                                    "3 Hostel Listings",
                                     "Standard Analytics",
                                     "Direct WhatsApp",
                                     "Email Support"
@@ -274,21 +274,21 @@ export default function SubscriptionPage() {
                         </thead>
                         <tbody className="divide-y divide-gray-50">
                             {[
-                                { name: "Hostel Listings", basic: "1 Only", pro: "Unlimited", highlight: true },
+                                { name: "Hostel Listings", basic: "3 Only", pro: "Unlimited", highlight: true },
                                 { name: "Room Management", basic: "Standard", pro: "Advanced", highlight: false },
-                                { name: "Featured Badges", basic: "—", pro: "Included", highlight: true },
+                                { name: "Featured Badges", basic: "Not Included", pro: "Included", highlight: true },
                                 { name: "Analytics Dashboard", basic: "Basic", pro: "Full Access", highlight: false },
                                 { name: "Revenue Tracking", basic: "No", pro: "Yes", highlight: true },
                                 { name: "Priority Support", basic: "No", pro: "Yes", highlight: false },
-                                { name: "WhatsApp Contact Tools", basic: "Included", pro: "Included", highlight: false },
-                            ].map((row, i) => (
+                                { name: "WhatsApp Contact Tools", basic: "Not Included", pro: "Included", highlight: true },
+                            ].map((item, i) => (
                                 <tr key={i} className="hover:bg-blue-50/20 transition-colors">
-                                    <td className="p-8 text-sm font-bold text-gray-700">{row.name}</td>
-                                    <td className="p-8 text-sm font-semibold text-center text-gray-400">{row.basic}</td>
+                                    <td className="p-8 text-sm font-bold text-gray-700">{item.name}</td>
+                                    <td className="p-8 text-sm font-semibold text-center text-gray-400">{item.basic}</td>
                                     <td className={cn(
                                         "p-8 text-sm font-black text-center",
-                                        row.highlight ? "text-blue-600" : "text-gray-950"
-                                    )}>{row.pro}</td>
+                                        item.highlight ? "text-blue-600" : "text-gray-950"
+                                    )}>{item.pro}</td>
                                 </tr>
                             ))}
                         </tbody>
