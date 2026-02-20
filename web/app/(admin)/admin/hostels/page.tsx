@@ -119,7 +119,7 @@ function AdminHostelsContent() {
             queryClient.invalidateQueries({ queryKey: ["admin-hostels"] });
             queryClient.invalidateQueries({ queryKey: ["admin-hostels-pending"] });
         },
-        onError: () => toast.error("Failed to verify hostel")
+        onError: (err: any) => toast.error(err.message)
     });
 
     const rejectHostelMutation = useMutation({
@@ -131,7 +131,7 @@ function AdminHostelsContent() {
             queryClient.invalidateQueries({ queryKey: ["admin-hostels"] });
             queryClient.invalidateQueries({ queryKey: ["admin-hostels-pending"] });
         },
-        onError: () => toast.error("Failed to reject hostel")
+        onError: (err: any) => toast.error(err.message)
     });
 
     const toggleFeatureMutation = useMutation({
@@ -142,7 +142,7 @@ function AdminHostelsContent() {
             toast.success(variables.featured ? "Hostel featured" : "Hostel unfeatured");
             queryClient.invalidateQueries({ queryKey: ["admin-hostels"] });
         },
-        onError: () => toast.error("Feature toggle failed")
+        onError: (err: any) => toast.error(err.message)
     });
 
     const deleteHostelMutation = useMutation({
@@ -161,7 +161,7 @@ function AdminHostelsContent() {
             queryClient.invalidateQueries({ queryKey: ["admin-hostels"] });
             queryClient.invalidateQueries({ queryKey: ["admin-hostels-pending"] });
         },
-        onError: () => toast.error("Operation failed")
+        onError: (err: any) => toast.error(err.message)
     });
 
     return (

@@ -44,7 +44,7 @@ export default function SubscriptionPage() {
                 toast.success("Successfully upgraded to PRO!");
             }
         },
-        onError: (err: any) => toast.error(err.response?.data?.message || "Upgrade failed")
+        onError: (err: any) => toast.error(err.message)
     });
 
     const downgradeMutation = useMutation({
@@ -53,7 +53,7 @@ export default function SubscriptionPage() {
             queryClient.invalidateQueries({ queryKey: ["my-subscription"] });
             toast.success("Switched to Basic Plan");
         },
-        onError: (err: any) => toast.error(err.response?.data?.message || "Downgrade failed")
+        onError: (err: any) => toast.error(err.message)
     });
 
     if (isLoading) return (

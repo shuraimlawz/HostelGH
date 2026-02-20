@@ -61,7 +61,7 @@ export default function TenantSettingsPage() {
         } catch (error: any) {
             setEmailNotifications(previousValue); // Revert
             console.error("Failed to update settings", error);
-            toast.error(error.response?.data?.message || "Failed to update settings");
+            toast.error(error.message);
         }
     };
 
@@ -88,7 +88,7 @@ export default function TenantSettingsPage() {
             setIsPasswordModalOpen(false);
             setPasswordData({ oldPassword: "", newPassword: "", confirmPassword: "" });
         } catch (error: any) {
-            toast.error(error.response?.data?.message || "Failed to change password");
+            toast.error(error.message);
         } finally {
             setIsChangingPassword(false);
         }

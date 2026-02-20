@@ -97,7 +97,7 @@ function AdminPaymentsContent() {
             toast.success(`Payout request ${variables.action === 'APPROVE' ? 'approved' : 'rejected'}`);
             queryClient.invalidateQueries({ queryKey: ["admin-payouts-pending"] });
         },
-        onError: () => toast.error("Failed to update payout status")
+        onError: (err: any) => toast.error(err.message)
     });
 
     const getStatusColor = (status: string) => {

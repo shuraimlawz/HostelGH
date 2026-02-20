@@ -48,8 +48,8 @@ export default function OnboardingPage() {
                     <button
                         onClick={() => setRole("TENANT")}
                         className={`p-8 rounded-[2.5rem] border-2 transition-all text-left flex flex-col gap-4 relative group ${role === "TENANT"
-                                ? "border-blue-600 bg-blue-50/50 shadow-xl shadow-blue-900/10"
-                                : "border-gray-100 bg-white hover:border-gray-300 hover:shadow-lg"
+                            ? "border-blue-600 bg-blue-50/50 shadow-xl shadow-blue-900/10"
+                            : "border-gray-100 bg-white hover:border-gray-300 hover:shadow-lg"
                             }`}
                     >
                         <div className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-colors ${role === "TENANT" ? "bg-blue-600 text-white" : "bg-gray-100 text-gray-500 group-hover:bg-gray-200"
@@ -72,8 +72,8 @@ export default function OnboardingPage() {
                     <button
                         onClick={() => setRole("OWNER")}
                         className={`p-8 rounded-[2.5rem] border-2 transition-all text-left flex flex-col gap-4 relative group ${role === "OWNER"
-                                ? "border-black bg-gray-50 shadow-xl shadow-black/10"
-                                : "border-gray-100 bg-white hover:border-gray-300 hover:shadow-lg"
+                            ? "border-black bg-gray-50 shadow-xl shadow-black/10"
+                            : "border-gray-100 bg-white hover:border-gray-300 hover:shadow-lg"
                             }`}
                     >
                         <div className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-colors ${role === "OWNER" ? "bg-black text-white" : "bg-gray-100 text-gray-500 group-hover:bg-gray-200"

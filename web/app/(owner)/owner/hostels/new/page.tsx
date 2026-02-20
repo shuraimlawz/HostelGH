@@ -169,7 +169,7 @@ export default function NewHostelPage() {
             setPublishResult({ requiresVerification: res.data?.requiresVerification ?? true });
         } catch (error: any) {
             setPublishStage('error');
-            toast.error(error.response?.data?.message || "Failed to submit hostel");
+            toast.error(error.message);
         }
     };
 

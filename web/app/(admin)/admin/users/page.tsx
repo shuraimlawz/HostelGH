@@ -112,7 +112,7 @@ function AdminUsersContent() {
             queryClient.invalidateQueries({ queryKey: ["users"] });
             queryClient.invalidateQueries({ queryKey: ["admin-stats"] });
         },
-        onError: (err: any) => toast.error(err.response?.data?.message || "Creation failed")
+        onError: (err: any) => toast.error(err.message)
     });
 
     const updateRoleMutation = useMutation({
@@ -148,7 +148,7 @@ function AdminUsersContent() {
             queryClient.invalidateQueries({ queryKey: ["users"] });
             queryClient.invalidateQueries({ queryKey: ["admin-stats"] });
         },
-        onError: (err: any) => toast.error(err.response?.data?.message || "Purge failed")
+        onError: (err: any) => toast.error(err.message)
     });
 
     return (

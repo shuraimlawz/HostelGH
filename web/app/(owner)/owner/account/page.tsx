@@ -187,7 +187,7 @@ export default function OwnerAccountPage() {
                                             updateUser({ ...user!, avatarUrl: imageUrl });
                                             toast.success("Avatar updated!", { id: loadingToast });
                                         } catch (error: any) {
-                                            toast.error("Upload failed", { id: loadingToast });
+                                            toast.error(error.message || "Upload failed", { id: loadingToast });
                                         }
                                     }}
                                 />
@@ -369,8 +369,8 @@ export default function OwnerAccountPage() {
                                     try {
                                         await api.patch("/users/me", { emailNotifications: newValue });
                                         toast.success("Preferences updated");
-                                    } catch (error) {
-                                        toast.error("Process failed");
+                                    } catch (error: any) {
+                                        toast.error(error.message || "Process failed");
                                         setFormData({ ...formData, emailNotifications: previousValue });
                                     }
                                 }}
