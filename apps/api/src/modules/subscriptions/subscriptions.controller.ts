@@ -8,23 +8,23 @@ import { UserRole } from "@prisma/client";
 @Controller("subscriptions")
 @UseGuards(JwtAuthGuard, RolesGuard)
 export class SubscriptionsController {
-    constructor(private readonly subscriptions: SubscriptionsService) { }
+  constructor(private readonly subscriptions: SubscriptionsService) {}
 
-    @Get("my")
-    @Roles(UserRole.OWNER, UserRole.ADMIN)
-    async getMySubscription(@Req() req: any) {
-        return this.subscriptions.getOwnerSubscription(req.user.userId);
-    }
+  @Get("my")
+  @Roles(UserRole.OWNER, UserRole.ADMIN)
+  async getMySubscription(@Req() req: any) {
+    return this.subscriptions.getOwnerSubscription(req.user.userId);
+  }
 
-    @Post("upgrade-pro")
-    @Roles(UserRole.OWNER, UserRole.ADMIN)
-    async upgradeToPro(@Req() req: any) {
-        return this.subscriptions.initiateProUpgrade(req.user.userId);
-    }
+  @Post("upgrade-pro")
+  @Roles(UserRole.OWNER, UserRole.ADMIN)
+  async upgradeToPro(@Req() req: any) {
+    return this.subscriptions.initiateProUpgrade(req.user.userId);
+  }
 
-    @Post("downgrade-free")
-    @Roles(UserRole.OWNER, UserRole.ADMIN)
-    async downgradeToFree(@Req() req: any) {
-        return this.subscriptions.downgradeToFree(req.user.userId);
-    }
+  @Post("downgrade-free")
+  @Roles(UserRole.OWNER, UserRole.ADMIN)
+  async downgradeToFree(@Req() req: any) {
+    return this.subscriptions.downgradeToFree(req.user.userId);
+  }
 }

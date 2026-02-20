@@ -8,14 +8,14 @@ import { UsersModule } from "../users/users.module";
 import { AuditModule } from "../audit/audit.module";
 
 @Module({
-    imports: [
-        PrismaModule,
-        NotificationsModule,
-        HostelsModule,
-        UsersModule,
-        AuditModule,
-    ],
-    controllers: [AdminController],
-    providers: [AdminService],
+  imports: [
+    PrismaModule,
+    NotificationsModule,
+    HostelsModule,
+    UsersModule,
+    AuditModule,
+  ],
+  controllers: [AdminController],
+  providers: [AdminService],
 })
-export class AdminModule { }
+export class AdminModule {}

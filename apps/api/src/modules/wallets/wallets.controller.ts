@@ -11,12 +11,12 @@ import { ApiTags, ApiBearerAuth, ApiOperation } from "@nestjs/swagger";
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Controller("wallets")
 export class WalletsController {
-    constructor(private wallets: WalletsService) { }
+  constructor(private wallets: WalletsService) {}
 
-    @Roles(UserRole.OWNER)
-    @Get("me")
-    @ApiOperation({ summary: "Get current owner wallet balance" })
-    getMe(@Req() req: any) {
-        return this.wallets.getWalletByOwner(req.user.userId);
-    }
+  @Roles(UserRole.OWNER)
+  @Get("me")
+  @ApiOperation({ summary: "Get current owner wallet balance" })
+  getMe(@Req() req: any) {
+    return this.wallets.getWalletByOwner(req.user.userId);
+  }
 }

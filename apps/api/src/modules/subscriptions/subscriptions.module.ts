@@ -5,9 +5,9 @@ import { PaymentsModule } from "../payments/payments.module";
 
 @Global()
 @Module({
-    imports: [PaymentsModule],
-    providers: [SubscriptionsService],
-    controllers: [SubscriptionsController],
-    exports: [SubscriptionsService],
+  imports: [PaymentsModule],
+  providers: [SubscriptionsService],
+  controllers: [SubscriptionsController],
+  exports: [SubscriptionsService],
 })
-export class SubscriptionsModule { }
+export class SubscriptionsModule {}

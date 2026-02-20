@@ -4,8 +4,8 @@ import { BookingsService } from "./bookings.service";
 import { NotificationsModule } from "../notifications/notifications.module";
 
 @Module({
-    imports: [NotificationsModule],
-    controllers: [BookingsController],
-    providers: [BookingsService],
+  imports: [NotificationsModule],
+  controllers: [BookingsController],
+  providers: [BookingsService],
 })
-export class BookingsModule { }
+export class BookingsModule {}

@@ -42,7 +42,7 @@ export default function RoomModal({ hostelId, room, onClose, onSuccess }: RoomMo
     const isEditing = !!room;
 
     const { register, handleSubmit, setValue, watch, formState: { errors, isSubmitting } } = useForm<z.infer<typeof roomSchema>>({
-        resolver: zodResolver(roomSchema),
+        resolver: zodResolver(roomSchema) as any,
         defaultValues: room ? {
             ...room,
             utilitiesIncluded: room.utilitiesIncluded || [],

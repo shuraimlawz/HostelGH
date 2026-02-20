@@ -334,7 +334,7 @@ model Payment {
 
 model AdminAuditLog {
   id           String   @id @default(cuid())
-  adminId      String
+  adminId      String?
   actionType   String // CREATE, UPDATE, DELETE, APPROVE, REJECT
   entityType   String // USER, HOSTEL, BOOKING, PAYMENT, etc.
   entityId     String?
@@ -345,7 +345,7 @@ model AdminAuditLog {
 
   createdAt    DateTime @default(now())
 
-  admin        User     @relation(fields: [adminId], references: [id])
+  admin        User?     @relation(fields: [adminId], references: [id])
 
   @@index([adminId])
   @@index([entityType])

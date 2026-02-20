@@ -1,17 +1,18 @@
 export function broadcastTemplate(args: {
-    title: string;
-    message: string;
-    type: string;
+  title: string;
+  message: string;
+  type: string;
 }) {
-    const typeColors = {
-        info: { bg: '#EFF6FF', border: '#3B82F6', icon: 'ℹ️' },
-        warning: { bg: '#FEF3C7', border: '#F59E0B', icon: '⚠️' },
-        alert: { bg: '#FEE2E2', border: '#EF4444', icon: '🚨' },
-    };
+  const typeColors = {
+    info: { bg: "#EFF6FF", border: "#3B82F6", icon: "ℹ️" },
+    warning: { bg: "#FEF3C7", border: "#F59E0B", icon: "⚠️" },
+    alert: { bg: "#FEE2E2", border: "#EF4444", icon: "🚨" },
+  };
 
-    const colors = typeColors[args.type as keyof typeof typeColors] || typeColors.info;
+  const colors =
+    typeColors[args.type as keyof typeof typeColors] || typeColors.info;
 
-    return `
+  return `
   <div style="font-family:Arial,sans-serif;line-height:1.6;color:#111;max-width:600px;margin:0 auto">
     <div style="background:${colors.bg};border-left:4px solid ${colors.border};padding:20px;border-radius:12px;margin-bottom:20px">
       <h2 style="margin:0 0 12px;display:flex;align-items:center;gap:8px">

@@ -5,9 +5,9 @@ import { PrismaModule } from "../../prisma/prisma.module";
 import { UploadModule } from "../upload/upload.module";
 
 @Module({
-    imports: [PrismaModule, UploadModule],
-    controllers: [RoomsController],
-    providers: [RoomsService],
-    exports: [RoomsService],
+  imports: [PrismaModule, UploadModule],
+  controllers: [RoomsController],
+  providers: [RoomsService],
+  exports: [RoomsService],
 })
-export class RoomsModule { }
+export class RoomsModule {}

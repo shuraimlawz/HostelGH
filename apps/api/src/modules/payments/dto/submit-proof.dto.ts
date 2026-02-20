@@ -1,9 +1,9 @@
 import { IsString, IsUrl } from "class-validator";
 
 export class SubmitProofDto {
-    @IsUrl()
-    proofUrl: string;
+  @IsUrl()
+  proofUrl: string;
 
-    @IsString()
-    notes: string;
+  @IsString()
+  notes: string;
 }

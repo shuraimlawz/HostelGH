@@ -6,9 +6,9 @@ import { PaystackService } from "./paystack.service";
 import { NotificationsModule } from "../notifications/notifications.module";
 
 @Module({
-    imports: [NotificationsModule],
-    controllers: [PaymentsController, WebhooksController],
-    providers: [PaymentsService, PaystackService],
-    exports: [PaymentsService, PaystackService],
+  imports: [NotificationsModule],
+  controllers: [PaymentsController, WebhooksController],
+  providers: [PaymentsService, PaystackService],
+  exports: [PaymentsService, PaystackService],
 })
-export class PaymentsModule { }
+export class PaymentsModule {}

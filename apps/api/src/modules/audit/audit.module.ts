@@ -4,8 +4,8 @@ import { PrismaModule } from "../../prisma/prisma.module";
 
 @Global()
 @Module({
-    imports: [PrismaModule],
-    providers: [AdminAuditLogService],
-    exports: [AdminAuditLogService],
+  imports: [PrismaModule],
+  providers: [AdminAuditLogService],
+  exports: [AdminAuditLogService],
 })
-export class AuditModule { }
+export class AuditModule {}

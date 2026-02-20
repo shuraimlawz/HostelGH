@@ -5,25 +5,25 @@ import { IS_PUBLIC_KEY } from "../../../common/decorators/public.decorator";
 
 @Injectable()
 export class JwtAuthGuard extends AuthGuard("jwt") {
-    constructor(private reflector: Reflector) {
-        super();
+  constructor(private reflector: Reflector) {
+    super();
+  }
+
+  async canActivate(context: ExecutionContext): Promise<boolean> {
+    const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
+      context.getHandler(),
+      context.getClass(),
+    ]);
+
+    if (isPublic) {
+      try {
+        await super.canActivate(context);
+      } catch (err) {
+        // Ignore errors for public routes, just don't populate req.user
+      }
+      return true;
     }
 
-    async canActivate(context: ExecutionContext): Promise<boolean> {
-        const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
-            context.getHandler(),
-            context.getClass(),
-        ]);
-
-        if (isPublic) {
-            try {
-                await super.canActivate(context);
-            } catch (err) {
-                // Ignore errors for public routes, just don't populate req.user
-            }
-            return true;
-        }
-
-        return super.canActivate(context) as Promise<boolean>;
-    }
+    return super.canActivate(context) as Promise<boolean>;
+  }
 }
