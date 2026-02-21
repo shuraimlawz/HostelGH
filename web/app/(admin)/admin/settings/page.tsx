@@ -172,8 +172,8 @@ export default function AdminSettingsPage() {
                                             try {
                                                 await api.patch("/users/me", { emailNotifications: newValue });
                                                 toast.success("Notification preferences updated");
-                                            } catch (error) {
-                                                toast.error("Failed to update notification settings");
+                                            } catch (error: any) {
+                                                toast.error(error.message || "Failed to update notification settings");
                                                 setFormData({ ...formData, emailNotifications: !newValue });
                                             }
                                         }}

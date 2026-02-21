@@ -37,7 +37,7 @@ export default function BookingModal({
             });
             setDone(true);
         } catch (e: any) {
-            setErr(e?.response?.data?.message ?? "Booking failed");
+            setErr(e.message || "Booking failed");
         } finally {
             setLoading(false);
         }

@@ -7,7 +7,6 @@ import { AuthModalProvider } from "@/components/auth/AuthModalProvider";
 import Shell from "@/components/layout/Shell";
 import { Toaster } from "sonner";
 import JsonLd from "@/components/JsonLd";
-import { ThemeProvider } from "@/components/ThemeProvider";
 
 const outfit = Outfit({
   variable: "--font-outfit",
@@ -77,19 +76,17 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${outfit.variable} ${inter.variable} font-sans antialiased uppercase-headings`}>
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          <JsonLd />
-          <AuthProvider>
-            <QueryProvider>
-              <AuthModalProvider>
-                <Shell>
-                  {children}
-                </Shell>
-                <Toaster position="top-center" richColors />
-              </AuthModalProvider>
-            </QueryProvider>
-          </AuthProvider>
-        </ThemeProvider>
+        <JsonLd />
+        <AuthProvider>
+          <QueryProvider>
+            <AuthModalProvider>
+              <Shell>
+                {children}
+              </Shell>
+              <Toaster position="top-center" richColors />
+            </AuthModalProvider>
+          </QueryProvider>
+        </AuthProvider>
       </body>
     </html>
   );

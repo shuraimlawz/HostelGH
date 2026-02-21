@@ -38,7 +38,7 @@ export default function ImageUpload({ value, onChange, maxImages = 10 }: ImageUp
             onChange([...value, ...newUrls]);
             toast.success("Images uploaded successfully!");
         } catch (error: any) {
-            toast.error(error.response?.data?.message || "Failed to upload images");
+            toast.error(error.message || "Failed to upload images");
         } finally {
             setUploading(false);
         }

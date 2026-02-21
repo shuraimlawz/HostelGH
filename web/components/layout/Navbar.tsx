@@ -9,7 +9,6 @@ import { useAuthModal } from "@/components/auth/AuthModalProvider";
 import { useRouter } from "next/navigation";
 import RegionSelector from "./RegionSelector";
 import { cn } from "@/lib/utils";
-import { ThemeToggle } from "./ThemeToggle";
 
 export default function Navbar() {
     const { user, logout } = useAuth();
@@ -69,7 +68,6 @@ export default function Navbar() {
                         <RegionSelector />
                     </Suspense>
 
-                    <ThemeToggle />
 
                     <div className="relative" ref={menuRef}>
                         <button

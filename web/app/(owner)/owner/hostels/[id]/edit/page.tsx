@@ -141,7 +141,7 @@ export default function EditHostelPage() {
             toast.success("Hostel updated successfully");
             queryClient.invalidateQueries({ queryKey: ["hostel", hostelId] });
         } catch (error: any) {
-            toast.error("Failed to update hostel");
+            toast.error(error.message || "Failed to update hostel");
         } finally {
             setIsSaving(false);
         }
@@ -156,7 +156,7 @@ export default function EditHostelPage() {
             setIsAddingRoom(false);
             queryClient.invalidateQueries({ queryKey: ["hostel", hostelId] });
         },
-        onError: () => toast.error("Failed to add room")
+        onError: (err: any) => toast.error(err.message || "Failed to add room")
     });
 
     const deleteRoomMutation = useMutation({

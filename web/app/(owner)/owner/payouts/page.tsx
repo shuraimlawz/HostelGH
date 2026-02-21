@@ -54,7 +54,7 @@ export default function PayoutSettingsPage() {
             setShowForm(false);
             reset();
         },
-        onError: (err: any) => toast.error(err.response?.data?.message || "Failed to add payout method"),
+        onError: (err: any) => toast.error(err.message || "Failed to add payout method"),
     });
 
     const deleteMutation = useMutation({
@@ -63,6 +63,7 @@ export default function PayoutSettingsPage() {
             queryClient.invalidateQueries({ queryKey: ["payout-methods"] });
             toast.success("Payout method removed");
         },
+        onError: (err: any) => toast.error(err.message || "Failed to remove payout method"),
     });
 
     const setDefaultMutation = useMutation({
@@ -71,6 +72,7 @@ export default function PayoutSettingsPage() {
             queryClient.invalidateQueries({ queryKey: ["payout-methods"] });
             toast.success("Default payout method updated");
         },
+        onError: (err: any) => toast.error(err.message || "Failed to update default method"),
     });
 
     const { register, handleSubmit, reset, watch, setValue, formState: { errors } } = useForm<PayoutFormValues>({

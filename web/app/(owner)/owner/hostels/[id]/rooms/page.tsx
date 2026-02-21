@@ -54,7 +54,7 @@ export default function RoomManagementPage() {
             queryClient.invalidateQueries({ queryKey: ["hostel-rooms", hostelId] });
             toast.success("Room type removed");
         },
-        onError: (err: any) => toast.error(err.response?.data?.message || "Failed to delete room")
+        onError: (err: any) => toast.error(err.message || "Failed to delete room")
     });
 
     if (roomsLoading || hostelLoading) {

@@ -49,7 +49,7 @@ export default function OwnerHostelsPage() {
             queryClient.invalidateQueries({ queryKey: ["owner-hostels"] });
             toast.success("Property removed from your portfolio");
         },
-        onError: (err: any) => toast.error(err.response?.data?.message || "Failed to delete hostel")
+        onError: (err: any) => toast.error(err.message || "Failed to delete hostel")
     });
 
     const handleDelete = (id: string, name: string) => {

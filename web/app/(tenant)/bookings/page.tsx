@@ -45,8 +45,8 @@ export default function TenantBookingsPage() {
                 toast.error("Could not initiate payment. Please try again.");
             }
         },
-        onError: (err: any) => {
-            toast.error(err.response?.data?.message || "Payment initiation failed");
+        onError: (error: any) => {
+            toast.error(error.message || "Payment initiation failed");
         }
     });
 
