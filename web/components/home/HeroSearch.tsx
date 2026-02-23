@@ -80,7 +80,7 @@ export default function HeroSearch() {
 
                 {/* Main Heading */}
                 <h1 className="text-5xl md:text-7xl lg:text-8xl font-black text-white mb-6 tracking-tighter drop-shadow-2xl animate-in fade-in slide-in-from-bottom-6 duration-1000 fill-mode-both">
-                    Find your <span className="text-blue-400">perfect</span> space
+                    Find your <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-300">perfect</span> space
                 </h1>
 
                 {/* Subtitle */}
@@ -90,16 +90,19 @@ export default function HeroSearch() {
 
                 {/* Modern GlassSearch Box */}
                 <div className="w-full max-w-3xl animate-in fade-in zoom-in-95 duration-1000 delay-500 fill-mode-both">
-                    <div className="bg-white/10 backdrop-blur-2xl p-3 rounded-[2rem] border border-white/20 shadow-[0_20px_50px_rgba(0,0,0,0.3)] flex flex-col md:flex-row items-center gap-3">
+                    <div className="bg-white/10 backdrop-blur-3xl p-3 rounded-[2rem] border border-white/30 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.5)] flex flex-col md:flex-row items-center gap-3 relative overflow-hidden">
+                        {/* Shimmer effect inside the glass box */}
+                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -skew-x-12 translate-x-[-150%] animate-[shimmer_3s_infinite]" />
+
                         {/* Location Input Group */}
-                        <div className="flex-1 flex items-center px-6 py-3 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 transition-colors w-full">
-                            <MapPin className="text-blue-400 mr-4" size={24} />
+                        <div className="relative z-10 flex-1 flex items-center px-6 py-3 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 transition-colors w-full focus-within:ring-2 focus-within:ring-blue-400/50">
+                            <MapPin className="text-cyan-400 mr-4" size={24} />
                             <div className="flex-1 text-left">
-                                <label className="block text-[10px] font-black text-white/50 uppercase tracking-[0.2em] mb-1">Campus or City</label>
+                                <label className="block text-[10px] font-black text-white/60 uppercase tracking-[0.2em] mb-1">Campus or City</label>
                                 <input
                                     type="text"
                                     placeholder="Enter Legon, KNUST, UCC..."
-                                    className="w-full text-white placeholder:text-white/30 font-bold bg-transparent border-none outline-none text-lg"
+                                    className="w-full text-white placeholder:text-white/40 font-bold bg-transparent border-none outline-none text-lg selection:bg-blue-500/30"
                                     value={city}
                                     onChange={(e) => setCity(e.target.value)}
                                     onKeyDown={(e) => e.key === "Enter" && handleSearch()}
@@ -110,10 +113,10 @@ export default function HeroSearch() {
                         {/* Search Button */}
                         <button
                             onClick={() => handleSearch()}
-                            className="bg-blue-600 hover:bg-blue-500 text-white px-8 h-full min-h-[64px] rounded-2xl transition-all shadow-xl hover:shadow-blue-500/25 flex items-center justify-center gap-3 w-full md:w-auto font-black text-lg group active:scale-95"
+                            className="relative z-10 bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 text-white px-8 h-full min-h-[64px] rounded-2xl transition-all shadow-xl hover:shadow-cyan-500/40 flex items-center justify-center gap-3 w-full md:w-auto font-black text-lg group active:scale-95 border border-white/10"
                         >
-                            <Search size={24} className="group-hover:scale-110 transition-transform" />
-                            <span>Quick Search</span>
+                            <Search size={24} className="group-hover:scale-110 group-hover:rotate-12 transition-transform duration-300" />
+                            <span>Search</span>
                         </button>
                     </div>
 

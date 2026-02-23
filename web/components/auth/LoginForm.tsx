@@ -72,11 +72,11 @@ export default function LoginForm({ onSuccess }: { onSuccess?: (user: any) => vo
     return (
         <div className="space-y-4">
             <form onSubmit={submit} className="space-y-4">
-                <div className="space-y-1">
-                    <label className="text-xs font-semibold text-muted-foreground px-1">Email</label>
+                <div className="space-y-1.5 group">
+                    <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest px-1 group-focus-within:text-blue-500 transition-colors">Email</label>
                     <input
                         type="email"
-                        className="w-full px-4 py-3 bg-muted/50 rounded-xl outline-none border border-transparent focus:border-primary focus:bg-background transition-all text-sm"
+                        className="w-full px-4 py-3.5 bg-white border border-black/5 hover:border-black/10 rounded-2xl outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all text-sm shadow-sm"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         placeholder="your@email.com"
@@ -84,12 +84,12 @@ export default function LoginForm({ onSuccess }: { onSuccess?: (user: any) => vo
                     />
                 </div>
 
-                <div className="space-y-1 relative">
-                    <label className="text-xs font-semibold text-muted-foreground px-1">Password</label>
+                <div className="space-y-1.5 group">
+                    <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest px-1 group-focus-within:text-blue-500 transition-colors">Password</label>
                     <div className="relative">
                         <input
                             type={showPassword ? "text" : "password"}
-                            className="w-full px-4 py-3 bg-muted/50 rounded-xl outline-none border border-transparent focus:border-primary focus:bg-background transition-all text-sm pr-12"
+                            className="w-full px-4 py-3.5 bg-white border border-black/5 hover:border-black/10 rounded-2xl outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all text-sm shadow-sm pr-12"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             placeholder="••••••••"
@@ -98,7 +98,7 @@ export default function LoginForm({ onSuccess }: { onSuccess?: (user: any) => vo
                         <button
                             type="button"
                             onClick={() => setShowPassword(!showPassword)}
-                            className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors outline-none z-10"
+                            className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-blue-500 transition-colors outline-none z-10"
                         >
                             {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                         </button>
@@ -120,24 +120,26 @@ export default function LoginForm({ onSuccess }: { onSuccess?: (user: any) => vo
                     </div>
                 )}
 
-                <button
-                    disabled={loading}
-                    className="group relative w-full rounded-xl bg-foreground text-background font-bold py-3.5 hover:opacity-90 transition-all active:scale-[0.98] disabled:opacity-60 text-sm shadow-md shadow-foreground/10 mt-2 overflow-hidden"
-                >
-                    {loading ? (
-                        <div className="flex items-center justify-center gap-2">
-                            <div className="w-1.5 h-1.5 bg-white rounded-full animate-bounce [animation-delay:-0.3s]"></div>
-                            <div className="w-1.5 h-1.5 bg-white rounded-full animate-bounce [animation-delay:-0.15s]"></div>
-                            <div className="w-1.5 h-1.5 bg-white rounded-full animate-bounce"></div>
-                            <span className="ml-1">Checking credentials...</span>
-                        </div>
-                    ) : (
-                        "Sign In"
-                    )}
-                    {loading && (
-                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full animate-[shimmer_2s_infinite]"></div>
-                    )}
-                </button>
+                <div className="pt-2">
+                    <button
+                        disabled={loading}
+                        className="group relative w-full rounded-2xl bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 text-white font-black py-4 hover:shadow-[0_10px_20px_rgba(59,130,246,0.2)] transition-all active:scale-[0.98] disabled:opacity-60 text-sm overflow-hidden mt-2"
+                    >
+                        {loading ? (
+                            <div className="flex items-center justify-center gap-2">
+                                <div className="w-1.5 h-1.5 bg-white rounded-full animate-bounce [animation-delay:-0.3s]"></div>
+                                <div className="w-1.5 h-1.5 bg-white rounded-full animate-bounce [animation-delay:-0.15s]"></div>
+                                <div className="w-1.5 h-1.5 bg-white rounded-full animate-bounce"></div>
+                                <span className="ml-1 tracking-wide">Checking credentials...</span>
+                            </div>
+                        ) : (
+                            <span className="tracking-wide">Sign In</span>
+                        )}
+                        {!loading && (
+                            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -skew-x-12 translate-x-[-150%] group-hover:animate-[shimmer_1.5s_infinite]"></div>
+                        )}
+                    </button>
+                </div>
             </form>
 
             <div className="relative py-2">
@@ -152,7 +154,7 @@ export default function LoginForm({ onSuccess }: { onSuccess?: (user: any) => vo
             <button
                 onClick={handleGoogleLogin}
                 type="button"
-                className="w-full flex items-center justify-center gap-3 rounded-xl border border-border bg-card text-foreground font-semibold py-3 hover:bg-accent transition-all active:scale-[0.98] text-sm"
+                className="w-full flex items-center justify-center gap-3 rounded-2xl border border-black/10 bg-white text-foreground font-bold py-4 hover:bg-zinc-50 hover:border-black/20 hover:shadow-sm transition-all active:scale-[0.98] text-sm"
             >
                 <svg viewBox="0 0 18 18" width="18" height="18" xmlns="http://www.w3.org/2000/svg">
                     <path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z" />

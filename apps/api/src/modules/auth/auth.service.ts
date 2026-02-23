@@ -25,7 +25,7 @@ export class AuthService {
     private readonly prisma: PrismaService,
     private readonly jwt: JwtService,
     private readonly config: ConfigService,
-  ) {}
+  ) { }
 
   async register(dto: RegisterDto) {
     if (dto.role === UserRole.ADMIN) {
@@ -164,7 +164,50 @@ export class AuthService {
 
     const tokens = await this.issueTokens(user.id, user.role);
     return {
-      user: { id: user.id, email: user.email, role: user.role },
+      user: { id: user.id, email: user.email, role: user.role, isOnboarded: user.isOnboarded },
+      ...tokens,
+    };
+  }
+
+  async switchRole(userId: string, targetRole: UserRole) {
+    if (targetRole === UserRole.ADMIN) {
+      throw new BadRequestException("Cannot switch to ADMIN role");
+    }
+
+    const user = await this.prisma.user.findUnique({ where: { id: userId } });
+    if (!user) throw new UnauthorizedException("User not found");
+    if (user.role === targetRole) throw new BadRequestException(`Already a ${targetRole}`);
+
+    if (targetRole === UserRole.TENANT) {
+      const hostels = await this.prisma.hostel.findMany({ select: { id: true }, where: { ownerId: userId } });
+      const hostelIds = hostels.map(h => h.id);
+
+      const deleteOperations = [
+        this.prisma.wallet.deleteMany({ where: { ownerId: userId } }),
+        this.prisma.payoutRequest.deleteMany({ where: { ownerId: userId } }),
+        this.prisma.subscription.deleteMany({ where: { ownerId: userId } }),
+        this.prisma.payoutMethod.deleteMany({ where: { ownerId: userId } })
+      ];
+
+      if (hostelIds.length > 0) {
+        deleteOperations.unshift(
+          this.prisma.booking.deleteMany({ where: { hostelId: { in: hostelIds } } }),
+          this.prisma.room.deleteMany({ where: { hostelId: { in: hostelIds } } }),
+          this.prisma.hostel.deleteMany({ where: { ownerId: userId } })
+        );
+      }
+
+      await this.prisma.$transaction(deleteOperations as any);
+    }
+
+    const updatedUser = await this.prisma.user.update({
+      where: { id: userId },
+      data: { role: targetRole },
+    });
+
+    const tokens = await this.issueTokens(updatedUser.id, updatedUser.role);
+    return {
+      user: { id: updatedUser.id, email: updatedUser.email, role: updatedUser.role, isOnboarded: updatedUser.isOnboarded },
       ...tokens,
     };
   }

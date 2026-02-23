@@ -31,7 +31,7 @@ export class AuthController {
   constructor(
     private readonly auth: AuthService,
     private readonly config: ConfigService,
-  ) {}
+  ) { }
 
   @Post("register")
   @ApiOperation({ summary: "Register a new user" })
@@ -72,6 +72,14 @@ export class AuthController {
   @ApiOperation({ summary: "Complete onboarding role selection" })
   onboard(@Req() req: any, @Body() body: { role: UserRole }) {
     return this.auth.completeOnboarding(req.user.userId, body.role);
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @Patch("role")
+  @ApiOperation({ summary: "Switch user account role (TENANT/OWNER)" })
+  switchRole(@Req() req: any, @Body() body: { role: UserRole }) {
+    return this.auth.switchRole(req.user.id, body.role);
   }
 
   @Get("google")

@@ -54,23 +54,24 @@ export default function AuthLayout({ children, title, subtitle }: AuthLayoutProp
                 </div>
 
                 {/* Overlay Content - Rotating Quotes */}
-                <div className="relative z-10 text-white max-w-lg p-12 w-full h-full flex flex-col justify-center">
-                    <div className="relative h-80">
+                <div className="absolute inset-0 z-10 bg-gradient-to-r from-black/80 via-black/40 to-transparent flex flex-col justify-center p-12 w-full h-full text-white">
+                    <div className="relative h-80 max-w-lg">
                         {QUOTES.map((quote, idx) => (
                             <div
                                 key={idx}
-                                className={`absolute inset-0 transition-all duration-1000 ease-in-out ${idx === quoteIndex
-                                    ? "opacity-100 translate-y-0 visible"
-                                    : "opacity-0 translate-y-8 invisible"
+                                className={`absolute inset-0 transition-all duration-[1200ms] ease-out ${idx === quoteIndex
+                                    ? "opacity-100 translate-x-0 visible"
+                                    : "opacity-0 -translate-x-12 invisible"
                                     }`}
                             >
-                                <h2 className="text-sm font-bold tracking-[0.3em] mb-6 text-blue-400 opacity-80 uppercase">A Wise Quote</h2>
-                                <div className="h-1 w-16 bg-white/20 mb-8"></div>
-                                <p className="text-2xl font-light opacity-90 leading-relaxed mb-10 drop-shadow-lg italic">
+                                <div className="inline-block px-3 py-1 mb-8 rounded-full border border-white/20 bg-white/10 backdrop-blur-md">
+                                    <h2 className="text-[10px] font-black tracking-[0.3em] text-cyan-300 uppercase">A Wise Quote</h2>
+                                </div>
+                                <p className="text-2xl font-medium opacity-90 leading-relaxed mb-8 drop-shadow-md text-white/90">
                                     "{quote.text}"
                                 </p>
                                 <div className="mt-auto">
-                                    <h1 className="text-5xl font-serif leading-tight drop-shadow-2xl whitespace-pre-line font-medium">
+                                    <h1 className="text-5xl lg:text-6xl font-black tracking-tighter leading-tight drop-shadow-2xl whitespace-pre-line text-transparent bg-clip-text bg-gradient-to-br from-white to-white/60">
                                         {quote.title}
                                     </h1>
                                 </div>
@@ -78,13 +79,13 @@ export default function AuthLayout({ children, title, subtitle }: AuthLayoutProp
                         ))}
                     </div>
 
-                    {/* Simple Progress Bar for Quotes */}
-                    <div className="absolute bottom-12 left-12 flex gap-3">
+                    {/* Premium Progress Bar for Quotes */}
+                    <div className="absolute bottom-12 left-12 flex gap-2 items-center bg-black/20 backdrop-blur-md p-2 rounded-full border border-white/10">
                         {QUOTES.map((_, idx) => (
                             <button
                                 key={idx}
                                 onClick={() => setQuoteIndex(idx)}
-                                className={`h-1 rounded-full transition-all duration-500 ${idx === quoteIndex ? "w-10 bg-blue-500" : "w-4 bg-white/20 hover:bg-white/40"
+                                className={`h-1.5 rounded-full transition-all duration-700 ${idx === quoteIndex ? "w-8 bg-gradient-to-r from-cyan-400 to-blue-500 shadow-[0_0_10px_rgba(34,211,238,0.5)]" : "w-2 bg-white/30 hover:bg-white/60"
                                     }`}
                                 aria-label={`Select quote ${idx + 1}`}
                             />
@@ -94,18 +95,23 @@ export default function AuthLayout({ children, title, subtitle }: AuthLayoutProp
             </div>
 
             {/* Right Side - Form Content */}
-            <div className="w-full lg:w-1/2 flex flex-col items-center justify-center p-8 bg-white">
-                <div className="w-full max-w-[420px]">
+            <div className="w-full lg:w-1/2 flex flex-col items-center justify-center p-8 bg-zinc-50 relative">
+                {/* Subtle background glow pattern to make it less plain white */}
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(59,130,246,0.03),transparent_40%)] pointer-events-none" />
+
+                <div className="w-full max-w-[420px] relative z-10">
                     {/* Header */}
                     <div className="mb-10 text-center">
-                        <div className="flex justify-center mb-6">
-                            <span className="font-bold text-2xl flex items-center gap-2">
-                                <LogoAnimation />
+                        <div className="flex justify-center mb-8">
+                            <span className="font-black tracking-tight text-2xl flex items-center gap-2 group cursor-pointer">
+                                <span className="p-2 bg-white rounded-2xl shadow-sm border border-black/5 group-hover:scale-105 transition-transform">
+                                    <LogoAnimation />
+                                </span>
                                 HostelGH
                             </span>
                         </div>
-                        <h1 className="text-4xl font-serif font-medium mb-3">{title}</h1>
-                        {subtitle && <p className="text-gray-500">{subtitle}</p>}
+                        <h1 className="text-4xl font-black tracking-tighter mb-3 text-foreground">{title}</h1>
+                        {subtitle && <p className="text-muted-foreground font-medium text-sm">{subtitle}</p>}
                     </div>
 
                     {/* Form Container */}

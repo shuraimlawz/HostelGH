@@ -4,7 +4,7 @@ import { useAuth } from "@/lib/auth-context";
 import { useEffect, useState } from "react";
 import { api } from "@/lib/api";
 import { toast } from "sonner";
-import { User, Mail, Phone, Shield, Camera, Loader2, Bell, XCircle } from "lucide-react";
+import { User, Mail, Phone, Shield, Camera, Loader2, Bell, XCircle, ArrowRightLeft, TriangleAlert } from "lucide-react";
 import { PasswordField } from "@/components/ui/PasswordField";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -32,6 +32,10 @@ export default function OwnerAccountPage() {
     const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
     const [passwordData, setPasswordData] = useState({ oldPassword: "", newPassword: "", confirmPassword: "" });
     const [isChangingPassword, setIsChangingPassword] = useState(false);
+
+    // Account Type Change State
+    const [isAccountTypeModalOpen, setIsAccountTypeModalOpen] = useState(false);
+    const [isSwitchingType, setIsSwitchingType] = useState(false);
 
     useEffect(() => {
         const fetchProfile = async () => {
@@ -106,6 +110,20 @@ export default function OwnerAccountPage() {
             window.location.href = "/";
         } catch (error: any) {
             toast.error(error.message || "Failed to delete account");
+        }
+    };
+
+    const handleSwitchAccountType = async () => {
+        setIsSwitchingType(true);
+        try {
+            const { data } = await api.patch("/auth/role", { role: "TENANT" });
+            updateUser(data.user);
+            localStorage.setItem("accessToken", data.accessToken);
+            toast.success("Account switched to Student successfully!");
+            window.location.href = "/tenant"; // Redirect manually to guarantee fresh context
+        } catch (error: any) {
+            toast.error(error.response?.data?.message || "Failed to switch account type");
+            setIsSwitchingType(false);
         }
     };
 
@@ -378,6 +396,54 @@ export default function OwnerAccountPage() {
                             >
                                 <div className={`w-4 h-4 bg-background rounded-full shadow-md transition-transform duration-300 ${formData.emailNotifications ? 'translate-x-6' : 'translate-x-0'}`} />
                             </button>
+                        </div>
+                    </div>
+
+                    {/* Account Type / Role Management */}
+                    <div className="bg-orange-50/50 rounded-[2.5rem] border border-orange-100 p-8 shadow-sm space-y-6">
+                        <div className="flex items-center justify-between border-b border-orange-100 pb-6">
+                            <h3 className="text-sm font-black text-orange-950 uppercase tracking-widest italic">Account Type</h3>
+                            <ArrowRightLeft size={20} className="text-orange-600" />
+                        </div>
+                        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-6 bg-white/60 rounded-[2rem] border border-orange-100">
+                            <div>
+                                <p className="font-black text-orange-950 uppercase tracking-widest text-[11px] mb-1">Switch to Student/Tenant</p>
+                                <p className="text-xs text-orange-900/70 font-medium">Change how you use HostelGH.</p>
+                            </div>
+
+                            <Dialog open={isAccountTypeModalOpen} onOpenChange={setIsAccountTypeModalOpen}>
+                                <DialogTrigger asChild>
+                                    <button className="text-[10px] font-black uppercase tracking-widest text-orange-700 bg-orange-100 hover:bg-orange-200 px-6 py-3 rounded-xl transition-all shadow-sm shrink-0 whitespace-nowrap">
+                                        Switch Account
+                                    </button>
+                                </DialogTrigger>
+                                <DialogContent className="sm:max-w-md rounded-[2.5rem] border-orange-100 shadow-2xl">
+                                    <DialogHeader>
+                                        <div className="flex items-center gap-3 mb-2">
+                                            <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center text-red-600">
+                                                <TriangleAlert size={20} />
+                                            </div>
+                                            <DialogTitle className="font-black italic uppercase tracking-wider text-red-600">Warning: Critical Action</DialogTitle>
+                                        </div>
+                                        <DialogDescription className="text-sm font-medium text-gray-600 leading-relaxed pt-2">
+                                            Switching to a <span className="font-bold text-gray-900">Student/Tenant</span> account will
+                                            <span className="font-bold text-red-600"> permanently delete</span> all your listed hostels, rooms, booking history as an owner, and payout records. This action cannot be undone.
+                                        </DialogDescription>
+                                    </DialogHeader>
+                                    <DialogFooter className="gap-3 sm:gap-0 mt-4">
+                                        <Button type="button" variant="outline" onClick={() => setIsAccountTypeModalOpen(false)} className="rounded-xl font-black uppercase tracking-widest text-[10px]">Cancel</Button>
+                                        <Button
+                                            onClick={handleSwitchAccountType}
+                                            disabled={isSwitchingType}
+                                            variant="destructive"
+                                            className="rounded-xl font-black uppercase tracking-widest text-[10px] bg-red-600 hover:bg-red-700"
+                                        >
+                                            {isSwitchingType ? <Loader2 className="animate-spin mr-2" size={16} /> : null}
+                                            {isSwitchingType ? "Switching..." : "I Understand, Switch Now"}
+                                        </Button>
+                                    </DialogFooter>
+                                </DialogContent>
+                            </Dialog>
                         </div>
                     </div>
 
