@@ -47,7 +47,7 @@ async function bootstrap() {
   app.useGlobalFilters(new HttpExceptionFilter());
 
   const prisma = app.get(PrismaService);
-  await prisma.enableShutdownHooks(app);
+  await prisma.enableShutdownHooks();
 
   const appUrl = process.env.APP_URL || "https://hostelgh.onrender.com";
   const frontendUrl = process.env.FRONTEND_URL || "https://hostelgh.vercel.app";

@@ -458,8 +458,7 @@ export class AdminService {
         where: { id },
         data: {
           status: status,
-          processedAt:
-            status === "PAID" || status === "APPROVED" ? new Date() : undefined,
+          processedBy: adminId,
         },
         include: { owner: { select: { id: true, email: true } } },
       });
