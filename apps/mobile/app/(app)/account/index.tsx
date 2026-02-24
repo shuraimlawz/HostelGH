@@ -9,12 +9,181 @@ import {
     ActivityIndicator,
     Image,
     TextInput,
+    StyleSheet,
 } from 'react-native';
 import { useRouter } from 'expo-router';
-import { LogOut, Edit2, User, Phone, Mail } from 'lucide-react-native';
 import { useAuthStore } from '@/lib/stores/authStore';
 import { apiClient } from '@/lib/api/client';
 import { User as UserType } from '@/lib/types';
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        backgroundColor: '#f9fafb',
+    },
+    centerContent: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    header: {
+        backgroundColor: '#fff',
+        paddingHorizontal: 16,
+        paddingVertical: 24,
+        borderBottomWidth: 1,
+        borderBottomColor: '#e5e7eb',
+    },
+    headerRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 16,
+    },
+    avatar: {
+        width: 64,
+        height: 64,
+        borderRadius: 32,
+        backgroundColor: '#d1d5db',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    avatarImage: {
+        width: 64,
+        height: 64,
+        borderRadius: 32,
+    },
+    headerInfo: {
+        flex: 1,
+    },
+    headerName: {
+        fontSize: 20,
+        fontWeight: 'bold',
+    },
+    headerRole: {
+        color: '#666',
+        marginTop: 4,
+    },
+    editButton: {
+        padding: 8,
+    },
+    editButtonText: {
+        fontSize: 18,
+    },
+    infoSection: {
+        paddingHorizontal: 16,
+        paddingVertical: 24,
+        gap: 16,
+    },
+    fieldGroup: {
+        gap: 8,
+    },
+    label: {
+        fontSize: 14,
+        fontWeight: '600',
+        color: '#333',
+    },
+    input: {
+        borderWidth: 1,
+        borderColor: '#ddd',
+        borderRadius: 8,
+        paddingHorizontal: 16,
+        paddingVertical: 12,
+        fontSize: 14,
+    },
+    buttonRow: {
+        flexDirection: 'row',
+        gap: 8,
+        paddingTop: 16,
+    },
+    cancelButton: {
+        flex: 1,
+        borderWidth: 1,
+        borderColor: '#ddd',
+        paddingVertical: 12,
+        borderRadius: 8,
+        alignItems: 'center',
+    },
+    cancelButtonText: {
+        fontWeight: '600',
+    },
+    saveButton: {
+        flex: 1,
+        backgroundColor: '#000',
+        paddingVertical: 12,
+        borderRadius: 8,
+        alignItems: 'center',
+    },
+    saveButtonText: {
+        color: '#fff',
+        fontWeight: '600',
+    },
+    infoCard: {
+        backgroundColor: '#fff',
+        paddingHorizontal: 16,
+        paddingVertical: 16,
+        borderRadius: 8,
+        borderWidth: 1,
+        borderColor: '#e5e7eb',
+    },
+    infoRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 12,
+        marginBottom: 12,
+    },
+    infoRowLast: {
+        marginBottom: 0,
+    },
+    infoIcon: {
+        fontSize: 20,
+        color: '#666',
+    },
+    infoContent: {
+        flex: 1,
+    },
+    infoLabel: {
+        color: '#666',
+        fontSize: 12,
+    },
+    infoValue: {
+        fontWeight: '600',
+        marginTop: 4,
+    },
+    memberBox: {
+        backgroundColor: '#eff6ff',
+        paddingHorizontal: 16,
+        paddingVertical: 16,
+        borderRadius: 8,
+        borderWidth: 1,
+        borderColor: '#bfdbfe',
+        marginTop: 16,
+    },
+    memberText: {
+        color: '#1e3a8a',
+        fontSize: 14,
+    },
+    logoutButton: {
+        backgroundColor: '#fef2f2',
+        borderWidth: 1,
+        borderColor: '#fecaca',
+        paddingVertical: 12,
+        borderRadius: 8,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 8,
+    },
+    logoutIcon: {
+        fontSize: 18,
+    },
+    logoutText: {
+        color: '#dc2626',
+        fontWeight: '600',
+    },
+    logoutSection: {
+        paddingHorizontal: 16,
+        paddingBottom: 32,
+    },
+});
 
 export default function AccountScreen() {
     const router = useRouter();
@@ -84,55 +253,55 @@ export default function AccountScreen() {
 
     if (loading) {
         return (
-            <SafeAreaView className="flex-1 justify-center items-center">
-                <ActivityIndicator size="large" color="#000" />
+            <SafeAreaView style={styles.container}>
+                <View style={styles.centerContent}>
+                    <ActivityIndicator size="large" color="#000" />
+                </View>
             </SafeAreaView>
         );
     }
 
     return (
-        <SafeAreaView className="flex-1 bg-gray-50">
-            <ScrollView showsVerticalScrollIndicator={false}>
+        <SafeAreaView style={styles.container}>
+            <ScrollView>
                 {/* Profile Header */}
-                <View className="bg-white px-4 py-6 border-b border-gray-200">
-                    <View className="flex-row items-center gap-4">
-                        <View className="w-16 h-16 rounded-full bg-gray-300 flex items-center justify-center">
+                <View style={styles.header}>
+                    <View style={styles.headerRow}>
+                        <View style={styles.avatar}>
                             {profile?.profileImage ? (
                                 <Image
                                     source={{ uri: profile.profileImage }}
-                                    className="w-16 h-16 rounded-full"
+                                    style={styles.avatarImage}
                                 />
                             ) : (
-                                <User size={32} color="#666" />
+                                <Text style={{ fontSize: 32 }}>👤</Text>
                             )}
                         </View>
 
-                        <View className="flex-1">
-                            <Text className="text-2xl font-bold">
+                        <View style={styles.headerInfo}>
+                            <Text style={styles.headerName}>
                                 {profile?.firstName} {profile?.lastName}
                             </Text>
-                            <Text className="text-gray-600">{profile?.role}</Text>
+                            <Text style={styles.headerRole}>{profile?.role}</Text>
                         </View>
 
                         <TouchableOpacity
                             onPress={() => setIsEditing(!isEditing)}
-                            className="p-2"
+                            style={styles.editButton}
                         >
-                            <Edit2 size={20} color="#000" />
+                            <Text style={styles.editButtonText}>✏️</Text>
                         </TouchableOpacity>
                     </View>
                 </View>
 
                 {/* Profile Info */}
-                <View className="px-4 py-6 gap-4">
+                <View style={styles.infoSection}>
                     {isEditing ? (
                         <>
-                            <View>
-                                <Text className="text-sm font-semibold mb-2 text-gray-700">
-                                    First Name
-                                </Text>
+                            <View style={styles.fieldGroup}>
+                                <Text style={styles.label}>First Name</Text>
                                 <TextInput
-                                    className="border border-gray-300 rounded-lg px-4 py-3"
+                                    style={styles.input}
                                     value={editData.firstName}
                                     onChangeText={(text: string) =>
                                         setEditData({ ...editData, firstName: text })
@@ -140,12 +309,10 @@ export default function AccountScreen() {
                                 />
                             </View>
 
-                            <View>
-                                <Text className="text-sm font-semibold mb-2 text-gray-700">
-                                    Last Name
-                                </Text>
+                            <View style={styles.fieldGroup}>
+                                <Text style={styles.label}>Last Name</Text>
                                 <TextInput
-                                    className="border border-gray-300 rounded-lg px-4 py-3"
+                                    style={styles.input}
                                     value={editData.lastName}
                                     onChangeText={(text: string) =>
                                         setEditData({ ...editData, lastName: text })
@@ -153,12 +320,10 @@ export default function AccountScreen() {
                                 />
                             </View>
 
-                            <View>
-                                <Text className="text-sm font-semibold mb-2 text-gray-700">
-                                    Phone Number
-                                </Text>
+                            <View style={styles.fieldGroup}>
+                                <Text style={styles.label}>Phone Number</Text>
                                 <TextInput
-                                    className="border border-gray-300 rounded-lg px-4 py-3"
+                                    style={styles.input}
                                     value={editData.phoneNumber}
                                     onChangeText={(text: string) =>
                                         setEditData({ ...editData, phoneNumber: text })
@@ -167,46 +332,44 @@ export default function AccountScreen() {
                                 />
                             </View>
 
-                            <View className="flex-row gap-2 pt-4">
+                            <View style={styles.buttonRow}>
                                 <TouchableOpacity
                                     onPress={() => setIsEditing(false)}
-                                    className="flex-1 border border-gray-300 py-3 rounded-lg"
+                                    style={styles.cancelButton}
                                 >
-                                    <Text className="text-center font-semibold">Cancel</Text>
+                                    <Text style={styles.cancelButtonText}>Cancel</Text>
                                 </TouchableOpacity>
                                 <TouchableOpacity
                                     onPress={handleUpdateProfile}
                                     disabled={loading}
-                                    className="flex-1 bg-black py-3 rounded-lg"
+                                    style={styles.saveButton}
                                 >
-                                    <Text className="text-white font-semibold text-center">
-                                        Save
-                                    </Text>
+                                    <Text style={styles.saveButtonText}>Save</Text>
                                 </TouchableOpacity>
                             </View>
                         </>
                     ) : (
                         <>
-                            <View className="bg-white p-4 rounded-lg border border-gray-200">
-                                <View className="flex-row items-center gap-3 mb-3">
-                                    <Mail size={20} color="#666" />
-                                    <View>
-                                        <Text className="text-gray-600 text-sm">Email</Text>
-                                        <Text className="font-semibold">{profile?.email}</Text>
+                            <View style={styles.infoCard}>
+                                <View style={styles.infoRow}>
+                                    <Text style={styles.infoIcon}>✉️</Text>
+                                    <View style={styles.infoContent}>
+                                        <Text style={styles.infoLabel}>Email</Text>
+                                        <Text style={styles.infoValue}>{profile?.email}</Text>
                                     </View>
                                 </View>
 
-                                <View className="flex-row items-center gap-3">
-                                    <Phone size={20} color="#666" />
-                                    <View>
-                                        <Text className="text-gray-600 text-sm">Phone</Text>
-                                        <Text className="font-semibold">{profile?.phoneNumber}</Text>
+                                <View style={[styles.infoRow, styles.infoRowLast]}>
+                                    <Text style={styles.infoIcon}>📱</Text>
+                                    <View style={styles.infoContent}>
+                                        <Text style={styles.infoLabel}>Phone</Text>
+                                        <Text style={styles.infoValue}>{profile?.phoneNumber}</Text>
                                     </View>
                                 </View>
                             </View>
 
-                            <View className="bg-blue-50 p-4 rounded-lg border border-blue-200 mt-4">
-                                <Text className="text-blue-900 text-sm">
+                            <View style={styles.memberBox}>
+                                <Text style={styles.memberText}>
                                     📍 Member since{' '}
                                     {new Date(profile?.createdAt || '').toLocaleDateString()}
                                 </Text>
@@ -216,13 +379,13 @@ export default function AccountScreen() {
                 </View>
 
                 {/* Logout Button */}
-                <View className="px-4 pb-8">
+                <View style={styles.logoutSection}>
                     <TouchableOpacity
                         onPress={handleLogout}
-                        className="bg-red-50 border border-red-200 py-3 rounded-lg flex-row items-center justify-center gap-2"
+                        style={styles.logoutButton}
                     >
-                        <LogOut size={20} color="#dc2626" />
-                        <Text className="text-red-600 font-semibold">Logout</Text>
+                        <Text style={styles.logoutIcon}>🚪</Text>
+                        <Text style={styles.logoutText}>Logout</Text>
                     </TouchableOpacity>
                 </View>
             </ScrollView>

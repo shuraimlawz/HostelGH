@@ -7,10 +7,141 @@ import {
     TouchableOpacity,
     ActivityIndicator,
     Alert,
+    StyleSheet,
 } from 'react-native';
-import { Calendar, MapPin, DollarSign, CheckCircle, Clock } from 'lucide-react-native';
 import { apiClient } from '@/lib/api/client';
 import { BookingDetail } from '@/lib/types';
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        backgroundColor: '#f9fafb',
+    },
+    filterTabs: {
+        flexDirection: 'row',
+        gap: 8,
+        paddingHorizontal: 16,
+        paddingTop: 16,
+        paddingBottom: 16,
+        borderBottomWidth: 1,
+        borderBottomColor: '#e5e7eb',
+    },
+    tabButton: {
+        paddingHorizontal: 16,
+        paddingVertical: 8,
+        borderRadius: 20,
+    },
+    tabButtonActive: {
+        backgroundColor: '#000',
+    },
+    tabButtonInactive: {
+        backgroundColor: '#fff',
+        borderWidth: 1,
+        borderColor: '#d1d5db',
+    },
+    tabButtonText: {
+        fontWeight: '600',
+        textTransform: 'capitalize',
+    },
+    tabButtonTextActive: {
+        color: '#fff',
+    },
+    tabButtonTextInactive: {
+        color: '#333',
+    },
+    loadingContainer: {
+        justifyContent: 'center',
+        alignItems: 'center',
+        paddingVertical: 48,
+    },
+    emptyContainer: {
+        paddingHorizontal: 16,
+        paddingVertical: 48,
+        alignItems: 'center',
+    },
+    emptyText: {
+        color: '#666',
+        fontSize: 16,
+    },
+    bookingsList: {
+        paddingHorizontal: 16,
+        paddingVertical: 16,
+        gap: 16,
+        paddingBottom: 24,
+    },
+    bookingCard: {
+        backgroundColor: '#fff',
+        borderRadius: 8,
+        paddingHorizontal: 16,
+        paddingVertical: 16,
+        borderWidth: 1,
+        borderColor: '#e5e7eb',
+    },
+    bookingHeader: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'flex-start',
+        marginBottom: 12,
+    },
+    bookingHeaderLeft: {
+        flex: 1,
+    },
+    hostelName: {
+        fontSize: 16,
+        fontWeight: 'bold',
+        marginBottom: 4,
+    },
+    roomName: {
+        color: '#666',
+        fontSize: 14,
+    },
+    statusBadge: {
+        paddingHorizontal: 12,
+        paddingVertical: 4,
+        borderRadius: 12,
+    },
+    statusBadgeText: {
+        fontSize: 11,
+        fontWeight: '600',
+    },
+    bookingDetails: {
+        gap: 8,
+        marginBottom: 16,
+    },
+    detailRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 8,
+    },
+    detailIcon: {
+        fontSize: 14,
+    },
+    detailText: {
+        color: '#333',
+        fontSize: 13,
+    },
+    actionButton: {
+        paddingVertical: 8,
+        borderRadius: 8,
+        alignItems: 'center',
+    },
+    cancelButton: {
+        backgroundColor: '#fef2f2',
+        borderWidth: 1,
+        borderColor: '#fecaca',
+    },
+    cancelButtonText: {
+        color: '#dc2626',
+        fontWeight: '600',
+    },
+    paymentButton: {
+        backgroundColor: '#000',
+    },
+    paymentButtonText: {
+        color: '#fff',
+        fontWeight: '600',
+    },
+});
 
 export default function BookingsScreen() {
     const [bookings, setBookings] = useState<BookingDetail[]>([]);
@@ -71,48 +202,50 @@ export default function BookingsScreen() {
     const getStatusColor = (status: string) => {
         switch (status) {
             case 'PENDING_APPROVAL':
-                return 'bg-yellow-100';
+                return '#fef3c7';
             case 'CONFIRMED':
-                return 'bg-green-100';
+                return '#dcfce7';
             case 'CANCELLED':
-                return 'bg-red-100';
+                return '#fee2e2';
             default:
-                return 'bg-gray-100';
+                return '#f3f4f6';
         }
     };
 
     const getStatusTextColor = (status: string) => {
         switch (status) {
             case 'PENDING_APPROVAL':
-                return 'text-yellow-800';
+                return '#78350f';
             case 'CONFIRMED':
-                return 'text-green-800';
+                return '#166534';
             case 'CANCELLED':
-                return 'text-red-800';
+                return '#991b1b';
             default:
-                return 'text-gray-800';
+                return '#374151';
         }
     };
 
     return (
-        <SafeAreaView className="flex-1 bg-gray-50">
+        <SafeAreaView style={styles.container}>
             <ScrollView showsVerticalScrollIndicator={false}>
                 {/* Filter Tabs */}
-                <View className="flex-row gap-2 px-4 pt-4 pb-4 border-b border-gray-200">
+                <View style={styles.filterTabs}>
                     {(['all', 'pending', 'confirmed', 'cancelled'] as const).map((f) => (
                         <TouchableOpacity
                             key={f}
                             onPress={() => setFilter(f)}
-                            className={`px-4 py-2 rounded-full ${
-                                filter === f ? 'bg-black' : 'bg-white border border-gray-300'
-                            }`}
+                            style={[
+                                styles.tabButton,
+                                filter === f ? styles.tabButtonActive : styles.tabButtonInactive,
+                            ]}
                         >
                             <Text
-                                className={
+                                style={[
+                                    styles.tabButtonText,
                                     filter === f
-                                        ? 'text-white font-semibold capitalize'
-                                        : 'text-gray-700 capitalize'
-                                }
+                                        ? styles.tabButtonTextActive
+                                        : styles.tabButtonTextInactive,
+                                ]}
                             >
                                 {f}
                             </Text>
@@ -122,39 +255,34 @@ export default function BookingsScreen() {
 
                 {/* Bookings List */}
                 {loading ? (
-                    <View className="flex-1 justify-center items-center py-12">
+                    <View style={styles.loadingContainer}>
                         <ActivityIndicator size="large" color="#000" />
                     </View>
                 ) : filteredBookings.length === 0 ? (
-                    <View className="px-4 py-12 items-center">
-                        <Text className="text-gray-600 text-lg">No bookings found</Text>
+                    <View style={styles.emptyContainer}>
+                        <Text style={styles.emptyText}>No bookings found</Text>
                     </View>
                 ) : (
-                    <View className="px-4 pb-6 gap-4">
+                    <View style={styles.bookingsList}>
                         {filteredBookings.map((booking) => (
-                            <View
-                                key={booking.id}
-                                className="bg-white rounded-lg p-4 border border-gray-200 shadow-sm"
-                            >
+                            <View key={booking.id} style={styles.bookingCard}>
                                 {/* Header */}
-                                <View className="flex-row justify-between items-start mb-3">
-                                    <View className="flex-1">
-                                        <Text className="text-lg font-bold mb-1">
-                                            {booking.hostel.name}
-                                        </Text>
-                                        <Text className="text-gray-600 text-sm">
-                                            {booking.room.name}
-                                        </Text>
+                                <View style={styles.bookingHeader}>
+                                    <View style={styles.bookingHeaderLeft}>
+                                        <Text style={styles.hostelName}>{booking.hostel.name}</Text>
+                                        <Text style={styles.roomName}>{booking.room.name}</Text>
                                     </View>
                                     <View
-                                        className={`px-3 py-1 rounded-full ${getStatusColor(
-                                            booking.status
-                                        )}`}
+                                        style={[
+                                            styles.statusBadge,
+                                            { backgroundColor: getStatusColor(booking.status) },
+                                        ]}
                                     >
                                         <Text
-                                            className={`text-xs font-semibold ${getStatusTextColor(
-                                                booking.status
-                                            )}`}
+                                            style={[
+                                                styles.statusBadgeText,
+                                                { color: getStatusTextColor(booking.status) },
+                                            ]}
                                         >
                                             {booking.status.replace(/_/g, ' ')}
                                         </Text>
@@ -162,25 +290,23 @@ export default function BookingsScreen() {
                                 </View>
 
                                 {/* Details */}
-                                <View className="gap-2 mb-4">
-                                    <View className="flex-row items-center gap-2">
-                                        <Calendar size={16} color="#666" />
-                                        <Text className="text-gray-700 text-sm">
+                                <View style={styles.bookingDetails}>
+                                    <View style={styles.detailRow}>
+                                        <Text style={styles.detailIcon}>📅</Text>
+                                        <Text style={styles.detailText}>
                                             {new Date(booking.startDate).toLocaleDateString()} -{' '}
                                             {new Date(booking.endDate).toLocaleDateString()}
                                         </Text>
                                     </View>
 
-                                    <View className="flex-row items-center gap-2">
-                                        <MapPin size={16} color="#666" />
-                                        <Text className="text-gray-700 text-sm">
-                                            {booking.hostel.city}
-                                        </Text>
+                                    <View style={styles.detailRow}>
+                                        <Text style={styles.detailIcon}>📍</Text>
+                                        <Text style={styles.detailText}>{booking.hostel.city}</Text>
                                     </View>
 
-                                    <View className="flex-row items-center gap-2">
-                                        <DollarSign size={16} color="#666" />
-                                        <Text className="text-gray-700 text-sm font-semibold">
+                                    <View style={styles.detailRow}>
+                                        <Text style={styles.detailIcon}>💰</Text>
+                                        <Text style={styles.detailText}>
                                             ₵{Math.floor(booking.totalPrice / 100)}
                                         </Text>
                                     </View>
@@ -190,18 +316,16 @@ export default function BookingsScreen() {
                                 {booking.status === 'PENDING_APPROVAL' && (
                                     <TouchableOpacity
                                         onPress={() => handleCancelBooking(booking.id)}
-                                        className="bg-red-50 py-2 rounded-lg border border-red-200"
+                                        style={[styles.actionButton, styles.cancelButton]}
                                     >
-                                        <Text className="text-red-600 font-semibold text-center">
-                                            Cancel Request
-                                        </Text>
+                                        <Text style={styles.cancelButtonText}>Cancel Request</Text>
                                     </TouchableOpacity>
                                 )}
                                 {booking.status === 'CONFIRMED' && booking.paymentStatus !== 'SUCCESS' && (
-                                    <TouchableOpacity className="bg-black py-2 rounded-lg">
-                                        <Text className="text-white font-semibold text-center">
-                                            Complete Payment
-                                        </Text>
+                                    <TouchableOpacity
+                                        style={[styles.actionButton, styles.paymentButton]}
+                                    >
+                                        <Text style={styles.paymentButtonText}>Complete Payment</Text>
                                     </TouchableOpacity>
                                 )}
                             </View>

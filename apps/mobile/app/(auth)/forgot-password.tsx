@@ -8,9 +8,111 @@ import {
     KeyboardAvoidingView,
     Platform,
     TextInput,
+    StyleSheet,
 } from 'react-native';
 import { useRouter } from 'expo-router';
-import { ArrowLeft } from 'lucide-react-native';
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        backgroundColor: '#fff',
+    },
+    keyboardView: {
+        flex: 1,
+        paddingHorizontal: 24,
+        justifyContent: 'center',
+    },
+    backButton: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 32,
+    },
+    backButtonText: {
+        marginLeft: 8,
+        fontWeight: '600',
+    },
+    header: {
+        marginBottom: 48,
+    },
+    title: {
+        fontSize: 32,
+        fontWeight: 'bold',
+        marginBottom: 8,
+    },
+    subtitle: {
+        fontSize: 16,
+        color: '#666',
+    },
+    successBox: {
+        backgroundColor: '#f0fdf4',
+        paddingHorizontal: 16,
+        paddingVertical: 16,
+        borderRadius: 8,
+        borderWidth: 1,
+        borderColor: '#dcfce7',
+    },
+    successTitle: {
+        color: '#166534',
+        fontWeight: '600',
+        textAlign: 'center',
+    },
+    successMessage: {
+        color: '#187a3a',
+        fontSize: 14,
+        textAlign: 'center',
+        marginTop: 8,
+    },
+    formContainer: {
+        marginBottom: 32,
+    },
+    fieldGroup: {
+        gap: 8,
+        marginBottom: 32,
+    },
+    label: {
+        fontSize: 14,
+        fontWeight: '600',
+        color: '#333',
+    },
+    input: {
+        borderWidth: 1,
+        borderColor: '#ddd',
+        borderRadius: 8,
+        paddingHorizontal: 16,
+        paddingVertical: 12,
+        fontSize: 14,
+    },
+    submitButton: {
+        borderRadius: 8,
+        paddingVertical: 12,
+        marginBottom: 16,
+    },
+    submitButtonActive: {
+        backgroundColor: '#000',
+    },
+    submitButtonDisabled: {
+        backgroundColor: '#ccc',
+    },
+    submitButtonText: {
+        color: '#fff',
+        fontWeight: '600',
+        fontSize: 16,
+        textAlign: 'center',
+    },
+    bottomSection: {
+        marginTop: 32,
+        flexDirection: 'row',
+        justifyContent: 'center',
+        gap: 8,
+    },
+    bottomText: {
+        color: '#666',
+    },
+    goBackLink: {
+        color: '#0066cc',
+        fontWeight: '600',
+    },
+});
 
 export default function ForgotPasswordScreen() {
     const router = useRouter();
@@ -42,44 +144,42 @@ export default function ForgotPasswordScreen() {
     };
 
     return (
-        <SafeAreaView className="flex-1 bg-white">
+        <SafeAreaView style={styles.container}>
             <KeyboardAvoidingView
                 behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-                className="flex-1 px-6 justify-center"
+                style={styles.keyboardView}
             >
                 <TouchableOpacity
                     onPress={() => router.back()}
-                    className="flex-row items-center mb-8"
+                    style={styles.backButton}
                 >
-                    <ArrowLeft size={24} color="#000" />
-                    <Text className="ml-2 font-semibold">Back</Text>
+                    <Text style={{ fontSize: 18 }}>←</Text>
+                    <Text style={styles.backButtonText}>Back</Text>
                 </TouchableOpacity>
 
-                <View className="mb-12">
-                    <Text className="text-4xl font-bold mb-2">Reset Password</Text>
-                    <Text className="text-gray-600">
+                <View style={styles.header}>
+                    <Text style={styles.title}>Reset Password</Text>
+                    <Text style={styles.subtitle}>
                         Enter your email to receive password reset instructions
                     </Text>
                 </View>
 
                 {sent ? (
-                    <View className="bg-green-50 p-4 rounded-lg border border-green-200">
-                        <Text className="text-green-900 font-semibold text-center">
-                            ✓ Reset email sent!
-                        </Text>
-                        <Text className="text-green-800 text-sm text-center mt-2">
+                    <View style={styles.successBox}>
+                        <Text style={styles.successTitle}>✓ Reset email sent!</Text>
+                        <Text style={styles.successMessage}>
                             Check your email for instructions to reset your password.
                         </Text>
                     </View>
                 ) : (
-                    <>
-                        <View className="mb-8">
-                            <Text className="text-sm font-semibold mb-2 text-gray-700">Email</Text>
+                    <View style={styles.formContainer}>
+                        <View style={styles.fieldGroup}>
+                            <Text style={styles.label}>Email</Text>
                             <TextInput
-                                className="border border-gray-300 rounded-lg px-4 py-3"
+                                style={styles.input}
                                 placeholder="Enter your email"
                                 value={email}
-                                onChangeText={setEmail}
+                                onChangeText={(text: string) => setEmail(text)}
                                 editable={!loading}
                                 keyboardType="email-address"
                                 autoCapitalize="none"
@@ -89,19 +189,22 @@ export default function ForgotPasswordScreen() {
                         <TouchableOpacity
                             onPress={handleResetPassword}
                             disabled={loading}
-                            className={`rounded-lg py-3 mb-4 ${loading ? 'bg-gray-400' : 'bg-black'}`}
+                            style={[
+                                styles.submitButton,
+                                loading ? styles.submitButtonDisabled : styles.submitButtonActive,
+                            ]}
                         >
-                            <Text className="text-white font-semibold text-center text-lg">
+                            <Text style={styles.submitButtonText}>
                                 {loading ? 'Sending...' : 'Send Reset Email'}
                             </Text>
                         </TouchableOpacity>
-                    </>
+                    </View>
                 )}
 
-                <View className="mt-8 flex-row justify-center gap-2">
-                    <Text className="text-gray-600">Remember your password?</Text>
+                <View style={styles.bottomSection}>
+                    <Text style={styles.bottomText}>Remember your password?</Text>
                     <TouchableOpacity onPress={() => router.back()}>
-                        <Text className="text-blue-600 font-semibold">Go Back</Text>
+                        <Text style={styles.goBackLink}>Go Back</Text>
                     </TouchableOpacity>
                 </View>
             </KeyboardAvoidingView>

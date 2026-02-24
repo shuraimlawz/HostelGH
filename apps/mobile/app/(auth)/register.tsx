@@ -9,10 +9,87 @@ import {
     ScrollView,
     KeyboardAvoidingView,
     Platform,
+    StyleSheet,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useAuthStore } from '@/lib/stores/authStore';
 import { apiClient } from '@/lib/api/client';
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        backgroundColor: '#fff',
+    },
+    keyboardView: {
+        flex: 1,
+    },
+    scrollContent: {
+        paddingHorizontal: 24,
+        paddingTop: 24,
+    },
+    header: {
+        marginBottom: 32,
+    },
+    title: {
+        fontSize: 32,
+        fontWeight: 'bold',
+        marginBottom: 8,
+    },
+    subtitle: {
+        fontSize: 16,
+        color: '#666',
+    },
+    formContainer: {
+        gap: 16,
+        marginBottom: 32,
+    },
+    fieldGroup: {
+        gap: 8,
+    },
+    label: {
+        fontSize: 14,
+        fontWeight: '600',
+        color: '#333',
+    },
+    input: {
+        borderWidth: 1,
+        borderColor: '#ddd',
+        borderRadius: 8,
+        paddingHorizontal: 16,
+        paddingVertical: 12,
+        fontSize: 14,
+    },
+    submitButton: {
+        borderRadius: 8,
+        paddingVertical: 12,
+        marginBottom: 16,
+    },
+    submitButtonActive: {
+        backgroundColor: '#000',
+    },
+    submitButtonDisabled: {
+        backgroundColor: '#ccc',
+    },
+    submitButtonText: {
+        color: '#fff',
+        fontWeight: '600',
+        fontSize: 16,
+        textAlign: 'center',
+    },
+    bottomSection: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        gap: 8,
+        paddingBottom: 32,
+    },
+    bottomText: {
+        color: '#666',
+    },
+    loginLink: {
+        color: '#0066cc',
+        fontWeight: '600',
+    },
+});
 
 export default function RegisterScreen() {
     const router = useRouter();
@@ -61,84 +138,84 @@ export default function RegisterScreen() {
     };
 
     return (
-        <SafeAreaView className="flex-1 bg-white">
+        <SafeAreaView style={styles.container}>
             <KeyboardAvoidingView
                 behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-                className="flex-1"
+                style={styles.keyboardView}
             >
-                <ScrollView className="px-6 pt-6" showsVerticalScrollIndicator={false}>
-                    <View className="mb-8">
-                        <Text className="text-4xl font-bold mb-2">Create Account</Text>
-                        <Text className="text-gray-600">Join HostelGH today</Text>
+                <ScrollView style={styles.scrollContent} showsVerticalScrollIndicator={false}>
+                    <View style={styles.header}>
+                        <Text style={styles.title}>Create Account</Text>
+                        <Text style={styles.subtitle}>Join HostelGH today</Text>
                     </View>
 
-                    <View className="gap-4 mb-8">
-                        <View>
-                            <Text className="text-sm font-semibold mb-2 text-gray-700">First Name</Text>
+                    <View style={styles.formContainer}>
+                        <View style={styles.fieldGroup}>
+                            <Text style={styles.label}>First Name</Text>
                             <TextInput
-                                className="border border-gray-300 rounded-lg px-4 py-3"
+                                style={styles.input}
                                 placeholder="First name"
                                 value={firstName}
-                                onChangeText={setFirstName}
+                                onChangeText={(text: string) => setFirstName(text)}
                                 editable={!loading}
                             />
                         </View>
 
-                        <View>
-                            <Text className="text-sm font-semibold mb-2 text-gray-700">Last Name</Text>
+                        <View style={styles.fieldGroup}>
+                            <Text style={styles.label}>Last Name</Text>
                             <TextInput
-                                className="border border-gray-300 rounded-lg px-4 py-3"
+                                style={styles.input}
                                 placeholder="Last name"
                                 value={lastName}
-                                onChangeText={setLastName}
+                                onChangeText={(text: string) => setLastName(text)}
                                 editable={!loading}
                             />
                         </View>
 
-                        <View>
-                            <Text className="text-sm font-semibold mb-2 text-gray-700">Email</Text>
+                        <View style={styles.fieldGroup}>
+                            <Text style={styles.label}>Email</Text>
                             <TextInput
-                                className="border border-gray-300 rounded-lg px-4 py-3"
+                                style={styles.input}
                                 placeholder="Email"
                                 value={email}
-                                onChangeText={setEmail}
+                                onChangeText={(text: string) => setEmail(text)}
                                 editable={!loading}
                                 keyboardType="email-address"
                                 autoCapitalize="none"
                             />
                         </View>
 
-                        <View>
-                            <Text className="text-sm font-semibold mb-2 text-gray-700">Phone</Text>
+                        <View style={styles.fieldGroup}>
+                            <Text style={styles.label}>Phone</Text>
                             <TextInput
-                                className="border border-gray-300 rounded-lg px-4 py-3"
+                                style={styles.input}
                                 placeholder="Phone number"
                                 value={phoneNumber}
-                                onChangeText={setPhoneNumber}
+                                onChangeText={(text: string) => setPhoneNumber(text)}
                                 editable={!loading}
                                 keyboardType="phone-pad"
                             />
                         </View>
 
-                        <View>
-                            <Text className="text-sm font-semibold mb-2 text-gray-700">Password</Text>
+                        <View style={styles.fieldGroup}>
+                            <Text style={styles.label}>Password</Text>
                             <TextInput
-                                className="border border-gray-300 rounded-lg px-4 py-3"
+                                style={styles.input}
                                 placeholder="Password (min 8 chars)"
                                 value={password}
-                                onChangeText={setPassword}
+                                onChangeText={(text: string) => setPassword(text)}
                                 editable={!loading}
                                 secureTextEntry
                             />
                         </View>
 
-                        <View>
-                            <Text className="text-sm font-semibold mb-2 text-gray-700">Confirm Password</Text>
+                        <View style={styles.fieldGroup}>
+                            <Text style={styles.label}>Confirm Password</Text>
                             <TextInput
-                                className="border border-gray-300 rounded-lg px-4 py-3"
+                                style={styles.input}
                                 placeholder="Confirm password"
                                 value={confirmPassword}
-                                onChangeText={setConfirmPassword}
+                                onChangeText={(text: string) => setConfirmPassword(text)}
                                 editable={!loading}
                                 secureTextEntry
                             />
@@ -148,20 +225,23 @@ export default function RegisterScreen() {
                     <TouchableOpacity
                         onPress={handleRegister}
                         disabled={loading}
-                        className={`rounded-lg py-3 mb-4 ${loading ? 'bg-gray-400' : 'bg-black'}`}
+                        style={[
+                            styles.submitButton,
+                            loading ? styles.submitButtonDisabled : styles.submitButtonActive,
+                        ]}
                     >
-                        <Text className="text-white font-semibold text-center text-lg">
+                        <Text style={styles.submitButtonText}>
                             {loading ? 'Creating Account...' : 'Sign Up'}
                         </Text>
                     </TouchableOpacity>
 
-                    <View className="flex-row justify-center gap-2 pb-8">
-                        <Text className="text-gray-600">Already have an account?</Text>
+                    <View style={styles.bottomSection}>
+                        <Text style={styles.bottomText}>Already have an account?</Text>
                         <TouchableOpacity
                             onPress={() => router.back()}
                             disabled={loading}
                         >
-                            <Text className="text-blue-600 font-semibold">Login</Text>
+                            <Text style={styles.loginLink}>Login</Text>
                         </TouchableOpacity>
                     </View>
                 </ScrollView>

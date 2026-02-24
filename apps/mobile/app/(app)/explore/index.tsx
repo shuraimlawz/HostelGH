@@ -8,11 +8,154 @@ import {
     ActivityIndicator,
     Image,
     FlatList,
+    StyleSheet,
+    TextInput,
 } from 'react-native';
 import { useRouter } from 'expo-router';
-import { Search, Filter, Star } from 'lucide-react-native';
 import { apiClient } from '@/lib/api/client';
 import { Hostel } from '@/lib/types';
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        backgroundColor: '#f9fafb',
+    },
+    header: {
+        paddingHorizontal: 16,
+        paddingTop: 16,
+        paddingBottom: 24,
+    },
+    title: {
+        fontSize: 28,
+        fontWeight: 'bold',
+        marginBottom: 24,
+    },
+    searchRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 8,
+        marginBottom: 24,
+    },
+    searchInput: {
+        flex: 1,
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: '#fff',
+        borderRadius: 8,
+        paddingHorizontal: 12,
+        paddingVertical: 12,
+        borderWidth: 1,
+        borderColor: '#e5e7eb',
+    },
+    searchText: {
+        flex: 1,
+        marginLeft: 8,
+        color: '#999',
+    },
+    filterButton: {
+        backgroundColor: '#fff',
+        paddingHorizontal: 12,
+        paddingVertical: 12,
+        borderRadius: 8,
+        borderWidth: 1,
+        borderColor: '#e5e7eb',
+    },
+    filterText: {
+        fontSize: 18,
+    },
+    citiesContainer: {
+        marginBottom: 24,
+    },
+    cityButton: {
+        marginRight: 8,
+        paddingHorizontal: 16,
+        paddingVertical: 8,
+        borderRadius: 20,
+        borderWidth: 1,
+    },
+    cityButtonActive: {
+        backgroundColor: '#000',
+        borderColor: '#000',
+    },
+    cityButtonInactive: {
+        backgroundColor: '#fff',
+        borderColor: '#d1d5db',
+    },
+    cityButtonText: {
+        fontWeight: '600',
+    },
+    cityButtonTextActive: {
+        color: '#fff',
+    },
+    cityButtonTextInactive: {
+        color: '#333',
+    },
+    loadingContainer: {
+        justifyContent: 'center',
+        alignItems: 'center',
+        paddingVertical: 48,
+    },
+    emptyContainer: {
+        paddingHorizontal: 16,
+        paddingVertical: 48,
+        alignItems: 'center',
+    },
+    emptyText: {
+        color: '#666',
+        fontSize: 16,
+    },
+    hostelsList: {
+        paddingHorizontal: 16,
+        paddingBottom: 24,
+    },
+    hostelCard: {
+        backgroundColor: '#fff',
+        borderRadius: 8,
+        overflow: 'hidden',
+        marginBottom: 16,
+        borderWidth: 1,
+        borderColor: '#f3f4f6',
+    },
+    hostelImage: {
+        width: '100%',
+        height: 160,
+        backgroundColor: '#d1d5db',
+    },
+    hostelInfo: {
+        padding: 16,
+    },
+    hostelName: {
+        fontSize: 16,
+        fontWeight: 'bold',
+        marginBottom: 4,
+    },
+    hostelCity: {
+        color: '#666',
+        fontSize: 12,
+        marginBottom: 12,
+    },
+    hostelFooter: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+    },
+    ratingContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 4,
+    },
+    ratingText: {
+        fontWeight: '600',
+    },
+    reviewCount: {
+        color: '#999',
+        fontSize: 12,
+    },
+    priceText: {
+        fontSize: 16,
+        fontWeight: 'bold',
+    },
+});
 
 export default function ExploreScreen() {
     const router = useRouter();
@@ -43,20 +186,26 @@ export default function ExploreScreen() {
     const cities = ['Accra', 'Kumasi', 'Cape Coast', 'Takoradi', 'Tema'];
 
     return (
-        <SafeAreaView className="flex-1 bg-gray-50">
+        <SafeAreaView style={styles.container}>
             <ScrollView showsVerticalScrollIndicator={false}>
                 {/* Header */}
-                <View className="px-4 pt-4 pb-6">
-                    <Text className="text-3xl font-bold mb-6">Discover Hostels</Text>
+                <View style={styles.header}>
+                    <Text style={styles.title}>Discover Hostels</Text>
 
                     {/* Search Bar */}
-                    <View className="flex-row items-center gap-2 mb-6">
-                        <View className="flex-1 flex-row items-center bg-white rounded-lg px-3 py-3 border border-gray-200">
-                            <Search size={20} color="#999" />
-                            <Text className="flex-1 ml-2" placeholder="Search hostels..." placeholderTextColor="#999" />
+                    <View style={styles.searchRow}>
+                        <View style={styles.searchInput}>
+                            <Text style={{ fontSize: 18 }}>🔍</Text>
+                            <TextInput
+                                style={styles.searchText}
+                                placeholder="Search hostels..."
+                                placeholderTextColor="#999"
+                                value={searchQuery}
+                                onChangeText={setSearchQuery}
+                            />
                         </View>
-                        <TouchableOpacity className="bg-white p-3 rounded-lg border border-gray-200">
-                            <Filter size={20} color="#000" />
+                        <TouchableOpacity style={styles.filterButton}>
+                            <Text style={styles.filterText}>⚙️</Text>
                         </TouchableOpacity>
                     </View>
 
@@ -64,24 +213,26 @@ export default function ExploreScreen() {
                     <ScrollView
                         horizontal
                         showsHorizontalScrollIndicator={false}
-                        className="mb-6"
+                        style={styles.citiesContainer}
                     >
                         {cities.map((city) => (
                             <TouchableOpacity
                                 key={city}
                                 onPress={() => setSelectedCity(city)}
-                                className={`mr-2 px-4 py-2 rounded-full border ${
+                                style={[
+                                    styles.cityButton,
                                     selectedCity === city
-                                        ? 'bg-black border-black'
-                                        : 'bg-white border-gray-300'
-                                }`}
+                                        ? styles.cityButtonActive
+                                        : styles.cityButtonInactive,
+                                ]}
                             >
                                 <Text
-                                    className={
+                                    style={[
+                                        styles.cityButtonText,
                                         selectedCity === city
-                                            ? 'text-white font-semibold'
-                                            : 'text-gray-700'
-                                    }
+                                            ? styles.cityButtonTextActive
+                                            : styles.cityButtonTextInactive,
+                                    ]}
                                 >
                                     {city}
                                 </Text>
@@ -92,44 +243,44 @@ export default function ExploreScreen() {
 
                 {/* Hostels List */}
                 {loading ? (
-                    <View className="flex-1 justify-center items-center py-12">
+                    <View style={styles.loadingContainer}>
                         <ActivityIndicator size="large" color="#000" />
                     </View>
                 ) : hostels.length === 0 ? (
-                    <View className="px-4 py-12 items-center">
-                        <Text className="text-gray-600 text-lg">No hostels found</Text>
+                    <View style={styles.emptyContainer}>
+                        <Text style={styles.emptyText}>No hostels found</Text>
                     </View>
                 ) : (
-                    <View className="px-4 pb-6">
+                    <View style={styles.hostelsList}>
                         {hostels.map((hostel) => (
                             <TouchableOpacity
                                 key={hostel.id}
                                 onPress={() => router.push(`/hostel/${hostel.id}`)}
-                                className="bg-white rounded-lg overflow-hidden mb-4 shadow-sm border border-gray-100"
+                                style={styles.hostelCard}
                                 activeOpacity={0.7}
                             >
                                 {/* Image */}
                                 <Image
                                     source={{ uri: hostel.imageUrl }}
-                                    className="w-full h-40 bg-gray-200"
+                                    style={styles.hostelImage}
                                 />
 
                                 {/* Info */}
-                                <View className="p-4">
-                                    <Text className="text-lg font-bold mb-1">{hostel.name}</Text>
-                                    <Text className="text-gray-600 text-sm mb-3">{hostel.city}</Text>
+                                <View style={styles.hostelInfo}>
+                                    <Text style={styles.hostelName}>{hostel.name}</Text>
+                                    <Text style={styles.hostelCity}>{hostel.city}</Text>
 
-                                    <View className="flex-row justify-between items-center">
-                                        <View className="flex-row items-center gap-1">
-                                            <Star size={16} color="#fbbf24" fill="#fbbf24" />
-                                            <Text className="font-semibold">
+                                    <View style={styles.hostelFooter}>
+                                        <View style={styles.ratingContainer}>
+                                            <Text>⭐</Text>
+                                            <Text style={styles.ratingText}>
                                                 {hostel.rating.toFixed(1)}
                                             </Text>
-                                            <Text className="text-gray-500 text-sm">
+                                            <Text style={styles.reviewCount}>
                                                 ({hostel.reviewCount})
                                             </Text>
                                         </View>
-                                        <Text className="text-lg font-bold">
+                                        <Text style={styles.priceText}>
                                             ₵{Math.floor(hostel.priceRange.min / 100)}/month
                                         </Text>
                                     </View>
