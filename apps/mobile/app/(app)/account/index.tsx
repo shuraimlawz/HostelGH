@@ -134,7 +134,7 @@ export default function AccountScreen() {
                                 <TextInput
                                     className="border border-gray-300 rounded-lg px-4 py-3"
                                     value={editData.firstName}
-                                    onChangeText={(text) =>
+                                    onChangeText={(text: string) =>
                                         setEditData({ ...editData, firstName: text })
                                     }
                                 />
@@ -147,7 +147,7 @@ export default function AccountScreen() {
                                 <TextInput
                                     className="border border-gray-300 rounded-lg px-4 py-3"
                                     value={editData.lastName}
-                                    onChangeText={(text) =>
+                                    onChangeText={(text: string) =>
                                         setEditData({ ...editData, lastName: text })
                                     }
                                 />
@@ -160,7 +160,7 @@ export default function AccountScreen() {
                                 <TextInput
                                     className="border border-gray-300 rounded-lg px-4 py-3"
                                     value={editData.phoneNumber}
-                                    onChangeText={(text) =>
+                                    onChangeText={(text: string) =>
                                         setEditData({ ...editData, phoneNumber: text })
                                     }
                                     keyboardType="phone-pad"

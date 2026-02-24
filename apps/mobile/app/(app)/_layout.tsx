@@ -36,7 +36,7 @@ export default function AppLayout() {
                 options={{
                     title: 'Explore',
                     tabBarLabel: 'Explore',
-                    tabBarIcon: ({ color }) => TAB_ICONS.explore(color),
+                    tabBarIcon: ({ color }: { color: string }) => TAB_ICONS.explore(color),
                     headerShown: true,
                     headerTitle: 'Discover Hostels',
                 }}
@@ -46,7 +46,7 @@ export default function AppLayout() {
                 options={{
                     title: 'Bookings',
                     tabBarLabel: 'Bookings',
-                    tabBarIcon: ({ color }) => TAB_ICONS.bookings(color),
+                    tabBarIcon: ({ color }: { color: string }) => TAB_ICONS.bookings(color),
                     headerShown: true,
                     headerTitle: 'My Bookings',
                 }}
@@ -56,7 +56,7 @@ export default function AppLayout() {
                 options={{
                     title: 'Account',
                     tabBarLabel: 'Account',
-                    tabBarIcon: ({ color }) => TAB_ICONS.account(color),
+                    tabBarIcon: ({ color }: { color: string }) => TAB_ICONS.account(color),
                     headerShown: true,
                     headerTitle: 'Profile',
                 }}
