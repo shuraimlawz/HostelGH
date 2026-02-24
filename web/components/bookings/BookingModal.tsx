@@ -462,27 +462,3 @@ export default function BookingModal({
         </div>
     );
 }
-                                        rows={3}
-                                        value={notes}
-                                        onChange={(e) => setNotes(e.target.value)}
-                                        placeholder="Any extra info..."
-                                    />
-                                </div>
-
-                                {err && <div className="text-sm text-red-600">{err}</div>}
-
-                                <button
-                                    disabled={loading}
-                                    onClick={submit}
-                                    className="w-full rounded-2xl bg-black text-white py-3 hover:opacity-90 disabled:opacity-60"
-                                >
-                                    {loading ? "Submitting..." : "Submit request"}
-                                </button>
-                            </>
-                        )}
-                    </div>
-                </div>
-            </div>
-        </div>
-    );
-}
