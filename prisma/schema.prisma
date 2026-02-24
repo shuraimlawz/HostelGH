@@ -51,6 +51,11 @@ enum RoomGender {
   MIXED
 }
 
+enum FacilityType {
+  FREE
+  PAID
+}
+
 enum HostelBookingStatus {
   OPEN // Accepting bookings
   LIMITED // Few slots left
@@ -182,20 +187,36 @@ model Hostel {
   distanceToCampus  String? // "10 minutes walk", "5 min trotro"
   utilitiesIncluded String[]            @default([]) // ["water", "light", "gas"]
   bookingStatus     HostelBookingStatus @default(OPEN)
+  policiesText      String?
+  genderCategory    RoomGender?
 
   isPublished          Boolean  @default(false)
   pendingVerification  Boolean  @default(false) // Awaiting admin review before first publish
   createdAt            DateTime @default(now())
   updatedAt            DateTime @updatedAt
 
-  owner    User      @relation("HostelOwner", fields: [ownerId], references: [id], onDelete: Cascade)
-  rooms    Room[]
-  bookings Booking[]
-  wallets  Wallet[]
+  owner      User             @relation("HostelOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+  rooms      Room[]
+  facilities HostelFacility[]
+  bookings   Booking[]
+  wallets    Wallet[]
 
   @@index([ownerId])
   @@index([city])
   @@index([isPublished])
+}
+
+model HostelFacility {
+  id        String       @id @default(cuid())
+  hostelId  String
+  name      String
+  type      FacilityType
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+
+  hostel Hostel @relation(fields: [hostelId], references: [id], onDelete: Cascade)
+
+  @@index([hostelId])
 }
 
 model Wallet {
@@ -289,6 +310,13 @@ model Booking {
   paymentDeadline DateTime? // 24-hour payment deadline
   autoReleaseAt   DateTime? // When to auto-release if unpaid
   slotNumber      Int? // Assigned slot number
+
+  // KYC/identity fields
+  levelOfStudy     String?
+  guardianName     String?
+  guardianPhone    String?
+  admissionDocUrl  String?
+  passportPhotoUrl String?
 
   deletionRequested Boolean @default(false)
   deletionReason    String?

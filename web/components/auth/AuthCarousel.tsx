@@ -3,13 +3,14 @@
 import { useState, useEffect } from "react";
 
 const IMAGES = [
-    "https://upload.wikimedia.org/wikipedia/commons/6/69/Unity_hall_KNUST.jpg", // Unity Hall KNUST
-    "https://upload.wikimedia.org/wikipedia/commons/5/53/Side_view_of_Commonwealth_Hall_Legon.jpg", // Commonwealth Hall Legon
-    "https://upload.wikimedia.org/wikipedia/commons/7/7d/Balme_Library_at_University_of_Ghana_-_Legon.jpg", // Balme Library (UG)
-    "https://upload.wikimedia.org/wikipedia/commons/a/a6/Great_Hall_University_of_Ghana.jpg", // Great Hall UG
-    "https://images.unsplash.com/photo-1555854877-bab0e564b8d5?q=80&w=2069&auto=format&fit=crop", // Hostel Bunk (Fallback/Vibe)
-    "https://images.unsplash.com/photo-1596276020587-8044fe049813?q=80&w=2078&auto=format&fit=crop", // Cozy Room (Fallback)
-    "https://images.unsplash.com/photo-1520277739336-7bf67edfa768?q=80&w=2070&auto=format&fit=crop", // Lounge (Fallback)
+    "/SRC_hostel_KNUST-Kumasi.jpg",
+    "/evandy-scaled-1.jpg",
+    "/upsahostel.jpg",
+    "/Hostel_Block_B_(GCTU).jpg",
+    "/hall-seven.jpg",
+    "/BfTDaFFIUAAYpK9.jpg",
+    "/FuubNuyWIAAzS0c.jpg",
+    "/ace2fe4f_z.webp"
 ];
 
 export default function AuthCarousel() {

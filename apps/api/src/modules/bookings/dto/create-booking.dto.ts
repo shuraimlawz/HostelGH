@@ -22,6 +22,12 @@ export class CreateBookingDto {
 
   @IsOptional() @IsString() notes?: string;
 
+  @IsOptional() @IsString() levelOfStudy?: string;
+  @IsOptional() @IsString() guardianName?: string;
+  @IsOptional() @IsString() guardianPhone?: string;
+  @IsOptional() @IsString() admissionDocUrl?: string;
+  @IsOptional() @IsString() passportPhotoUrl?: string;
+
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => BookingItemDto)

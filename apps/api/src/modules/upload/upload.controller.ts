@@ -15,6 +15,29 @@ import { ApiTags, ApiOperation, ApiConsumes, ApiBody } from "@nestjs/swagger";
 export class UploadController {
   constructor(private readonly uploadService: UploadService) {}
 
+  @Post("single")
+  @ApiOperation({ summary: "Upload a single file (KYC/document)" })
+  @UseInterceptors(FileInterceptor("file"))
+  @ApiConsumes("multipart/form-data")
+  @ApiBody({
+    schema: {
+      type: "object",
+      properties: {
+        file: {
+          type: "string",
+          format: "binary",
+        },
+      },
+    },
+  })
+  async uploadSingle(@UploadedFile() file: MulterFile) {
+    if (!file) {
+      throw new BadRequestException("No file uploaded");
+    }
+    const url = await this.uploadService.uploadImage(file);
+    return { url };
+  }
+
   @Post("image")
   @ApiOperation({ summary: "Upload a single image" })
   @UseInterceptors(FileInterceptor("file"))

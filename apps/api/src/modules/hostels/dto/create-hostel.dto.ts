@@ -7,6 +7,7 @@ import {
   IsArray,
 } from "class-validator";
 import { ApiProperty, PartialType } from "@nestjs/swagger";
+import { RoomGender } from "@prisma/client";
 
 export class CreateHostelDto {
   @ApiProperty({ example: "Sunny Side Hostel" })
@@ -86,6 +87,20 @@ export class CreateHostelDto {
   @IsOptional()
   @IsEnum(["OPEN", "LIMITED", "CLOSED", "FULL"])
   bookingStatus?: string;
+
+  @ApiProperty({ example: "No pets allowed.", required: false })
+  @IsOptional()
+  @IsString()
+  policiesText?: string;
+
+  @ApiProperty({
+    example: RoomGender.MIXED,
+    enum: RoomGender,
+    required: false,
+  })
+  @IsOptional()
+  @IsEnum(RoomGender)
+  genderCategory?: RoomGender;
 }
 
-export class UpdateHostelDto extends PartialType(CreateHostelDto) {}
+export class UpdateHostelDto extends PartialType(CreateHostelDto) { }

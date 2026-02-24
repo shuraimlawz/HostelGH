@@ -9,13 +9,19 @@ import { BookingStatus, UserRole, RoomGender } from "@prisma/client";
 import { Cron, CronExpression } from "@nestjs/schedule";
 import { CreateBookingDto } from "./dto/create-booking.dto";
 import { NotificationsService } from "../notifications/notifications.service";
+import {
+  AdminAuditLogService,
+  AdminAction,
+  AdminEntity,
+} from "../admin/admin-audit.service";
 
 @Injectable()
 export class BookingsService {
   constructor(
     private prisma: PrismaService,
     private notifications: NotificationsService,
-  ) {}
+    private audit: AdminAuditLogService,
+  ) { }
 
   async createBooking(tenantId: string, dto: CreateBookingDto) {
     const hostel = await this.prisma.hostel.findUnique({
@@ -66,6 +72,13 @@ export class BookingsService {
           // @ts-ignore
           autoReleaseAt: paymentDeadline,
           expiresAt: paymentDeadline, // Keep for backward compatibility if needed
+
+          // KYC fields
+          levelOfStudy: dto.levelOfStudy,
+          guardianName: dto.guardianName,
+          guardianPhone: dto.guardianPhone,
+          admissionDocUrl: dto.admissionDocUrl,
+          passportPhotoUrl: dto.passportPhotoUrl,
           items: {
             create: dto.items.map((i) => {
               const room = roomMap.get(i.roomId)!;
@@ -238,6 +251,16 @@ export class BookingsService {
         include: { tenant: true, hostel: true },
       });
 
+      // Log audit
+      await this.audit.log(
+        { id: actor.id } as any,
+        AdminAction.APPROVE,
+        AdminEntity.BOOKING,
+        bookingId,
+        `Booking approved for tenant ${updated.tenant.email}`,
+        { tenantId: updated.tenantId, hostelId: updated.hostelId },
+      );
+
       // Trigger notification
       this.notifications
         .sendBookingApprovedEmail(updated.tenant.email, {
@@ -288,6 +311,18 @@ export class BookingsService {
       },
       include: { tenant: true, hostel: true },
     });
+
+    // Log audit
+    this.audit
+      .log(
+        { id: actor.id } as any,
+        AdminAction.REJECT,
+        AdminEntity.BOOKING,
+        bookingId,
+        `Booking rejected: ${reason || "No reason provided"}`,
+        { tenantId: updated.tenantId, reason },
+      )
+      .catch(() => {});
 
     // Trigger notification
     this.notifications
@@ -459,10 +494,10 @@ export class BookingsService {
     const bookingTrend =
       previousMonthBookings > 0
         ? Math.round(
-            ((currentMonthBookings - previousMonthBookings) /
-              previousMonthBookings) *
-              100,
-          )
+          ((currentMonthBookings - previousMonthBookings) /
+            previousMonthBookings) *
+          100,
+        )
         : 0;
 
     return {

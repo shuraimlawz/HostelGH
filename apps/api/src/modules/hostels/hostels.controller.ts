@@ -22,6 +22,7 @@ import { Roles } from "../../common/decorators/roles.decorator";
 import { Public } from "../../common/decorators/public.decorator";
 import { UserRole } from "@prisma/client";
 import { CreateHostelDto, UpdateHostelDto } from "./dto/create-hostel.dto";
+import { AddFacilityDto } from "./dto/add-facility.dto";
 import { UploadService } from "../upload/upload.service";
 
 import {
@@ -41,7 +42,7 @@ export class HostelsController {
   constructor(
     private hostels: HostelsService,
     private upload: UploadService,
-  ) {}
+  ) { }
 
   @Roles(UserRole.OWNER)
   @Post()
@@ -143,6 +144,36 @@ export class HostelsController {
   @ApiOperation({ summary: "Get owner notification counts" })
   getOwnerCounts(@Req() req: any) {
     return this.hostels.getOwnerNotificationCounts(req.user.id);
+  }
+
+  @Roles(UserRole.OWNER, UserRole.ADMIN)
+  @Post(":id/facilities")
+  @ApiOperation({ summary: "Add a facility to a hostel (Owner/Admin only)" })
+  addFacility(
+    @Req() req: any,
+    @Param("id") hostelId: string,
+    @Body() dto: AddFacilityDto,
+  ) {
+    return this.hostels.addFacility(
+      { id: req.user.id, role: req.user.role },
+      hostelId,
+      dto,
+    );
+  }
+
+  @Roles(UserRole.OWNER, UserRole.ADMIN)
+  @Delete(":id/facilities/:facilityId")
+  @ApiOperation({ summary: "Remove a facility from a hostel (Owner/Admin only)" })
+  removeFacility(
+    @Req() req: any,
+    @Param("id") hostelId: string,
+    @Param("facilityId") facilityId: string,
+  ) {
+    return this.hostels.removeFacility(
+      { id: req.user.id, role: req.user.role },
+      hostelId,
+      facilityId,
+    );
   }
 
   @Roles(UserRole.OWNER)

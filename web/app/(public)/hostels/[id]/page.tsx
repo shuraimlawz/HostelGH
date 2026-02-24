@@ -65,13 +65,15 @@ export default function HostelDetailsPage() {
     });
 
     const [bookingRoomId, setBookingRoomId] = useState<string | null>(null);
+    const [bookingRoom, setBookingRoom] = useState<any>(null);
 
-    async function onBook(roomId: string) {
+    async function onBook(roomId: string, room: any) {
         if (!user) {
             const ok = await open("login");
             if (!ok) return;
         }
         setBookingRoomId(roomId);
+        setBookingRoom(room);
     }
 
     if (isLoading) return (
@@ -290,7 +292,7 @@ export default function HostelDetailsPage() {
                                                     <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Academic Year</p>
                                                 </div>
                                                 <button
-                                                    onClick={() => onBook(r.id)}
+                                                    onClick={() => onBook(r.id, r)}
                                                     className="w-full bg-black text-white py-4 rounded-2xl font-black uppercase tracking-[0.2em] text-xs shadow-xl shadow-black/10 hover:opacity-90 active:scale-95 transition-all"
                                                 >
                                                     Select Room
@@ -373,9 +375,13 @@ export default function HostelDetailsPage() {
 
             <BookingModal
                 open={!!bookingRoomId}
-                onClose={() => setBookingRoomId(null)}
+                onClose={() => {
+                    setBookingRoomId(null);
+                    setBookingRoom(null);
+                }}
                 hostelId={hostel.id}
                 roomId={bookingRoomId ?? ""}
+                room={bookingRoom}
             />
         </div>
     );

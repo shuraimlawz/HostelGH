@@ -2,13 +2,13 @@
 
 // Build trigger: Production Cleanup
 import { api } from "@/lib/api";
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { AlertCircle, Eye, EyeOff } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 
-export default function RegisterForm({ onSuccess }: { onSuccess?: () => void }) {
+function RegisterContent({ onSuccess }: { onSuccess?: () => void }) {
     const searchParams = useSearchParams();
     const { login } = useAuth();
     const defaultRole = searchParams.get("role") === "OWNER" ? "OWNER" : "TENANT";
@@ -185,5 +185,22 @@ export default function RegisterForm({ onSuccess }: { onSuccess?: () => void }) 
                 Already have an account? <a href="/auth/login" className="font-bold text-foreground border-b border-foreground hover:opacity-70 transition-opacity ml-1">Log In</a>
             </div>
         </div>
+    );
+}
+
+export default function RegisterForm({ onSuccess }: { onSuccess?: () => void }) {
+    return (
+        <Suspense fallback={
+            <div className="flex justify-center items-center py-8">
+                <div className="flex items-center gap-2 text-muted-foreground text-sm font-medium">
+                    <div className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce [animation-delay:-0.3s]"></div>
+                    <div className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce [animation-delay:-0.15s]"></div>
+                    <div className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce"></div>
+                    <span className="ml-1 tracking-wide">Loading form...</span>
+                </div>
+            </div>
+        }>
+            <RegisterContent onSuccess={onSuccess} />
+        </Suspense>
     );
 }

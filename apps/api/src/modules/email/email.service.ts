@@ -10,21 +10,80 @@ export class EmailService implements OnModuleInit {
     constructor(private config: ConfigService) { }
 
     async onModuleInit() {
-        // For development, we use ethereal email to generate preview links
-        // In production, you would use real SMTP credentials from env
+        const isProduction = this.config.get<string>("NODE_ENV") === "production";
+        
+        if (isProduction) {
+            // Use production SMTP configuration
+            const smtpHost = this.config.get<string>("SMTP_HOST");
+            const smtpPort = this.config.get<number>("SMTP_PORT");
+            const smtpUser = this.config.get<string>("SMTP_USER");
+            const smtpPass = this.config.get<string>("SMTP_PASSWORD");
+            
+            if (!smtpHost || !smtpUser || !smtpPass) {
+                if (!smtpHost) this.logger.warn("SMTP_HOST not configured, falling back to test account");
+                if (!smtpUser) this.logger.warn("SMTP_USER not configured, falling back to test account");
+                if (!smtpPass) this.logger.warn("SMTP_PASSWORD not configured, falling back to test account");
+            }
+
+            if (smtpHost && smtpUser && smtpPass) {
+                this.transporter = nodemailer.createTransport({
+                    host: smtpHost,
+                    port: smtpPort || 587,
+                    secure: (smtpPort || 587) === 465, // use TLS if port is 465
+                    auth: {
+                        user: smtpUser,
+                        pass: smtpPass,
+                    },
+                });
+
+                this.logger.log(`Email service initialized with SMTP: ${smtpHost}:${smtpPort}`);
+                return;
+            }
+        }
+
+        // Development: Use ethereal test account
         const account = await nodemailer.createTestAccount();
 
         this.transporter = nodemailer.createTransport({
             host: "smtp.ethereal.email",
             port: 587,
-            secure: false, // true for 465, false for other ports
+            secure: false,
             auth: {
-                user: account.user, // generated ethereal user
-                pass: account.pass, // generated ethereal password
+                user: account.user,
+                pass: account.pass,
             },
         });
 
-        this.logger.log(`Ethereal Email initialized. Emails will be caught at https://ethereal.email/login`);
+        this.logger.log(`Ethereal Email initialized for development. Emails: https://ethereal.email/login`);
+    }
+
+    async send(options: {
+        to: string;
+        subject: string;
+        html: string;
+        from?: string;
+    }) {
+        const mailOptions = {
+            from: options.from || '"HostelGH" <noreply@hostelgh.com>',
+            to: options.to,
+            subject: options.subject,
+            html: options.html,
+        };
+
+        try {
+            const info = await this.transporter.sendMail(mailOptions);
+            this.logger.log(`Email sent to ${options.to}`);
+            
+            // Log test URL in development
+            if (info.messageId?.includes("ethereal")) {
+                this.logger.log(`Preview: ${nodemailer.getTestMessageUrl(info)}`);
+            }
+            
+            return true;
+        } catch (error) {
+            this.logger.error(`Failed to send email to ${options.to}`, error);
+            return false;
+        }
     }
 
     async sendPasswordResetEmail(to: string, resetToken: string) {
@@ -36,7 +95,7 @@ export class EmailService implements OnModuleInit {
             to,
             subject: "Password Reset Request",
             html: `
-        <div style="font-family: Arial, sans-serif; max-w-md; margin: 0 auto; padding: 20px; border: 1px solid #eaeaea; border-radius: 10px;">
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eaeaea; border-radius: 10px;">
           <h2 style="color: #2563eb; text-align: center;">HostelGH Password Reset</h2>
           <p>We received a request to reset your password. Click the button below to set a new one:</p>
           <div style="text-align: center; margin: 30px 0;">
@@ -51,7 +110,9 @@ export class EmailService implements OnModuleInit {
         try {
             const info = await this.transporter.sendMail(mailOptions);
             this.logger.log(`Password reset email sent to ${to}`);
-            this.logger.log(`Preview URL: ${nodemailer.getTestMessageUrl(info)}`);
+            if (info.messageId?.includes("ethereal")) {
+                this.logger.log(`Preview: ${nodemailer.getTestMessageUrl(info)}`);
+            }
             return true;
         } catch (error) {
             this.logger.error(`Failed to send email to ${to}`, error);

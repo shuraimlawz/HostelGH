@@ -198,6 +198,7 @@ export class HostelsService {
       where: { id },
       include: {
         rooms: { where: { isActive: true }, orderBy: { createdAt: "asc" } },
+        facilities: true,
         owner: { select: { id: true, firstName: true, lastName: true, avatarUrl: true } },
       },
     });
@@ -354,11 +355,34 @@ export class HostelsService {
     });
   }
 
+  async addFacility(actor: UserActor, hostelId: string, dto: { name: string, type: any }) {
+    const hostel = await this.getHostelById(hostelId);
+    this.validateOwnership(actor, hostel.ownerId);
+
+    return this.prisma.hostelFacility.create({
+      data: {
+        hostelId,
+        name: dto.name,
+        type: dto.type as any,
+      },
+    });
+  }
+
+  async removeFacility(actor: UserActor, hostelId: string, facilityId: string) {
+    const hostel = await this.getHostelById(hostelId);
+    this.validateOwnership(actor, hostel.ownerId);
+
+    return this.prisma.hostelFacility.deleteMany({
+      where: { id: facilityId, hostelId },
+    });
+  }
+
   async getById(actor: UserActor, id: string) {
     const hostel = await this.prisma.hostel.findUnique({
       where: { id },
       include: {
         rooms: { orderBy: { createdAt: "asc" } },
+        facilities: true,
         _count: { select: { bookings: true } },
       },
     });
@@ -415,6 +439,8 @@ interface CreateHostelDto {
   university?: string;
   isPublished?: boolean;
   isFeatured?: boolean;
+  policiesText?: string;
+  genderCategory?: any; // RoomGender
 }
 
 interface UpdateHostelDto extends Partial<CreateHostelDto> { }
