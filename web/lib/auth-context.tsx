@@ -59,6 +59,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const logout = useCallback(() => {
         localStorage.clear();
         setUser(null);
+        window.location.href = "/";
     }, []);
 
     const updateUser = useCallback((updatedData: Partial<User>) => {
