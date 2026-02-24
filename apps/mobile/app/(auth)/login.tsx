@@ -8,11 +8,91 @@ import {
     Alert,
     KeyboardAvoidingView,
     Platform,
+    StyleSheet,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useAuthStore } from '@/lib/stores/authStore';
 import { apiClient } from '@/lib/api/client';
 import * as SecureStore from 'expo-secure-store';
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        backgroundColor: '#fff',
+    },
+    keyboardView: {
+        flex: 1,
+        paddingHorizontal: 24,
+        justifyContent: 'center',
+    },
+    header: {
+        marginBottom: 48,
+    },
+    title: {
+        fontSize: 32,
+        fontWeight: 'bold',
+        marginBottom: 8,
+    },
+    subtitle: {
+        fontSize: 16,
+        color: '#666',
+    },
+    formContainer: {
+        gap: 16,
+        marginBottom: 32,
+    },
+    fieldGroup: {
+        gap: 8,
+    },
+    label: {
+        fontSize: 14,
+        fontWeight: '600',
+        color: '#333',
+    },
+    input: {
+        borderWidth: 1,
+        borderColor: '#ddd',
+        borderRadius: 8,
+        paddingHorizontal: 16,
+        paddingVertical: 12,
+        fontSize: 14,
+    },
+    submitButton: {
+        borderRadius: 8,
+        paddingVertical: 12,
+        marginBottom: 16,
+    },
+    submitButtonActive: {
+        backgroundColor: '#000',
+    },
+    submitButtonDisabled: {
+        backgroundColor: '#ccc',
+    },
+    submitButtonText: {
+        color: '#fff',
+        fontWeight: '600',
+        fontSize: 16,
+        textAlign: 'center',
+    },
+    link: {
+        textAlign: 'center',
+        color: '#0066cc',
+        fontWeight: '600',
+    },
+    bottomSection: {
+        marginTop: 32,
+        flexDirection: 'row',
+        justifyContent: 'center',
+        gap: 8,
+    },
+    bottomText: {
+        color: '#666',
+    },
+    signupLink: {
+        color: '#0066cc',
+        fontWeight: '600',
+    },
+});
 
 export default function LoginScreen() {
     const router = useRouter();
@@ -47,21 +127,21 @@ export default function LoginScreen() {
     };
 
     return (
-        <SafeAreaView className="flex-1 bg-white">
+        <SafeAreaView style={styles.container}>
             <KeyboardAvoidingView
                 behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-                className="flex-1 px-6 justify-center"
+                style={styles.keyboardView}
             >
-                <View className="mb-12">
-                    <Text className="text-4xl font-bold mb-2">Welcome</Text>
-                    <Text className="text-gray-600">to HostelGH</Text>
+                <View style={styles.header}>
+                    <Text style={styles.title}>Welcome</Text>
+                    <Text style={styles.subtitle}>to HostelGH</Text>
                 </View>
 
-                <View className="gap-4 mb-8">
-                    <View>
-                        <Text className="text-sm font-semibold mb-2 text-gray-700">Email</Text>
+                <View style={styles.formContainer}>
+                    <View style={styles.fieldGroup}>
+                        <Text style={styles.label}>Email</Text>
                         <TextInput
-                            className="border border-gray-300 rounded-lg px-4 py-3"
+                            style={styles.input}
                             placeholder="Enter your email"
                             value={email}
                             onChangeText={setEmail}
@@ -71,13 +151,13 @@ export default function LoginScreen() {
                         />
                     </View>
 
-                    <View>
-                        <Text className="text-sm font-semibold mb-2 text-gray-700">Password</Text>
+                    <View style={styles.fieldGroup}>
+                        <Text style={styles.label}>Password</Text>
                         <TextInput
-                            className="border border-gray-300 rounded-lg px-4 py-3"
+                            style={styles.input}
                             placeholder="Enter your password"
                             value={password}
-                            onChangeText={setPassword}
+                            onChangeText={(text: string) => setPassword(text)}
                             editable={!loading}
                             secureTextEntry
                         />
@@ -87,9 +167,12 @@ export default function LoginScreen() {
                 <TouchableOpacity
                     onPress={handleLogin}
                     disabled={loading}
-                    className={`rounded-lg py-3 mb-4 ${loading ? 'bg-gray-400' : 'bg-black'}`}
+                    style={[
+                        styles.submitButton,
+                        loading ? styles.submitButtonDisabled : styles.submitButtonActive,
+                    ]}
                 >
-                    <Text className="text-white font-semibold text-center text-lg">
+                    <Text style={styles.submitButtonText}>
                         {loading ? 'Logging in...' : 'Login'}
                     </Text>
                 </TouchableOpacity>
@@ -98,21 +181,20 @@ export default function LoginScreen() {
                     onPress={() => router.push('/(auth)/forgot-password')}
                     disabled={loading}
                 >
-                    <Text className="text-center text-blue-600 font-semibold">
-                        Forgot Password?
-                    </Text>
+                    <Text style={styles.link}>Forgot Password?</Text>
                 </TouchableOpacity>
 
-                <View className="mt-8 flex-row justify-center gap-2">
-                    <Text className="text-gray-600">Don't have an account?</Text>
+                <View style={styles.bottomSection}>
+                    <Text style={styles.bottomText}>Don't have an account?</Text>
                     <TouchableOpacity
                         onPress={() => router.push('/(auth)/register')}
                         disabled={loading}
                     >
-                        <Text className="text-blue-600 font-semibold">Sign Up</Text>
+                        <Text style={styles.signupLink}>Sign Up</Text>
                     </TouchableOpacity>
                 </View>
             </KeyboardAvoidingView>
         </SafeAreaView>
     );
 }
+

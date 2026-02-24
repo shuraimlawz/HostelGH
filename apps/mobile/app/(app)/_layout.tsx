@@ -1,12 +1,5 @@
 import React from 'react';
 import { Tabs } from 'expo-router';
-import { Compass, MapPin, User } from 'lucide-react-native';
-
-const TAB_ICONS = {
-    explore: (color: string) => <Compass size={24} color={color} />,
-    bookings: (color: string) => <MapPin size={24} color={color} />,
-    account: (color: string) => <User size={24} color={color} />,
-};
 
 export default function AppLayout() {
     return (
@@ -36,7 +29,6 @@ export default function AppLayout() {
                 options={{
                     title: 'Explore',
                     tabBarLabel: 'Explore',
-                    tabBarIcon: ({ color }: { color: string }) => TAB_ICONS.explore(color),
                     headerShown: true,
                     headerTitle: 'Discover Hostels',
                 }}
@@ -46,7 +38,6 @@ export default function AppLayout() {
                 options={{
                     title: 'Bookings',
                     tabBarLabel: 'Bookings',
-                    tabBarIcon: ({ color }: { color: string }) => TAB_ICONS.bookings(color),
                     headerShown: true,
                     headerTitle: 'My Bookings',
                 }}
@@ -56,7 +47,6 @@ export default function AppLayout() {
                 options={{
                     title: 'Account',
                     tabBarLabel: 'Account',
-                    tabBarIcon: ({ color }: { color: string }) => TAB_ICONS.account(color),
                     headerShown: true,
                     headerTitle: 'Profile',
                 }}
@@ -64,3 +54,4 @@ export default function AppLayout() {
         </Tabs>
     );
 }
+
