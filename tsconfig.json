@@ -1,39 +1,40 @@
 {
-    "compilerOptions": {
-        "module": "commonjs",
-        "declaration": true,
-        "removeComments": true,
-        "emitDecoratorMetadata": true,
-        "experimentalDecorators": true,
-        "allowSyntheticDefaultImports": true,
-        "target": "es2017",
-        "sourceMap": true,
-        "outDir": "./dist",
-        "baseUrl": "./",
-        "incremental": true,
-        "skipLibCheck": true,
-        "strictNullChecks": false,
-        "noImplicitAny": false,
-        "strictBindCallApply": false,
-        "forceConsistentCasingInFileNames": false,
-        "noFallthroughCasesInSwitch": false,
-        "paths": {
-            "@app/common": [
-                "apps/api/src/common"
-            ],
-            "@app/common/*": [
-                "apps/api/src/common/*"
-            ]
-        },
-        "types": [
-            "jest",
-            "node"
-        ]
+  "compilerOptions": {
+    "module": "commonjs",
+    "declaration": true,
+    "removeComments": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "allowSyntheticDefaultImports": true,
+    "target": "es2017",
+    "sourceMap": true,
+    "outDir": "./dist",
+    "baseUrl": "./",
+    "incremental": true,
+    "skipLibCheck": true,
+    "strictNullChecks": false,
+    "noImplicitAny": false,
+    "strictBindCallApply": false,
+    "forceConsistentCasingInFileNames": false,
+    "noFallthroughCasesInSwitch": false,
+    "paths": {
+      "@app/common": [
+        "apps/api/src/common"
+      ],
+      "@app/common/*": [
+        "apps/api/src/common/*"
+      ]
     },
-    "exclude": [
-        "node_modules",
-        "dist",
-        "web",
-        "apps/mobile"
+    "types": [
+      "jest",
+      "node"
     ]
+  },
+  "exclude": [
+    "node_modules",
+    "dist",
+    "web",
+    "apps/mobile"
+  ],
+  "extends": "expo/tsconfig.base"
 }

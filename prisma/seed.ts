@@ -1,6 +1,12 @@
 import { PrismaClient, UserRole } from "@prisma/client";
 import * as bcrypt from "bcrypt";
 
+// Safety: require explicit opt-in to run destructive seed
+if (process.env.FORCE_SEED !== "true") {
+    console.error("Seeding blocked: set FORCE_SEED=true to run this seed (prevents accidental data loss).");
+    process.exit(1);
+}
+
 const prisma = new PrismaClient();
 
 async function main() {
