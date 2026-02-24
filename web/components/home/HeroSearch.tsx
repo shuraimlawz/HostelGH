@@ -7,14 +7,14 @@ import { cn } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 
-const HERO_IMAGES = [
+const FALLBACK_HERO_IMAGES = [
+    "/FuubNuyWIAAzS0c.jpg",
     "/SRC_hostel_KNUST-Kumasi.jpg",
     "/evandy-scaled-1.jpg",
     "/upsahostel.jpg",
     "/Hostel_Block_B_(GCTU).jpg",
     "/hall-seven.jpg",
     "/BfTDaFFIUAAYpK9.jpg",
-    "/FuubNuyWIAAzS0c.jpg",
     "/ace2fe4f_z.webp"
 ];
 
@@ -23,12 +23,26 @@ export default function HeroSearch() {
     const [city, setCity] = useState("");
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
+    const { data: trendingHostels } = useQuery({
+        queryKey: ["featured-hostels"],
+        queryFn: async () => {
+            const { data } = await api.get("/hostels/public");
+            return Array.isArray(data) ? data : [];
+        },
+    });
+
+    const activeImages = trendingHostels && trendingHostels.length > 0
+        ? trendingHostels.map((hostel: any) => hostel.images?.[0]).filter(Boolean)
+        : FALLBACK_HERO_IMAGES;
+
+    const displayImages = activeImages.length > 0 ? activeImages : FALLBACK_HERO_IMAGES;
+
     useEffect(() => {
         const interval = setInterval(() => {
-            setCurrentImageIndex((prev) => (prev + 1) % HERO_IMAGES.length);
+            setCurrentImageIndex((prev) => (prev + 1) % displayImages.length);
         }, 6000);
         return () => clearInterval(interval);
-    }, []);
+    }, [displayImages.length]);
 
     const handleSearch = (overrideCity?: string) => {
         const searchCity = overrideCity !== undefined ? overrideCity : city;
@@ -46,7 +60,7 @@ export default function HeroSearch() {
     return (
         <div className="relative w-full h-[70vh] md:h-[85vh] flex items-center justify-center overflow-hidden rounded-[2.5rem] mx-auto my-6 max-w-[98%] shadow-2xl">
             {/* Background Image Carousel with Ken Burns Effect */}
-            {HERO_IMAGES.map((img, index) => (
+            {displayImages.map((img: string, index: number) => (
                 <div
                     key={img}
                     className={cn(
@@ -149,7 +163,7 @@ export default function HeroSearch() {
 
             {/* Premium Indicators */}
             <div className="absolute bottom-8 flex gap-3 z-30">
-                {HERO_IMAGES.map((_, index) => (
+                {displayImages.map((_, index) => (
                     <button
                         key={index}
                         onClick={() => setCurrentImageIndex(index)}
