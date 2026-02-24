@@ -89,6 +89,7 @@ model User {
   subscriptions  Subscription[]
   adminAuditLogs AdminAuditLog[]
   processedPayouts PayoutRequest[] @relation("PayoutProcessor")
+  passwordResetTokens PasswordResetToken[]
 
   paystackSubaccountCode String? // For automated split payments
 
@@ -139,6 +140,19 @@ model RefreshToken {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
+  @@index([expiresAt])
+}
+
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  email     String
+  token     String   @unique // Hashed or securely generated random string
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [email], references: [email], onDelete: Cascade)
+
+  @@index([email])
   @@index([expiresAt])
 }
 

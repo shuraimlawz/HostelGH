@@ -17,7 +17,7 @@ type User = {
 type AuthContextType = {
     user: User | null;
     isLoading: boolean;
-    login: (token: string, user: User) => void;
+    login: (token: string, userData: User, remember?: boolean) => void;
     logout: () => void;
     updateUser: (user: Partial<User>) => void;
 };
@@ -30,15 +30,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     useEffect(() => {
         const initAuth = () => {
-            const storedUser = localStorage.getItem("user");
-            const token = localStorage.getItem("accessToken");
-            if (storedUser && token && storedUser !== "undefined") {
+            const token = localStorage.getItem("accessToken") || sessionStorage.getItem("accessToken");
+            const storedUser = localStorage.getItem("user") || sessionStorage.getItem("user");
+
+            if (token && storedUser && storedUser !== "undefined") {
                 try {
                     setUser(JSON.parse(storedUser));
                 } catch (e) {
                     console.error("Failed to parse user", e);
                     localStorage.removeItem("user");
                     localStorage.removeItem("accessToken");
+                    sessionStorage.removeItem("user");
+                    sessionStorage.removeItem("accessToken");
                 }
             }
             setIsLoading(false);
@@ -46,18 +49,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         initAuth();
     }, []);
 
-    const login = useCallback((token: string, userData: User) => {
+    const login = useCallback((token: string, userData: User, remember = false) => {
         if (!token || !userData) {
             console.error("Login failed: missing token or user data");
             return;
         }
-        localStorage.setItem("accessToken", token);
-        localStorage.setItem("user", JSON.stringify(userData));
+        const storage = remember ? localStorage : sessionStorage;
+
+        storage.setItem("accessToken", token);
+        storage.setItem("user", JSON.stringify(userData));
         setUser(userData);
     }, []);
 
     const logout = useCallback(() => {
         localStorage.clear();
+        sessionStorage.clear();
         setUser(null);
         window.location.href = "/";
     }, []);

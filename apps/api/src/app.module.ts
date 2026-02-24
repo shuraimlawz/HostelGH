@@ -17,12 +17,13 @@ import { PaymentMethodsModule } from "./modules/payment-methods/payment-methods.
 import { WalletsModule } from "./modules/wallets/wallets.module";
 import { RedisModule } from "./modules/redis/redis.module";
 import { SubscriptionsModule } from "./modules/subscriptions/subscriptions.module";
-import { ThrottlerModule } from "@nestjs/throttler";
-import { ThrottlerGuard } from "@nestjs/throttler";
+import { ThrottlerModule, ThrottlerGuard } from "@nestjs/throttler";
 import { ScheduleModule } from "@nestjs/schedule";
 import { APP_FILTER, APP_GUARD } from "@nestjs/core";
 import { HttpExceptionFilter } from "./common/filters/http-exception.filter";
 import { LoggingMiddleware } from "./common/middleware/logging.middleware";
+
+import { EmailModule } from "./modules/email/email.module";
 
 import { AppController } from "./app.controller";
 
@@ -49,6 +50,7 @@ import { AppController } from "./app.controller";
     WalletsModule,
     RedisModule,
     SubscriptionsModule,
+    EmailModule,
     ScheduleModule.forRoot(),
     ThrottlerModule.forRoot([
       {

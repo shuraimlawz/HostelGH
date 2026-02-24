@@ -9,6 +9,7 @@ import {
   UseGuards,
   HttpCode,
   HttpStatus,
+  BadRequestException,
 } from "@nestjs/common";
 import { AuthService } from "./auth.service";
 import { UserRole } from "@prisma/client";
@@ -105,5 +106,25 @@ export class AuthController {
   @ApiOperation({ summary: "Change current user password" })
   changePassword(@Req() req: any, @Body() dto: ChangePasswordDto) {
     return this.auth.changePassword(req.user.userId, dto);
+  }
+
+  @Post("forgot-password")
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: "Request a password reset link to be sent to your email" })
+  forgotPassword(@Body() body: { email: string }) {
+    if (!body.email) {
+      throw new BadRequestException("Email is required");
+    }
+    return this.auth.forgotPassword(body.email);
+  }
+
+  @Post("reset-password")
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: "Reset password using the secure token from email" })
+  resetPassword(@Body() body: { token: string; newPassword: string }) {
+    if (!body.token || !body.newPassword) {
+      throw new BadRequestException("Token and new password are required");
+    }
+    return this.auth.resetPassword(body.token, body.newPassword);
   }
 }

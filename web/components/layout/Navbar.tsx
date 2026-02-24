@@ -35,7 +35,7 @@ export default function Navbar() {
     };
 
     return (
-        <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-md border-b h-16 shadow-sm transition-colors duration-300">
+        <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border/40 h-20 shadow-[0_4px_30px_rgba(0,0,0,0.03)] transition-all duration-300">
             <div className="container mx-auto px-4 md:px-10 h-full flex items-center justify-between">
                 {/* Logo */}
                 <Link href="/" className="flex items-center gap-2 group relative h-full">
@@ -58,7 +58,7 @@ export default function Navbar() {
                     {!user && (
                         <Link
                             href="/auth/register?role=OWNER"
-                            className="hidden md:block text-base font-semibold px-4 py-2 rounded-lg bg-[#1877F2] text-white hover:bg-[#145CBF] transition-colors"
+                            className="hidden md:block text-sm font-bold px-5 py-2.5 rounded-full bg-foreground text-background hover:bg-foreground/90 transition-all shadow-md hover:shadow-lg active:scale-[0.98]"
                         >
                             List your hostel
                         </Link>
@@ -72,12 +72,15 @@ export default function Navbar() {
                     <div className="relative" ref={menuRef}>
                         <button
                             onClick={() => setIsOpen(!isOpen)}
-                            className="flex items-center gap-3 border border-gray-300 rounded-full pl-3 pr-1 py-1 hover:shadow-md transition-shadow ml-1 group"
+                            className={cn(
+                                "flex items-center gap-2.5 border rounded-full pl-3.5 pr-1.5 py-1.5 transition-all ml-1 group",
+                                isOpen ? "border-black/20 shadow-md bg-zinc-50" : "border-black/10 hover:border-black/20 shadow-sm hover:shadow-md bg-white"
+                            )}
                         >
-                            <Menu size={18} className="ml-1 text-gray-600 group-hover:text-black" />
-                            <div className="bg-gray-500 text-white rounded-full p-1 opacity-80 overflow-hidden">
+                            <Menu size={18} className="text-muted-foreground group-hover:text-foreground transition-colors" />
+                            <div className="bg-muted text-muted-foreground rounded-full p-1 opacity-90 overflow-hidden ring-2 ring-transparent group-hover:ring-black/5 transition-all">
                                 {user ? (
-                                    <div className="w-7 h-7 bg-foreground text-background rounded-full flex items-center justify-center text-[10px] font-bold overflow-hidden">
+                                    <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-cyan-500 text-white rounded-full flex items-center justify-center text-xs font-black overflow-hidden shadow-inner">
                                         {user.avatarUrl ? (
                                             <img src={user.avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
                                         ) : (
@@ -85,39 +88,39 @@ export default function Navbar() {
                                         )}
                                     </div>
                                 ) : (
-                                    <UserIcon size={24} className="fill-current text-muted-foreground relative -bottom-1" />
+                                    <UserIcon size={24} className="fill-current relative -bottom-1 text-muted-foreground/60" />
                                 )}
                             </div>
                         </button>
 
                         {isOpen && (
-                            <div className="absolute right-0 top-full mt-2 w-64 bg-card text-card-foreground rounded-xl shadow-[0_6px_16px_rgba(0,0,0,0.12)] border py-2 animate-in fade-in zoom-in-95 duration-200 overflow-hidden z-50">
+                            <div className="absolute right-0 top-[calc(100%+0.5rem)] w-64 bg-card text-card-foreground rounded-2xl shadow-2xl border border-black/5 py-3 animate-in fade-in zoom-in-95 duration-200 overflow-hidden z-50">
                                 {user ? (
                                     <>
-                                        <div className="px-4 py-3 border-b mb-1">
-                                            <div className="font-semibold text-sm truncate">{user.email}</div>
-                                            <div className="text-xs text-gray-500 mt-1 capitalize">{user.role.toLowerCase()} Account</div>
+                                        <div className="px-5 py-3 border-b border-black/5 mb-2 bg-zinc-50/50">
+                                            <div className="font-bold text-sm truncate text-foreground">{user.email}</div>
+                                            <div className="text-[10px] font-bold text-muted-foreground mt-0.5 uppercase tracking-widest">{user.role.toLowerCase()} Account</div>
                                         </div>
 
                                         <Link
                                             href={user.role === "ADMIN" ? "/admin" : user.role === "OWNER" ? "/owner" : "/account"}
-                                            className="block px-4 py-3 hover:bg-accent text-sm font-semibold text-foreground transition-colors"
+                                            className="block px-5 py-2.5 hover:bg-zinc-50 text-sm font-bold text-foreground transition-colors"
                                             onClick={() => setIsOpen(false)}
                                         >
                                             {user.role === "ADMIN" ? "Admin Dashboard" : user.role === "OWNER" ? "Owner Dashboard" : "My Account"}
                                         </Link>
-                                        <div className="border-t my-1" />
+                                        <div className="border-t border-black/5 my-2 mx-5" />
                                         <Link
                                             href={user.role === "OWNER" ? "/owner/bookings" : "/bookings"}
-                                            className="block px-4 py-3 hover:bg-gray-50 text-sm transition-colors"
+                                            className="block px-5 py-2.5 hover:bg-zinc-50 text-sm font-medium transition-colors"
                                             onClick={() => setIsOpen(false)}
                                         >
                                             My Bookings
                                         </Link>
-                                        <div className="border-t my-1" />
+                                        <div className="border-t border-black/5 my-2 mx-5" />
                                         <button
                                             onClick={handleLogout}
-                                            className="w-full text-left px-4 py-3 hover:bg-gray-50 text-sm transition-colors flex items-center gap-2"
+                                            className="w-full text-left px-5 py-2.5 hover:bg-red-50 hover:text-red-600 font-medium text-sm transition-colors flex items-center gap-2"
                                         >
                                             Log out
                                         </button>
@@ -129,7 +132,7 @@ export default function Navbar() {
                                                 setIsOpen(false);
                                                 open("login");
                                             }}
-                                            className="w-full text-left px-4 py-3 hover:bg-accent text-sm font-semibold transition-colors"
+                                            className="w-full text-left px-5 py-3 hover:bg-zinc-50 text-sm font-bold transition-colors"
                                         >
                                             Log in
                                         </button>
@@ -138,14 +141,14 @@ export default function Navbar() {
                                                 setIsOpen(false);
                                                 open("register");
                                             }}
-                                            className="w-full text-left px-4 py-3 hover:bg-accent text-sm transition-colors"
+                                            className="w-full text-left px-5 py-3 hover:bg-zinc-50 text-sm font-medium transition-colors"
                                         >
                                             Sign up
                                         </button>
-                                        <div className="border-t my-1" />
+                                        <div className="border-t border-black/5 my-2 mx-5" />
                                         <Link
                                             href="/auth/register?role=OWNER"
-                                            className="block px-4 py-3 hover:bg-accent text-sm transition-colors"
+                                            className="block px-5 py-3 hover:bg-zinc-50 text-sm font-medium transition-colors"
                                             onClick={() => setIsOpen(false)}
                                         >
                                             Host your home

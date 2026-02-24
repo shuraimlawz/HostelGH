@@ -7,11 +7,13 @@ import { useAuth } from "@/lib/auth-context";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { AlertCircle, Eye, EyeOff } from "lucide-react";
+import Link from "next/link";
 
 export default function LoginForm({ onSuccess }: { onSuccess?: (user: any) => void }) {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [showPassword, setShowPassword] = useState(false);
+    const [rememberMe, setRememberMe] = useState(false);
     const router = useRouter();
     const [loading, setLoading] = useState(false);
     const [err, setErr] = useState<string | null>(null);
@@ -30,7 +32,7 @@ export default function LoginForm({ onSuccess }: { onSuccess?: (user: any) => vo
             const data = res.data?.data || res.data;
             const { accessToken, user } = data;
 
-            login(accessToken, user);
+            login(accessToken, user, rememberMe);
             toast.success("Welcome back!");
 
             if (onSuccess) {
@@ -107,10 +109,17 @@ export default function LoginForm({ onSuccess }: { onSuccess?: (user: any) => vo
 
                 <div className="flex justify-between items-center px-1">
                     <label className="flex items-center gap-2 cursor-pointer">
-                        <input type="checkbox" className="rounded border-border w-3.5 h-3.5 text-primary focus:ring-primary bg-background" />
+                        <input
+                            type="checkbox"
+                            checked={rememberMe}
+                            onChange={(e) => setRememberMe(e.target.checked)}
+                            className="rounded border-border w-3.5 h-3.5 text-blue-600 focus:ring-blue-600 bg-background"
+                        />
                         <span className="text-xs text-muted-foreground">Remember me</span>
                     </label>
-                    <button type="button" className="text-xs font-semibold text-muted-foreground hover:text-foreground">Forgot password?</button>
+                    <Link href="/auth/forgot-password" className="text-xs font-semibold text-muted-foreground hover:text-blue-600 transition-colors">
+                        Forgot password?
+                    </Link>
                 </div>
 
                 {err && (
