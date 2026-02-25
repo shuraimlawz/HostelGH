@@ -1,24 +1,30 @@
 package com.hostelgh
 
-import android.content.Intent
 import android.os.Bundle
-import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
+import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        setContentView(R.layout.activity_main_nav)
 
-        // replace layout with buttons programmatically or modify XML
-        findViewById<Button>(R.id.exploreBtn)?.setOnClickListener {
-            startActivity(Intent(this, ExploreActivity::class.java))
+        val bottomNav = findViewById<BottomNavigationView>(R.id.bottom_nav)
+        bottomNav.setOnItemSelectedListener { item ->
+            val frag: Fragment = when (item.itemId) {
+                R.id.nav_explore -> ExploreFragment()
+                R.id.nav_bookings -> BookingsFragment()
+                R.id.nav_account -> AccountFragment()
+                else -> ExploreFragment()
+            }
+            supportFragmentManager.beginTransaction().replace(R.id.nav_host, frag).commit()
+            true
         }
-        findViewById<Button>(R.id.bookingsBtn)?.setOnClickListener {
-            startActivity(Intent(this, BookingsActivity::class.java))
-        }
-        findViewById<Button>(R.id.accountBtn)?.setOnClickListener {
-            startActivity(Intent(this, AccountActivity::class.java))
+
+        // default
+        if (savedInstanceState == null) {
+            supportFragmentManager.beginTransaction().replace(R.id.nav_host, ExploreFragment()).commit()
         }
     }
 }
