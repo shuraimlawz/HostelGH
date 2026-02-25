@@ -9,7 +9,10 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.hostelgh.models.Hostel
 
-class ExploreAdapter(private val items: List<Hostel>) : RecyclerView.Adapter<ExploreAdapter.ViewHolder>() {
+class ExploreAdapter(
+    private val items: List<Hostel>,
+    private val onClick: (Hostel) -> Unit
+) : RecyclerView.Adapter<ExploreAdapter.ViewHolder>() {
 
     class ViewHolder(v: View) : RecyclerView.ViewHolder(v) {
         val name: TextView = v.findViewById(R.id.hostelName)
@@ -29,6 +32,7 @@ class ExploreAdapter(private val items: List<Hostel>) : RecyclerView.Adapter<Exp
         holder.city.text = hostel.city
         holder.price.text = "₵ ${hostel.price}"
         Glide.with(holder.image.context).load(hostel.imageUrl).into(holder.image)
+        holder.itemView.setOnClickListener { onClick(hostel) }
     }
 
     override fun getItemCount(): Int = items.size

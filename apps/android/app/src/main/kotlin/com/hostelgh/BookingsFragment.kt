@@ -34,9 +34,7 @@ class BookingsFragment : Fragment() {
                 if (resp.isSuccessful) {
                     val bookings = resp.body() ?: emptyList()
                     withContext(Dispatchers.Main) {
-                        list?.adapter = BookingsAdapter(bookings) { bookingId ->
-                            cancelBooking(bookingId)
-                        }
+                        list?.adapter = BookingsAdapter(bookings)
                     }
                 }
             } catch (_: Exception) {
@@ -46,19 +44,4 @@ class BookingsFragment : Fragment() {
         }
     }
 
-    private fun cancelBooking(id: String) {
-        CoroutineScope(Dispatchers.IO).launch {
-            try {
-                val resp = RetrofitClient.apiService.cancelBooking(id)
-                withContext(Dispatchers.Main) {
-                    if (resp.isSuccessful) {
-                        fetchBookings()
-                    } else {
-                        // maybe toast
-                    }
-                }
-            } catch (_: Exception) {
-            }
-        }
-    }
 }

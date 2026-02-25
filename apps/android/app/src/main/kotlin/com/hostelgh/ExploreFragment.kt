@@ -7,6 +7,8 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import android.content.Intent
+import com.hostelgh.HostelDetailActivity
 import com.hostelgh.models.Hostel
 import com.hostelgh.network.RetrofitClient
 import kotlinx.coroutines.CoroutineScope
@@ -36,7 +38,15 @@ class ExploreFragment : Fragment() {
                     val dtos = resp.body() ?: emptyList()
                     val hostels = dtos.map { Hostel(it.id, it.name, it.city, it.price, it.rating, it.imageUrl) }
                     withContext(Dispatchers.Main) {
-                        list?.adapter = ExploreAdapter(hostels)
+                        list?.adapter = ExploreAdapter(hostels) { hostel ->
+                            val intent = android.content.Intent(requireContext(), HostelDetailActivity::class.java)
+                            intent.putExtra("hostelId", hostel.id)
+                            intent.putExtra("hostelName", hostel.name)
+                            intent.putExtra("hostelCity", hostel.city)
+                            intent.putExtra("hostelPrice", hostel.price)
+                            intent.putExtra("hostelImageUrl", hostel.imageUrl)
+                            startActivity(intent)
+                        }
                     }
                 }
             } catch (_: Exception) {

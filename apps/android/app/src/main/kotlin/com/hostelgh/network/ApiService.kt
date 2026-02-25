@@ -26,6 +26,16 @@ data class HostelDto(
     val imageUrl: String?
 )
 
+// Room returned by GET /rooms/hostel/:hostelId
+// only fields the mobile app needs for browsing/booking
+
+data class RoomDto(
+    val id: String,
+    val name: String,
+    val pricePerTerm: Double,
+    val totalUnits: Int
+)
+
 // Profile model
 data class ProfileResponse(
     val id: String,
@@ -63,7 +73,39 @@ interface ApiService {
     @POST("auth/profile")
     suspend fun updateProfile(@Body request: UpdateProfileRequest): Response<UpdateProfileResponse>
 
+    // rooms
+    @GET("rooms/hostel/{hostelId}")
+    suspend fun getRooms(@retrofit2.http.Path("hostelId") hostelId: String): Response<List<RoomDto>>
+
     // bookings
+    data class BookingDto(
+        val id: String,
+        val hostelName: String,
+        val roomName: String,
+        val status: String,
+        val startDate: String,
+        val endDate: String,
+        val price: Double
+    )
+
+    @GET("bookings/me")
+    suspend fun getBookings(): Response<List<BookingDto>>
+
+    data class CancelResponse(val success: Boolean, val message: String?)
+
+    // disable tenant cancel; backend doesn't support
+    // create booking
+    data class BookingItem(val roomId: String, val quantity: Int)
+    data class CreateBookingRequest(
+        val hostelId: String,
+        val startDate: String,
+        val endDate: String,
+        val items: List<BookingItem>,
+        val notes: String? = null
+    )
+
+    @POST("bookings")
+    suspend fun createBooking(@Body request: CreateBookingRequest): Response<Any>
     data class BookingDto(
         val id: String,
         val hostelName: String,

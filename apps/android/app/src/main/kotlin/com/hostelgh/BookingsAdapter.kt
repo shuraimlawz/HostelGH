@@ -8,8 +8,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 
 class BookingsAdapter(
-    private val items: List<com.hostelgh.network.ApiService.BookingDto>,
-    private val onCancel: (String) -> Unit
+    private val items: List<com.hostelgh.network.ApiService.BookingDto>
 ) : RecyclerView.Adapter<BookingsAdapter.ViewHolder>() {
     class ViewHolder(v: View) : RecyclerView.ViewHolder(v) {
         val name: TextView = v.findViewById(R.id.hostelName)
@@ -17,7 +16,6 @@ class BookingsAdapter(
         val status: TextView = v.findViewById(R.id.status)
         val dates: TextView = v.findViewById(R.id.dates)
         val price: TextView = v.findViewById(R.id.price)
-        val cancelBtn: Button = v.findViewById(R.id.cancelBtn)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -32,18 +30,6 @@ class BookingsAdapter(
         holder.status.text = b.status
         holder.dates.text = "${b.startDate} - ${b.endDate}"
         holder.price.text = "₵ ${b.price}"
-        holder.cancelBtn.setOnClickListener {
-            // ask for confirmation
-            val ctx = holder.itemView.context
-            android.app.AlertDialog.Builder(ctx)
-                .setTitle("Cancel Booking")
-                .setMessage("Are you sure you want to cancel this booking?")
-                .setPositiveButton("Yes") { _, _ ->
-                    onCancel(b.id)
-                }
-                .setNegativeButton("No", null)
-                .show()
-        }
     }
 
     override fun getItemCount(): Int = items.size
