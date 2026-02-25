@@ -26,6 +26,14 @@ data class HostelDto(
     val imageUrl: String?
 )
 
+// Profile model
+data class ProfileResponse(
+    val id: String,
+    val name: String,
+    val email: String,
+    val phone: String?
+)
+
 interface ApiService {
     @POST("auth/login")
     suspend fun login(@Body request: LoginRequest): Response<LoginResponse>
@@ -38,4 +46,7 @@ interface ApiService {
 
     @GET("hostels")
     suspend fun getHostels(): Response<List<HostelDto>>
+
+    @GET("auth/profile")
+    suspend fun getProfile(): Response<ProfileResponse>
 }
