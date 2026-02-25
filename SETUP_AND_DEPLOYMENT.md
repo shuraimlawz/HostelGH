@@ -324,23 +324,22 @@ npm run build
 npm start
 ```
 
-### **Mobile**
+### **Mobile (Android)**
+
+The Expo-based mobile app has been replaced by a native Android project under `apps/android`. Use Android Studio or Gradle commands to build and run.
 
 ```bash
-cd apps/mobile
+# open in Android Studio
+studio apps/android
 
-# Lint
-npm run lint
-
-# Build for iOS
-npm run build:ios
-
-# Build for Android
-npm run build:android
-
-# Test in Expo Go (development)
-npm run dev
+# or from command line:
+cd apps/android
+./gradlew assembleDebug    # build debug APK
+./gradlew installDebug     # compile & install on connected device/emulator
+./gradlew assembleRelease  # create release APK
 ```
+
+Development flow is standard Android engineering; the previous `apps/mobile` directory has been removed.
 
 ### **Running E2E Tests**
 
