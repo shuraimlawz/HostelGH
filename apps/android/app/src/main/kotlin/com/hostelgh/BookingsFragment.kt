@@ -15,10 +15,12 @@ import kotlinx.coroutines.withContext
 
 class BookingsFragment : Fragment() {
     private var list: RecyclerView? = null
+    private var progressBar: View? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val v = inflater.inflate(R.layout.activity_bookings, container, false)
+        val v = inflater.inflate(R.layout/activity_bookings, container, false)
         list = v.findViewById(R.id.hostelList)
+        progressBar = v.findViewById(R.id.progressBar)
         list?.layoutManager = LinearLayoutManager(requireContext())
         fetchBookings()
         return v
@@ -27,6 +29,7 @@ class BookingsFragment : Fragment() {
     private fun fetchBookings() {
         CoroutineScope(Dispatchers.IO).launch {
             try {
+                withContext(Dispatchers.Main) { progressBar?.visibility = View.VISIBLE }
                 val resp = RetrofitClient.apiService.getBookings()
                 if (resp.isSuccessful) {
                     val bookings = resp.body() ?: emptyList()
@@ -37,6 +40,8 @@ class BookingsFragment : Fragment() {
                     }
                 }
             } catch (_: Exception) {
+            } finally {
+                withContext(Dispatchers.Main) { progressBar?.visibility = View.GONE }
             }
         }
     }
