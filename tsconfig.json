@@ -32,9 +32,6 @@
   },
   "exclude": [
     "node_modules",
-    "dist",
-    "web",
-    "apps/mobile"
-  ],
-  "extends": "expo/tsconfig.base"
+    "dist"
+  ]
 }
