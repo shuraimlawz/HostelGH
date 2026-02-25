@@ -63,4 +63,9 @@ interface ApiService {
 
     @GET("bookings")
     suspend fun getBookings(): Response<List<BookingDto>>
+
+    data class CancelResponse(val success: Boolean, val message: String?)
+
+    @POST("bookings/{id}/cancel")
+    suspend fun cancelBooking(@retrofit2.http.Path("id") id: String): Response<CancelResponse>
 }

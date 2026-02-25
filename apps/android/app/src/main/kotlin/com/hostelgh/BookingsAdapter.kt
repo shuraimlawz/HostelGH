@@ -6,13 +6,17 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 
-class BookingsAdapter(private val items: List<com.hostelgh.network.ApiService.BookingDto>) : RecyclerView.Adapter<BookingsAdapter.ViewHolder>() {
+class BookingsAdapter(
+    private val items: List<com.hostelgh.network.ApiService.BookingDto>,
+    private val onCancel: (String) -> Unit
+) : RecyclerView.Adapter<BookingsAdapter.ViewHolder>() {
     class ViewHolder(v: View) : RecyclerView.ViewHolder(v) {
         val name: TextView = v.findViewById(R.id.hostelName)
         val room: TextView = v.findViewById(R.id.roomName)
         val status: TextView = v.findViewById(R.id.status)
         val dates: TextView = v.findViewById(R.id.dates)
         val price: TextView = v.findViewById(R.id.price)
+        val cancelBtn: Button = v.findViewById(R.id.cancelBtn)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -27,6 +31,9 @@ class BookingsAdapter(private val items: List<com.hostelgh.network.ApiService.Bo
         holder.status.text = b.status
         holder.dates.text = "${b.startDate} - ${b.endDate}"
         holder.price.text = "₵ ${b.price}"
+        holder.cancelBtn.setOnClickListener {
+            onCancel(b.id)
+        }
     }
 
     override fun getItemCount(): Int = items.size
