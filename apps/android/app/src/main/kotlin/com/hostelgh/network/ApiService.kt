@@ -34,6 +34,16 @@ data class ProfileResponse(
     val phone: String?
 )
 
+data class UpdateProfileRequest(
+    val name: String,
+    val phone: String?
+)
+
+data class UpdateProfileResponse(
+    val success: Boolean,
+    val message: String?
+)
+
 interface ApiService {
     @POST("auth/login")
     suspend fun login(@Body request: LoginRequest): Response<LoginResponse>
@@ -49,6 +59,9 @@ interface ApiService {
 
     @GET("auth/profile")
     suspend fun getProfile(): Response<ProfileResponse>
+
+    @POST("auth/profile")
+    suspend fun updateProfile(@Body request: UpdateProfileRequest): Response<UpdateProfileResponse>
 
     // bookings
     data class BookingDto(
