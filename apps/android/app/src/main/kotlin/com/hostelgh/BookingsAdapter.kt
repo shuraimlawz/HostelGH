@@ -3,6 +3,7 @@ package com.hostelgh
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 
@@ -32,7 +33,16 @@ class BookingsAdapter(
         holder.dates.text = "${b.startDate} - ${b.endDate}"
         holder.price.text = "₵ ${b.price}"
         holder.cancelBtn.setOnClickListener {
-            onCancel(b.id)
+            // ask for confirmation
+            val ctx = holder.itemView.context
+            android.app.AlertDialog.Builder(ctx)
+                .setTitle("Cancel Booking")
+                .setMessage("Are you sure you want to cancel this booking?")
+                .setPositiveButton("Yes") { _, _ ->
+                    onCancel(b.id)
+                }
+                .setNegativeButton("No", null)
+                .show()
         }
     }
 
