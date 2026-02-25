@@ -49,4 +49,18 @@ interface ApiService {
 
     @GET("auth/profile")
     suspend fun getProfile(): Response<ProfileResponse>
+
+    // bookings
+    data class BookingDto(
+        val id: String,
+        val hostelName: String,
+        val roomName: String,
+        val status: String,
+        val startDate: String,
+        val endDate: String,
+        val price: Double
+    )
+
+    @GET("bookings")
+    suspend fun getBookings(): Response<List<BookingDto>>
 }
