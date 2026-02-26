@@ -13,6 +13,9 @@ class SplashActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_splash)
 
+        // initialize networking (so interceptor can pick up token)
+        RetrofitClient.init(this)
+
         // show splash for 1.2s then go to MainActivity or LoginActivity depending on auth
         CoroutineScope(Dispatchers.Main).launch {
             delay(1200)
