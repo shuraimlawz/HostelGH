@@ -1,12 +1,15 @@
 package com.hostelgh.network
 
 import android.content.Context
+import com.hostelgh.BuildConfig
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 object RetrofitClient {
-    private const val BASE_URL = "http://10.0.2.2:3000/api/" // emulator localhost
+    // base URL initialized from Gradle BuildConfig; use 10.0.2.2 for emulator by default
+    private val BASE_URL: String
+        get() = BuildConfig.BASE_URL
     private lateinit var appContext: Context
 
     fun init(context: Context) {
