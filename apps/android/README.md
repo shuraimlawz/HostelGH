@@ -79,7 +79,7 @@ This app uses Firebase Cloud Messaging (FCM) for notifications. To enable:
 
 - Add push notifications (Firebase Cloud Messaging)
 - Implement cancellation/booking interactions per backend updates
-- Create iOS version (Swift/Kotlin Multiplatform) as needed
+- Create iOS version (Swift/Kotlin Multiplatform) as needed; currently only Android is supported
 
 ---
 
