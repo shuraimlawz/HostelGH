@@ -19,6 +19,16 @@ This folder contains the native Android application that replaced the earlier Ex
    - By default, network calls use `http://10.0.2.2:3000/api/` which resolves to localhost on the Android emulator.
    - If testing on a physical device, update `BASE_URL` in `RetrofitClient.kt` to your machine's IP address or use a tunneling tool (e.g., ngrok).
 
+## Firebase Push Notifications
+
+This app uses Firebase Cloud Messaging (FCM) for notifications. To enable:
+
+1. Create a Firebase project at [console.firebase.google.com](https://console.firebase.google.com).
+2. Add an Android app with package name `com.hostelgh`.
+3. Download the generated `google-services.json` and place it in `apps/android/app/`.
+4. Your `app/build.gradle` already applies the `com.google.gms.google-services` plugin; rebuild the project.
+5. Implement backend endpoint to accept device tokens from `MyFirebaseMessagingService.onNewToken`.
+
 ## Signing & Release
 
 - Create a keystore:
