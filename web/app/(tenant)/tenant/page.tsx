@@ -67,7 +67,7 @@ export default function TenantDashboardPage() {
     const { data: bookings, isLoading: bookingsLoading } = useQuery({
         queryKey: ["tenant-bookings"],
         queryFn: async () => {
-            const res = await api.get("/bookings");
+            const res = await api.get("/bookings/me");
             return res.data;
         }
     });
