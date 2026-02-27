@@ -10,7 +10,7 @@ export default function FeaturedHostels() {
     const { data: hostels, isLoading } = useQuery({
         queryKey: ["featured-hostels"],
         queryFn: async () => {
-            const { data } = await api.get("/hostels/public");
+            const { data } = await api.get("/hostels/public", { params: { sort: "relevance" } });
             return Array.isArray(data) ? data : [];
         },
     });

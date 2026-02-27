@@ -8,7 +8,10 @@ export type Hostel = {
     description?: string | null;
 };
 
-export async function fetchPublicHostels(city?: string): Promise<Hostel[]> {
-    const res = await api.get("/hostels/public", { params: city ? { city } : {} });
+export async function fetchPublicHostels(city?: string, sort: string = "relevance"): Promise<Hostel[]> {
+    const params: any = {};
+    if (city) params.city = city;
+    if (sort) params.sort = sort;
+    const res = await api.get("/hostels/public", { params });
     return res.data;
 }
