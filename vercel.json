@@ -3,6 +3,5 @@
     "installCommand": "npm install",
     "buildCommand": "npm run build -w web",
     "outputDirectory": "web/.next",
-    "framework": "nextjs",
-    "rootDirectory": "web"
+    "framework": "nextjs"
 }
