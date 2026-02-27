@@ -332,13 +332,25 @@ The Expo-based mobile app has been replaced by a native Android project under `a
 # open in Android Studio
 studio apps/android
 
-# or from command line:
+# or from command line (Android native project):
 cd apps/android
 ./gradlew assembleDebug    # build debug APK
 ./gradlew installDebug     # compile & install on connected device/emulator
-./gradlew assembleRelease  # create release APK
-```
 
+# For production / Play Store use a signed release build
+# generate a keystore if you don't have one:
+keytool -genkey -v -keystore release.keystore -alias hostelgh_key \
+  -keyalg RSA -keysize 2048 -validity 10000
+# put the keystore in apps/android and add to gradle.properties:
+# RELEASE_KEYSTORE_PASSWORD=yourPassword
+# RELEASE_KEY_PASSWORD=yourPassword
+# RELEASE_KEY_ALIAS=hostelgh_key
+# RELEASE_STORE_FILE=release.keystore
+
+# now build a signed artifact:
+./gradlew assembleRelease   # APK in app/build/outputs/apk/release
+./gradlew bundleRelease     # AAB in app/build/outputs/bundle/release
+```
 Development flow is standard Android engineering; the previous `apps/mobile` directory has been removed.
 
 ### **Running E2E Tests**

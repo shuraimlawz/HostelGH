@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "453332668020",
+    "project_id": "hostelgh-5cca9",
+    "storage_bucket": "hostelgh-5cca9.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:453332668020:android:298e2f75233d2cb3890b21",
+        "android_client_info": {
+          "package_name": "com.hostelgh"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "453332668020-dc5frjbb7hg0frkcbf9pfgmof0u63rm7.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCiK_uzImvBhi2ZYLlVeXGK5uf7uRgv18E"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "453332668020-dc5frjbb7hg0frkcbf9pfgmof0u63rm7.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

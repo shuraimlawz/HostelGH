@@ -67,7 +67,10 @@ class LoginActivity : AppCompatActivity() {
                     loginButton.isEnabled = true
                     if (response.isSuccessful) {
                         Toast.makeText(this@LoginActivity, "Login successful", Toast.LENGTH_SHORT).show()
-                        // Navigate to main activity (currently MainActivity)
+                        response.body()?.token?.let { token ->
+                            Preferences(this@LoginActivity).authToken = token
+                        }
+                        // Navigate to main activity
                         startActivity(Intent(this@LoginActivity, MainActivity::class.java))
                         finish()
                     } else {

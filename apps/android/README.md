@@ -11,8 +11,17 @@ This folder contains the native Android application that replaced the earlier Ex
 2. **Command line**
    ```bash
    cd apps/android
-   ./gradlew assembleDebug    # build debug APK
-   ./gradlew installDebug     # compile & install on connected device/emulator
+   # this project currently does *not* include a Gradle wrapper (gradlew),
+   # so you either need a system Gradle installation or generate one yourself.
+   #
+   # If you have Gradle installed on PATH:
+   gradle assembleDebug    # build debug APK
+   gradle installDebug     # compile & install on connected device/emulator
+   #
+   # To create a wrapper (once Gradle is available):
+   gradle wrapper
+   ./gradlew assembleDebug
+   ./gradlew installDebug
    ```
 
 3. **Backend configuration**
@@ -50,6 +59,25 @@ This app uses Firebase Cloud Messaging (FCM) for notifications. To enable:
   ./gradlew bundleRelease     # AAB in app/build/outputs/bundle/release
   ```
 - Upload the generated AAB to Google Play Console or distribute the APK directly.
+
+
+> **Note:** running `where gradle` on Windows (or `which gradle` on macOS/Linux)
+> will tell you where a system Gradle lives if one is installed.  The repository
+> itself doesn't ship a wrapper script, so Android Studio's bundled Gradle is
+> the easiest option.
+
+> **Note:**
+> - You can edit all sources in VS Code; however the build still relies on the
+>   Android SDK and a Java Development Kit being installed.  Android Studio is
+>   only used here for convenience (it bundles a JDK, manages SDK components,
+>   and provides an AVD manager).  A command‑line build with `gradlew` works
+>   perfectly once `JAVA_HOME` points to a JDK and `sdk.dir` is set in
+>   `local.properties`.
+> - Earlier Gradle sync errors were caused by outdated or missing plugins (the
+>   google‑services/Firebase plugin and lack of the Kotlin Android plugin) and
+>   by the absence of a Java installation.  Those have been corrected in the
+>   project files; if you still see such messages, make sure `gradlew` is used
+>   and that your environment variables are properly configured.
 
 ## Features
 

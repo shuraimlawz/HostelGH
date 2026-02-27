@@ -38,6 +38,10 @@ class ExploreFragment : Fragment() {
                     val dtos = resp.body() ?: emptyList()
                     val hostels = dtos.map { Hostel(it.id, it.name, it.city, it.price, it.rating, it.imageUrl) }
                     withContext(Dispatchers.Main) {
+                        if (hostels.isEmpty()) {
+                            // show simple text if no hostels
+                            Toast.makeText(requireContext(), "No hostels available", Toast.LENGTH_SHORT).show()
+                        }
                         list?.adapter = ExploreAdapter(hostels) { hostel ->
                             val intent = android.content.Intent(requireContext(), HostelDetailActivity::class.java)
                             intent.putExtra("hostelId", hostel.id)

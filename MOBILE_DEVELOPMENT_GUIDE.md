@@ -8,16 +8,11 @@
 
 ## 🎯 Executive Summary
 
-HostelGH is expanding to **mobile platforms** (iOS + Android) using **React Native + Expo**. This document outlines:
-- Why we chose React Native
-- Architecture and code sharing strategy
-- Development roadmap
-- Deployment timeline
-- Team setup and responsibilities
+HostelGH mobile began as an Expo/React Native project, but in early 2026 we made a strategic decision to pivot to a **native Android application**. The Expo codebase has been removed and all subsequent development happens under `apps/android`. This document now serves as a historical reference; see the README in `apps/android` for current Android‑specific details.
 
-**Current Phase:** Foundation Setup ✅  
-**Next Phase:** Core Features Development (Q2 2026)  
-**Target Launch:** Q3 2026 (5-6 months)
+> **Note:** the native Android app uses `http://10.0.2.2:3000/api/` to reach the backend when running in an emulator. When testing on a physical device you must update `BASE_URL` in `RetrofitClient.kt` to your host machine's IP address (e.g. `http://192.168.1.100:3000/api/`) or use a network tunnel.
+
+**Status:** Expo implementation retired, native Android complete.
 
 ---
 
