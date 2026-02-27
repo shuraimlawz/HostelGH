@@ -6,7 +6,8 @@
   "private": true,
   "license": "UNLICENSED",
   "workspaces": [
-    "apps/*"
+    "apps/*",
+    "web"
   ],
   "scripts": {
     "build": "npx prisma generate --schema=./prisma/schema.prisma && nest build",
