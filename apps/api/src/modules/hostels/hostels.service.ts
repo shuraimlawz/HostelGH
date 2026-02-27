@@ -139,12 +139,16 @@ export class HostelsService {
       roomConfig,
     } = params;
 
-    // Intelligent Suggestion Algorithm:
+    // Intelligent Suggestion / Relevance Algorithm:
     // 1. Featured hostels first
-    // 2. Then by selected sorting criteria
+    // 2. If requested, sort by relevance: bookings activity, rating, then recency
+    // 3. Otherwise, respect explicit sort criteria (price, name, newest)
     const orderBy: any[] = [{ isFeatured: "desc" }];
 
-    if (sort === "price_asc") {
+    if (sort === "relevance") {
+      // Use bookings count as a strong signal of popularity, then rating, then recency
+      orderBy.push({ _count: { bookings: "desc" } }, { rating: "desc" }, { createdAt: "desc" });
+    } else if (sort === "price_asc") {
       orderBy.push({ minPrice: "asc" });
     } else if (sort === "price_desc") {
       orderBy.push({ minPrice: "desc" });
