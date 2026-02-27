@@ -54,22 +54,35 @@ class RegisterActivity : AppCompatActivity() {
                     progressBar.visibility = View.GONE
                     registerButton.isEnabled = true
                     if (response.isSuccessful) {
-                        Toast.makeText(this@RegisterActivity, "Registration successful", Toast.LENGTH_SHORT).show()
-                        // store token
-                        response.body()?.token?.let { token ->
-                            Preferences(this@RegisterActivity).authToken = token
+                        val body = response.body()
+                        if (body != null && body.token.isNotEmpty()) {
+                            Toast.makeText(this@RegisterActivity, "Registration successful", Toast.LENGTH_SHORT).show()
+                            Preferences(this@RegisterActivity).authToken = body.token
+                            startActivity(Intent(this@RegisterActivity, MainActivity::class.java))
+                            finish()
+                        } else {
+                            Toast.makeText(this@RegisterActivity, "Invalid registration response from server", Toast.LENGTH_SHORT).show()
                         }
-                        startActivity(Intent(this@RegisterActivity, MainActivity::class.java))
-                        finish()
                     } else {
-                        Toast.makeText(this@RegisterActivity, "Register failed: ${response.code()}", Toast.LENGTH_SHORT).show()
+                        // Handle specific error codes
+                        val errorMsg = when (response.code()) {
+                            400 -> {
+                                if (response.message().contains("Email")) "Email already in use"
+                                else "Invalid input - check email and password format"
+                            }
+                            409 -> "Email already in use"
+                            500 -> "Server error - please try again later"
+                            else -> "Registration failed: ${response.code()}"
+                        }
+                        Toast.makeText(this@RegisterActivity, errorMsg, Toast.LENGTH_SHORT).show()
                     }
                 }
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
                     progressBar.visibility = View.GONE
                     registerButton.isEnabled = true
-                    Toast.makeText(this@RegisterActivity, "Error: ${e.localizedMessage}", Toast.LENGTH_SHORT).show()
+                    val errorMsg = "Error: ${e.localizedMessage ?: "Unknown error occurred"}"
+                    Toast.makeText(this@RegisterActivity, errorMsg, Toast.LENGTH_SHORT).show()
                 }
             }
         }

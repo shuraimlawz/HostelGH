@@ -24,8 +24,10 @@ async function main() {
 
     const passwordHash = await bcrypt.hash("Password123!", 12);
 
-    // 2. Users (Admin Only)
-    console.log("Creating admin user...");
+    // 2. Users (Admin + Test accounts)
+    console.log("Creating users...");
+
+    // Admin user
     await prisma.user.create({
         data: {
             email: "ramosnewz@gmail.com",
@@ -34,10 +36,39 @@ async function main() {
             firstName: "Shuraim",
             lastName: "Administrator",
             emailVerified: true,
+            isActive: true,
         },
     });
 
-    console.log("Cleanup and Admin creation complete!");
+    // Test TENANT account (for testing on Android)
+    await prisma.user.create({
+        data: {
+            email: "tenant@example.com",
+            passwordHash,
+            role: UserRole.TENANT,
+            firstName: "Test",
+            lastName: "Tenant",
+            emailVerified: true,
+            isActive: true,
+            isOnboarded: true,
+        },
+    });
+
+    // Test OWNER account (for testing hostel management)
+    await prisma.user.create({
+        data: {
+            email: "owner@example.com",
+            passwordHash,
+            role: UserRole.OWNER,
+            firstName: "Test",
+            lastName: "Owner",
+            emailVerified: true,
+            isActive: true,
+            isOnboarded: true,
+        },
+    });
+
+    console.log("Cleanup and user creation complete!");
 
     console.log("Seeding complete!");
 }

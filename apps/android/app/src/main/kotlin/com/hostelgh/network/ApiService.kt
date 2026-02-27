@@ -8,10 +8,27 @@ import retrofit2.http.GET
 // Data models
 
 data class LoginRequest(val email: String, val password: String)
-data class LoginResponse(val token: String, val userId: String)
+data class LoginResponse(
+    val token: String,
+    val userId: String,
+    val accessToken: String? = null,
+    val refreshToken: String? = null,
+    val user: UserInfo? = null
+)
+data class UserInfo(
+    val id: String,
+    val email: String,
+    val role: String?
+)
 
 data class RegisterRequest(val email: String, val password: String, val name: String)
-data class RegisterResponse(val token: String, val userId: String)
+data class RegisterResponse(
+    val token: String,
+    val userId: String,
+    val accessToken: String? = null,
+    val refreshToken: String? = null,
+    val user: UserInfo? = null
+)
 
 data class ForgotPasswordRequest(val email: String)
 data class ForgotPasswordResponse(val message: String)

@@ -59,21 +59,31 @@ export class AuthService {
     });
 
     const tokens = await this.issueTokens(user.id, user.role);
-    return { user, ...tokens };
+    return {
+      token: tokens.accessToken,
+      userId: user.id,
+      user,
+      ...tokens,
+    };
   }
 
   async login(dto: LoginDto) {
     const user = await this.prisma.user.findUnique({
       where: { email: dto.email },
     });
-    if (!user || !user.isActive)
-      throw new UnauthorizedException("Invalid credentials");
+    if (!user)
+      throw new UnauthorizedException("Invalid email or password");
+
+    if (!user.isActive)
+      throw new UnauthorizedException("Account is inactive");
 
     const ok = await bcrypt.compare(dto.password, user.passwordHash);
-    if (!ok) throw new UnauthorizedException("Invalid credentials");
+    if (!ok) throw new UnauthorizedException("Invalid email or password");
 
     const tokens = await this.issueTokens(user.id, user.role);
     return {
+      token: tokens.accessToken,
+      userId: user.id,
       user: { id: user.id, email: user.email, role: user.role },
       ...tokens,
     };

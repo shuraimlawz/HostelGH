@@ -66,22 +66,32 @@ class LoginActivity : AppCompatActivity() {
                     progressBar.visibility = View.GONE
                     loginButton.isEnabled = true
                     if (response.isSuccessful) {
-                        Toast.makeText(this@LoginActivity, "Login successful", Toast.LENGTH_SHORT).show()
-                        response.body()?.token?.let { token ->
-                            Preferences(this@LoginActivity).authToken = token
+                        val body = response.body()
+                        if (body != null && body.token.isNotEmpty()) {
+                            Toast.makeText(this@LoginActivity, "Login successful", Toast.LENGTH_SHORT).show()
+                            Preferences(this@LoginActivity).authToken = body.token
+                            startActivity(Intent(this@LoginActivity, MainActivity::class.java))
+                            finish()
+                        } else {
+                            Toast.makeText(this@LoginActivity, "Invalid login response from server", Toast.LENGTH_SHORT).show()
                         }
-                        // Navigate to main activity
-                        startActivity(Intent(this@LoginActivity, MainActivity::class.java))
-                        finish()
                     } else {
-                        Toast.makeText(this@LoginActivity, "Login failed: ${response.code()}", Toast.LENGTH_SHORT).show()
+                        // Handle specific error codes
+                        val errorMsg = when (response.code()) {
+                            401 -> "Invalid email or password"
+                            400 -> "Invalid email or password format"
+                            500 -> "Server error - please try again later"
+                            else -> "Login failed: ${response.code()}"
+                        }
+                        Toast.makeText(this@LoginActivity, errorMsg, Toast.LENGTH_SHORT).show()
                     }
                 }
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
                     progressBar.visibility = View.GONE
                     loginButton.isEnabled = true
-                    Toast.makeText(this@LoginActivity, "Error: ${e.localizedMessage}", Toast.LENGTH_SHORT).show()
+                    val errorMsg = "Error: ${e.localizedMessage ?: "Unknown error occurred"}"
+                    Toast.makeText(this@LoginActivity, errorMsg, Toast.LENGTH_SHORT).show()
                 }
             }
         }
