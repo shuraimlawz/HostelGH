@@ -1,9 +1,17 @@
-describe('HostelsService', () => {
-  it('placeholder', () => {
-    expect(true).toBe(true);
-  });
-});
+import { Test, TestingModule } from '@nestjs/testing';
+import { HostelsService } from './hostels.service';
+import { PrismaService } from '../../prisma/prisma.service';
+import { RedisService } from '../redis/redis.service';
+import { SubscriptionsService } from '../subscriptions/subscriptions.service';
+import { AdminAuditLogService } from '../admin/admin-audit-log.service';
+import { NotFoundException } from '@nestjs/common';
 
+describe('HostelsService', () => {
+  let service: HostelsService;
+  let prismaService: PrismaService;
+  let redisService: RedisService;
+
+  const mockHostel: any = {
     id: 'hostel-1',
     name: 'Legon Hostel',
     city: 'Accra',

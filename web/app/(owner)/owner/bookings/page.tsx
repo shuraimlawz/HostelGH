@@ -225,6 +225,32 @@ export default function OwnerBookingsPage() {
                                             <span>Requested {new Date(booking.createdAt).toLocaleDateString()}</span>
                                         </div>
                                     </div>
+
+                                    {/* KYC Details */}
+                                    {(booking.levelOfStudy || booking.guardianName) && (
+                                        <div className="space-y-3 pt-4 border-t border-gray-100">
+                                            <p className="text-[9px] font-black uppercase tracking-widest text-gray-400">Student & Guardian Details</p>
+                                            <div className="space-y-1.5 text-xs">
+                                                {booking.levelOfStudy && <p className="flex justify-between"><span className="text-gray-500 font-bold">Level:</span> <span className="font-medium text-right">{booking.levelOfStudy}</span></p>}
+                                                {booking.guardianName && <p className="flex justify-between"><span className="text-gray-500 font-bold">Guardian:</span> <span className="font-medium text-right truncate max-w-[120px]">{booking.guardianName}</span></p>}
+                                                {booking.guardianPhone && <p className="flex justify-between"><span className="text-gray-500 font-bold">Guardian Tel:</span> <span className="font-medium text-right">{booking.guardianPhone}</span></p>}
+                                            </div>
+                                            {(booking.admissionDocUrl || booking.passportPhotoUrl) && (
+                                                <div className="flex gap-2 mt-2">
+                                                    {booking.admissionDocUrl && (
+                                                        <a href={booking.admissionDocUrl} target="_blank" rel="noopener noreferrer" className="flex-1 text-center bg-gray-50 hover:bg-gray-100 border text-gray-600 rounded-xl py-2 font-bold text-[10px] uppercase tracking-widest transition-colors">
+                                                            ID Doc
+                                                        </a>
+                                                    )}
+                                                    {booking.passportPhotoUrl && (
+                                                        <a href={booking.passportPhotoUrl} target="_blank" rel="noopener noreferrer" className="flex-1 text-center bg-gray-50 hover:bg-gray-100 border text-gray-600 rounded-xl py-2 font-bold text-[10px] uppercase tracking-widest transition-colors">
+                                                            Photo
+                                                        </a>
+                                                    )}
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
                                 </div>
 
                                 {/* Booking Details */}

@@ -44,6 +44,8 @@ const formSchema = z.object({
     utilitiesIncluded: z.array(z.string()),
     amenities: z.array(z.string()),
     images: z.array(z.string()),
+    policiesText: z.string().optional(),
+    genderCategory: z.enum(["MALE", "FEMALE", "MIXED"]).optional(),
 });
 
 const AMENITIES = [
@@ -85,6 +87,8 @@ export default function NewHostelPage() {
             utilitiesIncluded: [],
             amenities: [],
             images: [],
+            policiesText: "",
+            genderCategory: "MIXED",
         }
     });
 
@@ -370,6 +374,30 @@ export default function NewHostelPage() {
                                 {form.formState.errors.description && (
                                     <p className="text-xs text-red-500 ml-1 font-bold">{form.formState.errors.description.message}</p>
                                 )}
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div className="space-y-2">
+                                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Gender Category</label>
+                                    <select
+                                        {...form.register("genderCategory")}
+                                        className="w-full px-6 py-5 bg-gray-50 rounded-2xl outline-none focus:ring-4 focus:ring-blue-100 transition-all font-bold text-gray-950 appearance-none"
+                                    >
+                                        <option value="MIXED">Mixed (Both Boys & Girls)</option>
+                                        <option value="MALE">Boys Only</option>
+                                        <option value="FEMALE">Girls Only</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div className="space-y-2">
+                                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">House Rules & Policies</label>
+                                <textarea
+                                    {...form.register("policiesText")}
+                                    rows={4}
+                                    className="w-full px-6 py-5 bg-gray-50 rounded-2xl outline-none focus:ring-4 focus:ring-blue-100 transition-all font-medium text-gray-950 placeholder:text-gray-300 resize-none"
+                                    placeholder="Enter your hostel rules (e.g., No smoking, Curfew at 11PM, etc.)"
+                                />
                             </div>
                         </div>
                     </div>

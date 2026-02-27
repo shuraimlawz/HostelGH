@@ -55,6 +55,8 @@ const hostelSchema = z.object({
     amenities: z.array(z.string()),
     images: z.array(z.string()),
     isPublished: z.boolean(),
+    policiesText: z.string().optional(),
+    genderCategory: z.enum(["MALE", "FEMALE", "MIXED"]).optional(),
 });
 
 const roomSchema = z.object({
@@ -113,6 +115,8 @@ export default function EditHostelPage() {
             amenities: [],
             images: [],
             isPublished: false,
+            policiesText: "",
+            genderCategory: "MIXED",
         }
     });
 
@@ -130,6 +134,8 @@ export default function EditHostelPage() {
                 amenities: hostel.amenities || [],
                 images: hostel.images || [],
                 isPublished: hostel.isPublished,
+                policiesText: hostel.policiesText || "",
+                genderCategory: hostel.genderCategory || "MIXED",
             });
         }
     }, [hostel, form]);
@@ -237,6 +243,19 @@ export default function EditHostelPage() {
                             <div className="space-y-4">
                                 <input {...form.register("name")} className="w-full px-5 py-4 bg-gray-50 rounded-2xl outline-none border focus:border-black transition-all" placeholder="Hostel Name" />
                                 <textarea {...form.register("description")} rows={5} className="w-full px-5 py-4 bg-gray-50 rounded-2xl outline-none border focus:border-black transition-all resize-none" placeholder="Description" />
+
+                                <div className="space-y-1">
+                                    <label className="text-[10px] font-bold text-gray-400 uppercase ml-1">Gender Category</label>
+                                    <select {...form.register("genderCategory")} className="w-full px-5 py-4 bg-gray-50 rounded-2xl outline-none border focus:border-black transition-all appearance-none">
+                                        <option value="MIXED">Mixed (Both Boys & Girls)</option>
+                                        <option value="MALE">Boys Only</option>
+                                        <option value="FEMALE">Girls Only</option>
+                                    </select>
+                                </div>
+                                <div className="space-y-1">
+                                    <label className="text-[10px] font-bold text-gray-400 uppercase ml-1">House Rules & Policies</label>
+                                    <textarea {...form.register("policiesText")} rows={4} className="w-full px-5 py-4 bg-gray-50 rounded-2xl outline-none border focus:border-black transition-all resize-none" placeholder="Hostel rules and policies..." />
+                                </div>
                             </div>
                         </section>
 

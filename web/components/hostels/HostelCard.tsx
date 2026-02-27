@@ -11,6 +11,8 @@ export default function HostelCard({ hostel }: { hostel: any }) {
             ? Math.min(...hostel.rooms.map((r: any) => r.pricePerTerm)) / 100
             : null);
 
+    const hasAvailableRooms = hostel.rooms?.some((r: any) => r.availableSlots > 0) ?? false;
+
     return (
         <Link href={`/hostels/${hostel.id}`} className="group block cursor-pointer space-y-3">
             <div className="relative aspect-square overflow-hidden rounded-xl bg-muted">
@@ -37,6 +39,13 @@ export default function HostelCard({ hostel }: { hostel: any }) {
                         <span className="text-xs font-semibold text-foreground">Guest favorite</span>
                     </div>
                 )}
+                
+                {/* Availability Badge */}
+                {hasAvailableRooms && (
+                    <div className="absolute bottom-3 left-3 bg-white/95 backdrop-blur-sm px-2.5 py-1 rounded-md shadow-sm border border-border">
+                        <span className="text-[10px] font-bold text-green-600 uppercase tracking-wider">Rooms available</span>
+                    </div>
+                )}
             </div>
 
             <div className="space-y-1">
@@ -56,10 +65,14 @@ export default function HostelCard({ hostel }: { hostel: any }) {
                 </div>
 
                 <div className="flex items-baseline gap-1 mt-1.5">
-                    <span className="font-semibold text-foreground text-[15px]">
-                        ₵{minPrice ? minPrice.toLocaleString() : "N/A"}
-                    </span>
-                    <span className="text-muted-foreground font-normal text-[15px]">per term</span>
+                    {minPrice ? (
+                        <>
+                            <span className="font-semibold text-foreground text-[15px]">From ₵{minPrice.toLocaleString()}</span>
+                            <span className="text-muted-foreground font-normal text-[15px]">per term</span>
+                        </>
+                    ) : (
+                        <span className="font-semibold text-foreground text-[15px]">Price Unavailable</span>
+                    )}
                 </div>
             </div>
         </Link>
