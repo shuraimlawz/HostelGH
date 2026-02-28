@@ -3,8 +3,9 @@ import { HostelsService } from './hostels.service';
 import { PrismaService } from '../../prisma/prisma.service';
 import { RedisService } from '../redis/redis.service';
 import { SubscriptionsService } from '../subscriptions/subscriptions.service';
-import { AdminAuditLogService } from '../admin/admin-audit-log.service';
+import { AdminAuditLogService } from '../admin/admin-audit.service';
 import { NotFoundException } from '@nestjs/common';
+import { UserRole } from '@prisma/client';
 
 describe('HostelsService', () => {
   let service: HostelsService;
@@ -204,24 +205,31 @@ describe('HostelsService', () => {
   describe('getPublicDetail', () => {
     it('should return hostel details for public view', async () => {
       const hostelId = 'hostel-1';
+      const actor = { id: 'owner-1', role: UserRole.OWNER };
 
       (redisService.get as jest.Mock).mockResolvedValue(null);
       (prismaService.hostel.findUnique as jest.Mock).mockResolvedValue(
         mockHostel,
       );
 
-      const result = await service.getById(hostelId);
+      const result = await service.getById(actor, hostelId);
 
       expect(result).toEqual(mockHostel);
       expect(prismaService.hostel.findUnique).toHaveBeenCalledWith({
         where: { id: hostelId },
+        include: {
+          rooms: { orderBy: { createdAt: 'asc' } },
+          facilities: true,
+          _count: { select: { bookings: true } },
+        },
       });
     });
 
     it('should throw error if hostel not found', async () => {
+      const actor = { id: 'owner-1', role: UserRole.OWNER };
       (prismaService.hostel.findUnique as jest.Mock).mockResolvedValue(null);
 
-      await expect(service.getById('nonexistent')).rejects.toThrow(
+      await expect(service.getById(actor, 'nonexistent')).rejects.toThrow(
         NotFoundException,
       );
     });

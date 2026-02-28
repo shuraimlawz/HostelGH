@@ -87,7 +87,7 @@ export default function AuthModal({
                 </div>
             </div>
 
-            <style jsx>{`
+            <style>{`
         .custom-scrollbar::-webkit-scrollbar {
           width: 6px;
         }

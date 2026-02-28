@@ -4,7 +4,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactNode, useState } from "react";
 import { Toaster } from "@/components/ui/sonner";
 
-export default function QueryProvider({ children }: { children: ReactNode }) {
+export default function QueryProvider({ children }: { children: ReactNode | any }) {
     const [client] = useState(() => new QueryClient({
         defaultOptions: {
             queries: {

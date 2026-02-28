@@ -161,7 +161,7 @@ export default function ReceiptPage({ params }: { params: { id: string } }) {
                 </button>
             </div>
 
-            <style jsx global>{`
+            <style>{`
                 @media print {
                     @page { margin: 0; }
                     body { background: white; }

@@ -7,7 +7,7 @@ import {
   IsArray,
 } from "class-validator";
 import { ApiProperty, PartialType } from "@nestjs/swagger";
-import { RoomGender } from "@prisma/client";
+import { RoomGender, HostelBookingStatus } from "@prisma/client";
 
 export class CreateHostelDto {
   @ApiProperty({ example: "Sunny Side Hostel" })
@@ -45,6 +45,15 @@ export class CreateHostelDto {
   @IsBoolean()
   isPublished?: boolean = false;
 
+  @ApiProperty({ example: false, default: false })
+  @IsOptional()
+  @IsBoolean()
+  isFeatured?: boolean = false;
+
+  @ApiProperty({ example: null, required: false })
+  @IsOptional()
+  featuredUntil?: Date;
+
   @ApiProperty({
     example: ["https://images.unsplash.com/photo-1596401057633-5310457b1d4f"],
   })
@@ -81,12 +90,12 @@ export class CreateHostelDto {
 
   @ApiProperty({
     example: "OPEN",
-    enum: ["OPEN", "LIMITED", "CLOSED", "FULL"],
+    enum: HostelBookingStatus,
     required: false,
   })
   @IsOptional()
-  @IsEnum(["OPEN", "LIMITED", "CLOSED", "FULL"])
-  bookingStatus?: string;
+  @IsEnum(HostelBookingStatus)
+  bookingStatus?: HostelBookingStatus;
 
   @ApiProperty({ example: "No pets allowed.", required: false })
   @IsOptional()

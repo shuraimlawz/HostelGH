@@ -4,7 +4,7 @@ import {
   NotFoundException,
 } from "@nestjs/common";
 import { PrismaService } from "../../prisma/prisma.service";
-import { UserRole } from "@prisma/client";
+import { UserRole, RoomGender } from "@prisma/client";
 import { RedisService } from "../redis/redis.service";
 import { SubscriptionsService } from "../subscriptions/subscriptions.service";
 import {
@@ -12,6 +12,7 @@ import {
   AdminAction,
   AdminEntity,
 } from "../admin/admin-audit.service";
+import { CreateHostelDto, UpdateHostelDto } from "./dto/create-hostel.dto";
 
 @Injectable()
 export class HostelsService {
@@ -35,7 +36,23 @@ export class HostelsService {
 
     const hostel = await this.prisma.hostel.create({
       data: {
-        ...dto,
+        name: dto.name,
+        description: dto.description,
+        addressLine: dto.addressLine,
+        city: dto.city,
+        region: dto.region,
+        country: dto.country,
+        images: dto.images,
+        amenities: dto.amenities,
+        university: dto.university,
+        whatsappNumber: dto.whatsappNumber,
+        distanceToCampus: dto.distanceToCampus,
+        utilitiesIncluded: dto.utilitiesIncluded,
+        bookingStatus: dto.bookingStatus,
+        policiesText: dto.policiesText,
+        genderCategory: dto.genderCategory,
+        isFeatured: dto.isFeatured,
+        featuredUntil: dto.featuredUntil,
         ownerId,
         isPublished: !isFirstHostel, // auto-publish if already verified
         pendingVerification: isFirstHostel, // flag first-timers for admin review
@@ -430,21 +447,3 @@ interface UserActor {
   id: string;
   role: UserRole;
 }
-
-interface CreateHostelDto {
-  name: string;
-  addressLine: string;
-  city: string;
-  description?: string;
-  region?: string;
-  country?: string;
-  images?: string[];
-  amenities?: string[];
-  university?: string;
-  isPublished?: boolean;
-  isFeatured?: boolean;
-  policiesText?: string;
-  genderCategory?: any; // RoomGender
-}
-
-interface UpdateHostelDto extends Partial<CreateHostelDto> { }

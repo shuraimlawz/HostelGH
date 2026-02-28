@@ -4,7 +4,7 @@ import {
   NotFoundException,
 } from "@nestjs/common";
 import { PrismaService } from "../../prisma/prisma.service";
-import { UserRole, BookingStatus } from "@prisma/client";
+import { UserRole, BookingStatus, RoomGender } from "@prisma/client";
 import { CreateRoomDto, UpdateRoomDto } from "./dto/create-room.dto";
 import { SubscriptionsService } from "../subscriptions/subscriptions.service";
 
