@@ -1,6 +1,6 @@
 import type { NextConfig } from "next";
 
-const nextConfig: NextConfig = {
+const nextConfig = {
   images: {
     remotePatterns: [
       {
@@ -13,6 +13,11 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-};
+  // Ensure Turbopack/Next infers the correct workspace root in monorepos
+  // This silences the "inferred your workspace root" warning on Vercel
+  turbopack: {
+    root: "web",
+  },
+} as unknown as NextConfig;
 
 export default nextConfig;
