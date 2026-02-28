@@ -1,19 +1,9 @@
 {
     "version": 2,
-        // for monorepo we tell Vercel which package.json to build
-        "installCommand": "npm install",
-        // build inside web folder using its own scripts
-        "buildCommand": "npm run build -w web",
-        // outputDirectory is relative to the build working dir, which is
-        // automatically set when using a custom "builds" entry below.
-        // we still keep this field in case UI defaults override. leave .next
-        "outputDirectory": "web/.next",
-        "framework": "nextjs",
-        // explicitly declare the build configuration for the web app
-        "builds": [
-            {
-                "src": "web/package.json",
-                "use": "@vercel/next"
-            }
-        ]
+    "builds": [
+        {
+            "src": "web/package.json",
+            "use": "@vercel/next"
+        }
+    ]
 }
