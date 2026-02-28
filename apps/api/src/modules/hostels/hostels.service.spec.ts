@@ -69,6 +69,10 @@ describe('HostelsService', () => {
               create: jest.fn(),
               update: jest.fn(),
               delete: jest.fn(),
+              groupBy: jest.fn(), // used in trending fallback logic
+            },
+            booking: {
+              groupBy: jest.fn(), // trending algorithm needs this
             },
           },
         },
@@ -78,6 +82,8 @@ describe('HostelsService', () => {
             get: jest.fn(),
             set: jest.fn(),
             del: jest.fn(),
+            getJson: jest.fn(),
+            setJson: jest.fn(),
           },
         },
         {
@@ -109,7 +115,7 @@ describe('HostelsService', () => {
         page: 1,
       };
 
-      (redisService.get as jest.Mock).mockResolvedValue(null);
+      (redisService.getJson as jest.Mock).mockResolvedValue(null);
       (prismaService.hostel.findMany as jest.Mock).mockResolvedValue(
         mockHostels,
       );
@@ -130,7 +136,7 @@ describe('HostelsService', () => {
         page: 1,
       };
 
-      (redisService.get as jest.Mock).mockResolvedValue(null);
+      (redisService.getJson as jest.Mock).mockResolvedValue(null);
       (prismaService.hostel.findMany as jest.Mock).mockResolvedValue([
         mockHostels[1],
       ]);
@@ -150,7 +156,7 @@ describe('HostelsService', () => {
         page: 1,
       };
 
-      (redisService.get as jest.Mock).mockResolvedValue(null);
+      (redisService.getJson as jest.Mock).mockResolvedValue(null);
       (prismaService.hostel.findMany as jest.Mock).mockResolvedValue(
         mockHostels.filter((h) => h.minPrice >= 8000 && h.minPrice <= 10000),
       );
@@ -167,16 +173,14 @@ describe('HostelsService', () => {
         city: 'Accra',
         sort: 'relevance',
       };
-      const cacheKey = `hostels:public:Accra:relevance`;
+      const cacheKey = `search:${JSON.stringify(query)}`;
 
-      (redisService.get as jest.Mock).mockResolvedValue(
-        JSON.stringify(mockHostels),
-      );
+      (redisService.getJson as jest.Mock).mockResolvedValue(mockHostels);
 
       const result = await service.publicSearch(query);
 
       expect(result).toHaveLength(3);
-      expect(redisService.get).toHaveBeenCalledWith(cacheKey);
+      expect(redisService.getJson).toHaveBeenCalledWith(cacheKey);
     });
 
     it('should handle pagination correctly', async () => {
@@ -186,7 +190,7 @@ describe('HostelsService', () => {
         page: 2,
       };
 
-      (redisService.get as jest.Mock).mockResolvedValue(null);
+      (redisService.getJson as jest.Mock).mockResolvedValue(null);
       (prismaService.hostel.findMany as jest.Mock).mockResolvedValue(
         mockHostels.slice(2, 4),
       );
@@ -207,7 +211,7 @@ describe('HostelsService', () => {
       const hostelId = 'hostel-1';
       const actor = { id: 'owner-1', role: UserRole.OWNER };
 
-      (redisService.get as jest.Mock).mockResolvedValue(null);
+      (redisService.getJson as jest.Mock).mockResolvedValue(null);
       (prismaService.hostel.findUnique as jest.Mock).mockResolvedValue(
         mockHostel,
       );
@@ -244,6 +248,7 @@ describe('HostelsService', () => {
         addressLine: '456 Oak St',
         description: 'A new hostel',
         minPrice: 12000,
+        listingFeeModel: 'STANDARD',
       };
 
       (prismaService.hostel.create as jest.Mock).mockResolvedValue({
@@ -252,12 +257,14 @@ describe('HostelsService', () => {
         ownerId,
         featured: false,
         isPublished: false,
+        owner: { email: 'owner@example.com' },
       });
 
       const result = await service.create(ownerId, createDto as any);
 
       expect(result.name).toBe(createDto.name);
       expect(result.ownerId).toBe(ownerId);
+      expect(result.listingFeeModel).toBe('STANDARD');
       expect(prismaService.hostel.create).toHaveBeenCalled();
     });
 
@@ -277,7 +284,9 @@ describe('HostelsService', () => {
     it('should return top cities by booking count', async () => {
       const trendingLocations = ['Accra', 'Kumasi', 'Cape Coast'];
 
-      (redisService.get as jest.Mock).mockResolvedValue(null);
+      (redisService.getJson as jest.Mock).mockResolvedValue(null);
+      (prismaService.booking.groupBy as jest.Mock).mockResolvedValue([]);
+      (prismaService.hostel.groupBy as jest.Mock).mockResolvedValue([]);
       (prismaService.hostel.findMany as jest.Mock).mockResolvedValue(
         mockHostels,
       );
@@ -301,6 +310,7 @@ describe('HostelsService', () => {
         description: 'Updated description',
       };
 
+      (prismaService.hostel.findUnique as jest.Mock).mockResolvedValue(mockHostel);
       (prismaService.hostel.update as jest.Mock).mockResolvedValue({
         ...mockHostel,
         ...updateDto,
@@ -327,8 +337,7 @@ describe('HostelsService', () => {
     it('should delete a hostel', async () => {
       const hostelId = 'hostel-1';
       const ownerId = 'owner-1';
-
-      (prismaService.hostel.delete as jest.Mock).mockResolvedValue(mockHostel);
+      (prismaService.hostel.findUnique as jest.Mock).mockResolvedValue(mockHostel);      (prismaService.hostel.delete as jest.Mock).mockResolvedValue(mockHostel);
 
       const result = await service.delete({ id: ownerId, role: 'OWNER' }, hostelId);
 

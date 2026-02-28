@@ -55,6 +55,20 @@ export default function Navbar() {
 
                 {/* Right Actions */}
                 <div className="flex items-center justify-end gap-3 flex-1">
+                    {/* Navigation Links */}
+                    <Link
+                        href="/hostels"
+                        className="hidden lg:block text-sm font-semibold px-4 py-2 rounded-full text-foreground hover:bg-muted transition-all"
+                    >
+                        Browse
+                    </Link>
+                    <Link
+                        href="/support"
+                        className="hidden lg:block text-sm font-semibold px-4 py-2 rounded-full text-foreground hover:bg-muted transition-all"
+                    >
+                        How it works
+                    </Link>
+
                     {!user && (
                         <Link
                             href="/auth/register?role=OWNER"
@@ -95,8 +109,25 @@ export default function Navbar() {
 
                         {isOpen && (
                             <div className="absolute right-0 top-[calc(100%+0.5rem)] w-64 bg-card text-card-foreground rounded-2xl shadow-2xl border border-black/5 py-3 animate-in fade-in zoom-in-95 duration-200 overflow-hidden z-50">
+                                {/* Navigation items for all users */}
+                                <Link
+                                    href="/hostels"
+                                    className="block px-5 py-2.5 hover:bg-zinc-50 text-sm font-bold text-foreground transition-colors lg:hidden"
+                                    onClick={() => setIsOpen(false)}
+                                >
+                                    Browse Hostels
+                                </Link>
+                                <Link
+                                    href="/support"
+                                    className="block px-5 py-2.5 hover:bg-zinc-50 text-sm font-bold text-foreground transition-colors lg:hidden"
+                                    onClick={() => setIsOpen(false)}
+                                >
+                                    How it works
+                                </Link>
+
                                 {user ? (
                                     <>
+                                        <div className="border-t border-black/5 my-2 mx-5" />
                                         <div className="px-5 py-3 border-b border-black/5 mb-2 bg-zinc-50/50">
                                             <div className="font-bold text-sm truncate text-foreground">{user.email}</div>
                                             <div className="text-[10px] font-bold text-muted-foreground mt-0.5 uppercase tracking-widest">{user.role.toLowerCase()} Account</div>

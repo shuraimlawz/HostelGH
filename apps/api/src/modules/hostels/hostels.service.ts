@@ -144,6 +144,8 @@ export class HostelsService {
     sort?: string;
     gender?: string;
     roomConfig?: string;
+    limit?: number;
+    page?: number;
   }) {
     const cacheKey = `search:${JSON.stringify(params)}`;
     const cached = await this.redis.getJson<any[]>(cacheKey);
@@ -180,6 +182,10 @@ export class HostelsService {
       orderBy.push({ createdAt: "desc" }); // Default to Newest
     }
 
+    // handle optional pagination
+    const take = params.limit ?? 10;
+    const skip = params.page && params.limit ? (params.page - 1) * params.limit : undefined;
+
     const results = await this.prisma.hostel.findMany({
       where: {
         isPublished: true,
@@ -213,6 +219,9 @@ export class HostelsService {
       },
       include: { rooms: { where: { isActive: true } } },
       orderBy: orderBy,
+      // apply paging if provided
+      ...(skip !== undefined ? { skip } : {}),
+      ...(take !== undefined ? { take } : {}),
     });
 
     await this.redis.setJson(cacheKey, results, 300); // 5 minutes cache

@@ -3,7 +3,7 @@ services:
     name: hostel-api
     runtime: node
     rootDir: .
-    buildCommand: npm install && npx prisma generate --schema=./prisma/schema.prisma && npm run build
+    buildCommand: npm install && npx prisma@6.3.1 generate --schema=./prisma/schema.prisma && npm run build
     startCommand: npm run start:prod
     envVars:
       - key: NODE_ENV

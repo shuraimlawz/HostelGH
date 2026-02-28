@@ -1,9 +1,16 @@
-describe('AuthService', () => {
-  it('placeholder', () => {
-    expect(true).toBe(true);
-  });
-});
+import { Test, TestingModule } from '@nestjs/testing';
+import { AuthService } from './auth.service';
+import { PrismaService } from '../../prisma/prisma.service';
+import { JwtService } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
+import * as bcrypt from 'bcrypt';
+jest.mock('bcrypt');
+import { BadRequestException, UnauthorizedException } from '@nestjs/common';
+import { EmailService } from '../email/email.service';
 
+
+
+describe('AuthService', () => {
   let service: AuthService;
   let prismaService: PrismaService;
   let jwtService: JwtService;
@@ -36,6 +43,7 @@ describe('AuthService', () => {
             refreshToken: {
               findFirst: jest.fn(),
               create: jest.fn(),
+              update: jest.fn(),
               updateMany: jest.fn(),
             },
           },
@@ -44,7 +52,9 @@ describe('AuthService', () => {
           provide: JwtService,
           useValue: {
             sign: jest.fn(),
+            signAsync: jest.fn(),
             verify: jest.fn(),
+            verifyAsync: jest.fn(),
           },
         },
         {
@@ -54,7 +64,7 @@ describe('AuthService', () => {
           },
         },
         {
-          provide: 'EmailService',
+          provide: EmailService,
           useValue: {
             sendEmail: jest.fn(),
           },
@@ -86,9 +96,9 @@ describe('AuthService', () => {
         firstName: registerDto.firstName,
         lastName: registerDto.lastName,
       });
-      (jwtService.sign as jest.Mock)
-        .mockReturnValueOnce('jwt-token')
-        .mockReturnValueOnce('refresh-token');
+      (jwtService.signAsync as jest.Mock)
+        .mockResolvedValueOnce('jwt-token')
+        .mockResolvedValueOnce('refresh-token');
 
       const result = await service.register(registerDto);
 
@@ -98,7 +108,7 @@ describe('AuthService', () => {
       expect(prismaService.user.findUnique).toHaveBeenCalledWith({
         where: { email: registerDto.email },
       });
-      expect(bcrypt.hash).toHaveBeenCalledWith(registerDto.password, 10);
+      expect(bcrypt.hash).toHaveBeenCalledWith(registerDto.password, 12);
     });
 
     it('should throw error if email already exists', async () => {
@@ -144,9 +154,9 @@ describe('AuthService', () => {
 
       (prismaService.user.findUnique as jest.Mock).mockResolvedValue(mockUser);
       (bcrypt.compare as jest.Mock).mockResolvedValue(true);
-      (jwtService.sign as jest.Mock)
-        .mockReturnValueOnce('jwt-token')
-        .mockReturnValueOnce('refresh-token');
+      (jwtService.signAsync as jest.Mock)
+        .mockResolvedValueOnce('jwt-token')
+        .mockResolvedValueOnce('refresh-token');
 
       const result = await service.login(loginDto);
 
@@ -196,9 +206,9 @@ describe('AuthService', () => {
         revokedAt: null,
       });
       (prismaService.user.findUnique as jest.Mock).mockResolvedValue(mockUser);
-      (jwtService.sign as jest.Mock)
-        .mockReturnValueOnce('new-jwt-token')
-        .mockReturnValueOnce('new-refresh-token');
+      (jwtService.signAsync as jest.Mock)
+        .mockResolvedValueOnce('new-jwt-token')
+        .mockResolvedValueOnce('new-refresh-token');
 
       const result = await service.refresh(userId, refreshToken);
 
@@ -229,3 +239,4 @@ describe('AuthService', () => {
       expect(prismaService.refreshToken.updateMany).toHaveBeenCalled();
     });
   });
+});

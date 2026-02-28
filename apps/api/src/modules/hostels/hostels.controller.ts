@@ -99,6 +99,8 @@ export class HostelsController {
     @Query("sort") sort?: string,
     @Query("gender") gender?: string,
     @Query("roomConfig") roomConfig?: string,
+    @Query("limit") limit?: string,
+    @Query("page") page?: string,
   ) {
     const amenitiesArr =
       typeof amenities === "string" ? amenities.split(",") : amenities;
@@ -108,6 +110,8 @@ export class HostelsController {
       minPrice: minPrice ? parseInt(minPrice, 10) : undefined,
       maxPrice: maxPrice ? parseInt(maxPrice, 10) : undefined,
       university,
+      limit: limit ? parseInt(limit, 10) : undefined,
+      page: page ? parseInt(page, 10) : undefined,
       amenities: amenitiesArr,
       sort,
       gender,
