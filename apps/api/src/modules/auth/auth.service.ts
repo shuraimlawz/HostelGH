@@ -48,6 +48,8 @@ export class AuthService {
         role: dto.role,
         firstName: dto.firstName,
         lastName: dto.lastName,
+        phone: dto.phone,
+        gender: dto.gender,
       },
       select: {
         id: true,
@@ -55,6 +57,8 @@ export class AuthService {
         role: true,
         firstName: true,
         lastName: true,
+        phone: true,
+        gender: true,
       },
     });
 

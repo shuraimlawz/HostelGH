@@ -53,6 +53,11 @@ export class HostelsService {
         genderCategory: dto.genderCategory,
         isFeatured: dto.isFeatured,
         featuredUntil: dto.featuredUntil,
+        // Listing fee model configuration
+        listingFeeModel: dto.listingFeeModel,
+        monthlyListingFee: dto.monthlyListingFee,
+        revenueSharePercentage: dto.revenueSharePercentage,
+        perAcceptanceFee: dto.perAcceptanceFee,
         ownerId,
         isPublished: !isFirstHostel, // auto-publish if already verified
         pendingVerification: isFirstHostel, // flag first-timers for admin review

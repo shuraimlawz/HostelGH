@@ -51,6 +51,12 @@ enum RoomGender {
   MIXED
 }
 
+enum UserGender {
+  MALE
+  FEMALE
+  OTHER
+}
+
 enum FacilityType {
   FREE
   PAID
@@ -61,6 +67,13 @@ enum HostelBookingStatus {
   LIMITED // Few slots left
   CLOSED // Not accepting bookings
   FULL // No availability
+}
+
+enum HostelListingFeeModel {
+  STANDARD        // Per-booking fee (default) - charged when tenant books
+  MONTHLY_LISTING // Flat monthly listing fee
+  REVENUE_SHARE   // Percentage of revenue (e.g., 5-10%)
+  PER_ACCEPTANCE  // Fixed fee per accepted booking regardless of amount
 }
 
 model User {
@@ -74,6 +87,7 @@ model User {
   firstName String?
   lastName  String?
   avatarUrl String?
+  gender    UserGender?
 
   isActive           Boolean @default(true)
   emailVerified      Boolean @default(false)
@@ -181,6 +195,12 @@ model Hostel {
   isFeatured Boolean @default(false)
   featuredUntil DateTime?
   minPrice   Int?
+
+  // Listing fee model and configuration
+  listingFeeModel        HostelListingFeeModel @default(STANDARD) // Fee model chosen by owner
+  monthlyListingFee      Int?                                     // For MONTHLY_LISTING model (pesewas)
+  revenueSharePercentage Float?                                   // For REVENUE_SHARE model (e.g., 5.0 = 5%)
+  perAcceptanceFee       Int?                                     // For PER_ACCEPTANCE model (pesewas)
 
   // Ghana-specific fields
   whatsappNumber    String? // Primary contact method

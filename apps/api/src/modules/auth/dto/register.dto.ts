@@ -7,7 +7,7 @@ import {
   IsArray,
   ValidateNested,
 } from "class-validator";
-import { UserRole } from "@prisma/client";
+import { UserRole, UserGender } from "@prisma/client";
 import { ApiProperty } from "@nestjs/swagger";
 
 export class RegisterDto {
@@ -32,4 +32,14 @@ export class RegisterDto {
   @IsOptional()
   @IsString()
   lastName?: string;
+
+  @ApiProperty({ example: "0541234567", required: false })
+  @IsOptional()
+  @IsString()
+  phone?: string;
+
+  @ApiProperty({ enum: UserGender, example: UserGender.MALE, required: false })
+  @IsOptional()
+  @IsEnum(UserGender)
+  gender?: UserGender;
 }
