@@ -1,5 +1,4 @@
 import type { NextConfig } from "next";
-import path from "path";
 
 const nextConfig: NextConfig = {
   images: {
@@ -13,12 +12,6 @@ const nextConfig: NextConfig = {
         hostname: 'res.cloudinary.com',
       },
     ],
-  },
-  // Use path.resolve(process.cwd()) to point to the repository root.
-  // This silences monorepo warnings and avoids runtime ESM/CJS interop issues.
-  outputFileTracingRoot: path.resolve(process.cwd(), ".."),
-  turbopack: {
-    root: path.resolve(process.cwd(), ".."),
   },
 };
 
