@@ -16,9 +16,7 @@ const nextConfig: NextConfig = {
   },
   // Use path.resolve(process.cwd()) to point to the repository root.
   // This silences monorepo warnings and avoids runtime ESM/CJS interop issues.
-  experimental: {
-    outputFileTracingRoot: path.resolve(process.cwd(), ".."),
-  },
+  outputFileTracingRoot: path.resolve(process.cwd(), ".."),
   turbopack: {
     root: path.resolve(process.cwd(), ".."),
   },
