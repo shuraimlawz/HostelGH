@@ -1,4 +1,9 @@
 import type { NextConfig } from "next";
+import path from "path";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const nextConfig = {
   images: {
@@ -13,10 +18,12 @@ const nextConfig = {
       },
     ],
   },
-  // Ensure Turbopack/Next infers the correct workspace root in monorepos
-  // This silences the "inferred your workspace root" warning on Vercel
+  // Align Turbopack root and outputFileTracingRoot with absolute paths to silence monorepo warnings
+  experimental: {
+    outputFileTracingRoot: path.join(__dirname, ".."),
+  },
   turbopack: {
-    root: "web",
+    root: path.join(__dirname, ".."),
   },
 } as unknown as NextConfig;
 
