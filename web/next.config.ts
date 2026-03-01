@@ -1,11 +1,7 @@
 import type { NextConfig } from "next";
 import path from "path";
-import { fileURLToPath } from "url";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-const nextConfig = {
+const nextConfig: NextConfig = {
   images: {
     remotePatterns: [
       {
@@ -18,13 +14,14 @@ const nextConfig = {
       },
     ],
   },
-  // Align Turbopack root and outputFileTracingRoot with absolute paths to silence monorepo warnings
+  // Use path.resolve(process.cwd()) to point to the repository root.
+  // This silences monorepo warnings and avoids runtime ESM/CJS interop issues.
   experimental: {
-    outputFileTracingRoot: path.join(__dirname, ".."),
+    outputFileTracingRoot: path.resolve(process.cwd(), ".."),
   },
   turbopack: {
-    root: path.join(__dirname, ".."),
+    root: path.resolve(process.cwd(), ".."),
   },
-} as unknown as NextConfig;
+};
 
 export default nextConfig;
