@@ -4,7 +4,7 @@
   "scripts": {
     "build": "echo 'Build is handled by root project'",
     "start": "nest start",
-    "start:prod": "node ../../dist/apps/api/src/main"
+    "start:prod": "cd ../.. && node dist/apps/api/src/main"
   },
   "dependencies": {
     "nodemailer": "^8.0.1"
