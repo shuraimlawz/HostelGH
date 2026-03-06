@@ -52,13 +52,24 @@ async function bootstrap() {
   const appUrl = process.env.APP_URL || "https://hostelgh.onrender.com";
   const frontendUrl = process.env.FRONTEND_URL || "https://hostelgh.vercel.app";
 
+  const allowedOrigins = [
+    appUrl,
+    frontendUrl,
+    "https://hostelgh.onrender.com",
+    "https://hostelgh.vercel.app",
+    "https://hostelgh-api.onrender.com",
+  ].filter(Boolean);
+
   app.enableCors({
-    origin: [
-      appUrl,
-      frontendUrl,
-      "https://hostelgh.onrender.com",
-      "https://hostelgh.vercel.app",
-    ],
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        // Log during development to debug CORS issues
+        logger.warn(`Blocked by CORS: ${origin}`);
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
     credentials: true,
   });
 

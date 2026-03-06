@@ -19,8 +19,6 @@ export default function LoginForm({ onSuccess }: { onSuccess?: (user: any) => vo
     const [err, setErr] = useState<string | null>(null);
     const { login } = useAuth();
 
-    const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "https://hostelgh.onrender.com";
-
     async function submit(e: React.FormEvent) {
         e.preventDefault();
         setErr(null);
@@ -66,7 +64,7 @@ export default function LoginForm({ onSuccess }: { onSuccess?: (user: any) => vo
     }
 
     const handleGoogleLogin = () => {
-        const url = `${API_BASE_URL}/auth/google`;
+        const url = `${api.defaults.baseURL}/auth/google`;
         console.log("Redirecting to Google Auth:", url);
         window.location.href = url;
     };
