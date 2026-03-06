@@ -2,7 +2,7 @@
   "name": "hostel-api",
   "version": "0.0.1",
   "scripts": {
-    "build": "echo 'Build is handled by root project'",
+    "build": "cd ../.. && npm run build --workspace=hostel-api",
     "start": "nest start",
     "start:prod": "cd ../.. && node dist/apps/api/src/main"
   },
