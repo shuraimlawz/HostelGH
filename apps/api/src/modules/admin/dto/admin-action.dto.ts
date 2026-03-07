@@ -47,4 +47,9 @@ export class AdminActionDto {
   @IsOptional()
   @IsBoolean()
   published?: boolean;
+
+  @ApiPropertyOptional({ description: "New status for dispute" })
+  @IsOptional()
+  @IsString()
+  disputeStatus?: string;
 }

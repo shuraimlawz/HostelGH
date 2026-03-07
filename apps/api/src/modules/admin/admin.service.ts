@@ -16,6 +16,14 @@ import {
   AdminEntity,
   AdminAuditLogService,
 } from "./admin-audit.service";
+import { AdminGateway } from "./admin.gateway";
+import { JwtService } from "@nestjs/jwt";
+import { ConfigService } from "@nestjs/config";
+import { randomBytes, createHash } from "crypto";
+
+function sha256(input: string) {
+  return createHash("sha256").update(input).digest("hex");
+}
 
 @Injectable()
 export class AdminService {
@@ -24,6 +32,9 @@ export class AdminService {
     private readonly notifications: NotificationsService,
     private readonly hostels: HostelsService,
     private readonly audit: AdminAuditLogService,
+    private readonly gateway: AdminGateway,
+    private readonly jwt: JwtService,
+    private readonly config: ConfigService,
   ) { }
 
   async getAnalytics() {
@@ -193,19 +204,50 @@ export class AdminService {
     };
   }
 
+  async verifyUser(adminId: string, userId: string) {
+    const admin = await this.prisma.user.findUnique({ where: { id: adminId } });
+    const user = await this.prisma.user.update({
+      where: { id: userId },
+      // @ts-ignore
+      data: { isVerified: true },
+    });
+
+    await this.audit.log(
+      admin!,
+      AdminAction.VERIFY,
+      AdminEntity.USER,
+      userId,
+      `User ${user.email} (Owner) identity verified with Ghana Card`,
+    );
+
+    this.gateway.broadcastActivity('USER_VERIFIED', { userId, email: user.email });
+
+    return user;
+  }
+
   async verifyHostel(adminId: string, hostelId: string) {
     const admin = await this.prisma.user.findUnique({ where: { id: adminId } });
     const hostel = await this.hostels.verifyHostel(hostelId);
 
+    // Also set the isVerifiedHostel flag for the badge
+    await this.prisma.hostel.update({
+      where: { id: hostelId },
+      // @ts-ignore
+      data: { isVerifiedHostel: true },
+    });
+
     await this.audit.log(
-      admin,
+      admin!,
       AdminAction.VERIFY,
       AdminEntity.HOSTEL,
       hostelId,
-      `Hostel ${hostel.name} verified and published`,
+      `Hostel ${hostel.name} verified and published with verification badge`,
     );
 
-    return hostel;
+    this.gateway.broadcastActivity('HOSTEL_VERIFIED', { hostelId, name: hostel.name });
+
+    // @ts-ignore
+    return { ...hostel, isVerifiedHostel: true };
   }
 
   async rejectHostel(adminId: string, hostelId: string, reason: string) {
@@ -560,5 +602,128 @@ export class AdminService {
       });
     }
     return alerts;
+  }
+
+  // --- COMMAND CENTER METHODS ---
+
+  async getVerificationQueue() {
+    const [pendingHostels, pendingOwners] = await Promise.all([
+      this.prisma.hostel.findMany({
+        where: { pendingVerification: true },
+        include: { owner: { select: { firstName: true, lastName: true, email: true } } },
+        orderBy: { createdAt: 'desc' }
+      }),
+      this.prisma.user.findMany({
+        // @ts-ignore
+        where: { role: UserRole.OWNER, isVerified: false, ghanaCardUrl: { not: null } },
+        // @ts-ignore
+        select: { id: true, firstName: true, lastName: true, email: true, ghanaCardUrl: true, ghanaCardId: true, createdAt: true },
+        orderBy: { createdAt: 'desc' }
+      })
+    ]);
+
+    return { hostels: pendingHostels, owners: pendingOwners };
+  }
+
+  async getDisputes() {
+    // @ts-ignore
+    return this.prisma.dispute.findMany({
+      include: {
+        booking: {
+          include: {
+            tenant: { select: { firstName: true, lastName: true, email: true } },
+            hostel: { select: { name: true } }
+          }
+        }
+      },
+      orderBy: { createdAt: 'desc' }
+    });
+  }
+
+  async updateDisputeStatus(adminId: string, disputeId: string, status: any) {
+    const admin = await this.prisma.user.findUnique({ where: { id: adminId } });
+    // @ts-ignore
+    const dispute = await this.prisma.dispute.update({
+      where: { id: disputeId },
+      data: { status },
+      include: { booking: true }
+    });
+
+    await this.audit.log(
+      admin!,
+      AdminAction.UPDATE,
+      AdminEntity.SYSTEM,
+      disputeId,
+      `Dispute ${disputeId} status updated to ${status}`,
+    );
+
+    this.gateway.broadcastActivity('DISPUTE_UPDATED', { disputeId, status });
+
+    return dispute;
+  }
+
+  async getFinancialStats() {
+    const [totalVolume, escrowBalance, pendingPayouts] = await Promise.all([
+      this.prisma.payment.aggregate({
+        _sum: { amount: true },
+        where: { status: 'SUCCESS' }
+      }),
+      this.prisma.wallet.aggregate({
+        // @ts-ignore
+        _sum: { pendingBalance: true }
+      }),
+      this.prisma.payoutRequest.aggregate({
+        _sum: { amount: true },
+        where: { status: 'PENDING' }
+      })
+    ]);
+
+    return {
+      totalVolume: totalVolume._sum.amount || 0,
+      // @ts-ignore
+      escrowBalance: escrowBalance._sum.pendingBalance || 0,
+      pendingPayouts: pendingPayouts._sum.amount || 0
+    };
+  }
+
+  async impersonateUser(adminId: string, targetUserId: string) {
+    const admin = await this.prisma.user.findUnique({ where: { id: adminId } });
+    if (!admin || admin.role !== UserRole.ADMIN) {
+      throw new BadRequestException("Only admins can impersonate");
+    }
+
+    const targetUser = await this.prisma.user.findUnique({ where: { id: targetUserId } });
+    if (!targetUser) throw new BadRequestException("Target user not found");
+
+    const accessToken = await this.jwt.signAsync(
+      { sub: targetUser.id, role: targetUser.role },
+      {
+        secret: this.config.get<string>("jwt.accessSecret"),
+        expiresIn: "7d",
+      },
+    );
+
+    const refreshPlain = randomBytes(48).toString("hex");
+    const refreshHash = sha256(refreshPlain);
+    const expiresAt = new Date(Date.now() + 1000 * 60 * 60 * 24 * 30);
+
+    await this.prisma.refreshToken.create({
+      data: { userId: targetUser.id, tokenHash: refreshHash, expiresAt },
+    });
+
+    await this.audit.log(
+      admin,
+      AdminAction.SYSTEM,
+      AdminEntity.USER,
+      targetUserId,
+      `Admin ${admin.email} started impersonating ${targetUser.email}`,
+    );
+
+    return {
+      token: accessToken,
+      refreshToken: refreshPlain,
+      userId: targetUser.id,
+      user: { id: targetUser.id, email: targetUser.email, role: targetUser.role },
+    };
   }
 }

@@ -152,9 +152,24 @@ export default function HostelDetailsPage() {
                                                 <School size={12} /> {hostel.university}
                                             </span>
                                         )}
-                                        <span className="bg-green-50 text-green-700 px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest flex items-center gap-1.5 border border-green-100">
-                                            <CheckCircle2 size={12} /> Verified Listing
-                                        </span>
+                                        {hostel.isVerifiedHostel ? (
+                                            <span className="bg-blue-600 text-white px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest flex items-center gap-1.5 border border-blue-400 shadow-sm">
+                                                <CheckCircle2 size={12} /> Verified by HostelGH
+                                            </span>
+                                        ) : (
+                                            <span className="bg-green-50 text-green-700 px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest flex items-center gap-1.5 border border-green-100">
+                                                <CheckCircle2 size={12} /> Verified Listing
+                                            </span>
+                                        )}
+                                        {hostel.virtualTourUrl && (
+                                            <a
+                                                href={hostel.virtualTourUrl}
+                                                target="_blank"
+                                                className="bg-purple-50 text-purple-700 px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest flex items-center gap-1.5 border border-purple-100 hover:bg-purple-100 transition-colors"
+                                            >
+                                                <Waves size={12} /> 360° Virtual Tour
+                                            </a>
+                                        )}
                                     </div>
                                     <h1 className="text-3xl font-black text-black tracking-tighter mb-2">{hostel.name}</h1>
                                     <div className="flex items-center gap-2 text-gray-500 text-sm font-medium">
@@ -164,7 +179,7 @@ export default function HostelDetailsPage() {
                                             <>
                                                 <span className="text-gray-300">•</span>
                                                 <span className="flex items-center gap-1 text-blue-600 font-bold uppercase text-[10px] tracking-widest bg-blue-50 px-2 py-0.5 rounded-md">
-                                                    <Clock size={10} /> {hostel.distanceToCampus}
+                                                    <Clock size={10} /> {hostel.distanceToCampus} from KNUST Main Gate
                                                 </span>
                                             </>
                                         )}
@@ -302,6 +317,41 @@ export default function HostelDetailsPage() {
                                     ))}
                                 </div>
                             )}
+                        </div>
+
+                        {/* Reviews Section */}
+                        <div className="pt-12 border-t">
+                            <h2 className="text-3xl font-black tracking-tight mb-8 flex items-center gap-3">
+                                <Star size={28} className="text-orange-400" />
+                                Guest Reviews
+                            </h2>
+                            <div className="grid md:grid-cols-2 gap-6">
+                                {hostel.reviews?.length > 0 ? (
+                                    hostel.reviews.map((r: any) => (
+                                        <div key={r.id} className="bg-gray-50 rounded-3xl p-6 border border-gray-100">
+                                            <div className="flex items-center gap-3 mb-4">
+                                                <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-bold">
+                                                    {r.tenant?.avatarUrl ? <img src={r.tenant.avatarUrl} className="rounded-full" /> : r.tenant?.firstName?.[0]}
+                                                </div>
+                                                <div>
+                                                    <p className="font-bold text-sm tracking-tight">{r.tenant?.firstName}</p>
+                                                    <div className="flex text-orange-400">
+                                                        {[...Array(5)].map((_, i) => (
+                                                            <Star key={i} size={10} className={i < r.rating ? "fill-current" : "text-gray-300"} />
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                                <span className="ml-auto text-[10px] font-bold text-gray-400 uppercase">{new Date(r.createdAt).toLocaleDateString()}</span>
+                                            </div>
+                                            <p className="text-gray-600 text-sm leading-relaxed">{r.comment}</p>
+                                        </div>
+                                    ))
+                                ) : (
+                                    <div className="col-span-2 text-center py-12 bg-gray-50 rounded-[2.5rem] border border-dashed text-gray-400 font-bold italic">
+                                        No reviews yet. Be the first to stay and review!
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     </div>
 

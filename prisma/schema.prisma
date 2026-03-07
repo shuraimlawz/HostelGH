@@ -76,6 +76,13 @@ enum HostelListingFeeModel {
   PER_ACCEPTANCE  // Fixed fee per accepted booking regardless of amount
 }
 
+enum DisputeStatus {
+  OPEN
+  RESOLVED
+  ESCALATED
+  REJECTED
+}
+
 model User {
   id           String   @id @default(cuid())
   email        String   @unique
@@ -97,6 +104,15 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  // Trust & Safety
+  isVerified      Boolean @default(false)
+  ghanaCardUrl    String?
+  ghanaCardId     String?
+  
+  // Community
+  lookingForRoommate Boolean @default(false)
+  roommateMatchingPrefs Json?
+
   // relations
   ownedHostels  Hostel[]       @relation("HostelOwner")
   bookings      Booking[]      @relation("BookingTenant")
@@ -109,6 +125,9 @@ model User {
   adminAuditLogs AdminAuditLog[]
   processedPayouts PayoutRequest[] @relation("PayoutProcessor")
   passwordResetTokens PasswordResetToken[]
+  reviews        Review[]
+  conversations  Conversation[]
+  messages       Message[]
 
   paystackSubaccountCode String? // For automated split payments
 
@@ -212,6 +231,11 @@ model Hostel {
 
   isPublished          Boolean  @default(false)
   pendingVerification  Boolean  @default(false) // Awaiting admin review before first publish
+  
+  // Trust & Safety
+  isVerifiedHostel     Boolean  @default(false)
+  virtualTourUrl       String?
+
   createdAt            DateTime @default(now())
   updatedAt            DateTime @updatedAt
 
@@ -220,6 +244,7 @@ model Hostel {
   facilities HostelFacility[]
   bookings   Booking[]
   wallets    Wallet[]
+  reviews    Review[]
 
   @@index([ownerId])
   @@index([city])
@@ -242,7 +267,8 @@ model HostelFacility {
 model Wallet {
   id        String   @id @default(cuid())
   ownerId   String   @unique
-  balance   Int      @default(0) // pesewas
+  balance   Int      @default(0) // pesewas (available for withdrawal)
+  pendingBalance Int @default(0) // pesewas (held in escrow)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -349,6 +375,8 @@ model Booking {
 
   items   BookingItem[]
   payment Payment?
+  installmentPlans InstallmentPlan[]
+  disputes Dispute[]
 
   @@index([hostelId])
   @@index([tenantId])
@@ -418,4 +446,68 @@ model AdminAuditLog {
   @@index([adminId])
   @@index([entityType])
   @@index([createdAt])
+}
+
+model Review {
+  id        String   @id @default(cuid())
+  rating    Int
+  comment   String?
+  tenantId  String
+  hostelId  String
+  createdAt DateTime @default(now())
+
+  tenant User   @relation(fields: [tenantId], references: [id])
+  hostel Hostel @relation(fields: [hostelId], references: [id])
+
+  @@index([hostelId])
+}
+
+model Conversation {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  participants User[]
+  messages     Message[]
+}
+
+model Message {
+  id             String   @id @default(cuid())
+  conversationId String
+  senderId       String
+  content        String
+  isRead         Boolean  @default(false)
+  createdAt      DateTime @default(now())
+
+  conversation Conversation @relation(fields: [conversationId], references: [id])
+  sender       User         @relation(fields: [senderId], references: [id])
+
+  @@index([conversationId])
+}
+
+model InstallmentPlan {
+  id        String   @id @default(cuid())
+  bookingId String
+  amount    Int      // pesewas
+  dueDate   DateTime
+  status    PaymentStatus @default(PENDING)
+  paidAt    DateTime?
+  
+  booking Booking @relation(fields: [bookingId], references: [id])
+
+  @@index([bookingId])
+}
+
+model Dispute {
+  id        String        @id @default(cuid())
+  bookingId String
+  reason    String
+  details   String?
+  status    DisputeStatus @default(OPEN)
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+
+  booking Booking @relation(fields: [bookingId], references: [id])
+
+  @@index([bookingId])
 }

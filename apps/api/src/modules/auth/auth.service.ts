@@ -327,4 +327,25 @@ export class AuthService {
 
     return { message: "Password updated successfully" };
   }
+
+  async impersonateUser(adminId: string, targetUserId: string) {
+    const admin = await this.prisma.user.findUnique({ where: { id: adminId } });
+    if (!admin || admin.role !== UserRole.ADMIN) {
+      throw new UnauthorizedException("Only admins can impersonate");
+    }
+
+    const targetUser = await this.prisma.user.findUnique({ where: { id: targetUserId } });
+    if (!targetUser) throw new BadRequestException("Target user not found");
+
+    this.logger.log(`Admin ${admin.email} is impersonating ${targetUser.email}`);
+
+    const tokens = await this.issueTokens(targetUser.id, targetUser.role);
+    return {
+      token: tokens.accessToken,
+      userId: targetUser.id,
+      user: { id: targetUser.id, email: targetUser.email, role: targetUser.role },
+      ...tokens,
+      isImpersonating: true,
+    };
+  }
 }

@@ -24,6 +24,9 @@ import { HttpExceptionFilter } from "./common/filters/http-exception.filter";
 import { LoggingMiddleware } from "./common/middleware/logging.middleware";
 
 import { EmailModule } from "./modules/email/email.module";
+import { ReviewsModule } from "./modules/reviews/reviews.module";
+
+import { ChatModule } from "./modules/chat/chat.module";
 
 import { AppController } from "./app.controller";
 
@@ -51,6 +54,8 @@ import { AppController } from "./app.controller";
     RedisModule,
     SubscriptionsModule,
     EmailModule,
+    ReviewsModule,
+    ChatModule,
     ScheduleModule.forRoot(),
     ThrottlerModule.forRoot([
       {

@@ -39,11 +39,21 @@ export default function HostelCard({ hostel }: { hostel: any }) {
                         <span className="text-xs font-semibold text-foreground">Guest favorite</span>
                     </div>
                 )}
-                
+
                 {/* Availability Badge */}
                 {hasAvailableRooms && (
                     <div className="absolute bottom-3 left-3 bg-white/95 backdrop-blur-sm px-2.5 py-1 rounded-md shadow-sm border border-border">
                         <span className="text-[10px] font-bold text-green-600 uppercase tracking-wider">Rooms available</span>
+                    </div>
+                )}
+
+                {/* Verified Badge */}
+                {hostel.isVerifiedHostel && (
+                    <div className="absolute bottom-3 right-3 bg-blue-600 text-white px-2.5 py-1 rounded-full shadow-lg border border-blue-400 flex items-center gap-1">
+                        <svg className="w-3 h-3 fill-current" viewBox="0 0 24 24">
+                            <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z" />
+                        </svg>
+                        <span className="text-[10px] font-bold uppercase tracking-tight">Verified</span>
                     </div>
                 )}
             </div>

@@ -23,7 +23,7 @@ export class PaymentsService {
     private readonly paystack: PaystackService,
     private readonly config: ConfigService,
     private readonly notifications: NotificationsService,
-  ) {}
+  ) { }
 
   async initPaystackPayment(
     actor: { userId: string; role: UserRole },
@@ -218,16 +218,19 @@ export class PaymentsService {
       }),
     ]);
 
-    // Increment owner wallet balance
+    // Increment owner wallet pending balance (Escrow)
     if (bookingRow.hostel.ownerId && payment?.ownerEarnings) {
       await this.prisma.wallet.upsert({
         where: { ownerId: bookingRow.hostel.ownerId },
         update: {
-          balance: { increment: payment.ownerEarnings },
+          // @ts-ignore
+          pendingBalance: { increment: payment.ownerEarnings },
         },
         create: {
           ownerId: bookingRow.hostel.ownerId,
-          balance: payment.ownerEarnings,
+          balance: 0,
+          // @ts-ignore
+          pendingBalance: payment.ownerEarnings,
           hostelId: bookingRow.hostelId,
         },
       });
@@ -396,5 +399,50 @@ export class PaymentsService {
         data: { status: PaymentStatus.FAILED },
       });
     }
+  }
+
+  async initInstallmentPayment(
+    actor: { userId: string; role: UserRole },
+    bookingId: string,
+    numberOfInstallments: number = 2,
+  ) {
+    const booking = await this.prisma.booking.findUnique({
+      where: { id: bookingId },
+      include: {
+        items: true,
+        tenant: true,
+        hostel: { include: { owner: true } },
+      },
+    });
+
+    if (!booking) throw new NotFoundException("Booking not found");
+    if (!(actor.role === UserRole.ADMIN || booking.tenantId === actor.userId)) {
+      throw new ForbiddenException("Not authorized");
+    }
+
+    const totalAmount = booking.items.reduce(
+      (sum, i) => sum + i.unitPrice * i.quantity,
+      0,
+    );
+    const installmentAmount = Math.ceil(totalAmount / numberOfInstallments);
+
+    // Create installment plans
+    for (let i = 0; i < numberOfInstallments; i++) {
+      const dueDate = new Date();
+      dueDate.setDate(dueDate.getDate() + i * 30);
+
+      // @ts-ignore
+      await this.prisma.installmentPlan.create({
+        data: {
+          bookingId: booking.id,
+          amount: installmentAmount,
+          dueDate,
+          status: PaymentStatus.PENDING,
+        },
+      });
+    }
+
+    // Initialize the first installment payment
+    return this.initPaystackPayment(actor, bookingId);
   }
 }
