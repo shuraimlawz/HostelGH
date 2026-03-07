@@ -4,6 +4,7 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import {
     Wifi,
     Wind,
@@ -20,7 +21,8 @@ import {
     School,
     DollarSign,
     MapPin,
-    Navigation
+    Navigation,
+    SlidersHorizontal
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
@@ -59,9 +61,10 @@ export default function HostelFilters() {
         setGender(params.get("gender") ?? "");
         setRoomConfig(params.get("roomConfig") ?? "");
         setMinPrice(params.get("minPrice") && !isNaN(parseInt(params.get("minPrice")!)) ? (parseInt(params.get("minPrice")!) / 100).toString() : "");
-        setMaxPrice(params.get("maxPrice") && !isNaN(parseInt(params.get("maxPrice")!)) ? (parseInt(params.get("maxPrice")!) / 100).toString() : "");
         setSelectedAmenities(params.get("amenities")?.split(",").filter(Boolean) ?? []);
     }, [params]);
+
+    const [isOpen, setIsOpen] = useState(false);
 
     const handleApply = () => {
         const p = new URLSearchParams();
@@ -75,6 +78,13 @@ export default function HostelFilters() {
         if (selectedAmenities.length > 0) p.set("amenities", selectedAmenities.join(","));
 
         router.push(`/hostels?${p.toString()}`);
+        setIsOpen(false);
+    };
+
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === "Enter") {
+            handleApply();
+        }
     };
 
     const toggleAmenity = (id: string) => {
@@ -93,167 +103,176 @@ export default function HostelFilters() {
         setMaxPrice("");
         setSelectedAmenities([]);
         router.push("/hostels");
+        setIsOpen(false);
     };
 
-    return (
-        <div className="w-full md:w-80 space-y-8 bg-white md:bg-gray-50/50 rounded-[2.5rem] md:p-8 md:border md:sticky md:top-24 h-fit">
-            <div className="flex items-center justify-between px-2 md:px-0">
-                <h3 className="font-bold text-xl">Filters</h3>
-                <button
-                    onClick={clearFilters}
-                    className="text-xs font-bold text-blue-600 hover:underline uppercase tracking-widest"
-                >
-                    Clear All
-                </button>
+    const filterContent = (
+        <div className="space-y-8">
+            {/* Location Filter */}
+            <div className="space-y-4">
+                <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 flex items-center gap-2">
+                    <MapPin size={14} className="text-blue-500" /> Location
+                </Label>
+                <div className="relative group">
+                    <Input
+                        value={city}
+                        onChange={(e) => setCity(e.target.value)}
+                        onKeyDown={handleKeyDown}
+                        className="rounded-2xl h-14 bg-white border-gray-100 shadow-sm shadow-gray-100/50 focus:ring-4 focus:ring-blue-50/50 focus:border-blue-200 transition-all font-bold text-gray-900 placeholder:text-gray-300"
+                        placeholder="e.g. Accra"
+                    />
+                </div>
             </div>
 
-            <div className="space-y-8">
-                {/* Location Filter */}
-                <div className="space-y-4">
-                    <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 flex items-center gap-2">
-                        <MapPin size={14} className="text-blue-500" /> Location
-                    </Label>
-                    <div className="relative group">
-                        <Input
-                            value={city}
-                            onChange={(e) => setCity(e.target.value)}
-                            className="rounded-2xl h-14 bg-white border-gray-100 shadow-sm shadow-gray-100/50 focus:ring-4 focus:ring-blue-50/50 focus:border-blue-200 transition-all font-bold text-gray-900 placeholder:text-gray-300"
-                            placeholder="e.g. Accra"
-                        />
+            {/* University Filter */}
+            <div className="space-y-4">
+                <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 flex items-center gap-2">
+                    <School size={14} className="text-purple-500" /> University
+                </Label>
+                <div className="relative">
+                    <select
+                        value={university}
+                        onChange={(e) => setUniversity(e.target.value)}
+                        className="w-full h-14 bg-white border border-gray-100 rounded-2xl px-5 outline-none focus:ring-4 focus:ring-blue-50/50 focus:border-blue-200 transition-all text-sm font-bold text-gray-900 shadow-sm shadow-gray-100/50 appearance-none cursor-pointer"
+                    >
+                        <option value="">Any University</option>
+                        {REGIONAL_UNIVERSITIES.map(group => (
+                            <optgroup key={group.region} label={group.region} className="font-black text-blue-600 bg-gray-50 uppercase tracking-widest text-[9px]">
+                                {group.unis.map(u => (
+                                    <option key={u} value={u} className="text-gray-900 bg-white font-bold">{u}</option>
+                                ))}
+                            </optgroup>
+                        ))}
+                    </select>
+                    <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
+                        <Layout size={14} />
                     </div>
                 </div>
+            </div>
 
-                {/* University Filter */}
-                <div className="space-y-4">
-                    <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 flex items-center gap-2">
-                        <School size={14} className="text-purple-500" /> University
-                    </Label>
-                    <div className="relative">
-                        <select
-                            value={university}
-                            onChange={(e) => setUniversity(e.target.value)}
-                            className="w-full h-14 bg-white border border-gray-100 rounded-2xl px-5 outline-none focus:ring-4 focus:ring-blue-50/50 focus:border-blue-200 transition-all text-sm font-bold text-gray-900 shadow-sm shadow-gray-100/50 appearance-none cursor-pointer"
+            {/* Gender Filter */}
+            <div className="space-y-4">
+                <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 flex items-center gap-2">
+                    <Users size={14} className="text-pink-500" /> Room For
+                </Label>
+                <div className="flex gap-3">
+                    {[
+                        { id: "MALE", label: "Boys", icon: User },
+                        { id: "FEMALE", label: "Girls", icon: UserCheck },
+                        { id: "MIXED", label: "Mixed", icon: Users }
+                    ].map((g) => (
+                        <button
+                            key={g.id}
+                            onClick={() => setGender(gender === g.id ? "" : g.id)}
+                            className={cn(
+                                "flex-1 flex flex-col items-center gap-3 py-4 rounded-2xl border transition-all active:scale-95",
+                                gender === g.id
+                                    ? "bg-gray-950 text-white border-gray-950 shadow-xl shadow-gray-200"
+                                    : "bg-white text-gray-500 border-gray-100 hover:border-gray-300 hover:bg-gray-50"
+                            )}
                         >
-                            <option value="">Any University</option>
-                            {REGIONAL_UNIVERSITIES.map(group => (
-                                <optgroup key={group.region} label={group.region} className="font-black text-blue-600 bg-gray-50 uppercase tracking-widest text-[9px]">
-                                    {group.unis.map(u => (
-                                        <option key={u} value={u} className="text-gray-900 bg-white font-bold">{u}</option>
-                                    ))}
-                                </optgroup>
-                            ))}
-                        </select>
-                        <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
-                            <Layout size={14} />
-                        </div>
+                            <g.icon size={18} className={cn(gender === g.id ? "text-blue-400" : "text-gray-400")} />
+                            <span className="text-[9px] font-black uppercase tracking-widest">{g.label}</span>
+                        </button>
+                    ))}
+                </div>
+            </div>
+
+            {/* Room Configuration Filter */}
+            <div className="space-y-4">
+                <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 flex items-center gap-2">
+                    <Layout size={14} className="text-orange-500" /> Configuration
+                </Label>
+                <div className="relative">
+                    <select
+                        value={roomConfig}
+                        onChange={(e) => setRoomConfig(e.target.value)}
+                        className="w-full h-14 bg-white border border-gray-100 rounded-2xl px-5 outline-none focus:ring-4 focus:ring-blue-50/50 focus:border-blue-200 transition-all text-sm font-bold text-gray-900 shadow-sm shadow-gray-100/50 appearance-none cursor-pointer"
+                    >
+                        <option value="">Any Configuration</option>
+                        <option value="1 in a room">1 in a room (Single)</option>
+                        <option value="2 in a room">2 in a room</option>
+                        <option value="3 in a room">3 in a room</option>
+                        <option value="4 in a room">4 in a room</option>
+                    </select>
+                    <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
+                        <Navigation size={14} />
                     </div>
                 </div>
+            </div>
 
-                {/* Gender Filter */}
-                <div className="space-y-4">
-                    <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 flex items-center gap-2">
-                        <Users size={14} className="text-pink-500" /> Room For
-                    </Label>
-                    <div className="flex gap-3">
-                        {[
-                            { id: "MALE", label: "Boys", icon: User },
-                            { id: "FEMALE", label: "Girls", icon: UserCheck },
-                            { id: "MIXED", label: "Mixed", icon: Users }
-                        ].map((g) => (
+            {/* Price Range */}
+            <div className="space-y-4">
+                <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 flex items-center gap-2">
+                    <DollarSign size={14} className="text-emerald-500" /> Price Range (₵)
+                </Label>
+                <div className="grid grid-cols-2 gap-4">
+                    <div className="relative">
+                        <Input
+                            type="number"
+                            value={minPrice}
+                            onChange={(e) => setMinPrice(e.target.value)}
+                            onKeyDown={handleKeyDown}
+                            className="rounded-2xl h-14 bg-white border-gray-100 shadow-sm focus:ring-4 focus:ring-emerald-50 focus:border-emerald-200 transition-all font-bold pl-8"
+                            placeholder="Min"
+                        />
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-300 font-bold text-xs">₵</span>
+                    </div>
+                    <div className="relative">
+                        <Input
+                            type="number"
+                            value={maxPrice}
+                            onChange={(e) => setMaxPrice(e.target.value)}
+                            onKeyDown={handleKeyDown}
+                            className="rounded-2xl h-14 bg-white border-gray-100 shadow-sm focus:ring-4 focus:ring-emerald-50 focus:border-emerald-200 transition-all font-bold pl-8"
+                            placeholder="Max"
+                        />
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-300 font-bold text-xs">₵</span>
+                    </div>
+                </div>
+            </div>
+
+            {/* Amenities */}
+            <div className="space-y-4">
+                <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Essential Amenities</Label>
+                <div className="grid grid-cols-2 gap-3">
+                    {AMENITIES.map((a) => {
+                        const isSelected = selectedAmenities.includes(a.id);
+                        return (
                             <button
-                                key={g.id}
-                                onClick={() => setGender(gender === g.id ? "" : g.id)}
+                                key={a.id}
+                                onClick={() => toggleAmenity(a.id)}
                                 className={cn(
-                                    "flex-1 flex flex-col items-center gap-3 py-4 rounded-2xl border transition-all active:scale-95",
-                                    gender === g.id
-                                        ? "bg-gray-950 text-white border-gray-950 shadow-xl shadow-gray-200"
-                                        : "bg-white text-gray-500 border-gray-100 hover:border-gray-300 hover:bg-gray-50"
+                                    "flex items-center gap-3 px-3 py-4 rounded-2xl border transition-all active:scale-95 min-h-[64px]",
+                                    isSelected
+                                        ? "bg-blue-600 text-white border-blue-600 shadow-lg shadow-blue-200 scale-[1.02] z-10"
+                                        : "bg-white text-gray-600 border-gray-100 hover:border-gray-300 hover:bg-gray-50"
                                 )}
                             >
-                                <g.icon size={18} className={cn(gender === g.id ? "text-blue-400" : "text-gray-400")} />
-                                <span className="text-[9px] font-black uppercase tracking-widest">{g.label}</span>
+                                <a.icon size={16} className={cn(isSelected ? "text-blue-200" : "text-gray-300")} />
+                                <span className="text-[9px] font-black uppercase tracking-[0.1em] text-left leading-tight break-words">{a.id}</span>
                             </button>
-                        ))}
-                    </div>
+                        );
+                    })}
                 </div>
+            </div>
+        </div>
+    );
 
-                {/* Room Configuration Filter */}
-                <div className="space-y-4">
-                    <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 flex items-center gap-2">
-                        <Layout size={14} className="text-orange-500" /> Configuration
-                    </Label>
-                    <div className="relative">
-                        <select
-                            value={roomConfig}
-                            onChange={(e) => setRoomConfig(e.target.value)}
-                            className="w-full h-14 bg-white border border-gray-100 rounded-2xl px-5 outline-none focus:ring-4 focus:ring-blue-50/50 focus:border-blue-200 transition-all text-sm font-bold text-gray-900 shadow-sm shadow-gray-100/50 appearance-none cursor-pointer"
-                        >
-                            <option value="">Any Configuration</option>
-                            <option value="1 in a room">1 in a room (Single)</option>
-                            <option value="2 in a room">2 in a room</option>
-                            <option value="3 in a room">3 in a room</option>
-                            <option value="4 in a room">4 in a room</option>
-                        </select>
-                        <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
-                            <Navigation size={14} />
-                        </div>
-                    </div>
+    return (
+        <>
+            {/* Desktop Sidebar Filter */}
+            <div className="hidden md:block w-80 space-y-8 bg-gray-50/50 rounded-[2.5rem] p-8 border sticky top-24 h-fit">
+                <div className="flex items-center justify-between">
+                    <h3 className="font-bold text-xl">Filters</h3>
+                    <button
+                        onClick={clearFilters}
+                        className="text-xs font-bold text-blue-600 hover:underline uppercase tracking-widest"
+                    >
+                        Clear All
+                    </button>
                 </div>
-
-                {/* Price Range */}
-                <div className="space-y-4">
-                    <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 flex items-center gap-2">
-                        <DollarSign size={14} className="text-emerald-500" /> Price Range (₵)
-                    </Label>
-                    <div className="grid grid-cols-2 gap-4">
-                        <div className="relative">
-                            <Input
-                                type="number"
-                                value={minPrice}
-                                onChange={(e) => setMinPrice(e.target.value)}
-                                className="rounded-2xl h-14 bg-white border-gray-100 shadow-sm focus:ring-4 focus:ring-emerald-50 focus:border-emerald-200 transition-all font-bold pl-8"
-                                placeholder="Min"
-                            />
-                            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-300 font-bold text-xs">₵</span>
-                        </div>
-                        <div className="relative">
-                            <Input
-                                type="number"
-                                value={maxPrice}
-                                onChange={(e) => setMaxPrice(e.target.value)}
-                                className="rounded-2xl h-14 bg-white border-gray-100 shadow-sm focus:ring-4 focus:ring-emerald-50 focus:border-emerald-200 transition-all font-bold pl-8"
-                                placeholder="Max"
-                            />
-                            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-300 font-bold text-xs">₵</span>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Amenities */}
-                <div className="space-y-4">
-                    <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Essential Amenities</Label>
-                    <div className="grid grid-cols-2 gap-3">
-                        {AMENITIES.map((a) => {
-                            const isSelected = selectedAmenities.includes(a.id);
-                            return (
-                                <button
-                                    key={a.id}
-                                    onClick={() => toggleAmenity(a.id)}
-                                    className={cn(
-                                        "flex items-center gap-3 px-3 py-4 rounded-2xl border transition-all active:scale-95 min-h-[64px]",
-                                        isSelected
-                                            ? "bg-blue-600 text-white border-blue-600 shadow-lg shadow-blue-200 scale-[1.02] z-10"
-                                            : "bg-white text-gray-600 border-gray-100 hover:border-gray-300 hover:bg-gray-50"
-                                    )}
-                                >
-                                    <a.icon size={16} className={cn(isSelected ? "text-blue-200" : "text-gray-300")} />
-                                    <span className="text-[9px] font-black uppercase tracking-[0.1em] text-left leading-tight break-words">{a.id}</span>
-                                </button>
-                            );
-                        })}
-                    </div>
-                </div>
-
+                {filterContent}
                 <Button
                     onClick={handleApply}
                     className="w-full rounded-2xl h-16 font-black uppercase tracking-[0.3em] bg-blue-600 text-white hover:bg-blue-700 hover:shadow-2xl hover:shadow-blue-500/30 transition-all active:scale-95 mt-4"
@@ -261,6 +280,39 @@ export default function HostelFilters() {
                     Apply Filters
                 </Button>
             </div>
-        </div>
+
+            {/* Mobile Bottom Sheet Filter (Airbnb style) */}
+            <div className="md:hidden w-full flex justify-end mb-4 px-2">
+                <Sheet open={isOpen} onOpenChange={setIsOpen}>
+                    <SheetTrigger asChild>
+                        <Button variant="outline" className="rounded-full shadow-md gap-2 border-gray-200 bg-white font-bold h-12 px-6">
+                            <SlidersHorizontal size={16} /> Filters
+                        </Button>
+                    </SheetTrigger>
+                    <SheetContent side="bottom" className="h-[90vh] rounded-t-[2rem] px-0 pb-0 overflow-hidden flex flex-col bg-white">
+                        <SheetHeader className="px-6 py-4 border-b flex-row justify-between items-center sticky top-0 bg-white z-10 shrink-0">
+                            <SheetTitle className="text-xl font-bold m-0">Filters</SheetTitle>
+                        </SheetHeader>
+                        <div className="flex-1 overflow-y-auto px-6 py-6 pb-24">
+                            {filterContent}
+                        </div>
+                        <div className="absolute bottom-0 left-0 right-0 p-4 bg-white border-t flex justify-between items-center z-20 shadow-[0_-10px_40px_rgba(0,0,0,0.05)]">
+                            <button
+                                onClick={clearFilters}
+                                className="font-bold underline text-sm hover:text-gray-600 transition-colors"
+                            >
+                                Clear all
+                            </button>
+                            <Button
+                                onClick={handleApply}
+                                className="bg-gray-900 hover:bg-black text-white rounded-xl px-8 py-6 font-bold text-md shadow-xl transition-all active:scale-95 border border-black"
+                            >
+                                Show places
+                            </Button>
+                        </div>
+                    </SheetContent>
+                </Sheet>
+            </div>
+        </>
     );
 }
