@@ -3,8 +3,8 @@ import { AuthService } from './auth.service';
 import { PrismaService } from '../../prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
-import * as bcrypt from 'bcrypt';
-jest.mock('bcrypt');
+import * as bcrypt from 'bcryptjs';
+jest.mock('bcryptjs');
 import { BadRequestException, UnauthorizedException } from '@nestjs/common';
 import { EmailService } from '../email/email.service';
 

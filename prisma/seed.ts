@@ -1,5 +1,5 @@
 import { PrismaClient, UserRole } from "@prisma/client";
-import * as bcrypt from "bcrypt";
+import * as bcrypt from "bcryptjs";
 
 // Safety: require explicit opt-in to run destructive seed
 if (process.env.FORCE_SEED !== "true") {

@@ -8,7 +8,7 @@ import { PrismaService } from "../../prisma/prisma.service";
 import { UserRole } from "@prisma/client";
 import { RegisterDto } from "./dto/register.dto";
 import { LoginDto } from "./dto/login.dto";
-import * as bcrypt from "bcrypt";
+import * as bcrypt from "bcryptjs";
 import { JwtService } from "@nestjs/jwt";
 import { ConfigService } from "@nestjs/config";
 import { randomBytes, createHash } from "crypto";
@@ -80,6 +80,9 @@ export class AuthService {
 
     if (!user.isActive)
       throw new UnauthorizedException("Account is inactive");
+
+    if (!user.passwordHash)
+      throw new UnauthorizedException("This account uses Google Sign-In. Please sign in with Google.");
 
     const ok = await bcrypt.compare(dto.password, user.passwordHash);
     if (!ok) throw new UnauthorizedException("Invalid email or password");

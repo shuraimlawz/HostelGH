@@ -5,7 +5,7 @@ import {
 } from "@nestjs/common";
 import { HostelsService } from "../hostels/hostels.service";
 import { PrismaService } from "../../prisma/prisma.service";
-import * as bcrypt from "bcrypt";
+import * as bcrypt from "bcryptjs";
 import { UserRole } from "@prisma/client";
 import { NotificationsService } from "../notifications/notifications.service";
 import { CreateInternalUserDto } from "./dto/create-internal-user.dto";

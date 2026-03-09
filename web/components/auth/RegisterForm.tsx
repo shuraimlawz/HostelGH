@@ -61,8 +61,11 @@ function RegisterContent({ onSuccess }: { onSuccess?: () => void }) {
                     duration: 5000,
                 });
             } else {
-                const message = error.response?.data?.message || "Registration failed. Please check your details.";
-                setErr(Array.isArray(message) ? message[0] : message);
+                const raw = error.response?.data?.message;
+                const message = (!raw || raw === "Internal server error")
+                    ? "Registration failed. Please try again later."
+                    : (Array.isArray(raw) ? raw[0] : raw);
+                setErr(message);
             }
         } finally {
             setLoading(false);

@@ -55,8 +55,11 @@ export default function LoginForm({ onSuccess }: { onSuccess?: (user: any) => vo
                     duration: 5000,
                 });
             } else {
-                const message = error.response?.data?.message || "Invalid email or password";
-                setErr(Array.isArray(message) ? message[0] : message);
+                const raw = error.response?.data?.message;
+                const message = (!raw || raw === "Internal server error")
+                    ? "Invalid email or password. Please check your credentials and try again."
+                    : (Array.isArray(raw) ? raw[0] : raw);
+                setErr(message);
             }
         } finally {
             setLoading(false);
