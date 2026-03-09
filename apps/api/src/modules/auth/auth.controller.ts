@@ -11,7 +11,9 @@ import {
   HttpStatus,
   BadRequestException,
 } from "@nestjs/common";
+import { Response, Request } from "express";
 import { AuthService } from "./auth.service";
+import { JwtService } from "@nestjs/jwt";
 import { UserRole } from "@prisma/client";
 import { RegisterDto } from "./dto/register.dto";
 import { LoginDto, RefreshTokenDto } from "./dto/login.dto";
@@ -32,13 +34,26 @@ export class AuthController {
   constructor(
     private readonly auth: AuthService,
     private readonly config: ConfigService,
+    private readonly jwtService: JwtService,
   ) { }
+
+  private setRefreshCookie(res: Response, refreshToken: string) {
+    res.cookie("refresh_token", refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+      path: "/auth/refresh",
+    });
+  }
 
   @Post("register")
   @ApiOperation({ summary: "Register a new user" })
   @ApiResponse({ status: 201, description: "User successfully registered" })
-  register(@Body() dto: RegisterDto) {
-    return this.auth.register(dto);
+  async register(@Body() dto: RegisterDto, @Res({ passthrough: true }) res: Response) {
+    const result = await this.auth.register(dto);
+    this.setRefreshCookie(res, result.refreshToken);
+    return result;
   }
 
   @Post("login")
@@ -48,8 +63,10 @@ export class AuthController {
     status: 200,
     description: "Returns access and refresh tokens",
   })
-  login(@Body() dto: LoginDto) {
-    return this.auth.login(dto);
+  async login(@Body() dto: LoginDto, @Res({ passthrough: true }) res: Response) {
+    const result = await this.auth.login(dto);
+    this.setRefreshCookie(res, result.refreshToken);
+    return result;
   }
 
   @ApiBearerAuth()
@@ -57,30 +74,53 @@ export class AuthController {
   @Post("logout")
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: "Logout and revoke refresh token" })
-  logout(@Req() req: any) {
+  async logout(@Req() req: any, @Res({ passthrough: true }) res: Response) {
+    res.clearCookie("refresh_token", { path: "/auth/refresh" });
     return this.auth.logout(req.user.userId);
   }
 
   @Post("refresh")
   @HttpCode(HttpStatus.OK)
-  refresh(@Body() dto: RefreshTokenDto) {
-    return this.auth.refresh(dto.userId, dto.refreshToken);
+  async refresh(@Req() req: Request, @Body() dto: RefreshTokenDto, @Res({ passthrough: true }) res: Response) {
+    // Read from HttpOnly cookie first (Web) -> fallback to Body (Mobile)
+    const token = req.cookies?.refresh_token || dto.refreshToken;
+    if (!token) throw new BadRequestException("Refresh token missing");
+
+    // Decode JWT token to figure out who is requesting the refresh silently
+    let userId = dto.userId;
+    if (!userId) {
+      try {
+        const decoded = this.jwtService.decode(token) as any;
+        userId = decoded?.sub;
+      } catch (e) {
+        throw new BadRequestException("Invalid refresh token payload");
+      }
+    }
+    if (!userId) throw new BadRequestException("UserId could not be determined");
+
+    const result = await this.auth.refresh(userId, token);
+    this.setRefreshCookie(res, result.refreshToken);
+    return result;
   }
 
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @Patch("onboard")
   @ApiOperation({ summary: "Complete onboarding role selection" })
-  onboard(@Req() req: any, @Body() body: { role: UserRole }) {
-    return this.auth.completeOnboarding(req.user.userId, body.role);
+  async onboard(@Req() req: any, @Body() body: { role: UserRole }, @Res({ passthrough: true }) res: Response) {
+    const result = await this.auth.completeOnboarding(req.user.userId, body.role);
+    this.setRefreshCookie(res, result.refreshToken);
+    return result;
   }
 
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @Patch("role")
   @ApiOperation({ summary: "Switch user account role (TENANT/OWNER)" })
-  switchRole(@Req() req: any, @Body() body: { role: UserRole }) {
-    return this.auth.switchRole(req.user.id, body.role);
+  async switchRole(@Req() req: any, @Body() body: { role: UserRole }, @Res({ passthrough: true }) res: Response) {
+    const result = await this.auth.switchRole(req.user.id, body.role);
+    this.setRefreshCookie(res, result.refreshToken);
+    return result;
   }
 
   @Get("google")
@@ -96,7 +136,12 @@ export class AuthController {
   async googleAuthCallback(@Req() req: any, @Res() res: any) {
     const result = await this.auth.validateGoogleUser(req.user);
     const frontendUrl = this.config.get<string>("app.frontendUrl");
-    const redirectUrl = `${frontendUrl}/auth/callback?accessToken=${result.accessToken}&refreshToken=${result.refreshToken}&userId=${result.user.id}&role=${result.user.role}&email=${result.user.email}&isOnboarded=${result.user.isOnboarded}`;
+
+    // Secure the refresh token
+    this.setRefreshCookie(res, result.refreshToken);
+
+    // Only pass access token and user metadata via URL, keeping the long-lived refresh token out of browser history
+    const redirectUrl = `${frontendUrl}/auth/callback?accessToken=${result.accessToken}&userId=${result.user.id}&role=${result.user.role}&email=${result.user.email}&isOnboarded=${result.user.isOnboarded}`;
     return res.redirect(redirectUrl);
   }
 

@@ -17,31 +17,48 @@ export class HttpExceptionFilter implements ExceptionFilter {
     const response = ctx.getResponse<Response>();
     const request = ctx.getRequest<Request>();
 
-    const status =
-      exception instanceof HttpException
-        ? exception.getStatus()
-        : HttpStatus.INTERNAL_SERVER_ERROR;
+    let status = HttpStatus.INTERNAL_SERVER_ERROR;
+    let message: string | string[] = "Internal server error";
 
-    const message =
-      exception instanceof HttpException
-        ? exception.getResponse()
-        : "Internal server error";
+    if (exception instanceof HttpException) {
+      status = exception.getStatus();
+      const res = exception.getResponse() as any;
+      message = res.message || exception.message;
+    }
+    // Handle Prisma errors mapping
+    else if ((exception as any)?.code === 'P2002') { // Prisma Client Known Request Error (Unique Constraint)
+      status = HttpStatus.CONFLICT;
+      const target = ((exception as any)?.meta?.target as string[])?.join(", ") || "field";
+      message = `This ${target} is already in use.`;
+    }
+    // Handle JWT & Token errors
+    else if (exception instanceof Error) {
+      if (exception.name === 'TokenExpiredError') {
+        status = HttpStatus.UNAUTHORIZED;
+        message = "Session expired. Please log in again.";
+      } else if (exception.name === 'JsonWebTokenError') {
+        status = HttpStatus.UNAUTHORIZED;
+        message = "Invalid authentication token.";
+      } else {
+        message = process.env.NODE_ENV === "development" ? exception.message : "Internal server error";
+      }
+    }
+
+    // Flatten Zod arrays if any and format the raw message
+    const finalMessage = typeof message === "string"
+      ? message
+      : (Array.isArray(message) ? message[0] : (message as any)?.message || "Internal server error");
 
     this.logger.error(
-      `Http Status: ${status} Error: ${JSON.stringify(message)}`,
-      status === HttpStatus.INTERNAL_SERVER_ERROR && exception instanceof Error
-        ? exception.stack
-        : "",
+      `Http Status: ${status} Error: ${finalMessage}`,
+      status === HttpStatus.INTERNAL_SERVER_ERROR && exception instanceof Error ? exception.stack : "",
     );
 
     response.status(status).json({
       statusCode: status,
       timestamp: new Date().toISOString(),
       path: request.url,
-      message:
-        typeof message === "object"
-          ? (message as any).message || message
-          : message,
+      message: finalMessage,
     });
   }
 }

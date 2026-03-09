@@ -13,6 +13,7 @@ import { JwtService } from "@nestjs/jwt";
 import { ConfigService } from "@nestjs/config";
 import { randomBytes, createHash } from "crypto";
 import { EmailService } from "../email/email.service";
+import { AdminAuditLogService, AdminAction, AdminEntity } from "../admin/admin-audit.service";
 
 function sha256(input: string) {
   return createHash("sha256").update(input).digest("hex");
@@ -27,6 +28,7 @@ export class AuthService {
     private readonly jwt: JwtService,
     private readonly config: ConfigService,
     private readonly emailService: EmailService,
+    private readonly auditLogger: AdminAuditLogService,
   ) { }
 
   async register(dto: RegisterDto) {
@@ -72,20 +74,44 @@ export class AuthService {
   }
 
   async login(dto: LoginDto) {
-    const user = await this.prisma.user.findUnique({
-      where: { email: dto.email },
+    // Find by email or phone depending on what was provided
+    const user = await this.prisma.user.findFirst({
+      where: {
+        OR: [
+          ...(dto.email ? [{ email: dto.email }] : []),
+          ...(dto.phone ? [{ phone: dto.phone }] : [])
+        ]
+      },
     });
-    if (!user)
+    if (!user) {
+      await this.auditLogger.log(null, AdminAction.LOGIN_FAILED, AdminEntity.USER, null, "Failed login attempt: Account not found");
       throw new UnauthorizedException("Invalid email or password");
+    }
 
-    if (!user.isActive)
+    if (!user.isActive) {
+      await this.auditLogger.log(null, AdminAction.LOGIN_FAILED, AdminEntity.USER, user.id, "Failed login attempt: Account suspended");
       throw new UnauthorizedException("Account is inactive");
+    }
 
-    if (!user.passwordHash)
+    if (!user.passwordHash) {
+      await this.auditLogger.log(null, AdminAction.LOGIN_FAILED, AdminEntity.USER, user.id, "Failed login attempt: Google Account needs Google OAuth");
       throw new UnauthorizedException("This account uses Google Sign-In. Please sign in with Google.");
+    }
 
     const ok = await bcrypt.compare(dto.password, user.passwordHash);
-    if (!ok) throw new UnauthorizedException("Invalid email or password");
+    if (!ok) {
+      await this.auditLogger.log(null, AdminAction.LOGIN_FAILED, AdminEntity.USER, user.id, "Failed login attempt: Invalid password");
+      throw new UnauthorizedException("Invalid email or password");
+    }
+
+    await this.auditLogger.log(
+      null,
+      AdminAction.LOGIN_SUCCESS,
+      AdminEntity.USER,
+      user.id,
+      "User logged in successfully",
+      { role: user.role }
+    );
 
     const tokens = await this.issueTokens(user.id, user.role);
     return {
@@ -94,6 +120,14 @@ export class AuthService {
       user: { id: user.id, email: user.email, role: user.role },
       ...tokens,
     };
+  }
+
+  /**
+   * Mock implementation for Ghana-specific MNO OTP verification
+   */
+  async verifyGhanaOTP(phone: string, otp: string) {
+    this.logger.log(`[MOCK SMS] Verified OTP ${otp} for phone ${phone} via Arkesel/Hubtel`);
+    return true;
   }
 
   async refresh(userId: string, refreshToken: string) {

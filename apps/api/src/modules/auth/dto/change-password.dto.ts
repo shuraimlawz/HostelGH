@@ -1,15 +1,9 @@
-import { IsNotEmpty, IsString, MinLength } from "class-validator";
-import { ApiProperty } from "@nestjs/swagger";
+import { createZodDto } from "nestjs-zod";
+import { z } from "zod";
 
-export class ChangePasswordDto {
-  @ApiProperty()
-  @IsString()
-  @IsNotEmpty()
-  oldPassword: string;
+export const ChangePasswordSchema = z.object({
+  oldPassword: z.string().min(1, "Old password is required"),
+  newPassword: z.string().min(6, "Password must be at least 6 characters long"),
+});
 
-  @ApiProperty()
-  @IsString()
-  @IsNotEmpty()
-  @MinLength(6, { message: "Password must be at least 6 characters long" })
-  newPassword: string;
-}
+export class ChangePasswordDto extends createZodDto(ChangePasswordSchema) { }

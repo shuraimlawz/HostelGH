@@ -14,6 +14,9 @@ export enum AdminAction {
   UNSUSPEND = "UNSUSPEND",
   VERIFY = "VERIFY",
   SYSTEM = "SYSTEM",
+  LOGIN_SUCCESS = "LOGIN_SUCCESS",
+  LOGIN_FAILED = "LOGIN_FAILED",
+  PASSWORD_CHANGE = "PASSWORD_CHANGE",
 }
 
 export enum AdminEntity {
@@ -30,7 +33,7 @@ export enum AdminEntity {
 export class AdminAuditLogService {
   private readonly logger = new Logger(AdminAuditLogService.name);
 
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) { }
 
   /**
    * Log an admin action safely.

@@ -7,9 +7,13 @@
     "start:prod": "cd ../.. && node dist/apps/api/src/main"
   },
   "dependencies": {
-    "nodemailer": "^8.0.1"
+    "cookie-parser": "^1.4.7",
+    "nestjs-zod": "^5.1.1",
+    "nodemailer": "^8.0.1",
+    "zod": "^4.3.6"
   },
   "devDependencies": {
+    "@types/cookie-parser": "^1.4.10",
     "@types/nodemailer": "^7.0.11"
   }
 }
