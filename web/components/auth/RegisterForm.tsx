@@ -62,10 +62,16 @@ function RegisterContent({ onSuccess }: { onSuccess?: () => void }) {
                 });
             } else {
                 const raw = error.response?.data?.message;
+                const errorName = error.response?.data?.error || error.name;
                 const message = (!raw || raw === "Internal server error")
-                    ? "Registration failed. Please try again later."
+                    ? `Registration failed: ${errorName || "Unknown Error"}`
                     : (Array.isArray(raw) ? raw[0] : raw);
                 setErr(message);
+                console.error("[Registration Diagnostic]", {
+                    status: error.response?.status,
+                    data: error.response?.data,
+                    message: error.message
+                });
             }
         } finally {
             setLoading(false);

@@ -43,9 +43,10 @@ export class HttpExceptionFilter implements ExceptionFilter {
         message = "Invalid authentication token.";
       } else {
         // In production, give a slightly more useful hint for 500s that still hides sensitive paths
+        const errorName = exception.constructor.name || exception.name;
         message = process.env.NODE_ENV === "development"
           ? exception.message
-          : `Internal server error (${exception.name})`;
+          : `Internal server error (${errorName})`;
       }
     }
 

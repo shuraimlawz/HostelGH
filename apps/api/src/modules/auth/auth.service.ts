@@ -31,56 +31,66 @@ export class AuthService {
     private readonly auditLogger: AdminAuditLogService,
   ) { }
 
+  onModuleInit() {
+    const accessSecret = this.config.get<string>("jwt.accessSecret");
+    const refreshSecret = this.config.get<string>("jwt.refreshSecret");
+    
+    this.logger.log(`[Auth Audit] JWT Access Secret: ${accessSecret ? accessSecret.length + " chars" : "MISSING"}`);
+    this.logger.log(`[Auth Audit] JWT Refresh Secret: ${refreshSecret ? refreshSecret.length + " chars" : "MISSING"}`);
+  }
+
   async register(dto: RegisterDto) {
-    try {
-      if (dto.role === UserRole.ADMIN) {
-        throw new BadRequestException(
-          "Cannot register as an ADMIN via public endpoint",
-        );
+    return this.prisma.$transaction(async (tx) => {
+      try {
+        if (dto.role === UserRole.ADMIN) {
+          throw new BadRequestException(
+            "Cannot register as an ADMIN via public endpoint",
+          );
+        }
+        const exists = await tx.user.findUnique({
+          where: { email: dto.email },
+        });
+        if (exists) throw new BadRequestException("Email already in use");
+
+        const passwordHash = await bcrypt.hash(dto.password, 12);
+        const user = await tx.user.create({
+          data: {
+            email: dto.email,
+            passwordHash,
+            role: dto.role as UserRole,
+            firstName: dto.firstName,
+            lastName: dto.lastName,
+            phone: dto.phone,
+            gender: dto.gender as any,
+          },
+          select: {
+            id: true,
+            email: true,
+            role: true,
+            firstName: true,
+            lastName: true,
+            phone: true,
+            gender: true,
+          },
+        });
+
+        this.logger.log(`User created: ${user.id} (${user.email})`);
+
+        const tokens = await this.issueTokens(user.id, user.role, tx);
+
+        this.logger.log(`Tokens issued for: ${user.id}`);
+
+        return {
+          token: tokens.accessToken,
+          userId: user.id,
+          user,
+          ...tokens,
+        };
+      } catch (error) {
+        this.logger.error(`Registration failed for ${dto.email}: ${error.message}`, error.stack);
+        throw error;
       }
-      const exists = await this.prisma.user.findUnique({
-        where: { email: dto.email },
-      });
-      if (exists) throw new BadRequestException("Email already in use");
-
-      const passwordHash = await bcrypt.hash(dto.password, 12);
-      const user = await this.prisma.user.create({
-        data: {
-          email: dto.email,
-          passwordHash,
-          role: dto.role as UserRole,
-          firstName: dto.firstName,
-          lastName: dto.lastName,
-          phone: dto.phone,
-          gender: dto.gender as any, // Cast to any or UserGender if imported
-        },
-        select: {
-          id: true,
-          email: true,
-          role: true,
-          firstName: true,
-          lastName: true,
-          phone: true,
-          gender: true,
-        },
-      });
-
-      this.logger.log(`User created: ${user.id} (${user.email})`);
-
-      const tokens = await this.issueTokens(user.id, user.role);
-
-      this.logger.log(`Tokens issued for: ${user.id}`);
-
-      return {
-        token: tokens.accessToken,
-        userId: user.id,
-        user,
-        ...tokens,
-      };
-    } catch (error) {
-      this.logger.error(`Registration failed for ${dto.email}: ${error.message}`, error.stack);
-      throw error;
-    }
+    });
   }
 
   async login(dto: LoginDto) {
@@ -335,7 +345,9 @@ export class AuthService {
     return { message: "Password has been successfully reset." };
   }
 
-  private async issueTokens(userId: string, role: string) {
+  private async issueTokens(userId: string, role: string, tx?: any) {
+    const prisma = tx || this.prisma;
+    
     const accessToken = await this.jwt.signAsync(
       { sub: userId, role },
       {
@@ -348,7 +360,7 @@ export class AuthService {
     const refreshHash = sha256(refreshPlain);
 
     const expiresAt = new Date(Date.now() + 1000 * 60 * 60 * 24 * 30); // 30 days
-    await this.prisma.refreshToken.create({
+    await prisma.refreshToken.create({
       data: { userId, tokenHash: refreshHash, expiresAt },
     });
 
