@@ -1,5 +1,6 @@
 import { NestFactory } from "@nestjs/core";
 import { AppModule } from "./app.module";
+// Build trigger: Production Auth Fix - March 10
 import { PrismaService } from "./prisma/prisma.service";
 import * as bodyParser from "body-parser";
 import { ValidationPipe, Logger } from "@nestjs/common";
