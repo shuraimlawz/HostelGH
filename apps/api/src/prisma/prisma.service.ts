@@ -8,12 +8,14 @@ export class PrismaService
   extends PrismaClient
   implements OnModuleInit, OnModuleDestroy {
   constructor() {
-    // pg-connection-string forces strict cert verification if it sees sslmode=require, 
-    // completely ignoring our custom 'ssl' configuration override unless we strip it out.
-    const connectionString = process.env.DATABASE_URL
-      ?.replace("?sslmode=require", "")
-      ?.replace("&sslmode=require", "?") // Fixes query string joining if it was the first param
-      ?.replace("?pgbouncer=true?", "?pgbouncer=true"); // Cleanup just in case
+    let connectionString = process.env.DATABASE_URL || "";
+
+    // Remove sslmode=require if present to avoid dual-validation conflicts with node-postgres and Prisma
+    const url = new URL(connectionString);
+    if (url.searchParams.has("sslmode")) {
+      url.searchParams.delete("sslmode");
+    }
+    connectionString = url.toString();
 
     const pool = new Pool({
       connectionString,

@@ -7,6 +7,7 @@ import * as cookieParser from "cookie-parser";
 import helmet from "helmet";
 import { HttpExceptionFilter } from "./common/filters/http-exception.filter";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
+import { HybridValidationPipe } from "./common/pipes/validation.pipe";
 
 async function bootstrap() {
   const logger = new Logger("Bootstrap");
@@ -39,13 +40,7 @@ async function bootstrap() {
 
   app.use(cookieParser());
 
-  app.useGlobalPipes(
-    new ValidationPipe({
-      whitelist: true,
-      forbidNonWhitelisted: true,
-      transform: true,
-    }),
-  );
+  app.useGlobalPipes(new HybridValidationPipe());
 
   app.useGlobalFilters(new HttpExceptionFilter());
 
