@@ -11,18 +11,16 @@ export class EmailService implements OnModuleInit {
 
     async onModuleInit() {
         const isProduction = this.config.get<string>("NODE_ENV") === "production";
-        
+
         if (isProduction) {
             // Use production SMTP configuration
             const smtpHost = this.config.get<string>("SMTP_HOST");
             const smtpPort = this.config.get<number>("SMTP_PORT");
             const smtpUser = this.config.get<string>("SMTP_USER");
             const smtpPass = this.config.get<string>("SMTP_PASSWORD");
-            
+
             if (!smtpHost || !smtpUser || !smtpPass) {
-                if (!smtpHost) this.logger.warn("SMTP_HOST not configured, falling back to test account");
-                if (!smtpUser) this.logger.warn("SMTP_USER not configured, falling back to test account");
-                if (!smtpPass) this.logger.warn("SMTP_PASSWORD not configured, falling back to test account");
+                this.logger.warn("SMTP configuration incomplete (Host/User/Pass). Falling back to development test account (Ethereal).");
             }
 
             if (smtpHost && smtpUser && smtpPass) {
@@ -73,12 +71,12 @@ export class EmailService implements OnModuleInit {
         try {
             const info = await this.transporter.sendMail(mailOptions);
             this.logger.log(`Email sent to ${options.to}`);
-            
+
             // Log test URL in development
             if (info.messageId?.includes("ethereal")) {
                 this.logger.log(`Preview: ${nodemailer.getTestMessageUrl(info)}`);
             }
-            
+
             return true;
         } catch (error) {
             this.logger.error(`Failed to send email to ${options.to}`, error);

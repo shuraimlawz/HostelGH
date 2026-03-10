@@ -9,15 +9,16 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
   constructor(private configService: ConfigService) { }
 
   async onModuleInit() {
-    const url =
-      this.configService.get<string>("redis.url") || process.env.REDIS_URL;
-    const host =
-      this.configService.get<string>("redis.host") ||
-      process.env.REDIS_HOST ||
-      "localhost";
-    const port =
-      this.configService.get<number>("redis.port") ||
-      parseInt(process.env.REDIS_PORT || "6379");
+    const url = this.configService.get<string>("redis.url") || process.env.REDIS_URL;
+    const host = this.configService.get<string>("redis.host") || process.env.REDIS_HOST;
+    const port = this.configService.get<number>("redis.port") || parseInt(process.env.REDIS_PORT || "6379");
+
+    const hasConfig = !!(url || (host && host !== "localhost"));
+
+    if (!hasConfig) {
+      console.log("[Redis] No configuration found, skipping initialization");
+      return;
+    }
 
     const options = {
       lazyConnect: true,
@@ -39,11 +40,7 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
     }
 
     this.client.on("error", (err) => {
-      // Only log errors if we've explicitly provided a URL or Host (ignoring 'localhost' default)
-      const hasConfig = process.env.REDIS_URL || (process.env.REDIS_HOST && process.env.REDIS_HOST !== 'localhost');
-      if (hasConfig) {
-        console.error("[Redis] Connection Error:", err.message);
-      }
+      console.error("[Redis] Connection Error:", err.message);
     });
 
     try {
