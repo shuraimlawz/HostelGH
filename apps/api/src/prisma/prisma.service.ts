@@ -10,12 +10,18 @@ export class PrismaService
   constructor() {
     let connectionString = process.env.DATABASE_URL || "";
 
-    // Remove sslmode=require if present to avoid dual-validation conflicts with node-postgres and Prisma
-    const url = new URL(connectionString);
-    if (url.searchParams.has("sslmode")) {
-      url.searchParams.delete("sslmode");
+    try {
+      if (connectionString) {
+        // Remove sslmode=require if present to avoid dual-validation conflicts with node-postgres and Prisma
+        const url = new URL(connectionString);
+        if (url.searchParams.has("sslmode")) {
+          url.searchParams.delete("sslmode");
+        }
+        connectionString = url.toString();
+      }
+    } catch (e) {
+      console.error("[Prisma] Failed to parse DATABASE_URL, using raw string:", e.message);
     }
-    connectionString = url.toString();
 
     const pool = new Pool({
       connectionString,

@@ -6,7 +6,7 @@ import Redis from "ioredis";
 export class RedisService implements OnModuleInit, OnModuleDestroy {
   private client: Redis;
 
-  constructor(private configService: ConfigService) {}
+  constructor(private configService: ConfigService) { }
 
   async onModuleInit() {
     const url =
@@ -39,7 +39,11 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
     }
 
     this.client.on("error", (err) => {
-      console.error("[Redis] Connection Error:", err.message);
+      // Only log errors if we've explicitly provided a URL or Host (ignoring 'localhost' default)
+      const hasConfig = process.env.REDIS_URL || (process.env.REDIS_HOST && process.env.REDIS_HOST !== 'localhost');
+      if (hasConfig) {
+        console.error("[Redis] Connection Error:", err.message);
+      }
     });
 
     try {

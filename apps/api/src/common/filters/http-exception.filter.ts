@@ -33,6 +33,8 @@ export class HttpExceptionFilter implements ExceptionFilter {
     }
     // Handle JWT & Token errors
     else if (exception instanceof Error) {
+      this.logger.error(`Unhandled Exception: ${exception.name} - ${exception.message}`, exception.stack);
+
       if (exception.name === 'TokenExpiredError') {
         status = HttpStatus.UNAUTHORIZED;
         message = "Session expired. Please log in again.";
@@ -40,7 +42,10 @@ export class HttpExceptionFilter implements ExceptionFilter {
         status = HttpStatus.UNAUTHORIZED;
         message = "Invalid authentication token.";
       } else {
-        message = process.env.NODE_ENV === "development" ? exception.message : "Internal server error";
+        // In production, give a slightly more useful hint for 500s that still hides sensitive paths
+        message = process.env.NODE_ENV === "development"
+          ? exception.message
+          : `Internal server error (${exception.name})`;
       }
     }
 
