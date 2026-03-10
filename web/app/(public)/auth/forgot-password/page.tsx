@@ -3,9 +3,8 @@
 import { useState } from "react";
 import { api } from "@/lib/api";
 import { toast } from "sonner";
-import { ArrowLeft, AlertCircle, CheckCircle2, Mail, Sparkles } from "lucide-react";
+import { ArrowLeft, AlertCircle, CheckCircle2, Mail } from "lucide-react";
 import Link from "next/link";
-import { cn } from "@/lib/utils";
 import LogoAnimation from "@/components/layout/LogoAnimation";
 
 export default function ForgotPasswordPage() {
@@ -33,7 +32,6 @@ export default function ForgotPasswordPage() {
 
     return (
         <div className="min-h-screen bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-blue-50 via-white to-cyan-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8 relative overflow-hidden">
-            {/* Ambient Background Elements */}
             <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-400/10 rounded-full blur-[120px] animate-pulse"></div>
             <div className="absolute bottom-[-10%] right-[-10%] w-[30%] h-[30%] bg-cyan-400/10 rounded-full blur-[100px] animate-pulse [animation-delay:2s]"></div>
 
@@ -56,16 +54,12 @@ export default function ForgotPasswordPage() {
 
             <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-[480px] relative z-10">
                 <div className="bg-white/80 backdrop-blur-2xl py-12 px-6 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.08)] sm:rounded-[3rem] sm:px-12 border border-white/40 relative overflow-hidden">
-                    {/* Interior Shimmer */}
                     <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-blue-500/20 to-transparent"></div>
 
                     {success ? (
                         <div className="text-center space-y-8 animate-in fade-in zoom-in-95 duration-500">
-                            <div className="relative inline-flex mb-4">
-                                <div className="absolute inset-0 bg-green-400/20 rounded-full blur-xl scale-150 animate-pulse"></div>
-                                <div className="w-20 h-20 bg-gradient-to-br from-green-50 to-green-100 rounded-full flex items-center justify-center mx-auto relative border border-green-200 shadow-inner">
-                                    <CheckCircle2 className="w-10 h-10 text-green-500" />
-                                </div>
+                            <div className="w-20 h-20 bg-gradient-to-br from-green-50 to-green-100 rounded-full flex items-center justify-center mx-auto relative border border-green-200">
+                                <CheckCircle2 className="w-10 h-10 text-green-500" />
                             </div>
                             
                             <div className="space-y-3">
@@ -135,9 +129,6 @@ export default function ForgotPasswordPage() {
                                             Secure Recovery Link
                                         </div>
                                     )}
-                                    {!loading && (
-                                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12 translate-x-[-150%] group-hover:animate-[shimmer_2s_infinite]"></div>
-                                    )}
                                 </button>
                                 
                                 <p className="mt-8 text-center text-xs font-bold text-gray-400 tracking-wide">
@@ -151,6 +142,14 @@ export default function ForgotPasswordPage() {
                     )}
                 </div>
             </div>
+            
+            <style jsx>{`
+                @keyframes shimmer {
+                    100% {
+                        translate: 150%;
+                    }
+                }
+            `}</style>
         </div>
     );
 }
