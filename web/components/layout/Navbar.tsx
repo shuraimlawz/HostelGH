@@ -4,9 +4,24 @@ import { useState, useRef, useEffect, Suspense } from "react";
 import Link from "next/link";
 import { useAuth } from "@/lib/auth-context";
 import LogoAnimation from "./LogoAnimation";
-import { Menu, User as UserIcon, Globe } from "lucide-react";
+import { 
+    Menu, 
+    User as UserIcon, 
+    Globe, 
+    LayoutDashboard, 
+    Home, 
+    Users, 
+    Calendar, 
+    CreditCard, 
+    BarChart, 
+    Activity, 
+    Settings,
+    LogOut,
+    Building2,
+    Wallet
+} from "lucide-react";
 import { useAuthModal } from "@/components/auth/AuthModalProvider";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import RegionSelector from "./RegionSelector";
 import { cn } from "@/lib/utils";
 
@@ -16,6 +31,45 @@ export default function Navbar() {
     const [isOpen, setIsOpen] = useState(false);
     const menuRef = useRef<HTMLDivElement>(null);
     const router = useRouter();
+    const pathname = usePathname();
+
+    // Define navigation items based on role
+    const getNavItems = () => {
+        if (!user) return [];
+
+        if (user.role === "ADMIN") {
+            return [
+                { label: "Dashboard", href: "/admin", icon: LayoutDashboard },
+                { label: "Hostels", href: "/admin/hostels", icon: Building2 },
+                { label: "Users", href: "/admin/users", icon: Users },
+                { label: "Bookings", href: "/admin/bookings", icon: Calendar },
+                { label: "Payments", href: "/admin/payments", icon: CreditCard },
+                { label: "Analytics", href: "/admin/stats", icon: BarChart },
+                { label: "System Logs", href: "/admin/logs", icon: Activity },
+                { label: "Settings", href: "/admin/settings", icon: Settings },
+            ];
+        }
+
+        if (user.role === "OWNER") {
+            return [
+                { label: "Dashboard", href: "/owner", icon: LayoutDashboard },
+                { label: "My Hostels", href: "/owner/hostels", icon: Home },
+                { label: "My Rooms", href: "/owner/rooms", icon: Building2 },
+                { label: "Reservation List", href: "/owner/bookings", icon: Calendar },
+                { label: "Payouts", href: "/owner/payouts", icon: Wallet },
+                { label: "Subscription", href: "/owner/subscription", icon: CreditCard },
+                { label: "Profile Settings", href: "/owner/account", icon: UserIcon },
+            ];
+        }
+
+        return [
+            { label: "Dashboard", href: "/tenant", icon: LayoutDashboard },
+            { label: "My Bookings", href: "/tenant/bookings", icon: Calendar },
+            { label: "My Account", href: "/account", icon: UserIcon },
+        ];
+    };
+
+    const navItems = getNavItems();
 
     // Close menu when clicking outside
     useEffect(() => {
@@ -128,31 +182,34 @@ export default function Navbar() {
                                 {user ? (
                                     <>
                                         <div className="border-t border-black/5 my-2 mx-5" />
-                                        <div className="px-5 py-3 border-b border-black/5 mb-2 bg-zinc-50/50">
+                                        <div className="px-5 py-3 border-b border-black/5 mb-1 bg-zinc-50/50">
                                             <div className="font-bold text-sm truncate text-foreground">{user.email}</div>
                                             <div className="text-[10px] font-bold text-muted-foreground mt-0.5 uppercase tracking-widest">{user.role.toLowerCase()} Account</div>
                                         </div>
 
-                                        <Link
-                                            href={user.role === "ADMIN" ? "/admin" : user.role === "OWNER" ? "/owner" : "/account"}
-                                            className="block px-5 py-2.5 hover:bg-zinc-50 text-sm font-bold text-foreground transition-colors"
-                                            onClick={() => setIsOpen(false)}
-                                        >
-                                            {user.role === "ADMIN" ? "Admin Dashboard" : user.role === "OWNER" ? "Owner Dashboard" : "My Account"}
-                                        </Link>
-                                        <div className="border-t border-black/5 my-2 mx-5" />
-                                        <Link
-                                            href={user.role === "OWNER" ? "/owner/bookings" : "/bookings"}
-                                            className="block px-5 py-2.5 hover:bg-zinc-50 text-sm font-medium transition-colors"
-                                            onClick={() => setIsOpen(false)}
-                                        >
-                                            My Bookings
-                                        </Link>
+                                        <div className="max-h-[60vh] overflow-y-auto">
+                                            {navItems.map((item) => (
+                                                <Link
+                                                    key={item.href}
+                                                    href={item.href}
+                                                    className={cn(
+                                                        "flex items-center gap-3 px-5 py-2.5 hover:bg-zinc-50 text-sm font-bold transition-colors",
+                                                        pathname === item.href ? "text-[#1877F2] bg-blue-50/50" : "text-foreground"
+                                                    )}
+                                                    onClick={() => setIsOpen(false)}
+                                                >
+                                                    <item.icon size={16} className={cn(pathname === item.href ? "text-[#1877F2]" : "text-muted-foreground")} />
+                                                    {item.label}
+                                                </Link>
+                                            ))}
+                                        </div>
+
                                         <div className="border-t border-black/5 my-2 mx-5" />
                                         <button
                                             onClick={handleLogout}
-                                            className="w-full text-left px-5 py-2.5 hover:bg-red-50 hover:text-red-600 font-medium text-sm transition-colors flex items-center gap-2"
+                                            className="w-full text-left px-5 py-2.5 hover:bg-red-50 hover:text-red-600 font-bold text-sm transition-colors flex items-center gap-3"
                                         >
+                                            <LogOut size={16} />
                                             Log out
                                         </button>
                                     </>
