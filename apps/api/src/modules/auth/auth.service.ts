@@ -32,45 +32,55 @@ export class AuthService {
   ) { }
 
   async register(dto: RegisterDto) {
-    if (dto.role === UserRole.ADMIN) {
-      throw new BadRequestException(
-        "Cannot register as an ADMIN via public endpoint",
-      );
+    try {
+      if (dto.role === UserRole.ADMIN) {
+        throw new BadRequestException(
+          "Cannot register as an ADMIN via public endpoint",
+        );
+      }
+      const exists = await this.prisma.user.findUnique({
+        where: { email: dto.email },
+      });
+      if (exists) throw new BadRequestException("Email already in use");
+
+      const passwordHash = await bcrypt.hash(dto.password, 12);
+      const user = await this.prisma.user.create({
+        data: {
+          email: dto.email,
+          passwordHash,
+          role: dto.role as UserRole,
+          firstName: dto.firstName,
+          lastName: dto.lastName,
+          phone: dto.phone,
+          gender: dto.gender as any, // Cast to any or UserGender if imported
+        },
+        select: {
+          id: true,
+          email: true,
+          role: true,
+          firstName: true,
+          lastName: true,
+          phone: true,
+          gender: true,
+        },
+      });
+
+      this.logger.log(`User created: ${user.id} (${user.email})`);
+
+      const tokens = await this.issueTokens(user.id, user.role);
+
+      this.logger.log(`Tokens issued for: ${user.id}`);
+
+      return {
+        token: tokens.accessToken,
+        userId: user.id,
+        user,
+        ...tokens,
+      };
+    } catch (error) {
+      this.logger.error(`Registration failed for ${dto.email}: ${error.message}`, error.stack);
+      throw error;
     }
-    const exists = await this.prisma.user.findUnique({
-      where: { email: dto.email },
-    });
-    if (exists) throw new BadRequestException("Email already in use");
-
-    const passwordHash = await bcrypt.hash(dto.password, 12);
-    const user = await this.prisma.user.create({
-      data: {
-        email: dto.email,
-        passwordHash,
-        role: dto.role,
-        firstName: dto.firstName,
-        lastName: dto.lastName,
-        phone: dto.phone,
-        gender: dto.gender,
-      },
-      select: {
-        id: true,
-        email: true,
-        role: true,
-        firstName: true,
-        lastName: true,
-        phone: true,
-        gender: true,
-      },
-    });
-
-    const tokens = await this.issueTokens(user.id, user.role);
-    return {
-      token: tokens.accessToken,
-      userId: user.id,
-      user,
-      ...tokens,
-    };
   }
 
   async login(dto: LoginDto) {
@@ -177,7 +187,7 @@ export class AuthService {
           googleId: googleUser.googleId,
           firstName: googleUser.firstName,
           lastName: googleUser.lastName,
-          role: UserRole.TENANT, // Default to tenant temporarily
+          role: UserRole.TENANT as UserRole, // Default to tenant temporarily
           emailVerified: true,
           isOnboarded: false, // Force role selection
         },

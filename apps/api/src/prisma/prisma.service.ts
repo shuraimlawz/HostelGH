@@ -33,7 +33,13 @@ export class PrismaService
   }
 
   async onModuleInit() {
-    await this.$connect();
+    try {
+      await this.$connect();
+      console.log("[Prisma] Database connected successfully");
+    } catch (error) {
+      console.error("[Prisma] Database connection failed during boot:", error.message);
+      // We don't throw here to allow the app to boot and show errors via health check/filter
+    }
   }
 
   async onModuleDestroy() {

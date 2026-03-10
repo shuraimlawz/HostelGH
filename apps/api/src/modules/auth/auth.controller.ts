@@ -38,10 +38,12 @@ export class AuthController {
   ) { }
 
   private setRefreshCookie(res: Response, refreshToken: string) {
+    const isProduction = process.env.NODE_ENV === "production";
     res.cookie("refresh_token", refreshToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
+      secure: isProduction,
+      // "none" is required for cross-domain (Vercel -> Render)
+      sameSite: isProduction ? "none" : "lax",
       maxAge: 7 * 24 * 60 * 60 * 1000,
       path: "/auth/refresh",
     });
@@ -134,15 +136,21 @@ export class AuthController {
   @UseGuards(AuthGuard("google"))
   @ApiOperation({ summary: "Google OAuth2 callback" })
   async googleAuthCallback(@Req() req: any, @Res() res: any) {
-    const result = await this.auth.validateGoogleUser(req.user);
-    const frontendUrl = this.config.get<string>("app.frontendUrl");
+    try {
+      const result = await this.auth.validateGoogleUser(req.user);
+      const frontendUrl = this.config.get<string>("app.frontendUrl") || "https://hostelgh.vercel.app";
 
-    // Secure the refresh token
-    this.setRefreshCookie(res, result.refreshToken);
+      // Secure the refresh token
+      this.setRefreshCookie(res, result.refreshToken);
 
-    // Only pass access token and user metadata via URL, keeping the long-lived refresh token out of browser history
-    const redirectUrl = `${frontendUrl}/auth/callback?accessToken=${result.accessToken}&userId=${result.user.id}&role=${result.user.role}&email=${result.user.email}&isOnboarded=${result.user.isOnboarded}`;
-    return res.redirect(redirectUrl);
+      // Only pass access token and user metadata via URL, keeping the long-lived refresh token out of browser history
+      const redirectUrl = `${frontendUrl}/auth/callback?accessToken=${result.accessToken}&userId=${result.user.id}&role=${result.user.role}&email=${result.user.email}&isOnboarded=${result.user.isOnboarded}`;
+      return res.redirect(redirectUrl);
+    } catch (error) {
+      console.error("[Google OAuth Callback Error]", error.message, error.stack);
+      const frontendUrl = this.config.get<string>("app.frontendUrl") || "https://hostelgh.vercel.app";
+      return res.redirect(`${frontendUrl}/auth/login?error=OAuthFailed&message=${encodeURIComponent(error.message)}`);
+    }
   }
 
   @Patch("password")
