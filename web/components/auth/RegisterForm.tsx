@@ -51,7 +51,7 @@ function RegisterContent({ onSuccess }: { onSuccess?: () => void }) {
                 }
             } else {
                 toast.success("Account created! Please log in.");
-                router.push("/auth/login?registered=true");
+                router.replace("/auth/login?registered=true");
             }
         } catch (error: any) {
             const isNetworkError = !error.response;

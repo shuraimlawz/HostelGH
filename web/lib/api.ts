@@ -9,7 +9,7 @@ export const api = axios.create({
 
 api.interceptors.request.use((config) => {
     if (typeof window !== "undefined") {
-        const token = localStorage.getItem("accessToken");
+        const token = localStorage.getItem("accessToken") || sessionStorage.getItem("accessToken");
         if (token) config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
@@ -35,7 +35,11 @@ api.interceptors.response.use(
                 if (res.data?.token || res.data?.accessToken) {
                     const newToken = res.data.token || res.data.accessToken;
                     if (typeof window !== "undefined") {
-                        localStorage.setItem("accessToken", newToken);
+                        if (localStorage.getItem("accessToken")) {
+                            localStorage.setItem("accessToken", newToken);
+                        } else {
+                            sessionStorage.setItem("accessToken", newToken);
+                        }
                     }
                     originalRequest.headers.Authorization = `Bearer ${newToken}`;
 
@@ -46,6 +50,7 @@ api.interceptors.response.use(
                 // Silent refresh failed (cookie expired, revoked, or missing)
                 if (typeof window !== "undefined") {
                     localStorage.removeItem("accessToken");
+                    sessionStorage.removeItem("accessToken");
 
                     // Prevent redirect loops if already on auth page
                     if (!window.location.pathname.startsWith("/auth")) {
