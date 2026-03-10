@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { AlertCircle, Eye, EyeOff, CheckCircle2 } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams, useRouter } from "next/navigation";
+import LogoAnimation from "@/components/layout/LogoAnimation";
 
 function ResetPasswordContent() {
     const searchParams = useSearchParams();
@@ -60,14 +61,13 @@ function ResetPasswordContent() {
         <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
             <div className="sm:mx-auto sm:w-full sm:max-w-md">
                 <div className="text-center group relative inline-flex justify-center w-full">
-                    <div className="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center transform group-hover:-rotate-12 transition-all duration-300 shadow-xl shadow-blue-500/20 relative cursor-pointer">
-                        <div className="absolute inset-0 bg-white/20 rounded-2xl blur group-hover:blur-md transition-all"></div>
-                        <span className="text-white text-3xl font-black relative z-10 shadow-sm leading-none">H</span>
+                    <div className="transform group-hover:scale-110 group-hover:rotate-3 transition-all duration-500">
+                        <LogoAnimation />
                     </div>
                 </div>
 
                 <h2 className="mt-8 text-center text-3xl font-black text-gray-900 tracking-tight">
-                    Set new password
+                    Set <span className="text-[#1877F2]">New Password</span>
                 </h2>
                 <p className="mt-2 text-center text-sm text-gray-600">
                     Your new password must be securely created.

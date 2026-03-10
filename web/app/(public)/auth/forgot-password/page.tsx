@@ -5,6 +5,8 @@ import { api } from "@/lib/api";
 import { toast } from "sonner";
 import { ArrowLeft, AlertCircle, CheckCircle2, Mail, Sparkles } from "lucide-react";
 import Link from "next/link";
+import { cn } from "@/lib/utils";
+import LogoAnimation from "@/components/layout/LogoAnimation";
 
 export default function ForgotPasswordPage() {
     const [email, setEmail] = useState("");
@@ -37,20 +39,16 @@ export default function ForgotPasswordPage() {
 
             <div className="sm:mx-auto sm:w-full sm:max-w-md relative z-10">
                 <div className="text-center group relative inline-flex justify-center w-full">
-                    <div className="w-20 h-20 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-[2.5rem] flex items-center justify-center transform group-hover:rotate-[15deg] group-hover:scale-110 transition-all duration-500 shadow-2xl shadow-blue-500/30 relative cursor-pointer">
-                        <div className="absolute inset-0 bg-white/10 rounded-[2.5rem] blur opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                        <span className="text-white text-4xl font-black relative z-10 tracking-tighter">H</span>
-                        <div className="absolute -top-1 -right-1 w-6 h-6 bg-cyan-400 rounded-full border-4 border-white flex items-center justify-center animate-bounce">
-                            <Sparkles className="text-white w-3 h-3" />
-                        </div>
+                    <div className="transform group-hover:scale-110 group-hover:rotate-3 transition-all duration-500">
+                        <LogoAnimation />
                     </div>
                 </div>
 
-                <div className="mt-10 space-y-2">
-                    <h2 className="text-center text-4xl font-black text-gray-900 tracking-tight leading-tight">
-                        Password <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-cyan-500">Recovery</span>
-                    </h2>
-                    <p className="text-center text-sm font-medium text-gray-500/80 max-w-[280px] mx-auto leading-relaxed">
+                <div className="mt-8 space-y-2">
+                    <h1 className="text-center text-3xl font-black text-gray-900 tracking-tight leading-tight">
+                        Password <span className="text-[#1877F2]">Recovery</span>
+                    </h1>
+                    <p className="text-center text-sm font-bold text-gray-400 max-w-[280px] mx-auto leading-relaxed">
                         Enter your email below and we&apos;ll send you a magic link to regain access.
                     </p>
                 </div>
