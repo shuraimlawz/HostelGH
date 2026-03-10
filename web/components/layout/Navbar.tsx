@@ -65,7 +65,9 @@ export default function Navbar() {
         return [
             { label: "Dashboard", href: "/tenant", icon: LayoutDashboard },
             { label: "My Bookings", href: "/tenant/bookings", icon: Calendar },
+            { label: "Payments", href: "/account/payments", icon: CreditCard },
             { label: "My Account", href: "/account", icon: UserIcon },
+            { label: "Settings", href: "/account/settings", icon: Settings },
         ];
     };
 
