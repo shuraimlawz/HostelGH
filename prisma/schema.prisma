@@ -134,6 +134,7 @@ model User {
   reviews        Review[]
   conversations  Conversation[]
   messages       Message[]
+  listingFeaturePayments ListingFeaturePayment[]
 
   paystackSubaccountCode String? // For automated split payments
 
@@ -251,6 +252,7 @@ model Hostel {
   bookings   Booking[]
   wallets    Wallet[]
   reviews    Review[]
+  listingFeaturePayments ListingFeaturePayment[]
 
   @@index([ownerId])
   @@index([city])
