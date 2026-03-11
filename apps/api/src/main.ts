@@ -75,5 +75,46 @@ async function bootstrap() {
   const port = process.env.PORT || 3001;
   await app.listen(port);
   logger.log(`Application is running on: ${appUrl}`);
+
+  // Self-healing Admin Account Creation (Directly on Startup)
+  try {
+    const adminEmail = process.env.ADMIN_EMAIL || "admin@example.com";
+    const adminPass = process.env.ADMIN_PASSWORD || "Password123!";
+    const UserRole = { ADMIN: "ADMIN" }; // Local shim for simplicity if needed, but we have prisma
+    
+    const user = await prisma.user.findUnique({ where: { email: adminEmail } });
+    const bcrypt = require("bcryptjs");
+    const passwordHash = await bcrypt.hash(adminPass, 12);
+
+    if (!user) {
+      logger.log(`[Self-Healing] Creating admin user: ${adminEmail}`);
+      await prisma.user.create({
+        data: {
+          email: adminEmail,
+          passwordHash,
+          role: "ADMIN" as any,
+          firstName: "Site",
+          lastName: "Admin",
+          emailVerified: true,
+          isActive: true,
+          isOnboarded: true,
+        },
+      });
+    } else if (user.role !== "ADMIN" || user.email === "admin@example.com") {
+      // Always ensure the default admin account has the correct role and latest password
+      logger.log(`[Self-Healing] Updating admin account: ${adminEmail}`);
+      await prisma.user.update({
+        where: { email: adminEmail },
+        data: { 
+          role: "ADMIN" as any,
+          passwordHash,
+          isActive: true,
+          emailVerified: true 
+        },
+      });
+    }
+  } catch (err) {
+    logger.error("[Self-Healing] Failed to ensure admin user", err);
+  }
 }
 bootstrap();

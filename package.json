@@ -10,7 +10,7 @@
     "web"
   ],
   "scripts": {
-    "build": "npx prisma generate --schema=./prisma/schema.prisma && nest build && FORCE_CREATE_ADMIN=true ts-node -r tsconfig-paths/register scripts/create_admin.ts",
+    "build": "npx prisma generate --schema=./prisma/schema.prisma && nest build",
     "postinstall": "npx prisma generate --schema=./prisma/schema.prisma",
     "admin:create": "FORCE_CREATE_ADMIN=true ts-node -r tsconfig-paths/register scripts/create_admin.ts",
     "format": "prettier --write \"apps/**/*.ts\" \"libs/**/*.ts\"",
