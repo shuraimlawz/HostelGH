@@ -142,14 +142,6 @@ export default function ForgotPasswordPage() {
                     )}
                 </div>
             </div>
-            
-            <style jsx>{`
-                @keyframes shimmer {
-                    100% {
-                        translate: 150%;
-                    }
-                }
-            `}</style>
         </div>
     );
 }
