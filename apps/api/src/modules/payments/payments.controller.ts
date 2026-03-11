@@ -75,4 +75,20 @@ export class PaymentsController {
       status,
     );
   }
+
+  @Post("feature/init/:hostelId")
+  @Roles(UserRole.OWNER, UserRole.ADMIN)
+  @HttpCode(HttpStatus.OK)
+  initFeaturePayment(
+    @Req() req: any,
+    @Param("hostelId") hostelId: string,
+    @Body("durationDays") durationDays?: number,
+  ) {
+    const days = durationDays ? Number(durationDays) : undefined;
+    return this.payments.initFeaturedListingPayment(
+      { userId: req.user.userId, role: req.user.role },
+      hostelId,
+      days,
+    );
+  }
 }

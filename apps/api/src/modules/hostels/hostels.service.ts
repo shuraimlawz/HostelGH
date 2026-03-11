@@ -13,6 +13,7 @@ import {
   AdminEntity,
 } from "../admin/admin-audit.service";
 import { CreateHostelDto, UpdateHostelDto } from "./dto/create-hostel.dto";
+import { Cron, CronExpression } from "@nestjs/schedule";
 
 @Injectable()
 export class HostelsService {
@@ -34,6 +35,15 @@ export class HostelsService {
     // First hostel always requires admin verification; subsequent hostels auto-publish
     const isFirstHostel = !existingVerified;
 
+    let featuredUntil = dto.featuredUntil;
+    if (dto.isFeatured) {
+      await this.subscriptions.checkLimit(ownerId, "featured_listings");
+      if (!featuredUntil) {
+        const sub = await this.subscriptions.getOwnerSubscription(ownerId);
+        featuredUntil = sub?.endDate ?? sub?.expiresAt ?? null;
+      }
+    }
+
     const hostel = await this.prisma.hostel.create({
       data: {
         name: dto.name,
@@ -52,7 +62,7 @@ export class HostelsService {
         policiesText: dto.policiesText,
         genderCategory: dto.genderCategory,
         isFeatured: dto.isFeatured,
-        featuredUntil: dto.featuredUntil,
+        featuredUntil: featuredUntil,
         // Listing fee model configuration
         listingFeeModel: dto.listingFeeModel,
         monthlyListingFee: dto.monthlyListingFee,
@@ -111,6 +121,10 @@ export class HostelsService {
 
     if (dto.isFeatured) {
       await this.subscriptions.checkLimit(hostel.ownerId, "featured_listings");
+      if (!dto.featuredUntil) {
+        const sub = await this.subscriptions.getOwnerSubscription(hostel.ownerId);
+        dto.featuredUntil = sub?.endDate ?? sub?.expiresAt ?? null;
+      }
     }
 
     return this.prisma.hostel.update({
@@ -248,6 +262,18 @@ export class HostelsService {
     }
 
     return hostel;
+  }
+
+  @Cron(CronExpression.EVERY_HOUR)
+  async clearExpiredFeaturedListings() {
+    const now = new Date();
+    await this.prisma.hostel.updateMany({
+      where: {
+        isFeatured: true,
+        featuredUntil: { lt: now },
+      },
+      data: { isFeatured: false, featuredUntil: null },
+    });
   }
 
   async getCityStats() {

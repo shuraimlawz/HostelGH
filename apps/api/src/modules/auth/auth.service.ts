@@ -255,12 +255,12 @@ export class AuthService {
       const hostels = await this.prisma.hostel.findMany({ select: { id: true }, where: { ownerId: userId } });
       const hostelIds = hostels.map(h => h.id);
 
-      const deleteOperations = [
-        this.prisma.wallet.deleteMany({ where: { ownerId: userId } }),
-        this.prisma.payoutRequest.deleteMany({ where: { ownerId: userId } }),
-        this.prisma.subscription.deleteMany({ where: { ownerId: userId } }),
-        this.prisma.payoutMethod.deleteMany({ where: { ownerId: userId } })
-      ];
+        const deleteOperations = [
+          this.prisma.wallet.deleteMany({ where: { ownerId: userId } }),
+          this.prisma.payoutRequest.deleteMany({ where: { ownerId: userId } }),
+          this.prisma.subscription.deleteMany({ where: { userId: userId } }),
+          this.prisma.payoutMethod.deleteMany({ where: { ownerId: userId } })
+        ];
 
       if (hostelIds.length > 0) {
         deleteOperations.unshift(

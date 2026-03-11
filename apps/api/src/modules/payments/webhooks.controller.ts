@@ -69,13 +69,19 @@ export class WebhooksController {
     if (event?.event === "charge.success") {
       const reference = event?.data?.reference;
       const paidAt = event?.data?.paid_at;
+      const metadata = event?.data?.metadata;
 
-      if (reference?.startsWith("SUB_PRO_")) {
-        await this.subscriptions.handleSubscriptionWebhook(
-          reference,
-          event.data,
-        );
-      } else if (reference) {
+      if (metadata?.type === "subscription" || metadata?.type === "subscription_upgrade" || reference?.startsWith("SUB_")) {
+        await this.subscriptions.handleSubscriptionWebhook(reference, event.data);
+        return { received: true };
+      }
+
+      if (metadata?.type === "feature_listing" || reference?.startsWith("FT_")) {
+        await this.payments.markFeaturedListingPaidFromWebhook(reference, event, paidAt);
+        return { received: true };
+      }
+
+      if (reference) {
         await this.payments.markPaidFromWebhook(reference, event, paidAt);
       }
     }

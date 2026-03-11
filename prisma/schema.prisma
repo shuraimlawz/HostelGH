@@ -82,6 +82,13 @@ enum DisputeStatus {
   REJECTED
 }
 
+enum SubscriptionStatus {
+  ACTIVE
+  EXPIRED
+  CANCELED
+  PENDING
+}
+
 model User {
   id           String   @id @default(cuid())
   email        String   @unique
@@ -297,15 +304,37 @@ enum PayoutStatus {
 }
 
 model Subscription {
-  id        String    @id @default(cuid())
-  ownerId   String
-  plan      String
-  active    Boolean   @default(false)
-  expiresAt DateTime?
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  id               String             @id @default(cuid())
+  userId           String
+  planId           String
+  status           SubscriptionStatus @default(PENDING)
+  startDate        DateTime           @default(now())
+  endDate          DateTime?
+  paymentReference String?            @unique
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
 
-  owner User @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  plan Plan @relation(fields: [planId], references: [id], onDelete: Restrict)
+
+  @@index([userId])
+  @@index([status])
+  @@index([endDate])
+}
+
+model Plan {
+  id               String        @id @default(cuid())
+  code             String        @unique // FREE, PRO, PREMIUM
+  name             String
+  description      String?
+  monthlyPrice     Int?          // pesewas
+  yearlyPrice      Int?          // pesewas
+  listingLimit     Int?          // null = unlimited
+  featuredIncluded Boolean       @default(false)
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+
+  subscriptions Subscription[]
 }
 
 model Room {
@@ -425,6 +454,29 @@ model Payment {
 
   @@index([status])
   @@index([provider])
+}
+
+model ListingFeaturePayment {
+  id           String          @id @default(cuid())
+  hostelId     String
+  ownerId      String
+  provider     PaymentProvider @default(PAYSTACK)
+  status       PaymentStatus   @default(INITIATED)
+  amount       Int
+  currency     String          @default("GHS")
+  reference    String          @unique
+  durationDays Int
+  paidAt       DateTime?
+  rawWebhook   Json?
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+
+  hostel Hostel @relation(fields: [hostelId], references: [id], onDelete: Cascade)
+  owner  User   @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+
+  @@index([hostelId])
+  @@index([ownerId])
+  @@index([status])
 }
 
 model AdminAuditLog {

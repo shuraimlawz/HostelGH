@@ -21,8 +21,13 @@ export class SubscriptionsController {
   async upgradeToPro(
     @Req() req: any,
     @Body("billingCycle") billingCycle: "monthly" | "yearly",
+    @Body("planCode") planCode?: "FREE" | "PRO" | "PREMIUM",
   ) {
-    return this.subscriptions.initiateProUpgrade(req.user.userId, billingCycle);
+    return this.subscriptions.initiateProUpgrade(
+      req.user.userId,
+      billingCycle,
+      planCode,
+    );
   }
 
   @Post("downgrade-free")

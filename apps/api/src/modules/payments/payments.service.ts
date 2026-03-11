@@ -119,6 +119,77 @@ export class PaymentsService {
     };
   }
 
+  async initFeaturedListingPayment(
+    actor: { userId: string; role: UserRole },
+    hostelId: string,
+    durationDays: number = 30,
+  ) {
+    const hostel = await this.prisma.hostel.findUnique({
+      where: { id: hostelId },
+      include: { owner: true },
+    });
+    if (!hostel) throw new NotFoundException("Hostel not found");
+
+    const isOwner =
+      actor.role === UserRole.ADMIN || hostel.ownerId === actor.userId;
+    if (!isOwner) throw new ForbiddenException("Not authorized to feature this hostel");
+
+    if (durationDays <= 0 || durationDays > 365) {
+      throw new BadRequestException("Invalid feature duration");
+    }
+
+    const FEATURED_PRICE_PER_30_DAYS = 5000; // GH₵50.00 in pesewas
+    const pricePerDay = Math.ceil(FEATURED_PRICE_PER_30_DAYS / 30);
+    const amount = pricePerDay * durationDays;
+
+    const reference = `FT_${randomBytes(10).toString("hex")}`;
+
+    const payment = await this.prisma.listingFeaturePayment.create({
+      data: {
+        hostelId,
+        ownerId: hostel.ownerId,
+        amount,
+        reference,
+        status: PaymentStatus.INITIATED,
+        provider: PaymentProvider.PAYSTACK,
+        currency: "GHS",
+        durationDays,
+      },
+    });
+
+    const appUrl = this.config.get<string>("APP_URL");
+
+    if (!hostel.owner?.email) {
+      throw new BadRequestException("Owner email is required for payment");
+    }
+
+    const initResponse = await this.paystack.initializeTransaction({
+      email: hostel.owner.email,
+      amount,
+      reference,
+      callback_url: appUrl ? `${appUrl}/owner/feature` : undefined,
+      metadata: {
+        hostelId,
+        ownerId: hostel.ownerId,
+        durationDays,
+        type: "feature_listing",
+      },
+    });
+
+    const data = initResponse?.data;
+    await this.prisma.listingFeaturePayment.update({
+      where: { id: payment.id },
+      data: { status: PaymentStatus.PENDING },
+    });
+
+    return {
+      authorizationUrl: data?.authorization_url,
+      reference,
+      amount,
+      currency: "GHâ‚µ",
+    };
+  }
+
   async verifyPaystackReference(reference: string) {
     const payment = await this.prisma.payment.findUnique({
       where: { reference },
@@ -181,6 +252,50 @@ export class PaymentsService {
       paymentRow,
       reference,
     );
+  }
+
+  async markFeaturedListingPaidFromWebhook(
+    reference: string,
+    rawWebhook: any,
+    paidAt?: string,
+  ) {
+    const payment = await this.prisma.listingFeaturePayment.findUnique({
+      where: { reference },
+      include: { hostel: true },
+    });
+    if (!payment) return;
+
+    if (payment.status === PaymentStatus.SUCCESS) {
+      await this.prisma.listingFeaturePayment.update({
+        where: { reference },
+        data: { rawWebhook: rawWebhook as any },
+      });
+      return;
+    }
+
+    const baseDate =
+      payment.hostel.featuredUntil && payment.hostel.featuredUntil > new Date()
+        ? payment.hostel.featuredUntil
+        : new Date();
+    const featuredUntil = new Date(baseDate.getTime() + payment.durationDays * 24 * 60 * 60 * 1000);
+
+    await this.prisma.$transaction([
+      this.prisma.listingFeaturePayment.update({
+        where: { reference },
+        data: {
+          status: PaymentStatus.SUCCESS,
+          paidAt: paidAt ? new Date(paidAt) : new Date(),
+          rawWebhook: rawWebhook as any,
+        },
+      }),
+      this.prisma.hostel.update({
+        where: { id: payment.hostelId },
+        data: {
+          isFeatured: true,
+          featuredUntil,
+        },
+      }),
+    ]);
   }
 
   private async updatePaymentWebhook(reference: string, rawWebhook: any) {
