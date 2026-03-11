@@ -3,6 +3,7 @@ import {
   ForbiddenException,
   NotFoundException,
   Logger,
+  ServiceUnavailableException,
 } from "@nestjs/common";
 import { PrismaService } from "../../prisma/prisma.service";
 import { ConfigService } from "@nestjs/config";
@@ -62,39 +63,84 @@ export class SubscriptionsService {
   ) { }
 
   async onModuleInit() {
-    await this.ensureDefaultPlans();
+    try {
+      await this.ensureDefaultPlans();
+    } catch (err: any) {
+      if (this.isMissingTableError(err)) {
+        this.logger.warn("Billing tables not migrated yet. Skipping plan seed.");
+        return;
+      }
+      throw err;
+    }
   }
 
   private async ensureDefaultPlans() {
-    for (const plan of DEFAULT_PLANS) {
-      await this.prisma.plan.upsert({
-        where: { code: plan.code },
-        update: {
-          name: plan.name,
-          description: plan.description,
-          monthlyPrice: plan.monthlyPrice ?? null,
-          yearlyPrice: plan.yearlyPrice ?? null,
-          listingLimit: plan.listingLimit ?? null,
-          featuredIncluded: plan.featuredIncluded ?? false,
-        },
-        create: {
-          code: plan.code,
-          name: plan.name,
-          description: plan.description,
-          monthlyPrice: plan.monthlyPrice ?? null,
-          yearlyPrice: plan.yearlyPrice ?? null,
-          listingLimit: plan.listingLimit ?? null,
-          featuredIncluded: plan.featuredIncluded ?? false,
-        },
-      });
+    try {
+      for (const plan of DEFAULT_PLANS) {
+        await this.prisma.plan.upsert({
+          where: { code: plan.code },
+          update: {
+            name: plan.name,
+            description: plan.description,
+            monthlyPrice: plan.monthlyPrice ?? null,
+            yearlyPrice: plan.yearlyPrice ?? null,
+            listingLimit: plan.listingLimit ?? null,
+            featuredIncluded: plan.featuredIncluded ?? false,
+          },
+          create: {
+            code: plan.code,
+            name: plan.name,
+            description: plan.description,
+            monthlyPrice: plan.monthlyPrice ?? null,
+            yearlyPrice: plan.yearlyPrice ?? null,
+            listingLimit: plan.listingLimit ?? null,
+            featuredIncluded: plan.featuredIncluded ?? false,
+          },
+        });
+      }
+    } catch (err: any) {
+      if (this.isMissingTableError(err)) {
+        throw err;
+      }
+      throw err;
     }
   }
 
   private async getPlanByCode(code: PlanCode) {
-    await this.ensureDefaultPlans();
-    const plan = await this.prisma.plan.findUnique({ where: { code } });
+    try {
+      await this.ensureDefaultPlans();
+      const plan = await this.prisma.plan.findUnique({ where: { code } });
+      if (!plan) throw new NotFoundException(`Plan not found: ${code}`);
+      return plan;
+    } catch (err: any) {
+      if (this.isMissingTableError(err)) {
+        throw new ServiceUnavailableException(
+          "Billing tables are not migrated. Please run database migrations.",
+        );
+      }
+      throw err;
+    }
+  }
+
+  private getFallbackPlan(code: PlanCode) {
+    const plan = DEFAULT_PLANS.find((p) => p.code === code);
     if (!plan) throw new NotFoundException(`Plan not found: ${code}`);
-    return plan;
+    return {
+      id: `fallback_${plan.code}`,
+      code: plan.code,
+      name: plan.name,
+      description: plan.description ?? null,
+      monthlyPrice: plan.monthlyPrice ?? null,
+      yearlyPrice: plan.yearlyPrice ?? null,
+      listingLimit: plan.listingLimit ?? null,
+      featuredIncluded: plan.featuredIncluded ?? false,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+  }
+
+  private isMissingTableError(err: any) {
+    return err?.code === "P2021" || err?.meta?.modelName === "Plan";
   }
 
   private isSubscriptionActive(sub: { status: SubscriptionStatus; endDate: Date | null }) {
@@ -104,25 +150,46 @@ export class SubscriptionsService {
   }
 
   private async getEffectivePlan(ownerId: string) {
-    const sub = await this.prisma.subscription.findFirst({
-      where: { userId: ownerId, status: SubscriptionStatus.ACTIVE },
-      orderBy: { endDate: "desc" },
-      include: { plan: true },
-    });
+    let sub: any = null;
+    try {
+      sub = await this.prisma.subscription.findFirst({
+        where: { userId: ownerId, status: SubscriptionStatus.ACTIVE },
+        orderBy: { endDate: "desc" },
+        include: { plan: true },
+      });
+    } catch (err: any) {
+      if (this.isMissingTableError(err)) {
+        const fallback = this.getFallbackPlan("FREE");
+        return { plan: fallback, subscription: null };
+      }
+      throw err;
+    }
 
     if (sub && this.isSubscriptionActive(sub)) {
       return { plan: sub.plan, subscription: sub };
     }
 
     if (sub && !this.isSubscriptionActive(sub)) {
-      await this.prisma.subscription.update({
-        where: { id: sub.id },
-        data: { status: SubscriptionStatus.EXPIRED },
-      });
+      try {
+        await this.prisma.subscription.update({
+          where: { id: sub.id },
+          data: { status: SubscriptionStatus.EXPIRED },
+        });
+      } catch (err: any) {
+        if (!this.isMissingTableError(err)) throw err;
+      }
     }
 
-    const freePlan = await this.getPlanByCode("FREE");
-    return { plan: freePlan, subscription: null };
+    try {
+      const freePlan = await this.getPlanByCode("FREE");
+      return { plan: freePlan, subscription: null };
+    } catch (err: any) {
+      if (this.isMissingTableError(err)) {
+        const fallback = this.getFallbackPlan("FREE");
+        return { plan: fallback, subscription: null };
+      }
+      throw err;
+    }
   }
 
   async getOwnerSubscription(ownerId: string) {
@@ -289,13 +356,22 @@ export class SubscriptionsService {
   }
 
   async downgradeToFree(ownerId: string) {
-    const result = await this.prisma.subscription.updateMany({
-      where: { userId: ownerId, status: SubscriptionStatus.ACTIVE },
-      data: { status: SubscriptionStatus.CANCELED, endDate: new Date() },
-    });
-    const freePlan = await this.getPlanByCode("FREE");
-    await this.enforceListingLimit(ownerId, freePlan.listingLimit ?? 1);
-    return result;
+    try {
+      const result = await this.prisma.subscription.updateMany({
+        where: { userId: ownerId, status: SubscriptionStatus.ACTIVE },
+        data: { status: SubscriptionStatus.CANCELED, endDate: new Date() },
+      });
+      const freePlan = await this.getPlanByCode("FREE");
+      await this.enforceListingLimit(ownerId, freePlan.listingLimit ?? 1);
+      return result;
+    } catch (err: any) {
+      if (this.isMissingTableError(err)) {
+        const fallback = this.getFallbackPlan("FREE");
+        await this.enforceListingLimit(ownerId, fallback.listingLimit ?? 1);
+        return { count: 0 };
+      }
+      throw err;
+    }
   }
 
   async enforceListingLimit(ownerId: string, limit: number | null) {
@@ -315,18 +391,36 @@ export class SubscriptionsService {
   }
 
   async expireSubscriptionsAndEnforceLimits() {
-    const now = new Date();
-    const expired = await this.prisma.subscription.findMany({
-      where: {
-        status: SubscriptionStatus.ACTIVE,
-        endDate: { lt: now },
-      },
-      include: { plan: true },
-    });
+    let expired: any[] = [];
+    try {
+      const now = new Date();
+      expired = await this.prisma.subscription.findMany({
+        where: {
+          status: SubscriptionStatus.ACTIVE,
+          endDate: { lt: now },
+        },
+        include: { plan: true },
+      });
+    } catch (err: any) {
+      if (this.isMissingTableError(err)) {
+        this.logger.warn("Billing tables not migrated yet. Skipping expiration job.");
+        return;
+      }
+      throw err;
+    }
 
     if (expired.length === 0) return;
 
-    const freePlan = await this.getPlanByCode("FREE");
+    let freePlan: any;
+    try {
+      freePlan = await this.getPlanByCode("FREE");
+    } catch (err: any) {
+      if (this.isMissingTableError(err)) {
+        freePlan = this.getFallbackPlan("FREE");
+      } else {
+        throw err;
+      }
+    }
 
     await this.prisma.subscription.updateMany({
       where: {
