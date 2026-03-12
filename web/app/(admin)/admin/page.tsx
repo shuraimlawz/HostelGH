@@ -217,6 +217,7 @@ export default function AdminDashboardPage() {
                                 </div>
                             </div>
                         </div>
+                    </div>
 
                     <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
                         <div className="lg:col-span-5">
