@@ -14,6 +14,9 @@ function RegisterContent({ onSuccess }: { onSuccess?: () => void }) {
     const defaultRole = searchParams.get("role") === "OWNER" ? "OWNER" : "TENANT";
 
     const [email, setEmail] = useState("");
+    const [firstName, setFirstName] = useState("");
+    const [middleName, setMiddleName] = useState("");
+    const [lastName, setLastName] = useState("");
     const [password, setPassword] = useState("");
     const [showPassword, setShowPassword] = useState(false);
     const [role, setRole] = useState<"TENANT" | "OWNER">(defaultRole);
@@ -29,7 +32,14 @@ function RegisterContent({ onSuccess }: { onSuccess?: () => void }) {
         setLoading(true);
 
         try {
-            const res = await api.post("/auth/register", { email, password, role });
+            const res = await api.post("/auth/register", {
+                email,
+                password,
+                role,
+                firstName,
+                middleName: middleName || undefined,
+                lastName,
+            });
             const data = res.data?.data || res.data;
             const { accessToken, user } = data;
 
@@ -85,6 +95,43 @@ function RegisterContent({ onSuccess }: { onSuccess?: () => void }) {
     return (
         <div className="space-y-4">
             <form onSubmit={submit} className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-1.5 group">
+                        <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest px-1 group-focus-within:text-blue-500 transition-colors">First Name</label>
+                        <input
+                            type="text"
+                            className="w-full px-4 py-3.5 bg-white border border-black/5 hover:border-black/10 rounded-2xl outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all text-sm shadow-sm"
+                            value={firstName}
+                            onChange={(e) => setFirstName(e.target.value)}
+                            placeholder="Ama"
+                            required
+                        />
+                    </div>
+
+                    <div className="space-y-1.5 group">
+                        <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest px-1 group-focus-within:text-blue-500 transition-colors">Last Name</label>
+                        <input
+                            type="text"
+                            className="w-full px-4 py-3.5 bg-white border border-black/5 hover:border-black/10 rounded-2xl outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all text-sm shadow-sm"
+                            value={lastName}
+                            onChange={(e) => setLastName(e.target.value)}
+                            placeholder="Mensah"
+                            required
+                        />
+                    </div>
+                </div>
+
+                <div className="space-y-1.5 group">
+                    <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest px-1 group-focus-within:text-blue-500 transition-colors">Middle Name (Optional)</label>
+                    <input
+                        type="text"
+                        className="w-full px-4 py-3.5 bg-white border border-black/5 hover:border-black/10 rounded-2xl outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all text-sm shadow-sm"
+                        value={middleName}
+                        onChange={(e) => setMiddleName(e.target.value)}
+                        placeholder="Kofi"
+                    />
+                </div>
+
                 <div className="space-y-1.5 group">
                     <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest px-1 group-focus-within:text-blue-500 transition-colors">Email</label>
                     <input

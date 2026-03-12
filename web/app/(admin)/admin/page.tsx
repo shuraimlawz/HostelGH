@@ -13,7 +13,6 @@ import {
     ArrowDownRight,
     Loader2,
     Send,
-    ShieldAlert,
     Zap,
     Globe,
     DollarSign,
@@ -21,7 +20,12 @@ import {
     XCircle,
     UserCircle,
     Eye,
-    LifeBuoy
+    LifeBuoy,
+    Settings,
+    Bell,
+    ListChecks,
+    Wallet,
+    FileText
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState, useEffect } from "react";
@@ -86,6 +90,19 @@ export default function AdminDashboardPage() {
         queryFn: async () => (await api.get("/admin/activity")).data
     });
 
+    const { data: alerts } = useQuery({
+        queryKey: ["admin-alerts"],
+        queryFn: async () => (await api.get("/admin/alerts")).data,
+        retry: false,
+        refetchInterval: 30000
+    });
+
+    const { data: notificationCounts } = useQuery({
+        queryKey: ["admin-notifications-counts"],
+        queryFn: async () => (await api.get("/admin/notifications/counts")).data,
+        refetchInterval: 30000
+    });
+
     // --- MUTATIONS ---
     const verifyHostel = useMutation({
         mutationFn: async (id: string) => api.patch(`/admin/hostels/${id}/verify`),
@@ -124,6 +141,12 @@ export default function AdminDashboardPage() {
     );
 
     const activityList = Array.isArray(activity) ? activity : (activity?.activities || []);
+    const alertsList = Array.isArray(alerts) ? alerts : [];
+    const pendingApprovals = (verificationQueue?.hostels?.length || 0) + (verificationQueue?.owners?.length || 0);
+    const pendingPayoutAmount = financials?.pendingPayouts || 0;
+    const pendingPayoutCount = notificationCounts?.payouts || 0;
+    const pendingHostels = notificationCounts?.hostels || verificationQueue?.hostels?.length || 0;
+    const totalRevenue = financials?.totalVolume || stats?.revenue || 0;
 
     return (
         <div className="max-w-[1600px] mx-auto space-y-10 pb-20 bg-background text-foreground transition-colors duration-300">
@@ -141,6 +164,15 @@ export default function AdminDashboardPage() {
                     <h1 className="text-3xl font-black text-foreground tracking-tight leading-none mb-3">
                         Strategic Dashboard <span className="text-primary">.</span>
                     </h1>
+                    <p className="text-xs text-muted-foreground font-bold uppercase tracking-widest">Live snapshot • {new Date().toLocaleDateString()}</p>
+                </div>
+                <div className="flex items-center gap-3">
+                    <Link href="/admin/settings" className="px-5 py-3 rounded-2xl bg-card border border-border text-xs font-black uppercase tracking-widest hover:bg-muted transition-all flex items-center gap-2">
+                        <Settings size={14} /> Configure
+                    </Link>
+                    <Link href="/admin/logs" className="px-5 py-3 rounded-2xl bg-foreground text-background text-xs font-black uppercase tracking-widest hover:opacity-90 transition-all flex items-center gap-2">
+                        <Activity size={14} /> System Logs
+                    </Link>
                 </div>
             </div>
 
@@ -155,11 +187,13 @@ export default function AdminDashboardPage() {
 
                 {/* --- OVERVIEW --- */}
                 <TabsContent value="overview" className="space-y-10">
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                        <StatCard label="Total Volume" value={`₵${(financials?.totalVolume / 100).toLocaleString()}`} icon={DollarSign} trend={+12} up />
-                        <StatCard label="Escrow Balance" value={`₵${(financials?.escrowBalance / 100).toLocaleString()}`} icon={ShieldAlert} trend={0} up />
-                        <StatCard label="Pending Payouts" value={`₵${(financials?.pendingPayouts / 100).toLocaleString()}`} icon={TrendingUp} trend={-5} up={false} />
-                        <StatCard label="Global Members" value={stats?.totalUsers || 0} icon={Users} trend={stats?.trends?.users} up />
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6 gap-6">
+                        <StatCard label="Live Hostels" value={stats?.liveHostels || 0} icon={Building2} />
+                        <StatCard label="Total Users" value={stats?.totalUsers || 0} icon={Users} trend={stats?.trends?.users} up />
+                        <StatCard label="Total Bookings" value={stats?.bookings || 0} icon={CalendarCheck} />
+                        <StatCard label="Total Revenue" value={`₵${(totalRevenue / 100).toLocaleString()}`} icon={DollarSign} />
+                        <StatCard label="Pending Approvals" value={pendingApprovals} icon={ListChecks} />
+                        <StatCard label="Open Disputes" value={disputes?.length || 0} icon={LifeBuoy} />
                     </div>
 
                     <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
@@ -172,6 +206,7 @@ export default function AdminDashboardPage() {
                                 <div className="space-y-4 relative z-10">
                                     <QuickActionLink href="/admin/users" label="User Registry" sub="Control platform access" icon={Users} />
                                     <QuickActionLink href="/admin/hostels" label="Asset Control" sub="Moderate live hostels" icon={Building2} />
+                                    <QuickActionLink href="/admin/bookings" label="Reservations" sub="Monitor booking activity" icon={CalendarCheck} />
                                     <button className="w-full bg-background/5 hover:bg-background/10 rounded-[1.5rem] p-6 text-left transition-all border border-background/5 flex items-center justify-between group">
                                         <div>
                                             <p className="font-black text-[12px] uppercase tracking-wider mb-1">Drill-Down Mode</p>
@@ -179,6 +214,68 @@ export default function AdminDashboardPage() {
                                         </div>
                                         <Zap size={14} className="text-background/50 group-hover:text-primary transition-colors" />
                                     </button>
+                                </div>
+                            </div>
+                        </div>
+
+                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+                        <div className="lg:col-span-5">
+                            <div className="bg-card rounded-[3rem] border border-border p-10 space-y-6">
+                                <h2 className="text-xl font-black italic uppercase tracking-tighter flex items-center gap-3">
+                                    <Bell size={20} className="text-primary" /> Operations Snapshot
+                                </h2>
+                                <div className="space-y-4">
+                                    <div className="flex items-center justify-between p-5 rounded-2xl bg-muted/40 border border-border">
+                                        <div>
+                                            <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Pending Hostels</p>
+                                            <p className="text-lg font-black">{pendingHostels}</p>
+                                        </div>
+                                        <Link href="/admin/hostels" className="text-xs font-black uppercase tracking-widest text-primary">Review</Link>
+                                    </div>
+                                    <div className="flex items-center justify-between p-5 rounded-2xl bg-muted/40 border border-border">
+                                        <div>
+                                            <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Pending Payouts</p>
+                                            <p className="text-lg font-black">₵{(pendingPayoutAmount / 100).toLocaleString()} <span className="text-[10px] text-muted-foreground">({pendingPayoutCount} req)</span></p>
+                                        </div>
+                                        <Link href="/admin/payments" className="text-xs font-black uppercase tracking-widest text-primary">Process</Link>
+                                    </div>
+                                    <div className="flex items-center justify-between p-5 rounded-2xl bg-muted/40 border border-border">
+                                        <div>
+                                            <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Deletion Requests</p>
+                                            <p className="text-lg font-black">{notificationCounts?.total || 0}</p>
+                                        </div>
+                                        <Link href="/admin/deletions" className="text-xs font-black uppercase tracking-widest text-primary">Review</Link>
+                                    </div>
+                                    {alertsList.length > 0 ? (
+                                        <div className="p-5 rounded-2xl bg-red-500/5 border border-red-500/20">
+                                            <p className="text-[10px] font-black uppercase tracking-widest text-red-500 mb-2">System Alerts</p>
+                                            <ul className="space-y-1 text-xs text-red-600 font-bold">
+                                                {alertsList.slice(0, 3).map((alert: any, idx: number) => (
+                                                    <li key={idx}>{alert.message}</li>
+                                                ))}
+                                            </ul>
+                                        </div>
+                                    ) : (
+                                        <div className="p-5 rounded-2xl bg-emerald-500/5 border border-emerald-500/20">
+                                            <p className="text-[10px] font-black uppercase tracking-widest text-emerald-600">No critical alerts</p>
+                                            <p className="text-xs text-emerald-700 font-bold mt-1">All systems healthy</p>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+                        <div className="lg:col-span-7">
+                            <div className="bg-card rounded-[3rem] border border-border p-10 space-y-6">
+                                <h2 className="text-xl font-black italic uppercase tracking-tighter flex items-center gap-3">
+                                    <FileText size={20} className="text-primary" /> Admin Configuration
+                                </h2>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <ConfigLink href="/admin/settings" label="Settings Hub" sub="Roles, visibility, preferences" icon={Settings} />
+                                    <ConfigLink href="/admin/stats" label="System Stats" sub="KPIs, platform health" icon={TrendingUp} />
+                                    <ConfigLink href="/admin/logs" label="System Logs" sub="Audits, security, trace" icon={Activity} />
+                                    <ConfigLink href="/admin/users" label="User Registry" sub="Admins, owners, tenants" icon={Users} />
+                                    <ConfigLink href="/admin/hostels" label="Hostel Governance" sub="Listings, verification" icon={Building2} />
+                                    <ConfigLink href="/admin/payments" label="Financial Control" sub="Payouts, revenue" icon={Wallet} />
                                 </div>
                             </div>
                         </div>
@@ -405,3 +502,21 @@ function QuickActionLink({ href, label, sub, icon: Icon }: any) {
         </Link>
     );
 }
+
+function ConfigLink({ href, label, sub, icon: Icon }: any) {
+    return (
+        <Link href={href} className="flex items-center justify-between rounded-2xl border border-border bg-muted/40 p-5 hover:bg-muted transition-all">
+            <div>
+                <p className="text-xs font-black uppercase tracking-widest">{label}</p>
+                <p className="text-[10px] text-muted-foreground font-bold mt-1">{sub}</p>
+            </div>
+            <div className="w-10 h-10 rounded-xl bg-foreground text-background flex items-center justify-center">
+                <Icon size={16} />
+            </div>
+        </Link>
+    );
+}
+
+
+
+

@@ -11,6 +11,7 @@ export const RegisterSchema = z.object({
     message: "Invalid role. Must be TENANT, OWNER, or ADMIN"
   }),
   firstName: z.string().optional(),
+  middleName: z.string().optional(),
   lastName: z.string().optional(),
   phone: z.string().regex(phoneRegex, 'Invalid Ghana phone number format. Use +233...').optional(),
   gender: z.string().refine(val => ['MALE', 'FEMALE', 'OTHER'].includes(val), {
