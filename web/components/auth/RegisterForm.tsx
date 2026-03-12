@@ -41,7 +41,13 @@ function RegisterContent({ onSuccess }: { onSuccess?: () => void }) {
                 lastName,
             });
             const data = res.data?.data || res.data;
-            const { accessToken, user } = data;
+            const { accessToken, user, requiresEmailVerification } = data;
+
+            if (requiresEmailVerification) {
+                toast.info("Check your email to verify your account.");
+                router.replace("/auth/login?verify=1");
+                return;
+            }
 
             if (accessToken && user) {
                 login(accessToken, user);
@@ -60,8 +66,8 @@ function RegisterContent({ onSuccess }: { onSuccess?: () => void }) {
                     }
                 }
             } else {
-                toast.success("Account created! Please log in.");
-                router.replace("/auth/login?registered=true");
+                toast.success("Account created! Please verify your email.");
+                router.replace("/auth/login?verify=1");
             }
         } catch (error: any) {
             const isNetworkError = !error.response;

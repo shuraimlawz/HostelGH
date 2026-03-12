@@ -202,6 +202,19 @@ model PasswordResetToken {
   @@index([expiresAt])
 }
 
+model EmailVerificationToken {
+  id        String   @id @default(cuid())
+  email     String
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [email], references: [email], onDelete: Cascade)
+
+  @@index([email])
+  @@index([expiresAt])
+}
+
 model Hostel {
   id          String  @id @default(cuid())
   ownerId     String

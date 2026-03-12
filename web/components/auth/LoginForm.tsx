@@ -17,6 +17,7 @@ export default function LoginForm({ onSuccess }: { onSuccess?: (user: any) => vo
     const router = useRouter();
     const [loading, setLoading] = useState(false);
     const [err, setErr] = useState<string | null>(null);
+    const [resendLoading, setResendLoading] = useState(false);
     const { login } = useAuth();
 
     async function submit(e: React.FormEvent) {
@@ -63,6 +64,22 @@ export default function LoginForm({ onSuccess }: { onSuccess?: (user: any) => vo
             }
         } finally {
             setLoading(false);
+        }
+    }
+
+    async function resendVerification() {
+        if (!email) {
+            setErr("Enter your email to resend verification.");
+            return;
+        }
+        setResendLoading(true);
+        try {
+            await api.post("/auth/resend-verification", { email });
+            toast.success("Verification email sent.");
+        } catch (error: any) {
+            toast.error("Failed to resend verification email.");
+        } finally {
+            setResendLoading(false);
         }
     }
 
@@ -128,6 +145,16 @@ export default function LoginForm({ onSuccess }: { onSuccess?: (user: any) => vo
                         <AlertCircle className="w-4 h-4" />
                         <span>{err}</span>
                     </div>
+                )}
+                {err && err.toLowerCase().includes("verify") && (
+                    <button
+                        type="button"
+                        onClick={resendVerification}
+                        disabled={resendLoading}
+                        className="w-full text-xs font-bold uppercase tracking-widest text-blue-600 hover:text-blue-500 transition-colors"
+                    >
+                        {resendLoading ? "Resending..." : "Resend verification email"}
+                    </button>
                 )}
 
                 <div className="pt-2">

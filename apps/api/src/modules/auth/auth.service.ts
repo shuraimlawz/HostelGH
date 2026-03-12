@@ -3,6 +3,7 @@ import {
   Injectable,
   UnauthorizedException,
   Logger,
+  ForbiddenException,
 } from "@nestjs/common";
 import { PrismaService } from "../../prisma/prisma.service";
 import { UserRole } from "@prisma/client";
@@ -73,20 +74,19 @@ export class AuthService {
             lastName: true,
             phone: true,
             gender: true,
+            emailVerified: true,
           },
         });
 
         this.logger.log(`User created: ${user.id} (${user.email})`);
 
-        const tokens = await this.issueTokens(user.id, user.role, tx);
-
-        this.logger.log(`Tokens issued for: ${user.id}`);
+        await this.createAndSendVerificationEmail(user.email, tx);
 
         return {
-          token: tokens.accessToken,
+          message: "Account created. Please verify your email to activate your account.",
+          requiresEmailVerification: true,
           userId: user.id,
           user,
-          ...tokens,
         };
       } catch (error) {
         this.logger.error(`Registration failed for ${dto.email}: ${error.message}`, error.stack);
@@ -118,6 +118,11 @@ export class AuthService {
     if (!user.passwordHash) {
       await this.auditLogger.log(null, AdminAction.LOGIN_FAILED, AdminEntity.USER, user.id, "Failed login attempt: Google Account needs Google OAuth");
       throw new UnauthorizedException("This account uses Google Sign-In. Please sign in with Google.");
+    }
+
+    if (!user.emailVerified) {
+      await this.auditLogger.log(null, AdminAction.LOGIN_FAILED, AdminEntity.USER, user.id, "Failed login attempt: Email not verified");
+      throw new ForbiddenException("Please verify your email to activate your account.");
     }
 
     const ok = await bcrypt.compare(dto.password, user.passwordHash);
@@ -408,5 +413,53 @@ export class AuthService {
       ...tokens,
       isImpersonating: true,
     };
+  }
+
+  private async createAndSendVerificationEmail(email: string, tx?: any) {
+    const rawToken = randomBytes(32).toString("hex");
+    const hashedToken = sha256(rawToken);
+    const expiresAt = new Date(Date.now() + 1000 * 60 * 60 * 24); // 24 hours
+
+    const client = tx ?? this.prisma;
+    await client.emailVerificationToken.deleteMany({ where: { email } });
+    await client.emailVerificationToken.create({
+      data: {
+        email,
+        token: hashedToken,
+        expiresAt,
+      },
+    });
+
+    await this.emailService.sendEmailVerification(email, rawToken);
+  }
+
+  async verifyEmail(token: string) {
+    const hashedToken = sha256(token);
+    const record = await this.prisma.emailVerificationToken.findUnique({
+      where: { token: hashedToken },
+    });
+
+    if (!record || record.expiresAt < new Date()) {
+      throw new BadRequestException("Invalid or expired verification token.");
+    }
+
+    await this.prisma.user.update({
+      where: { email: record.email },
+      data: { emailVerified: true },
+    });
+
+    await this.prisma.emailVerificationToken.delete({
+      where: { token: hashedToken },
+    });
+
+    return { ok: true };
+  }
+
+  async resendVerification(email: string) {
+    const user = await this.prisma.user.findUnique({ where: { email } });
+    if (!user) throw new BadRequestException("Account not found");
+    if (user.emailVerified) return { ok: true, message: "Email already verified." };
+    await this.createAndSendVerificationEmail(email);
+    return { ok: true };
   }
 }

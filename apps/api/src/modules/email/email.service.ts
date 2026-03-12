@@ -117,4 +117,38 @@ export class EmailService implements OnModuleInit {
             return false;
         }
     }
+
+    async sendEmailVerification(to: string, verifyToken: string) {
+        const frontendUrl = this.config.get<string>("app.frontendUrl") || "https://hostelgh.vercel.app";
+        const verifyLink = `${frontendUrl}/auth/verify-email?token=${verifyToken}`;
+
+        const mailOptions = {
+            from: '"HostelGH Security" <noreply@hostelgh.com>',
+            to,
+            subject: "Verify your email",
+            html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eaeaea; border-radius: 10px;">
+          <h2 style="color: #2563eb; text-align: center;">Confirm your email</h2>
+          <p>Thanks for creating a HostelGH account. Please verify your email to activate your account:</p>
+          <div style="text-align: center; margin: 30px 0;">
+            <a href="${verifyLink}" style="background-color: #2563eb; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">Verify Email</a>
+          </div>
+          <p style="font-size: 12px; color: #666;">If you did not create an account, you can ignore this email.</p>
+          <p style="font-size: 12px; color: #666;">This link will expire in 24 hours.</p>
+        </div>
+      `,
+        };
+
+        try {
+            const info = await this.transporter.sendMail(mailOptions);
+            this.logger.log(`Verification email sent to ${to}`);
+            if (info.messageId?.includes("ethereal")) {
+                this.logger.log(`Preview: ${nodemailer.getTestMessageUrl(info)}`);
+            }
+            return true;
+        } catch (error) {
+            this.logger.error(`Failed to send verification email to ${to}`, error);
+            return false;
+        }
+    }
 }

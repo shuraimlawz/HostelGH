@@ -54,7 +54,9 @@ export class AuthController {
   @ApiResponse({ status: 201, description: "User successfully registered" })
   async register(@Body() dto: RegisterDto, @Res({ passthrough: true }) res: Response) {
     const result = await this.auth.register(dto);
-    this.setRefreshCookie(res, result.refreshToken);
+    if ((result as any).refreshToken) {
+      this.setRefreshCookie(res, (result as any).refreshToken);
+    }
     return result;
   }
 
@@ -69,6 +71,21 @@ export class AuthController {
     const result = await this.auth.login(dto);
     this.setRefreshCookie(res, result.refreshToken);
     return result;
+  }
+
+  @Get("verify-email")
+  @ApiOperation({ summary: "Verify email with token" })
+  async verifyEmail(@Req() req: Request) {
+    const token = req.query?.token as string;
+    if (!token) throw new BadRequestException("Verification token missing");
+    return this.auth.verifyEmail(token);
+  }
+
+  @Post("resend-verification")
+  @ApiOperation({ summary: "Resend verification email" })
+  async resendVerification(@Body("email") email: string) {
+    if (!email) throw new BadRequestException("Email is required");
+    return this.auth.resendVerification(email);
   }
 
   @ApiBearerAuth()
