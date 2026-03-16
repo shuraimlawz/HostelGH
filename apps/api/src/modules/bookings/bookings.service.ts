@@ -418,6 +418,39 @@ export class BookingsService {
     ]);
   }
 
+
+  async cancelBooking(
+    actor: { id: string; role: UserRole },
+    bookingId: string,
+  ) {
+    const booking = await this.prisma.booking.findUnique({
+      where: { id: bookingId },
+      include: { items: true, hostel: true, payment: true },
+    });
+    if (!booking) throw new NotFoundException("Booking not found");
+    if (booking.tenantId !== actor.id) {
+      throw new ForbiddenException("Not authorized to cancel this booking");
+    }
+    if (booking.status !== BookingStatus.PENDING_APPROVAL && booking.status !== BookingStatus.APPROVED) {
+      throw new BadRequestException(`Booking cannot be canceled from ${booking.status}.`);
+    }
+    return await this.prisma.$transaction(async (tx) => {
+      if (booking.status === BookingStatus.APPROVED) {
+        for (const item of booking.items) {
+          await tx.room.update({
+            where: { id: item.roomId },
+            // @ts-ignore
+            data: { availableSlots: { increment: item.quantity } },
+          });
+        }
+      }
+      return tx.booking.update({
+        where: { id: bookingId },
+        data: { status: BookingStatus.CANCELLED },
+      });
+    });
+  }
+
   async requestDeletion(
     actor: { id: string; role: UserRole },
     bookingId: string,

@@ -12,14 +12,14 @@ function AuthCallbackContent() {
     const { login } = useAuth();
 
     useEffect(() => {
-        const accessToken = searchParams.get("accessToken");
-        const refreshToken = searchParams.get("refreshToken");
-        const userId = searchParams.get("userId");
+        const accessToken = searchParams.get("accessToken") || searchParams.get("token");
+        // refresh token stored in HttpOnly cookie
+        const userId = searchParams.get("userId") || searchParams.get("id");
         const role = searchParams.get("role");
         const email = searchParams.get("email");
         const isOnboarded = searchParams.get("isOnboarded") === "true";
 
-        if (accessToken && refreshToken && userId && role && email) {
+        if (accessToken && userId && role && email) {
             login(accessToken, { id: userId, role, email, isOnboarded } as any);
 
             if (!isOnboarded) {
@@ -29,7 +29,8 @@ function AuthCallbackContent() {
                 router.push("/");
             }
         } else {
-            toast.error("Authentication failed. Please try again.");
+            console.error("Auth missing params. AccessToken:", !!accessToken, "UserId:", !!userId, "Role:", !!role, "Email:", !!email);
+            toast.error("Authentication failed. Missing necessary information.");
             router.push("/auth/login");
         }
     }, [searchParams, login, router]);

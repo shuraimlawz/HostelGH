@@ -132,6 +132,7 @@ model User {
   adminAuditLogs AdminAuditLog[]
   processedPayouts PayoutRequest[] @relation("PayoutProcessor")
   passwordResetTokens PasswordResetToken[]
+  emailVerificationTokens EmailVerificationToken[]
   reviews        Review[]
   conversations  Conversation[]
   messages       Message[]

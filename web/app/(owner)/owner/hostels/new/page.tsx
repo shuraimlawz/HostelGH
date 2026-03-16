@@ -607,7 +607,7 @@ export default function NewHostelPage() {
                                 if (isValid) {
                                     setCurrentStep(s => s + 1);
                                 } else {
-                                    toast.error("Please fix errors before continuing");
+                                    toast.error("Please fill in all required fields");
                                 }
                             }}
                             className="px-8 py-4 bg-gray-950 text-white rounded-2xl font-black text-[11px] uppercase tracking-widest shadow-xl shadow-gray-200 hover:bg-black transition-all active:scale-[0.98]"

@@ -1,20 +1,11 @@
-import {
-  BadRequestException,
-  ForbiddenException,
-  Injectable,
-  NotFoundException,
-} from "@nestjs/common";
+import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from "@nestjs/common";
 import { PrismaService } from "../../prisma/prisma.service";
-import {
-  BookingStatus,
-  PaymentStatus,
-  UserRole,
-  PaymentProvider,
-} from "@prisma/client";
+import { BookingStatus, PaymentStatus, UserRole, PaymentProvider } from "@prisma/client";
 import { PaystackService } from "./paystack.service";
 import { ConfigService } from "@nestjs/config";
 import { randomBytes } from "crypto";
 import { NotificationsService } from "../notifications/notifications.service";
+import { FeeCalculationService } from "./fee-calculation.service";
 
 @Injectable()
 export class PaymentsService {
@@ -23,7 +14,15 @@ export class PaymentsService {
     private readonly paystack: PaystackService,
     private readonly config: ConfigService,
     private readonly notifications: NotificationsService,
+    private readonly feeCalc: FeeCalculationService,
   ) { }
+
+  private getCommissionRate() {
+    const envRate = this.config.get<string>("COMMISSION_RATE");
+    const parsed = envRate ? Number(envRate) : NaN;
+    if (!Number.isFinite(parsed) || parsed <= 0 || parsed >= 1) return 0.05;
+    return parsed;
+  }
 
   async initPaystackPayment(
     actor: { userId: string; role: UserRole },
@@ -54,7 +53,6 @@ export class PaymentsService {
       throw new BadRequestException("This booking has already been paid for.");
     }
 
-    const COMMISSION_RATE = 0.05; // 5%
     const totalAmount = booking.items.reduce(
       (sum, i) => sum + i.unitPrice * i.quantity,
       0,
@@ -62,7 +60,13 @@ export class PaymentsService {
     if (totalAmount <= 0)
       throw new BadRequestException("Invalid booking amount");
 
-    const platformFee = Math.round(totalAmount * COMMISSION_RATE);
+    const fee = await this.feeCalc.calculateListingFee({
+      hostelId: booking.hostelId,
+      bookingAmount: totalAmount,
+      isAcceptance: true,
+    });
+
+    const platformFee = fee.feeAmount;
     const ownerEarnings = totalAmount - platformFee;
 
     const reference = `HB_${randomBytes(10).toString("hex")}`;
@@ -73,6 +77,10 @@ export class PaymentsService {
         status: PaymentStatus.INITIATED,
         amount: totalAmount,
         platformFee,
+        // @ts-ignore
+        feeType: (fee as any).feeType,
+        // @ts-ignore
+        feeDescription: (fee as any).description,
         ownerEarnings,
         currency: "GHS",
         reference,
@@ -81,6 +89,10 @@ export class PaymentsService {
         bookingId: booking.id,
         amount: totalAmount,
         platformFee,
+        // @ts-ignore
+        feeType: (fee as any).feeType,
+        // @ts-ignore
+        feeDescription: (fee as any).description,
         ownerEarnings,
         currency: "GHS",
         reference,
@@ -346,6 +358,8 @@ export class PaymentsService {
           balance: 0,
           // @ts-ignore
           pendingBalance: payment.ownerEarnings,
+        // @ts-ignore
+        // @ts-ignore
           hostelId: bookingRow.hostelId,
         },
       });
@@ -449,7 +463,7 @@ export class PaymentsService {
   ) {
     const booking = await this.prisma.booking.findUnique({
       where: { id: bookingId },
-      include: { payment: true },
+      include: { payment: true, items: true },
     });
 
     if (!booking || booking.tenantId !== userId) {
@@ -468,7 +482,7 @@ export class PaymentsService {
       },
       create: {
         bookingId,
-        amount: 0, // Placeholder, usually would calculate from items
+        amount: booking.items.reduce((sum, i) => sum + i.unitPrice * i.quantity, 0), // computed from booking items
         status: PaymentStatus.AWAITING_VERIFICATION,
         offlineProofUrl: proofUrl,
         provider: PaymentProvider.OFFLINE,
@@ -561,3 +575,8 @@ export class PaymentsService {
     return this.initPaystackPayment(actor, bookingId);
   }
 }
+
+
+
+
+

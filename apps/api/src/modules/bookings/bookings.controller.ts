@@ -81,6 +81,14 @@ export class BookingsController {
   }
 
   @Roles(UserRole.OWNER, UserRole.ADMIN)
+
+  @Roles(UserRole.TENANT)
+  @Patch(":id/cancel")
+  @ApiOperation({ summary: "Cancel a booking (Tenant only)" })
+  cancel(@Req() req: any, @Param("id") id: string) {
+    return this.bookings.cancelBooking({ id: req.user.id, role: req.user.role }, id);
+  }
+
   @Patch(":id/complete")
   complete(@Req() req: any, @Param("id") id: string) {
     return this.bookings.complete({ id: req.user.id, role: req.user.role }, id);

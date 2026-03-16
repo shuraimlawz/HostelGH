@@ -567,7 +567,32 @@ export class AdminService {
   }
 
   async createInternalUser(dto: any) {
-    return {};
+    const exists = await this.prisma.user.findUnique({ where: { email: dto.email } });
+    if (exists) {
+      throw new BadRequestException("Email already in use");
+    }
+    const passwordHash = await bcrypt.hash(dto.password, 12);
+    const user = await this.prisma.user.create({
+      data: {
+        email: dto.email,
+        passwordHash,
+        firstName: dto.firstName,
+        lastName: dto.lastName,
+        role: dto.role,
+        emailVerified: true,
+        isActive: true,
+        isOnboarded: true,
+      },
+    });
+    await this.audit.log(
+      null,
+      AdminAction.CREATE,
+      AdminEntity.USER,
+      user.id,
+      `Internal user created: ${dto.email}`,
+      { role: dto.role },
+    );
+    return user;
   }
   async deleteUser(id: string) {
     return {};

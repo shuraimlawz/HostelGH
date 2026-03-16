@@ -465,7 +465,7 @@ export class HostelsService {
       this.prisma.booking.count({
         where: {
           hostel: { ownerId },
-          status: "PENDING" as any,
+          status: "PENDING_APPROVAL" as any,
         },
       }),
     ]);
