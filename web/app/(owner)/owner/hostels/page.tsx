@@ -13,11 +13,8 @@ import {
     Eye,
     Trash2,
     CalendarCheck,
-    Star,
     Loader2,
     Search,
-    Clock,
-    LayoutDashboard,
     Zap
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -47,13 +44,13 @@ export default function OwnerHostelsPage() {
         mutationFn: (id: string) => api.delete(`/hostels/${id}`),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["owner-hostels"] });
-            toast.success("Property removed from your portfolio");
+            toast.success("Property removed successfully");
         },
         onError: (err: any) => toast.error(err.message || "Failed to delete hostel")
     });
 
     const handleDelete = (id: string, name: string) => {
-        if (confirm(`Permanently remove ${name}? This action cannot be undone.`)) {
+        if (confirm(`Permanently remove ${name}?`)) {
             deleteMutation.mutate(id);
         }
     };
@@ -66,141 +63,122 @@ export default function OwnerHostelsPage() {
     if (isLoading) {
         return (
             <div className="flex h-[60vh] items-center justify-center">
-                <div className="flex flex-col items-center gap-4">
-                    <Loader2 className="animate-spin text-blue-600" size={40} />
-                    <p className="text-sm font-black text-gray-400 uppercase tracking-widest animate-pulse">Syncing Properties...</p>
+                <div className="flex flex-col items-center gap-2">
+                    <Loader2 className="animate-spin text-primary" size={24} />
+                    <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest animate-pulse">Syncing Portfolio...</p>
                 </div>
             </div>
         );
     }
 
     return (
-        <div className="max-w-[1600px] mx-auto space-y-10 pb-20">
-            {/* Command Header */}
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+        <div className="max-w-[1400px] mx-auto space-y-6 pb-12">
+            {/* Header Area */}
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-border pb-6">
                 <div>
-                    <div className="flex items-center gap-3 mb-4">
-                        <span className="px-2.5 py-1 bg-blue-50 text-blue-600 rounded-full text-[9px] font-black uppercase tracking-widest border border-blue-100">
+                    <div className="flex items-center gap-2 mb-2">
+                        <span className="px-2 py-0.5 bg-foreground text-background rounded-sm text-[8px] font-black uppercase tracking-[0.2em]">
                             Proprietor Hub
                         </span>
                     </div>
-                    <h1 className="text-4xl font-black text-gray-950 tracking-tight leading-none mb-3">
-                        My Hostels <span className="text-blue-600">.</span>
+                    <h1 className="text-2xl font-black text-foreground tracking-tight uppercase italic">
+                        Portfolio <span className="text-primary NOT-italic">.</span>
                     </h1>
-                    <p className="text-gray-500 font-medium text-lg">Manage and track your property portfolio performance.</p>
+                    <p className="text-muted-foreground font-bold text-[10px] uppercase tracking-widest">Manage your property fleet and tracking results.</p>
                 </div>
                 <Link
                     href="/owner/hostels/new"
-                    className="flex items-center gap-3 bg-gray-950 text-white px-8 py-4 rounded-2xl font-black text-[11px] uppercase tracking-widest hover:bg-black transition-all shadow-xl shadow-gray-200 group active:scale-[0.98]"
+                    className="flex items-center gap-2 bg-foreground text-background px-6 py-2.5 rounded-sm font-black text-[10px] uppercase tracking-widest hover:opacity-90 transition-all active:scale-[0.98] w-fit"
                 >
-                    <Plus size={16} className="group-hover:rotate-90 transition-transform" />
-                    <span>List New Property</span>
+                    <Plus size={14} />
+                    <span>Deploy Listing</span>
                 </Link>
             </div>
 
-            {/* Search & Controls */}
+            {/* Controls */}
             {hostels?.length > 0 && (
-                <div className="relative max-w-lg">
-                    <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+                <div className="relative max-w-sm">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground/50" size={14} />
                     <input
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
-                        className="w-full bg-white border border-gray-100 rounded-[2rem] py-5 pl-16 pr-8 outline-none focus:ring-4 focus:ring-blue-50 transition-all font-bold text-gray-950 placeholder:text-gray-400 shadow-sm"
-                        placeholder="Search your properties..."
+                        className="w-full bg-background border border-border rounded-sm py-2 pl-9 pr-4 outline-none focus:border-primary transition-all text-[11px] font-bold uppercase tracking-tight placeholder:text-muted-foreground/30 shadow-sm"
+                        placeholder="FILTER ASSETS..."
                     />
                 </div>
             )}
 
             {/* Grid */}
             {filteredHostels?.length === 0 ? (
-                <div className="bg-white border-2 border-dashed border-gray-100 rounded-[3rem] p-20 text-center space-y-6">
-                    <div className="w-20 h-20 bg-gray-50 rounded-[2rem] flex items-center justify-center mx-auto mb-6 transform rotate-3">
-                        <Building2 className="text-gray-300" size={40} />
-                    </div>
-                    <div className="max-w-md mx-auto">
-                        <h3 className="text-2xl font-black text-gray-950 tracking-tight mb-2">No properties found</h3>
-                        <p className="text-gray-500 font-medium">Start building your portfolio by adding your first hostel property to the platform.</p>
-                    </div>
+                <div className="bg-muted/30 border border-border border-dashed rounded-sm p-12 text-center">
+                    <Building2 className="text-muted-foreground/30 mx-auto mb-4" size={32} />
+                    <h3 className="text-xs font-black text-foreground tracking-widest uppercase mb-2">Null Set</h3>
+                    <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-tight mb-4">No assets detected in the current filter.</p>
                     {hostels?.length === 0 && (
                         <Link
                             href="/owner/hostels/new"
-                            className="inline-flex items-center gap-2 text-blue-600 font-black text-sm uppercase tracking-widest hover:underline mt-4"
+                            className="text-primary font-black text-[10px] uppercase tracking-widest hover:underline"
                         >
-                            Create first listing <Plus size={14} />
+                            Deploy First Asset
                         </Link>
                     )}
                 </div>
             ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                     {filteredHostels?.map((hostel: any) => (
-                        <div key={hostel.id} className="group bg-white rounded-[2.5rem] border border-gray-100 overflow-hidden hover:shadow-2xl hover:shadow-gray-200/50 transition-all duration-500 flex flex-col relative">
+                        <div key={hostel.id} className="group bg-card border border-border rounded-sm overflow-hidden hover:border-foreground/20 transition-all duration-300 flex flex-col relative shadow-sm">
                             {/* Image Area */}
-                            <div className="aspect-[4/3] bg-gray-100 relative overflow-hidden">
+                            <div className="aspect-[16/10] bg-muted relative overflow-hidden border-b border-border">
                                 {hostel.images?.[0] ? (
                                     <img
                                         src={hostel.images[0]}
                                         alt={hostel.name}
-                                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                                        className="w-full h-full object-cover grayscale-[0.5] group-hover:grayscale-0 transition-all duration-500"
                                     />
                                 ) : (
-                                    <div className="w-full h-full flex items-center justify-center text-gray-300 bg-gray-50">
-                                        <Building2 size={48} />
+                                    <div className="w-full h-full flex items-center justify-center text-muted-foreground/20">
+                                        <Building2 size={32} />
                                     </div>
                                 )}
 
-                                <div className="absolute top-5 left-5 right-5 flex justify-between items-start">
+                                <div className="absolute top-3 left-3 right-3 flex justify-between items-start">
                                     <span className={cn(
-                                        "px-3 py-1.5 rounded-xl text-[9px] font-black uppercase tracking-widest border backdrop-blur-md shadow-sm",
+                                        "px-2 py-0.5 rounded-sm text-[8px] font-black uppercase tracking-widest border shadow-sm",
                                         hostel.isPublished
-                                            ? "bg-emerald-500/90 text-white border-emerald-400"
+                                            ? "bg-emerald-500 text-white border-emerald-400"
                                             : hostel.pendingVerification
-                                                ? "bg-amber-500/90 text-white border-amber-400"
-                                                : "bg-gray-900/90 text-gray-400 border-gray-800"
+                                                ? "bg-amber-500 text-white border-amber-400"
+                                                : "bg-foreground text-background border-border"
                                     )}>
-                                        {hostel.isPublished ? "Live" : hostel.pendingVerification ? "Pending Approval" : "Draft"}
+                                        {hostel.isPublished ? "Live" : hostel.pendingVerification ? "Pending" : "Draft"}
                                     </span>
 
                                     <DropdownMenu>
                                         <DropdownMenuTrigger asChild>
-                                            <button className="w-8 h-8 flex items-center justify-center bg-white/90 backdrop-blur-sm rounded-full hover:bg-white transition-colors text-gray-900 shadow-sm border border-white/20">
-                                                <MoreVertical size={16} />
+                                            <button className="w-6 h-6 flex items-center justify-center bg-background/80 backdrop-blur-sm rounded-sm hover:bg-background transition-colors text-foreground shadow-sm border border-border">
+                                                <MoreVertical size={14} />
                                             </button>
                                         </DropdownMenuTrigger>
-                                        <DropdownMenuContent align="end" className="w-56 rounded-2xl p-2 shadow-xl border-gray-100">
-                                            <DropdownMenuItem asChild className="rounded-xl p-3 font-bold text-xs cursor-pointer focus:bg-gray-50">
-                                                <Link href={`/hostels/${hostel.id}`} target="_blank" className="flex items-center gap-3">
-                                                    <Eye size={16} className="text-blue-500" />
-                                                    View Public Listing
+                                        <DropdownMenuContent align="end" className="w-48 rounded-sm p-1 shadow-xl border-border bg-background">
+                                            <DropdownMenuItem asChild className="rounded-sm p-2 font-black text-[10px] uppercase tracking-widest cursor-pointer focus:bg-muted">
+                                                <Link href={`/hostels/${hostel.id}`} target="_blank" className="flex items-center gap-2">
+                                                    <Eye size={12} className="text-primary" />
+                                                    Preview
                                                 </Link>
                                             </DropdownMenuItem>
-                                            <DropdownMenuItem asChild className="rounded-xl p-3 font-bold text-xs cursor-pointer focus:bg-gray-50">
-                                                <Link href={`/owner/hostels/${hostel.id}/rooms`} className="flex items-center gap-3">
-                                                    <LayoutDashboard size={16} className="text-purple-500" />
-                                                    Manage Rooms
+                                            <DropdownMenuItem asChild className="rounded-sm p-2 font-black text-[10px] uppercase tracking-widest cursor-pointer focus:bg-muted">
+                                                <Link href={`/owner/hostels/${hostel.id}/edit`} className="flex items-center gap-2">
+                                                    <Edit2 size={12} className="text-foreground" />
+                                                    Configure
                                                 </Link>
                                             </DropdownMenuItem>
-                                            <DropdownMenuItem asChild className="rounded-xl p-3 font-bold text-xs cursor-pointer focus:bg-gray-50">
-                                                <Link href={`/owner/hostels/${hostel.id}/edit`} className="flex items-center gap-3">
-                                                    <Edit2 size={16} className="text-gray-900" />
-                                                    Edit Details
-                                                </Link>
-                                            </DropdownMenuItem>
-                                            {!hostel.isFeatured && (
-                                                <DropdownMenuItem
-                                                    onClick={() => toast.info("Upgrade to Pro to unlock featured listings!")}
-                                                    className="rounded-xl p-3 font-bold text-xs cursor-pointer focus:bg-orange-50 text-orange-600 focus:text-orange-700"
-                                                >
-                                                    <Star size={16} className="mr-3" />
-                                                    Promote to Featured
-                                                </DropdownMenuItem>
-                                            )}
-                                            <DropdownMenuSeparator className="bg-gray-50" />
+                                            <DropdownMenuSeparator className="bg-border" />
                                             <DropdownMenuItem
                                                 onClick={() => handleDelete(hostel.id, hostel.name)}
-                                                className="rounded-xl p-3 font-bold text-xs cursor-pointer focus:bg-red-50 text-red-600 focus:text-red-700"
+                                                className="rounded-sm p-2 font-black text-[10px] uppercase tracking-widest cursor-pointer focus:bg-red-50 text-red-600"
                                             >
-                                                <Trash2 size={16} className="mr-3" />
-                                                Delete Property
+                                                <Trash2 size={12} className="mr-2" />
+                                                Terminate
                                             </DropdownMenuItem>
                                         </DropdownMenuContent>
                                     </DropdownMenu>
@@ -208,52 +186,41 @@ export default function OwnerHostelsPage() {
                             </div>
 
                             {/* Content */}
-                            <div className="p-8 flex-1 flex flex-col">
-                                <div className="mb-6">
-                                    <h3 className="text-xl font-black text-gray-950 tracking-tight leading-tight mb-2 group-hover:text-blue-600 transition-colors">
+                            <div className="p-4 flex-1 flex flex-col">
+                                <div className="mb-4">
+                                    <h3 className="text-sm font-black text-foreground tracking-tight uppercase italic truncate group-hover:text-primary transition-colors">
                                         {hostel.name}
                                     </h3>
-                                    <div className="flex items-center gap-2 text-gray-500 text-[11px] font-bold uppercase tracking-widest">
-                                        <MapPin size={12} className="text-blue-500" />
-                                        <span>{hostel.city}, {hostel.addressLine}</span>
+                                    <div className="flex items-center gap-1 text-muted-foreground text-[9px] font-bold uppercase tracking-widest truncate">
+                                        <MapPin size={10} className="text-primary" />
+                                        <span>{hostel.city}</span>
                                     </div>
                                 </div>
 
-                                {hostel.pendingVerification && (
-                                    <div className="mt-4 p-4 rounded-2xl bg-amber-50 border border-amber-100 flex items-center gap-3">
-                                        <div className="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center text-amber-600 shrink-0">
-                                            <Clock size={16} />
+                                <div className="grid grid-cols-2 gap-2 mt-auto">
+                                    <div className="bg-muted/30 rounded-sm p-2 border border-border">
+                                        <div className="flex items-center gap-1.5 text-muted-foreground mb-0.5">
+                                            <Users size={10} />
+                                            <span className="text-[8px] font-black uppercase tracking-widest">Units</span>
                                         </div>
-                                        <div className="flex-1">
-                                            <p className="text-[10px] font-black text-amber-900 uppercase tracking-widest leading-tight">Waiting for Verification</p>
-                                            <p className="text-[10px] font-bold text-amber-700">An admin will review your listing shortly.</p>
-                                        </div>
+                                        <p className="text-sm font-black text-foreground tracking-tight">{hostel._count.rooms}</p>
                                     </div>
-                                )}
-
-                                <div className="mt-auto grid grid-cols-2 gap-4 pt-4">
-                                    <div className="bg-gray-50 rounded-2xl p-4 border border-transparent hover:border-gray-200 transition-all">
-                                        <div className="flex items-center gap-2 text-gray-400 mb-1">
-                                            <Users size={14} />
-                                            <span className="text-[9px] font-black uppercase tracking-widest">Inventory</span>
+                                    <div className="bg-muted/30 rounded-sm p-2 border border-border">
+                                        <div className="flex items-center gap-1.5 text-muted-foreground mb-0.5">
+                                            <CalendarCheck size={10} />
+                                            <span className="text-[8px] font-black uppercase tracking-widest">Orders</span>
                                         </div>
-                                        <p className="text-xl font-black text-gray-950 tracking-tighter">{hostel._count.rooms}</p>
-                                    </div>
-                                    <div className="bg-gray-50 rounded-2xl p-4 border border-transparent hover:border-gray-200 transition-all">
-                                        <div className="flex items-center gap-2 text-gray-400 mb-1">
-                                            <CalendarCheck size={14} />
-                                            <span className="text-[9px] font-black uppercase tracking-widest">Bookings</span>
-                                        </div>
-                                        <p className="text-xl font-black text-gray-950 tracking-tighter">{hostel._count.bookings}</p>
+                                        <p className="text-sm font-black text-foreground tracking-tight">{hostel._count.bookings}</p>
                                     </div>
                                 </div>
-                                <div className="mt-6">
+
+                                <div className="mt-4">
                                     <Link
                                         href={`/owner/hostels/${hostel.id}/rooms`}
-                                        className="w-full bg-blue-600 text-white py-3 rounded-2xl flex items-center justify-center font-black text-[10px] uppercase tracking-widest hover:bg-blue-700 transition-all gap-2"
+                                        className="w-full bg-foreground text-background py-2 rounded-sm flex items-center justify-center font-black text-[10px] uppercase tracking-widest hover:opacity-90 transition-all gap-2"
                                     >
-                                        <Zap size={14} />
-                                        Manage Pricing & Rooms
+                                        <Zap size={10} />
+                                        Manage inventory
                                     </Link>
                                 </div>
                             </div>

@@ -1,11 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { api } from "@/lib/api";
 import Link from "next/link";
 
-export default function VerifyEmailPage() {
+function VerifyEmailContent() {
     const params = useSearchParams();
     const router = useRouter();
     const token = params.get("token");
@@ -55,5 +55,19 @@ export default function VerifyEmailPage() {
                 )}
             </div>
         </div>
+    );
+}
+
+export default function VerifyEmailPage() {
+    return (
+        <Suspense fallback={
+            <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-white to-blue-50 px-6">
+                <div className="max-w-md w-full bg-white border border-slate-100 rounded-3xl shadow-xl p-10 text-center space-y-4">
+                    <h1 className="text-xl font-black">Loading...</h1>
+                </div>
+            </div>
+        }>
+            <VerifyEmailContent />
+        </Suspense>
     );
 }

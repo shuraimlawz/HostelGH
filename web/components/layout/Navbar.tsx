@@ -91,50 +91,50 @@ export default function Navbar() {
     };
 
     return (
-        <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border/40 h-20 shadow-[0_4px_30px_rgba(0,0,0,0.03)] transition-all duration-300">
-            <div className="container mx-auto px-4 md:px-10 h-full flex items-center justify-between">
+        <header className="sticky top-0 z-50 bg-background/90 backdrop-blur-xl border-b border-border shadow-sm h-16 transition-all duration-300">
+            <div className="container mx-auto px-4 md:px-8 h-full flex items-center justify-between">
                 {/* Logo */}
-                <Link href="/" className="flex items-center gap-2 group relative h-full">
+                <Link href="/" className="flex items-center gap-1.5 group relative">
                     <LogoAnimation />
-                    <span className="font-bold text-xl tracking-tighter text-[#1877F2] flex overflow-hidden">
-                        {"HostelGH".split("").map((char, i) => (
-                            <span
-                                key={i}
-                                className="inline-block animate-letter-reveal"
-                                style={{ animationDelay: `${i * 0.05}s` }}
-                            >
-                                {char}
-                            </span>
-                        ))}
+                    <span className="font-black text-lg tracking-tighter text-primary flex overflow-hidden">
+                        HostelGH
                     </span>
                 </Link>
 
                 {/* Right Actions */}
-                <div className="flex items-center justify-end gap-3 flex-1">
+                <div className="flex items-center justify-end gap-2 flex-1">
                     {/* Navigation Links */}
-                    <Link
-                        href="/hostels"
-                        className="hidden lg:block text-sm font-semibold px-4 py-2 rounded-full text-foreground hover:bg-muted transition-all"
-                    >
-                        Browse
-                    </Link>
-                    <Link
-                        href="/support"
-                        className="hidden lg:block text-sm font-semibold px-4 py-2 rounded-full text-foreground hover:bg-muted transition-all"
-                    >
-                        How it works
-                    </Link>
+                    <div className="hidden lg:flex items-center">
+                        <Link
+                            href="/hostels"
+                            className="text-xs font-black uppercase tracking-widest px-4 py-2 text-muted-foreground hover:text-foreground transition-all"
+                        >
+                            Browse
+                        </Link>
+                        <Link
+                            href="/feed"
+                            className="text-xs font-black uppercase tracking-widest px-4 py-2 text-muted-foreground hover:text-foreground transition-all"
+                        >
+                            Community
+                        </Link>
+                        <Link
+                            href="/support"
+                            className="text-xs font-black uppercase tracking-widest px-4 py-2 text-muted-foreground hover:text-foreground transition-all"
+                        >
+                            Support
+                        </Link>
+                    </div>
 
                     {!user && (
                         <Link
                             href="/auth/register?role=OWNER"
-                            className="hidden md:block text-sm font-bold px-5 py-2.5 rounded-full bg-foreground text-background hover:bg-foreground/90 transition-all shadow-md hover:shadow-lg active:scale-[0.98]"
+                            className="hidden md:block text-[10px] font-black uppercase tracking-[0.15em] px-4 py-2 rounded-sm bg-foreground text-background hover:bg-foreground/90 transition-all shadow-sm active:scale-[0.98]"
                         >
-                            List your hostel
+                            List Hostel
                         </Link>
                     )}
 
-                    <Suspense fallback={<div className="w-10 h-10" />}>
+                    <Suspense fallback={<div className="w-8 h-8" />}>
                         <RegionSelector />
                     </Suspense>
 
@@ -143,14 +143,14 @@ export default function Navbar() {
                         <button
                             onClick={() => setIsOpen(!isOpen)}
                             className={cn(
-                                "flex items-center gap-2.5 border rounded-full pl-3.5 pr-1.5 py-1.5 transition-all ml-1 group",
-                                isOpen ? "border-black/20 shadow-md bg-zinc-50" : "border-black/10 hover:border-black/20 shadow-sm hover:shadow-md bg-white"
+                                "flex items-center gap-2 border rounded-md px-2 py-1.5 transition-all ml-1 group",
+                                isOpen ? "border-primary/30 shadow-sm bg-accent" : "border-border hover:border-primary/20 bg-background"
                             )}
                         >
-                            <Menu size={18} className="text-muted-foreground group-hover:text-foreground transition-colors" />
-                            <div className="bg-muted text-muted-foreground rounded-full p-1 opacity-90 overflow-hidden ring-2 ring-transparent group-hover:ring-black/5 transition-all">
+                            <Menu size={16} className="text-muted-foreground group-hover:text-foreground transition-colors" />
+                            <div className="bg-muted text-muted-foreground rounded-sm p-0.5 opacity-90 overflow-hidden transition-all">
                                 {user ? (
-                                    <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-cyan-500 text-white rounded-full flex items-center justify-center text-xs font-black overflow-hidden shadow-inner">
+                                    <div className="w-7 h-7 bg-primary text-primary-foreground rounded-sm flex items-center justify-center text-[10px] font-black overflow-hidden">
                                         {user.avatarUrl ? (
                                             <img src={user.avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
                                         ) : (
@@ -158,7 +158,7 @@ export default function Navbar() {
                                         )}
                                     </div>
                                 ) : (
-                                    <UserIcon size={24} className="fill-current relative -bottom-1 text-muted-foreground/60" />
+                                    <UserIcon size={18} className="text-muted-foreground/60" />
                                 )}
                             </div>
                         </button>
@@ -172,6 +172,13 @@ export default function Navbar() {
                                     onClick={() => setIsOpen(false)}
                                 >
                                     Browse Hostels
+                                </Link>
+                                <Link
+                                    href="/feed"
+                                    className="block px-5 py-2.5 hover:bg-zinc-50 text-sm font-bold text-foreground transition-colors lg:hidden"
+                                    onClick={() => setIsOpen(false)}
+                                >
+                                    Community Feed
                                 </Link>
                                 <Link
                                     href="/support"

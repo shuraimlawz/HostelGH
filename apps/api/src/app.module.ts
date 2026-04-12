@@ -27,6 +27,7 @@ import { EmailModule } from "./modules/email/email.module";
 import { ReviewsModule } from "./modules/reviews/reviews.module";
 
 import { ChatModule } from "./modules/chat/chat.module";
+import { FeedModule } from "./modules/feed/feed.module";
 
 import { AppController } from "./app.controller";
 
@@ -56,6 +57,7 @@ import { AppController } from "./app.controller";
     EmailModule,
     ReviewsModule,
     ChatModule,
+    FeedModule,
     ScheduleModule.forRoot(),
     ThrottlerModule.forRoot([
       {

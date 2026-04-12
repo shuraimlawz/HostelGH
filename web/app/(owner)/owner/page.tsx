@@ -116,15 +116,15 @@ export default function OwnerDashboardPage() {
     };
 
     return (
-        <div className="max-w-[1600px] mx-auto space-y-10 pb-20 bg-background text-foreground transition-colors duration-300">
+        <div className="max-w-[1400px] mx-auto space-y-8 pb-10 bg-background text-foreground transition-colors duration-300">
             {/* Header / Portfolio Insights */}
-            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8 pt-4">
-                <div className="space-y-3">
-                    <div className="flex items-center gap-3 mb-2">
+            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 pt-2">
+                <div className="space-y-1">
+                    <div className="flex items-center gap-3 mb-1">
                         <div className="flex -space-x-2">
                             {[1, 2, 3].map((i) => (
-                                <div key={i} className="w-8 h-8 rounded-full border-2 border-background bg-muted flex items-center justify-center overflow-hidden">
-                                    <div className="w-full h-full bg-gradient-to-br from-blue-400 to-purple-400 opacity-50" />
+                                <div key={i} className="w-8 h-8 rounded-sm border-2 border-background bg-muted flex items-center justify-center overflow-hidden">
+                                    <div className="w-full h-full bg-primary/20" />
                                 </div>
                             ))}
                         </div>
@@ -132,142 +132,121 @@ export default function OwnerDashboardPage() {
                             Proprietor Hub <span className="text-primary ml-1">Live</span>
                         </span>
                     </div>
-                    <h1 className="text-2xl font-black text-foreground tracking-tight">
+                    <h1 className="text-xl font-black text-foreground tracking-tight uppercase italic">
                         Portfolio Insights <span className="text-primary">.</span>
                     </h1>
-                    <p className="text-muted-foreground font-medium text-sm">
-                        Real-time performance metrics for your hostel portfolio.
+                    <p className="text-muted-foreground font-bold text-[10px] uppercase">
+                        Real-time performance metrics.
                     </p>
                 </div>
 
-                <div className="flex items-center gap-4">
-                    {sub?.plan === "PRO" && sub.expiresAt && (
-                        <div className="hidden xl:flex items-center gap-2 px-4 py-2 bg-primary/5 rounded-2xl border border-primary/10">
-                            <Zap size={14} className="text-primary" />
-                            <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mr-1">Pro Status</span>
-                            <span className="text-[10px] font-bold text-primary italic">
-                                Expires {new Date(sub.expiresAt).toLocaleDateString()}
-                            </span>
+                <div className="flex items-center gap-3">
+                    {!subLoading && sub?.plan === "PRO" && (
+                        <div className="hidden xl:flex items-center gap-2 px-3 py-1.5 bg-primary/5 rounded-sm border border-primary/10">
+                            <Zap size={12} className="text-primary" />
+                            <span className="text-[9px] font-black uppercase tracking-widest text-primary">Pro Status</span>
                         </div>
                     )}
-                    <div className="hidden sm:flex items-center gap-2 px-4 py-2 bg-card rounded-2xl border border-border shadow-sm animate-in fade-in duration-500">
-                        <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-                        <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Real-time Sync Active</span>
+                    <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-muted/50 rounded-sm border border-border/50">
+                        <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                        <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground">Sync Active</span>
                     </div>
                     <Link
                         href="/owner/hostels/new"
-                        className="bg-foreground text-background px-6 py-3 rounded-2xl font-black text-[11px] uppercase tracking-widest hover:opacity-90 transition-all shadow-xl shadow-foreground/5 flex items-center gap-2 group"
+                        className="bg-foreground text-background px-4 py-2 rounded-sm font-black text-[10px] uppercase tracking-widest hover:bg-foreground/90 transition-all flex items-center gap-2 group"
                     >
-                        <PlusCircle size={16} className="group-hover:rotate-90 transition-transform" /> Add Property
+                        <PlusCircle size={14} className="group-hover:rotate-90 transition-transform" /> Add Property
                     </Link>
                 </div>
             </div>
 
             {/* Stats Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <div className="bg-card p-6 rounded-[2.5rem] border border-border shadow-sm relative overflow-hidden group">
-                    <div className="absolute top-0 right-0 w-24 h-24 bg-primary/10 rounded-full -mr-12 -mt-12 group-hover:scale-110 transition-transform" />
-                    <div className="relative z-10">
-                        <div className="flex items-center justify-between mb-6">
-                            <div className="w-12 h-12 bg-primary/10 text-primary rounded-2xl flex items-center justify-center">
-                                <Building2 size={24} />
-                            </div>
-                            <TrendingUp size={20} className="text-green-500" />
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div className="bg-card p-5 rounded-lg border border-border transition-all hover:border-primary/30">
+                    <div className="flex items-center justify-between mb-4">
+                        <div className="w-10 h-10 bg-primary/10 text-primary rounded-md flex items-center justify-center">
+                            <Building2 size={20} />
                         </div>
-                        <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-1">Total Assets</p>
-                        <h3 className="text-xl font-black text-foreground">{stats.totalHostels} Hostels</h3>
+                        <TrendingUp size={16} className="text-emerald-500" />
                     </div>
+                    <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest mb-0.5">Total Assets</p>
+                    <h3 className="text-lg font-black text-foreground">{stats.totalHostels} Hostels</h3>
                 </div>
 
-                <div className="bg-card p-6 rounded-[2.5rem] border border-border shadow-sm relative overflow-hidden group">
-                    <div className="absolute top-0 right-0 w-24 h-24 bg-purple-500/10 rounded-full -mr-12 -mt-12 group-hover:scale-110 transition-transform" />
-                    <div className="relative z-10">
-                        <div className="flex items-center justify-between mb-6">
-                            <div className="w-12 h-12 bg-purple-500/10 text-purple-600 rounded-2xl flex items-center justify-center">
-                                <Users size={24} />
-                            </div>
-                            <span className="text-[10px] font-black text-purple-600 bg-purple-500/20 px-2 py-1 rounded-lg">High Demand</span>
+                <div className="bg-card p-5 rounded-lg border border-border transition-all hover:border-primary/30">
+                    <div className="flex items-center justify-between mb-4">
+                        <div className="w-10 h-10 bg-purple-500/10 text-purple-600 rounded-md flex items-center justify-center">
+                            <Users size={20} />
                         </div>
-                        <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-1">Active Tenants</p>
-                        <h3 className="text-xl font-black text-foreground">{stats.totalApprovedBookings} Students</h3>
+                        <span className="text-[8px] font-black text-purple-600 bg-purple-500/10 px-1.5 py-0.5 rounded-sm uppercase tracking-widest leading-none">High Demand</span>
                     </div>
+                    <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest mb-0.5">Active Tenants</p>
+                    <h3 className="text-lg font-black text-foreground">{stats.totalApprovedBookings} Students</h3>
                 </div>
 
-                <div className="bg-card p-6 rounded-[2.5rem] border border-border shadow-sm relative overflow-hidden group">
-                    <div className="absolute top-0 right-0 w-24 h-24 bg-orange-500/10 rounded-full -mr-12 -mt-12 group-hover:scale-110 transition-transform" />
-                    <div className="relative z-10">
-                        <div className="flex items-center justify-between mb-6">
-                            <div className="w-12 h-12 bg-orange-500/10 text-orange-600 rounded-2xl flex items-center justify-center">
-                                <Zap size={24} />
-                            </div>
-                            <span className="text-[10px] font-black text-orange-600 bg-orange-500/20 px-2 py-1 rounded-lg">Action Needed</span>
+                <div className="bg-card p-5 rounded-lg border border-border transition-all hover:border-primary/30">
+                    <div className="flex items-center justify-between mb-4">
+                        <div className="w-10 h-10 bg-orange-500/10 text-orange-600 rounded-md flex items-center justify-center">
+                            <Zap size={20} />
                         </div>
-                        <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-1">Queue Size</p>
-                        <h3 className="text-xl font-black text-foreground">{stats.totalPendingBookings} Pending</h3>
+                        <span className="text-[8px] font-black text-orange-600 bg-orange-500/10 px-1.5 py-0.5 rounded-sm uppercase tracking-widest leading-none">Action</span>
                     </div>
+                    <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest mb-0.5">Queue Size</p>
+                    <h3 className="text-lg font-black text-foreground">{stats.totalPendingBookings} Pending</h3>
                 </div>
 
-                {/* Primary Wallet Card */}
-                <div className="bg-card p-6 rounded-[2.5rem] border border-border shadow-sm relative overflow-hidden group">
-                    <div className="absolute top-0 right-0 w-40 h-40 bg-primary/10 rounded-full -mr-20 -mt-20 blur-3xl group-hover:scale-110 transition-transform" />
-                    <div className="relative z-10">
-                        <div className="flex items-center justify-between mb-6">
-                            <div className="w-12 h-12 bg-primary/10 text-primary rounded-2xl flex items-center justify-center">
-                                <DollarSign size={24} />
-                            </div>
-                            <Link href="/owner/payouts" className="text-[10px] font-black text-primary uppercase tracking-widest hover:underline flex items-center gap-1">
-                                Withdraw <ArrowUpRight size={12} />
-                            </Link>
+                <div className="bg-card p-5 rounded-lg border border-primary/20 bg-primary/[0.02] transition-all hover:border-primary/40 group">
+                    <div className="flex items-center justify-between mb-4">
+                        <div className="w-10 h-10 bg-primary/10 text-primary rounded-md flex items-center justify-center">
+                            <DollarSign size={20} />
                         </div>
-                        <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-1 italic">Settled Balance</p>
-                        <h3 className="text-2xl font-black text-foreground tracking-tighter">₵{walletBalance.toLocaleString()}</h3>
-                        <p className="text-[9px] text-muted-foreground font-medium mt-4 flex items-center gap-1">
-                            <CheckCircle2 size={10} className="text-green-500" /> Auto-payout enabled
-                        </p>
+                        <Link href="/owner/payouts" className="text-[9px] font-black text-primary uppercase tracking-widest hover:underline flex items-center gap-1">
+                            Withdraw <ArrowUpRight size={10} />
+                        </Link>
                     </div>
+                    <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest mb-0.5 italic">Settled Balance</p>
+                    <h3 className="text-xl font-black text-foreground tracking-tighter">₵{walletBalance.toLocaleString()}</h3>
                 </div>
             </div>
 
             {/* Analytics & Management */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
                 {/* Revenue Visualization */}
-                <div className="lg:col-span-8 bg-card p-8 rounded-[2.5rem] border border-border shadow-sm relative">
-                    <div className="flex items-center justify-between mb-10">
-                        <div className="space-y-1">
-                            <h2 className="text-xl font-black text-foreground italic uppercase tracking-wider">Revenue Drift</h2>
-                            <p className="text-xs text-muted-foreground font-medium">Monthly performance across all properties.</p>
+                <div className="lg:col-span-8 bg-card p-6 rounded-lg border border-border">
+                    <div className="flex items-center justify-between mb-8">
+                        <div className="space-y-0.5">
+                            <h2 className="text-sm font-black text-foreground uppercase tracking-wider italic">Revenue Drift</h2>
+                            <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest">Monthly Performance</p>
                         </div>
-                        <div className="flex items-center gap-4">
-                            <div className="flex items-center gap-2">
-                                <div className="w-2 h-2 rounded-full bg-primary" />
-                                <span className="text-[10px] font-black uppercase text-muted-foreground">Revenue</span>
-                            </div>
+                        <div className="flex items-center gap-2">
+                            <div className="w-1.5 h-1.5 rounded-full bg-primary" />
+                            <span className="text-[9px] font-black uppercase text-muted-foreground tracking-widest">Revenue</span>
                         </div>
                     </div>
 
-                    <div className="h-[300px] w-full mt-4">
+                    <div className="h-[280px] w-full mt-2">
                         <ResponsiveContainer width="100%" height="100%">
                             <AreaChart data={bookingTrendData}>
                                 <defs>
                                     <linearGradient id="colorRev" x1="0" y1="0" x2="0" y2="1">
-                                        <stop offset="5%" stopColor="#3B82F6" stopOpacity={0.1} />
-                                        <stop offset="95%" stopColor="#3B82F6" stopOpacity={0} />
+                                        <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.1} />
+                                        <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0} />
                                     </linearGradient>
                                 </defs>
-                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
+                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" opacity={0.5} />
                                 <XAxis
                                     dataKey="month"
                                     axisLine={false}
                                     tickLine={false}
-                                    tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 11, fontWeight: 700 }}
+                                    tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 9, fontWeight: 900 }}
                                 />
                                 <YAxis
                                     axisLine={false}
                                     tickLine={false}
-                                    tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 11, fontWeight: 700 }}
+                                    tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 9, fontWeight: 900 }}
                                 />
                                 <Tooltip
-                                    contentStyle={{ borderRadius: '1.5rem', border: 'none', backgroundColor: 'hsl(var(--card))', color: 'hsl(var(--foreground))', boxShadow: '0 10px 25px -5px rgba(0,0,0,0.2)' }}
+                                    contentStyle={{ borderRadius: '0.4rem', border: '1px solid hsl(var(--border))', backgroundColor: 'hsl(var(--card))', color: 'hsl(var(--foreground))', fontSize: '10px' }}
                                 />
                                 <Area
                                     type="monotone"
@@ -283,31 +262,29 @@ export default function OwnerDashboardPage() {
                 </div>
 
                 {/* Portfolio Summary (Right) */}
-                <div className="lg:col-span-4 space-y-6">
-                    <div className="bg-gradient-to-br from-primary to-primary/80 rounded-[3rem] p-8 text-background shadow-xl shadow-primary/10 flex flex-col justify-between min-h-[400px] relative overflow-hidden group">
-                        <div className="absolute top-0 right-0 w-40 h-40 bg-white/10 rounded-full -mr-20 -mt-20 blur-3xl group-hover:bg-white/20 transition-all" />
-
-                        <div className="relative z-10">
-                            <div className="w-12 h-12 bg-background/20 rounded-2xl flex items-center justify-center mb-6">
-                                <Building2 size={20} />
+                <div className="lg:col-span-4 space-y-4">
+                    <div className="bg-foreground rounded-lg p-6 text-background shadow-md min-h-[370px] flex flex-col justify-between border border-border overflow-hidden group">
+                        <div>
+                            <div className="w-10 h-10 bg-background/10 rounded-md flex items-center justify-center mb-4">
+                                <Building2 size={18} />
                             </div>
-                            <h3 className="text-2xl font-black mb-2">My Properties</h3>
-                            <p className="text-background/80 font-medium text-xs">You are currently managing {totalHostels} hostels with {totalRooms} total units.</p>
+                            <h3 className="text-xl font-black uppercase italic tracking-tight mb-1">My Portfolio</h3>
+                            <p className="text-background/60 font-medium text-[10px] uppercase tracking-widest">Managing {totalHostels} Assets • {totalRooms} Units</p>
                         </div>
 
-                        <div className="relative z-10 space-y-4">
-                            <div className="grid grid-cols-2 gap-4">
-                                <div className="bg-background/10 p-4 rounded-2xl border border-background/10">
-                                    <p className="text-[10px] font-black text-background/60 uppercase tracking-widest mb-1">Hostels</p>
+                        <div className="space-y-3">
+                            <div className="grid grid-cols-2 gap-3">
+                                <div className="bg-background/5 p-4 rounded-md border border-background/10">
+                                    <p className="text-[8px] font-black text-background/40 uppercase tracking-widest mb-1">Hostels</p>
                                     <p className="text-2xl font-black">{totalHostels}</p>
                                 </div>
-                                <div className="bg-background/10 p-4 rounded-2xl border border-background/10">
-                                    <p className="text-[10px] font-black text-background/60 uppercase tracking-widest mb-1">Rooms</p>
+                                <div className="bg-background/5 p-4 rounded-md border border-background/10">
+                                    <p className="text-[8px] font-black text-background/40 uppercase tracking-widest mb-1">Rooms</p>
                                     <p className="text-2xl font-black">{totalRooms}</p>
                                 </div>
                             </div>
-                            <Link href="/owner/hostels" className="w-full bg-background text-primary py-4 rounded-2xl flex items-center justify-center font-black text-sm uppercase tracking-widest hover:bg-background/90 transition-all gap-2">
-                                Manage Listings <ArrowRight size={18} />
+                            <Link href="/owner/hostels" className="w-full bg-background text-foreground py-3.5 rounded-sm flex items-center justify-center font-black text-[10px] uppercase tracking-[0.2em] hover:bg-background/90 transition-all gap-2">
+                                Manage <ArrowRight size={14} />
                             </Link>
                         </div>
                     </div>
@@ -315,24 +292,24 @@ export default function OwnerDashboardPage() {
             </div>
 
             {/* Management Table */}
-            <div className="bg-card rounded-[2.5rem] border border-border overflow-hidden shadow-sm transition-colors duration-300">
-                <div className="p-8 border-b border-border flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div className="bg-card rounded-lg border border-border overflow-hidden shadow-sm">
+                <div className="p-6 border-b border-border flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div>
-                        <h3 className="text-xl font-black text-foreground">Booking Management</h3>
-                        <p className="text-sm text-muted-foreground font-medium">Handle requests and monitor check-ins.</p>
+                        <h3 className="text-sm font-black text-foreground uppercase tracking-widest leading-none mb-1">Booking Ledger</h3>
+                        <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-tight">Real-time occupancy management</p>
                     </div>
 
-                    <div className="flex bg-muted p-1.5 rounded-2xl">
+                    <div className="flex bg-muted p-1 rounded-md">
                         {[
                             { key: "all", label: "All" },
                             { key: "pending", label: "Pending" },
-                            { key: "active", label: "Active" }
+                            { key: "active", label: "Live" }
                         ].map((tab) => (
                             <button
                                 key={tab.key}
                                 onClick={() => setSelectedTab(tab.key as any)}
                                 className={cn(
-                                    "px-5 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all",
+                                    "px-4 py-1.5 rounded-sm text-[9px] font-black uppercase tracking-widest transition-all",
                                     selectedTab === tab.key
                                         ? "bg-background text-primary shadow-sm border border-border"
                                         : "text-muted-foreground hover:text-foreground"
@@ -345,56 +322,56 @@ export default function OwnerDashboardPage() {
 
                 <div className="overflow-x-auto">
                     {filteredBookings.length === 0 ? (
-                        <div className="p-20 text-center space-y-4">
-                            <Activity size={48} className="mx-auto text-muted/30" />
-                            <p className="text-muted-foreground font-black uppercase tracking-widest text-xs">No active bookings found</p>
+                        <div className="p-12 text-center space-y-4">
+                            <Activity size={32} className="mx-auto text-muted/30" />
+                            <p className="text-muted-foreground font-black uppercase tracking-widest text-[10px]">No active bookings</p>
                         </div>
                     ) : (
                         <table className="w-full">
                             <thead>
-                                <tr className="bg-muted/30">
-                                    <th className="px-8 py-4 text-left text-[10px] font-black text-muted-foreground uppercase tracking-widest">Tenant</th>
-                                    <th className="px-8 py-4 text-left text-[10px] font-black text-muted-foreground uppercase tracking-widest">Property / Unit</th>
-                                    <th className="px-8 py-4 text-left text-[10px] font-black text-muted-foreground uppercase tracking-widest">Stay Period</th>
-                                    <th className="px-8 py-4 text-left text-[10px] font-black text-muted-foreground uppercase tracking-widest">Status</th>
-                                    <th className="px-8 py-4 text-right text-[10px] font-black text-muted-foreground uppercase tracking-widest">Actions</th>
+                                <tr className="bg-muted/30 border-b border-border">
+                                    <th className="px-6 py-3 text-left text-[9px] font-black text-muted-foreground uppercase tracking-widest">Tenant</th>
+                                    <th className="px-6 py-3 text-left text-[9px] font-black text-muted-foreground uppercase tracking-widest">Property / Unit</th>
+                                    <th className="px-6 py-3 text-left text-[9px] font-black text-muted-foreground uppercase tracking-widest">Stay Info</th>
+                                    <th className="px-6 py-3 text-left text-[9px] font-black text-muted-foreground uppercase tracking-widest">Status</th>
+                                    <th className="px-6 py-3 text-right text-[9px] font-black text-muted-foreground uppercase tracking-widest">Action</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-border">
                                 {filteredBookings.slice(0, 8).map((booking: any) => (
                                     <tr key={booking.id} className="hover:bg-muted/30 transition-colors group">
-                                        <td className="px-8 py-5">
-                                            <div className="flex items-center gap-4">
-                                                <div className="w-10 h-10 bg-primary/10 text-primary rounded-full flex items-center justify-center font-black text-sm">
+                                        <td className="px-6 py-4">
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-8 h-8 bg-primary/10 text-primary rounded-sm flex items-center justify-center font-black text-xs">
                                                     {booking.user.firstName?.[0] || booking.user.email[0].toUpperCase()}
                                                 </div>
                                                 <div>
-                                                    <p className="font-bold text-foreground text-sm">{booking.user.firstName} {booking.user.lastName}</p>
-                                                    <p className="text-xs text-muted-foreground font-medium">{booking.user.email}</p>
+                                                    <p className="font-black text-foreground text-xs uppercase tracking-tight">{booking.user.firstName} {booking.user.lastName}</p>
+                                                    <p className="text-[9px] text-muted-foreground font-bold">{booking.user.email}</p>
                                                 </div>
                                             </div>
                                         </td>
-                                        <td className="px-8 py-5">
-                                            <p className="font-bold text-foreground text-sm">{booking.hostel.name}</p>
-                                            <p className="text-xs text-muted-foreground font-black uppercase tracking-wider">{booking.items?.[0]?.room?.name || "Suite"}</p>
+                                        <td className="px-6 py-4">
+                                            <p className="font-black text-foreground text-xs uppercase tracking-tight">{booking.hostel.name}</p>
+                                            <p className="text-[9px] text-muted-foreground font-black uppercase tracking-widest">{booking.items?.[0]?.room?.name || "Suite"}</p>
                                         </td>
-                                        <td className="px-8 py-5">
-                                            <div className="text-sm font-bold text-foreground">
+                                        <td className="px-6 py-4">
+                                            <div className="text-xs font-black text-foreground">
                                                 {new Date(booking.items?.[0]?.startDate).toLocaleDateString()}
                                             </div>
-                                            <p className="text-[10px] font-black text-muted-foreground uppercase">Check-in Date</p>
+                                            <p className="text-[8px] font-black text-muted-foreground uppercase tracking-widest">Check-in</p>
                                         </td>
-                                        <td className="px-8 py-5">
-                                            <span className={cn("px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest border", getStatusStyles(booking.status))}>
+                                        <td className="px-6 py-4">
+                                            <span className={cn("px-3 py-1 rounded-sm text-[8px] font-black uppercase tracking-widest border", getStatusStyles(booking.status))}>
                                                 {booking.status.replace(/_/g, " ")}
                                             </span>
                                         </td>
-                                        <td className="px-8 py-5 text-right">
+                                        <td className="px-6 py-4 text-right">
                                             <Link
                                                 href={`/owner/bookings/${booking.id}`}
-                                                className="inline-flex items-center justify-center w-10 h-10 bg-muted text-muted-foreground rounded-xl hover:bg-primary hover:text-background transition-all shadow-sm"
+                                                className="inline-flex items-center justify-center w-8 h-8 bg-muted text-muted-foreground rounded-sm hover:bg-foreground hover:text-background transition-all shadow-sm"
                                             >
-                                                <Eye size={18} />
+                                                <Eye size={14} />
                                             </Link>
                                         </td>
                                     </tr>
@@ -403,9 +380,9 @@ export default function OwnerDashboardPage() {
                         </table>
                     )}
                 </div>
-                <div className="p-8 bg-muted/30 border-t border-border">
-                    <Link href="/owner/bookings" className="text-[10px] font-black text-primary uppercase tracking-[0.2em] hover:underline flex items-center gap-2">
-                        View Complete Booking Ledger <ArrowRight size={14} />
+                <div className="p-6 bg-muted/20 border-t border-border">
+                    <Link href="/owner/bookings" className="text-[9px] font-black text-primary uppercase tracking-[0.2em] hover:underline flex items-center gap-2">
+                        View Complete Ledger <ArrowRight size={12} />
                     </Link>
                 </div>
             </div>

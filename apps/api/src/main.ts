@@ -57,6 +57,7 @@ async function bootstrap() {
     "https://hostelgh.onrender.com",
     "https://hostelgh.vercel.app",
     "https://hostelgh-api.onrender.com",
+    "http://localhost:3000"
   ].filter(Boolean);
 
   app.enableCors({

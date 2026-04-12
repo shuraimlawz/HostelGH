@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState, useEffect } from "react";
 import LogoAnimation from "../layout/LogoAnimation";
 import AuthCarousel from "./AuthCarousel";
@@ -95,27 +96,29 @@ export default function AuthLayout({ children, title, subtitle }: AuthLayoutProp
             </div>
 
             {/* Right Side - Form Content */}
-            <div className="w-full lg:w-1/2 flex flex-col items-center justify-center p-8 bg-zinc-50 relative">
-                {/* Subtle background glow pattern to make it less plain white */}
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(59,130,246,0.03),transparent_40%)] pointer-events-none" />
+            <div className="w-full lg:w-1/2 flex flex-col items-center justify-center p-6 bg-background relative">
+                {/* Subtle background glow */}
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(var(--primary-rgb),0.03),transparent_40%)] pointer-events-none" />
 
-                <div className="w-full max-w-[420px] relative z-10">
+                <div className="w-full max-w-[380px] relative z-10">
                     {/* Header */}
-                    <div className="mb-10 text-center">
-                        <div className="flex justify-center mb-8">
-                            <span className="font-black tracking-tight text-2xl flex items-center gap-2 group cursor-pointer">
-                                <span className="p-2 bg-white rounded-2xl shadow-sm border border-black/5 group-hover:scale-105 transition-transform">
+                    <div className="mb-8 text-center lg:text-left">
+                        <div className="flex justify-center lg:justify-start mb-6">
+                            <Link href="/" className="font-black tracking-tighter text-lg flex items-center gap-2 group">
+                                <span className="p-1.5 bg-foreground text-background rounded-sm">
                                     <LogoAnimation />
                                 </span>
-                                HostelGH
-                            </span>
+                                <span className="uppercase tracking-[0.2em] text-xs">HostelGH</span>
+                            </Link>
                         </div>
-                        <h1 className="text-4xl font-black tracking-tighter mb-3 text-foreground">{title}</h1>
-                        {subtitle && <p className="text-muted-foreground font-medium text-sm">{subtitle}</p>}
+                        <h1 className="text-2xl font-black tracking-tight mb-1 text-foreground uppercase italic">{title} <span className="text-primary NOT-italic">.</span></h1>
+                        {subtitle && <p className="text-muted-foreground font-bold text-[10px] uppercase tracking-widest">{subtitle}</p>}
                     </div>
 
                     {/* Form Container */}
-                    {children}
+                    <div className="bg-card border border-border p-6 rounded-sm shadow-sm">
+                        {children}
+                    </div>
                 </div>
             </div>
         </div>

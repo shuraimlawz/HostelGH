@@ -26,8 +26,7 @@ import {
     Droplets,
     Flame,
     Clock,
-    Image as ImageIcon,
-    Trash2
+    Image as ImageIcon
 } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
@@ -60,17 +59,16 @@ const AMENITIES = [
 ];
 
 const STEPS = [
-    { id: 1, label: "Basic Info", icon: Info },
+    { id: 1, label: "Identity", icon: Info },
     { id: 2, label: "Location", icon: MapPin },
-    { id: 3, label: "Features", icon: Zap },
-    { id: 4, label: "Photos", icon: ImageIcon },
+    { id: 3, label: "Specs", icon: Zap },
+    { id: 4, label: "Visuals", icon: ImageIcon },
 ];
 
 const DRAFT_KEY = "hostel_listing_draft";
 
 export default function NewHostelPage() {
     const router = useRouter();
-    const [loading, setLoading] = useState(false);
     const [currentStep, setCurrentStep] = useState(1);
     const [selectedAmenities, setSelectedAmenities] = useState<string[]>([]);
 
@@ -98,7 +96,6 @@ export default function NewHostelPage() {
         if (savedDraft) {
             try {
                 const draft = JSON.parse(savedDraft);
-                // Restore form fields
                 if (draft.formData) {
                     Object.keys(draft.formData).forEach((key) => {
                         form.setValue(key as any, draft.formData[key]);
@@ -107,14 +104,10 @@ export default function NewHostelPage() {
                         setSelectedAmenities(draft.formData.amenities);
                     }
                 }
-                // Restore UI State
                 if (draft.currentStep) {
                     setCurrentStep(draft.currentStep);
                 }
-
-                toast.success("Draft restored", {
-                    description: "We've recovered your previous progress."
-                });
+                toast.success("Progress Restored");
             } catch (e) {
                 console.error("Failed to restore draft", e);
             }
@@ -145,7 +138,6 @@ export default function NewHostelPage() {
     const [publishStage, setPublishStage] = useState<'idle' | 'uploading' | 'verifying' | 'done' | 'error'>('idle');
     const [publishResult, setPublishResult] = useState<{ requiresVerification: boolean } | null>(null);
 
-    // Close overlay on error to allow user to see toast and fix issues (e.g. subscription limits)
     useEffect(() => {
         if (publishStage === 'error') {
             const timer = setTimeout(() => {
@@ -158,17 +150,11 @@ export default function NewHostelPage() {
     const onSubmit = async (values: z.infer<typeof formSchema>) => {
         setPublishStage('uploading');
         try {
-            // Stage 1: simulate upload/transmission feel
             await new Promise(r => setTimeout(r, 900));
             setPublishStage('verifying');
-
-            // Stage 2: actual API call
             const res = await api.post("/hostels", values);
             await new Promise(r => setTimeout(r, 700));
-
-            // Clear draft on success
             localStorage.removeItem(DRAFT_KEY);
-
             setPublishStage('done');
             setPublishResult({ requiresVerification: res.data?.requiresVerification ?? true });
         } catch (error: any) {
@@ -180,73 +166,55 @@ export default function NewHostelPage() {
     const isPublishing = publishStage !== 'idle' && publishStage !== 'error';
 
     const stages = [
-        { key: 'uploading', label: 'Transmitting property data...' },
-        { key: 'verifying', label: 'Queuing for admin verification...' },
-        { key: 'done', label: 'Submission complete!' },
+        { key: 'uploading', label: 'TRANSMITTING ASSET DATA...' },
+        { key: 'verifying', label: 'VERIFYING COMPLIANCE...' },
+        { key: 'done', label: 'DEPLOYMENT COMPLETE' },
     ];
 
     return (
-        <div className="max-w-5xl mx-auto pb-20 relative">
+        <div className="max-w-4xl mx-auto pb-20 relative">
 
-            {/* ─── Publishing Full-Page Overlay ─── */}
+            {/* ─── Publishing Overlay ─── */}
             {(publishStage !== 'idle') && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center">
-                    {/* Backdrop blur */}
-                    <div className="absolute inset-0 bg-white/60 backdrop-blur-md" />
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+                    <div className="absolute inset-0 bg-background/80 backdrop-blur-sm" />
 
-                    <div className="relative z-10 bg-white border border-gray-100 rounded-[3rem] shadow-2xl shadow-gray-200 p-12 max-w-md w-full mx-4 text-center animate-in zoom-in-95 duration-300">
+                    <div className="relative z-10 bg-card border border-border rounded-sm shadow-2xl p-8 max-w-sm w-full text-center animate-in zoom-in-95 duration-300">
 
                         {publishStage === 'done' && publishResult ? (
-                            // ── Success State ──
                             <>
-                                <div className="w-20 h-20 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-6 border-2 border-blue-100">
-                                    <Check className="text-blue-600" size={36} />
+                                <div className="w-16 h-16 bg-primary/10 rounded-sm flex items-center justify-center mx-auto mb-6 border border-primary/20">
+                                    <Check className="text-primary" size={32} />
                                 </div>
-                                <h2 className="text-2xl font-black text-gray-950 tracking-tight mb-3">
-                                    {publishResult.requiresVerification ? 'Under Review' : 'Hostel Published!'}
+                                <h2 className="text-xl font-black text-foreground tracking-tight uppercase italic mb-2">
+                                    {publishResult.requiresVerification ? 'Processing' : 'Asset Live'} <span className="text-primary NOT-italic">.</span>
                                 </h2>
-                                {publishResult.requiresVerification ? (
-                                    <p className="text-gray-500 text-sm font-medium leading-relaxed mb-8">
-                                        Your hostel has been submitted. Because this is your <strong className="text-gray-900">first listing</strong>, our team needs to verify your property before it goes live. We'll notify you once approved — usually within 24 hours.
-                                    </p>
-                                ) : (
-                                    <p className="text-gray-500 text-sm font-medium leading-relaxed mb-8">
-                                        Your hostel is now live and discoverable by students!
-                                    </p>
-                                )}
-                                {publishResult.requiresVerification && (
-                                    <div className="bg-blue-50 border border-blue-100 rounded-2xl p-4 mb-8 text-left">
-                                        <p className="text-[11px] font-black text-blue-700 uppercase tracking-widest mb-2">What happens next?</p>
-                                        <ul className="space-y-1.5 text-xs text-blue-600 font-medium">
-                                            <li className="flex items-center gap-2"><Check size={10} className="shrink-0" />Admin team reviews your listing</li>
-                                            <li className="flex items-center gap-2"><Check size={10} className="shrink-0" />You get notified on approval</li>
-                                            <li className="flex items-center gap-2"><Check size={10} className="shrink-0" />Future hostels auto-publish</li>
-                                        </ul>
-                                    </div>
-                                )}
+                                <p className="text-muted-foreground text-[10px] font-bold uppercase tracking-widest leading-relaxed mb-6">
+                                    {publishResult.requiresVerification 
+                                        ? "Your asset has been queued for manual verification. Expected turn-around: 24 hours."
+                                        : "Your asset is now operational and visible to secondary users."
+                                    }
+                                </p>
                                 <button
                                     onClick={() => router.push('/owner/hostels')}
-                                    className="w-full bg-gray-950 text-white py-4 rounded-2xl font-black text-[11px] uppercase tracking-widest hover:bg-black transition-all shadow-xl shadow-gray-200"
+                                    className="w-full bg-foreground text-background py-3 rounded-sm font-black text-[10px] uppercase tracking-[0.2em] hover:opacity-90 transition-all"
                                 >
-                                    View My Hostels →
+                                    Return to Hub
                                 </button>
                             </>
                         ) : (
-                            // ── Loading / Progress State ──
                             <>
-                                {/* Animated ring */}
-                                <div className="relative w-24 h-24 mx-auto mb-8">
-                                    <div className="absolute inset-0 rounded-full border-4 border-blue-100" />
-                                    <div className="absolute inset-0 rounded-full border-4 border-blue-600 border-t-transparent animate-spin" />
+                                <div className="relative w-16 h-16 mx-auto mb-8">
+                                    <div className="absolute inset-0 rounded-sm border-2 border-primary/10" />
+                                    <div className="absolute inset-0 rounded-sm border-2 border-primary border-t-transparent animate-spin" />
                                     <div className="absolute inset-0 flex items-center justify-center">
-                                        <Building2 className="text-blue-600" size={28} />
+                                        <Building2 className="text-primary" size={20} />
                                     </div>
                                 </div>
 
-                                <h2 className="text-xl font-black text-gray-950 tracking-tight mb-2">Publishing Your Hostel</h2>
-                                <p className="text-gray-400 text-sm font-medium mb-8">Please wait — do not close this page.</p>
+                                <h2 className="text-sm font-black text-foreground tracking-[0.2em] uppercase italic mb-6">Transmitting Session</h2>
 
-                                <div className="space-y-3 text-left">
+                                <div className="space-y-2 text-left">
                                     {stages.map((s, i) => {
                                         const stageOrder = ['uploading', 'verifying', 'done'];
                                         const currentIdx = stageOrder.indexOf(publishStage);
@@ -256,20 +224,19 @@ export default function NewHostelPage() {
 
                                         return (
                                             <div key={s.key} className={cn(
-                                                "flex items-center gap-3 p-3 rounded-xl transition-all",
-                                                isActive ? "bg-blue-50 border border-blue-100" : "bg-gray-50"
+                                                "flex items-center gap-3 p-2 rounded-sm border transition-all",
+                                                isActive ? "bg-primary/5 border-primary/20" : "bg-muted/30 border-transparent"
                                             )}>
                                                 <div className={cn(
-                                                    "w-6 h-6 rounded-full flex items-center justify-center shrink-0 text-[10px] font-black",
-                                                    isDone ? "bg-blue-600 text-white" : isActive ? "bg-blue-100 text-blue-600" : "bg-gray-200 text-gray-400"
+                                                    "w-5 h-5 rounded-sm flex items-center justify-center shrink-0 text-[8px] font-black",
+                                                    isDone ? "bg-primary text-white" : isActive ? "bg-primary/20 text-primary" : "bg-border text-muted-foreground"
                                                 )}>
                                                     {isDone ? <Check size={10} /> : i + 1}
                                                 </div>
                                                 <p className={cn(
-                                                    "text-xs font-bold",
-                                                    isActive ? "text-blue-700" : isDone ? "text-gray-600" : "text-gray-400"
+                                                    "text-[9px] font-black uppercase tracking-widest",
+                                                    isActive ? "text-primary" : isDone ? "text-foreground" : "text-muted-foreground"
                                                 )}>{s.label}</p>
-                                                {isActive && <div className="ml-auto w-3 h-3 rounded-full bg-blue-400 animate-pulse" />}
                                             </div>
                                         );
                                     })}
@@ -279,124 +246,125 @@ export default function NewHostelPage() {
                     </div>
                 </div>
             )}
+
             {/* Back & Header */}
             <Link
                 href="/owner/hostels"
-                className="inline-flex items-center gap-2 text-xs font-black text-gray-400 hover:text-gray-900 mb-10 transition-colors group uppercase tracking-widest"
+                className="inline-flex items-center gap-2 text-[10px] font-black text-muted-foreground hover:text-foreground mb-8 transition-colors group uppercase tracking-[0.2em]"
             >
-                <ChevronLeft size={16} className="group-hover:-translate-x-1 transition-transform" />
-                Back to Hostels
+                <ChevronLeft size={14} className="group-hover:-translate-x-1 transition-transform" />
+                Hub Overview
             </Link>
 
-            <div className="mb-12">
-                <div className="flex items-center gap-3 mb-4">
-                    <span className="px-2.5 py-1 bg-blue-50 text-blue-600 rounded-full text-[9px] font-black uppercase tracking-widest border border-blue-100">
-                        New Listing
+            <div className="mb-10">
+                <div className="flex items-center gap-2 mb-2">
+                    <span className="px-2 py-0.5 bg-foreground text-background rounded-sm text-[8px] font-black uppercase tracking-[0.2em]">
+                        Unit Deployment
                     </span>
                 </div>
-                <h1 className="text-4xl font-black text-gray-950 tracking-tight leading-none mb-3">
-                    List a Property <span className="text-blue-600">.</span>
+                <h1 className="text-3xl font-black text-foreground tracking-tight uppercase italic mb-2">
+                    Deploy Listing <span className="text-primary NOT-italic">.</span>
                 </h1>
-                <p className="text-gray-500 font-medium text-lg">Add your hostel and start receiving bookings from students.</p>
+                <p className="text-muted-foreground font-bold text-[11px] uppercase tracking-widest">Commission a new property asset into the primary fleet.</p>
             </div>
 
             {/* Step Indicator */}
-            <div className="flex items-center gap-2 mb-12">
+            <div className="flex items-center gap-2 mb-10 overflow-x-auto no-scrollbar pb-2">
                 {STEPS.map((step, i) => (
-                    <div key={step.id} className="flex items-center gap-2">
+                    <div key={step.id} className="flex items-center gap-2 shrink-0">
                         <button
                             type="button"
                             onClick={() => setCurrentStep(step.id)}
                             className={cn(
-                                "flex items-center gap-2.5 px-5 py-3 rounded-2xl text-[11px] font-black uppercase tracking-widest transition-all border",
+                                "flex items-center gap-2 px-4 py-2 rounded-sm text-[9px] font-black uppercase tracking-[0.2em] transition-all border",
                                 currentStep === step.id
-                                    ? "bg-gray-950 text-white border-gray-950 shadow-lg shadow-gray-200"
+                                    ? "bg-foreground text-background border-foreground shadow-lg shadow-foreground/5"
                                     : currentStep > step.id
-                                        ? "bg-blue-50 text-blue-600 border-blue-100"
-                                        : "bg-white text-gray-400 border-gray-100 hover:border-gray-200"
+                                        ? "bg-primary/10 text-primary border-primary/20"
+                                        : "bg-background text-muted-foreground border-border hover:border-foreground/20"
                             )}
                         >
                             {currentStep > step.id ? (
-                                <Check size={12} />
+                                <Check size={10} />
                             ) : (
-                                <step.icon size={12} />
+                                <step.icon size={10} />
                             )}
                             {step.label}
                         </button>
                         {i < STEPS.length - 1 && (
                             <div className={cn(
-                                "h-px flex-1 max-w-8 transition-all",
-                                currentStep > step.id ? "bg-blue-300" : "bg-gray-100"
+                                "w-4 h-[1px] transition-all",
+                                currentStep > step.id ? "bg-primary/30" : "bg-border"
                             )} />
                         )}
                     </div>
                 ))}
             </div>
 
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
                 {/* Step 1: Basic Info */}
                 {currentStep === 1 && (
-                    <div className="bg-white rounded-[2.5rem] border border-gray-100 p-8 md:p-12 shadow-sm space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-300">
-                        <div className="flex items-center gap-4 pb-6 border-b border-gray-100">
-                            <div className="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600">
-                                <Info size={22} />
+                    <div className="bg-card border border-border p-6 rounded-sm shadow-sm space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
+                        <div className="flex items-center gap-3 pb-4 border-b border-border">
+                            <div className="w-10 h-10 bg-muted rounded-sm flex items-center justify-center text-foreground">
+                                <Info size={18} />
                             </div>
                             <div>
-                                <h2 className="text-xl font-black text-gray-950 tracking-tight">Basic Information</h2>
-                                <p className="text-sm text-gray-400 font-medium mt-0.5">Name and describe your property</p>
+                                <h2 className="text-sm font-black text-foreground uppercase tracking-widest italic">Asset Identity</h2>
+                                <p className="text-[9px] text-muted-foreground font-bold uppercase tracking-widest">Base identification and purpose</p>
                             </div>
                         </div>
 
-                        <div className="space-y-6">
-                            <div className="space-y-2">
-                                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Hostel Name</label>
+                        <div className="space-y-4">
+                            <div className="space-y-1.5">
+                                <label className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] px-0.5">Commercial Name</label>
                                 <div className="relative">
-                                    <Building2 className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+                                    <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground/50" size={14} />
                                     <input
                                         {...form.register("name")}
-                                        className="w-full pl-14 pr-5 py-5 bg-gray-50 rounded-2xl outline-none focus:ring-4 focus:ring-blue-100 transition-all font-bold text-gray-950 placeholder:text-gray-300 text-lg"
-                                        placeholder="e.g. Sunrise Ridge Hostel"
+                                        className="w-full pl-9 pr-4 py-2.5 bg-background border border-border rounded-sm outline-none focus:border-primary transition-all text-xs font-bold uppercase tracking-tight placeholder:text-muted-foreground/30"
+                                        placeholder="e.g. SKYLINE RESIDENCES"
                                     />
                                 </div>
                                 {form.formState.errors.name && (
-                                    <p className="text-xs text-red-500 ml-1 font-bold">{form.formState.errors.name.message}</p>
+                                    <p className="text-[9px] text-red-500 font-black uppercase tracking-widest">{form.formState.errors.name.message}</p>
                                 )}
                             </div>
 
-                            <div className="space-y-2">
-                                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Description</label>
+                            <div className="space-y-1.5">
+                                <label className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] px-0.5">Operational Summary</label>
                                 <textarea
                                     {...form.register("description")}
-                                    rows={5}
-                                    className="w-full px-6 py-5 bg-gray-50 rounded-2xl outline-none focus:ring-4 focus:ring-blue-100 transition-all font-medium text-gray-950 placeholder:text-gray-300 resize-none"
-                                    placeholder="What makes your hostel special? Describe the atmosphere, location benefits, and what students will love about it..."
+                                    rows={4}
+                                    className="w-full px-4 py-2.5 bg-background border border-border rounded-sm outline-none focus:border-primary transition-all text-xs font-bold uppercase tracking-tight placeholder:text-muted-foreground/30 resize-none"
+                                    placeholder="Brief technical and aesthetic description of the asset..."
                                 />
                                 {form.formState.errors.description && (
-                                    <p className="text-xs text-red-500 ml-1 font-bold">{form.formState.errors.description.message}</p>
+                                    <p className="text-[9px] text-red-500 font-black uppercase tracking-widest">{form.formState.errors.description.message}</p>
                                 )}
                             </div>
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div className="space-y-2">
-                                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Gender Category</label>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div className="space-y-1.5">
+                                    <label className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] px-0.5">Gender Vector</label>
                                     <select
                                         {...form.register("genderCategory")}
-                                        className="w-full px-6 py-5 bg-gray-50 rounded-2xl outline-none focus:ring-4 focus:ring-blue-100 transition-all font-bold text-gray-950 appearance-none"
+                                        className="w-full px-4 py-2.5 bg-background border border-border rounded-sm outline-none focus:border-primary transition-all text-xs font-black uppercase tracking-widest appearance-none cursor-pointer"
                                     >
-                                        <option value="MIXED">Mixed (Both Boys & Girls)</option>
-                                        <option value="MALE">Boys Only</option>
-                                        <option value="FEMALE">Girls Only</option>
+                                        <option value="MIXED">Neutral (Mixed Population)</option>
+                                        <option value="MALE">Male Specific</option>
+                                        <option value="FEMALE">Female Specific</option>
                                     </select>
                                 </div>
                             </div>
 
-                            <div className="space-y-2">
-                                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">House Rules & Policies</label>
+                            <div className="space-y-1.5">
+                                <label className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] px-0.5">Protocol & Compliance</label>
                                 <textarea
                                     {...form.register("policiesText")}
-                                    rows={4}
-                                    className="w-full px-6 py-5 bg-gray-50 rounded-2xl outline-none focus:ring-4 focus:ring-blue-100 transition-all font-medium text-gray-950 placeholder:text-gray-300 resize-none"
-                                    placeholder="Enter your hostel rules (e.g., No smoking, Curfew at 11PM, etc.)"
+                                    rows={3}
+                                    className="w-full px-4 py-2.5 bg-background border border-border rounded-sm outline-none focus:border-primary transition-all text-xs font-bold uppercase tracking-tight placeholder:text-muted-foreground/30 resize-none"
+                                    placeholder="House rules and contractual stipulations..."
                                 />
                             </div>
                         </div>
@@ -405,65 +373,64 @@ export default function NewHostelPage() {
 
                 {/* Step 2: Location */}
                 {currentStep === 2 && (
-                    <div className="bg-white rounded-[2.5rem] border border-gray-100 p-8 md:p-12 shadow-sm space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-300">
-                        <div className="flex items-center gap-4 pb-6 border-b border-gray-100">
-                            <div className="w-12 h-12 bg-green-50 rounded-2xl flex items-center justify-center text-green-600">
-                                <MapPin size={22} />
+                    <div className="bg-card border border-border p-6 rounded-sm shadow-sm space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
+                        <div className="flex items-center gap-3 pb-4 border-b border-border">
+                            <div className="w-10 h-10 bg-muted rounded-sm flex items-center justify-center text-foreground">
+                                <MapPin size={18} />
                             </div>
                             <div>
-                                <h2 className="text-xl font-black text-gray-950 tracking-tight">Location & Proximity</h2>
-                                <p className="text-sm text-gray-400 font-medium mt-0.5">Help students find you easily</p>
+                                <h2 className="text-sm font-black text-foreground uppercase tracking-widest italic">Zone Deployment</h2>
+                                <p className="text-[9px] text-muted-foreground font-bold uppercase tracking-widest">Physical coordinates and accessibility</p>
                             </div>
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div className="space-y-2">
-                                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">City</label>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="space-y-1.5">
+                                <label className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] px-0.5">Municipal Zone</label>
                                 <input
                                     {...form.register("city")}
-                                    className="w-full px-6 py-5 bg-gray-50 rounded-2xl outline-none focus:ring-4 focus:ring-blue-100 transition-all font-bold text-gray-950 placeholder:text-gray-300"
-                                    placeholder="e.g. Kumasi"
+                                    className="w-full px-4 py-2.5 bg-background border border-border rounded-sm outline-none focus:border-primary transition-all text-xs font-bold uppercase tracking-tight placeholder:text-muted-foreground/30"
+                                    placeholder="e.g. ACCRA"
                                 />
                                 {form.formState.errors.city && (
-                                    <p className="text-xs text-red-500 ml-1 font-bold">{form.formState.errors.city.message}</p>
+                                    <p className="text-[9px] text-red-500 font-black uppercase tracking-widest">{form.formState.errors.city.message}</p>
                                 )}
                             </div>
 
-                            <div className="space-y-2">
-                                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Address Line</label>
+                            <div className="space-y-1.5">
+                                <label className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] px-0.5">Street Identification</label>
                                 <input
                                     {...form.register("addressLine")}
-                                    className="w-full px-6 py-5 bg-gray-50 rounded-2xl outline-none focus:ring-4 focus:ring-blue-100 transition-all font-bold text-gray-950 placeholder:text-gray-300"
-                                    placeholder="e.g. 12th Lane, East Legon"
+                                    className="w-full px-4 py-2.5 bg-background border border-border rounded-sm outline-none focus:border-primary transition-all text-xs font-bold uppercase tracking-tight placeholder:text-muted-foreground/30"
+                                    placeholder="PLT 22B, RING ROAD"
                                 />
                                 {form.formState.errors.addressLine && (
-                                    <p className="text-xs text-red-500 ml-1 font-bold">{form.formState.errors.addressLine.message}</p>
+                                    <p className="text-[9px] text-red-500 font-black uppercase tracking-widest">{form.formState.errors.addressLine.message}</p>
                                 )}
                             </div>
 
-                            <div className="space-y-2">
-                                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1 flex items-center gap-2">
-                                    <MessageSquare size={12} className="text-green-500" /> WhatsApp Number
+                            <div className="space-y-1.5">
+                                <label className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] px-0.5 flex items-center gap-2">
+                                    <MessageSquare size={10} /> Comm-Link (WhatsApp)
                                 </label>
                                 <input
                                     {...form.register("whatsappNumber")}
-                                    className="w-full px-6 py-5 bg-gray-50 rounded-2xl outline-none focus:ring-4 focus:ring-blue-100 transition-all font-bold text-gray-950 placeholder:text-gray-300"
+                                    className="w-full px-4 py-2.5 bg-background border border-border rounded-sm outline-none focus:border-primary transition-all text-xs font-bold uppercase tracking-tight placeholder:text-muted-foreground/30"
                                     placeholder="e.g. 0541234567"
                                 />
-                                <p className="text-[10px] text-gray-400 ml-1 font-bold">Students contact you via WhatsApp</p>
                                 {form.formState.errors.whatsappNumber && (
-                                    <p className="text-xs text-red-500 ml-1 font-bold">{form.formState.errors.whatsappNumber.message}</p>
+                                    <p className="text-[9px] text-red-500 font-black uppercase tracking-widest">{form.formState.errors.whatsappNumber.message}</p>
                                 )}
                             </div>
 
-                            <div className="space-y-2">
-                                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1 flex items-center gap-2">
-                                    <Clock size={12} className="text-blue-500" /> Distance to Campus
+                            <div className="space-y-1.5">
+                                <label className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] px-0.5 flex items-center gap-2">
+                                    <Clock size={10} /> Campus Proximity
                                 </label>
                                 <input
                                     {...form.register("distanceToCampus")}
-                                    className="w-full px-6 py-5 bg-gray-50 rounded-2xl outline-none focus:ring-4 focus:ring-blue-100 transition-all font-bold text-gray-950 placeholder:text-gray-300"
-                                    placeholder="e.g. 5 mins walk / 10 mins trotro"
+                                    className="w-full px-4 py-2.5 bg-background border border-border rounded-sm outline-none focus:border-primary transition-all text-xs font-bold uppercase tracking-tight placeholder:text-muted-foreground/30"
+                                    placeholder="e.g. 5 MINS TRANSIT"
                                 />
                             </div>
                         </div>
@@ -472,24 +439,24 @@ export default function NewHostelPage() {
 
                 {/* Step 3: Features */}
                 {currentStep === 3 && (
-                    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-300">
+                    <div className="space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
                         {/* Utilities */}
-                        <div className="bg-white rounded-[2.5rem] border border-gray-100 p-8 md:p-12 shadow-sm space-y-8">
-                            <div className="flex items-center gap-4 pb-6 border-b border-gray-100">
-                                <div className="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600">
-                                    <Zap size={22} />
+                        <div className="bg-card border border-border p-6 rounded-sm shadow-sm space-y-6">
+                            <div className="flex items-center gap-3 pb-4 border-b border-border">
+                                <div className="w-10 h-10 bg-muted rounded-sm flex items-center justify-center text-foreground">
+                                    <Zap size={18} />
                                 </div>
                                 <div>
-                                    <h2 className="text-xl font-black text-gray-950 tracking-tight">Included Utilities</h2>
-                                    <p className="text-sm text-gray-400 font-medium mt-0.5">What's covered in the rent?</p>
+                                    <h2 className="text-sm font-black text-foreground uppercase tracking-widest italic">Core Provisions</h2>
+                                    <p className="text-[9px] text-muted-foreground font-bold uppercase tracking-widest">Included baseline services</p>
                                 </div>
                             </div>
 
-                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                                 {[
-                                    { id: "water", label: "Water", icon: Droplets, color: "text-blue-500", bg: "bg-blue-50" },
-                                    { id: "light", label: "Electricity", icon: Zap, color: "text-yellow-500", bg: "bg-yellow-50" },
-                                    { id: "gas", label: "Gas / Cooking", icon: Flame, color: "text-orange-500", bg: "bg-orange-50" }
+                                    { id: "water", label: "H2O Unit", icon: Droplets },
+                                    { id: "light", label: "Energy Pack", icon: Zap },
+                                    { id: "gas", label: "Fuel System", icon: Flame }
                                 ].map((util) => {
                                     const isSelected = form.watch("utilitiesIncluded")?.includes(util.id);
                                     return (
@@ -504,16 +471,14 @@ export default function NewHostelPage() {
                                                 form.setValue("utilitiesIncluded", updated);
                                             }}
                                             className={cn(
-                                                "flex items-center gap-4 p-6 rounded-2xl border-2 transition-all",
+                                                "flex items-center gap-3 p-3 rounded-sm border transition-all",
                                                 isSelected
-                                                    ? "border-gray-950 bg-gray-950 text-white"
-                                                    : "border-gray-100 bg-gray-50 text-gray-500 hover:border-gray-200"
+                                                    ? "bg-foreground text-background border-foreground shadow-lg shadow-foreground/5"
+                                                    : "bg-muted/30 border-transparent text-muted-foreground hover:border-foreground/20 hover:text-foreground"
                                             )}
                                         >
-                                            <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center", isSelected ? "bg-white/10" : util.bg)}>
-                                                <util.icon size={20} className={isSelected ? "text-white" : util.color} />
-                                            </div>
-                                            <span className="text-sm font-black uppercase tracking-wider">{util.label}</span>
+                                            <util.icon size={14} className={isSelected ? "text-background" : "text-primary"} />
+                                            <span className="text-[9px] font-black uppercase tracking-[0.2em]">{util.label}</span>
                                         </button>
                                     );
                                 })}
@@ -521,18 +486,18 @@ export default function NewHostelPage() {
                         </div>
 
                         {/* Amenities */}
-                        <div className="bg-white rounded-[2.5rem] border border-gray-100 p-8 md:p-12 shadow-sm space-y-8">
-                            <div className="flex items-center gap-4 pb-6 border-b border-gray-100">
-                                <div className="w-12 h-12 bg-orange-50 rounded-2xl flex items-center justify-center text-orange-600">
-                                    <Check size={22} />
+                        <div className="bg-card border border-border p-6 rounded-sm shadow-sm space-y-6">
+                            <div className="flex items-center gap-3 pb-4 border-b border-border">
+                                <div className="w-10 h-10 bg-muted rounded-sm flex items-center justify-center text-foreground">
+                                    <Check size={18} />
                                 </div>
                                 <div>
-                                    <h2 className="text-xl font-black text-gray-950 tracking-tight">Amenities</h2>
-                                    <p className="text-sm text-gray-400 font-medium mt-0.5">Select all available facilities</p>
+                                    <h2 className="text-sm font-black text-foreground uppercase tracking-widest italic">Asset Modules</h2>
+                                    <p className="text-[9px] text-muted-foreground font-bold uppercase tracking-widest">Hardware and software add-ons</p>
                                 </div>
                             </div>
 
-                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                                 {AMENITIES.map((item) => {
                                     const isSelected = selectedAmenities.includes(item.id);
                                     return (
@@ -541,14 +506,14 @@ export default function NewHostelPage() {
                                             type="button"
                                             onClick={() => toggleAmenity(item.id)}
                                             className={cn(
-                                                "flex flex-col items-center gap-3 p-6 rounded-3xl border-2 transition-all active:scale-95 cursor-pointer",
+                                                "flex flex-col items-center gap-2 p-4 rounded-sm border transition-all active:scale-95 cursor-pointer",
                                                 isSelected
-                                                    ? "border-gray-950 bg-gray-950 text-white shadow-xl shadow-gray-200"
-                                                    : "border-gray-100 bg-gray-50 text-gray-400 hover:border-gray-200 hover:text-gray-600"
+                                                    ? "bg-foreground text-background border-foreground shadow-lg shadow-foreground/5"
+                                                    : "bg-muted/30 border-transparent text-muted-foreground hover:border-foreground/20 hover:text-foreground"
                                             )}
                                         >
-                                            <item.icon size={24} />
-                                            <span className="text-[10px] font-black uppercase tracking-widest">{item.label}</span>
+                                            <item.icon size={16} />
+                                            <span className="text-[8px] font-black uppercase tracking-[0.2em]">{item.label}</span>
                                         </button>
                                     );
                                 })}
@@ -559,14 +524,14 @@ export default function NewHostelPage() {
 
                 {/* Step 4: Photos */}
                 {currentStep === 4 && (
-                    <div className="bg-white rounded-[2.5rem] border border-gray-100 p-8 md:p-12 shadow-sm space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-300">
-                        <div className="flex items-center gap-4 pb-6 border-b border-gray-100">
-                            <div className="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600">
-                                <ImageIcon size={22} />
+                    <div className="bg-card border border-border p-6 rounded-sm shadow-sm space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
+                        <div className="flex items-center gap-3 pb-4 border-b border-border">
+                            <div className="w-10 h-10 bg-muted rounded-sm flex items-center justify-center text-foreground">
+                                <ImageIcon size={18} />
                             </div>
                             <div>
-                                <h2 className="text-xl font-black text-gray-950 tracking-tight">Property Photos</h2>
-                                <p className="text-sm text-gray-400 font-medium mt-0.5">Good photos attract 3x more bookings</p>
+                                <h2 className="text-sm font-black text-foreground uppercase tracking-widest italic">Visual Verification</h2>
+                                <p className="text-[9px] text-muted-foreground font-bold uppercase tracking-widest">Capture operational reality</p>
                             </div>
                         </div>
 
@@ -575,7 +540,7 @@ export default function NewHostelPage() {
                             onChange={(urls) => form.setValue("images", urls)}
                         />
                         {form.formState.errors.images && (
-                            <p className="text-xs text-red-500 font-bold">{form.formState.errors.images.message}</p>
+                            <p className="text-[9px] text-red-500 font-black uppercase tracking-widest italic">{form.formState.errors.images.message}</p>
                         )}
                     </div>
                 )}
@@ -586,9 +551,9 @@ export default function NewHostelPage() {
                         <button
                             type="button"
                             onClick={() => setCurrentStep(s => s - 1)}
-                            className="px-8 py-4 bg-white border border-gray-200 text-gray-900 rounded-2xl font-black text-[11px] uppercase tracking-widest hover:bg-gray-50 transition-all"
+                            className="px-6 py-2.5 bg-background border border-border text-foreground rounded-sm font-black text-[10px] uppercase tracking-widest hover:bg-muted transition-all"
                         >
-                            ← Previous
+                            ← Reverse
                         </button>
                     ) : (
                         <div />
@@ -601,39 +566,34 @@ export default function NewHostelPage() {
                                 let fieldsToValidate: any[] = [];
                                 if (currentStep === 1) fieldsToValidate = ["name", "description"];
                                 if (currentStep === 2) fieldsToValidate = ["city", "addressLine", "whatsappNumber"];
-                                if (currentStep === 3) fieldsToValidate = []; // Optional
-
+                                
                                 const isValid = await form.trigger(fieldsToValidate);
                                 if (isValid) {
                                     setCurrentStep(s => s + 1);
                                 } else {
-                                    toast.error("Please fill in all required fields");
+                                    toast.error("PROTOCOL BREACH", { description: "Required sectors require attention." });
                                 }
                             }}
-                            className="px-8 py-4 bg-gray-950 text-white rounded-2xl font-black text-[11px] uppercase tracking-widest shadow-xl shadow-gray-200 hover:bg-black transition-all active:scale-[0.98]"
+                            className="px-6 py-2.5 bg-foreground text-background rounded-sm font-black text-[10px] uppercase tracking-widest shadow-xl shadow-foreground/5 hover:opacity-90 transition-all active:scale-[0.98]"
                         >
-                            Continue →
+                            Advance →
                         </button>
                     ) : (
                         <button
-                            type="button" // Change to button to manually trigger submit with validation check
+                            type="button"
                             disabled={publishStage !== 'idle'}
                             onClick={async () => {
                                 const isValid = await form.trigger();
                                 if (isValid) {
                                     form.handleSubmit(onSubmit)();
                                 } else {
-                                    toast.error("Please fill in all required fields", {
-                                        description: Object.values(form.formState.errors).map((e: any) => e.message).join(", ")
-                                    });
-                                    // Debug log
-                                    console.error("Form Validation Errors:", form.formState.errors);
+                                    toast.error("VALIDATION ERROR");
                                 }
                             }}
-                            className="px-12 py-4 bg-blue-600 text-white rounded-2xl font-black text-[11px] uppercase tracking-widest shadow-xl shadow-blue-200 hover:bg-blue-700 transition-all active:scale-[0.98] flex items-center gap-3 disabled:opacity-60 disabled:cursor-not-allowed"
+                            className="px-8 py-2.5 bg-primary text-white rounded-sm font-black text-[10px] uppercase tracking-[0.2em] shadow-xl shadow-primary/10 hover:opacity-90 transition-all active:scale-[0.98] flex items-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
                         >
-                            <Building2 size={16} />
-                            Publish My Hostel →
+                            <Building2 size={14} />
+                            Execute Deployment
                         </button>
                     )}
                 </div>

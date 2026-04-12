@@ -138,6 +138,11 @@ model User {
   messages       Message[]
   listingFeaturePayments ListingFeaturePayment[]
 
+  posts    Post[]
+  likes    Like[]
+  comments Comment[]
+  shares   Share[]
+
   paystackSubaccountCode String? // For automated split payments
 
   @@index([role])
@@ -268,6 +273,7 @@ model Hostel {
   wallets    Wallet[]
   reviews    Review[]
   listingFeaturePayments ListingFeaturePayment[]
+  posts      Post[]
 
   @@index([ownerId])
   @@index([city])
@@ -378,6 +384,7 @@ model Room {
 
   hostel   Hostel        @relation(fields: [hostelId], references: [id], onDelete: Cascade)
   bookings BookingItem[]
+  posts    Post[]
 
   @@index([hostelId])
   @@index([isActive])
@@ -578,4 +585,69 @@ model Dispute {
   booking Booking @relation(fields: [bookingId], references: [id])
 
   @@index([bookingId])
+}
+
+model Post {
+  id        String   @id @default(cuid())
+  authorId  String
+  content   String
+  images    String[] @default([])
+  
+  hostelId  String?
+  roomId    String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  author    User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  hostel    Hostel?  @relation(fields: [hostelId], references: [id], onDelete: SetNull)
+  room      Room?    @relation(fields: [roomId], references: [id], onDelete: SetNull)
+  
+  likes     Like[]
+  comments  Comment[]
+  shares    Share[]
+
+  @@index([authorId])
+  @@index([hostelId])
+  @@index([roomId])
+}
+
+model Like {
+  id        String   @id @default(cuid())
+  postId    String
+  userId    String
+  createdAt DateTime @default(now())
+
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([postId, userId])
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  postId    String
+  authorId  String
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  author    User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  @@index([postId])
+  @@index([authorId])
+}
+
+model Share {
+  id        String   @id @default(cuid())
+  postId    String
+  userId    String
+  createdAt DateTime @default(now())
+
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([postId])
+  @@index([userId])
 }
