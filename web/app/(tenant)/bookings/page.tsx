@@ -52,16 +52,25 @@ export default function TenantBookingsPage() {
 
     const getStatusColor = (status: string) => {
         switch (status) {
-            case "PENDING_APPROVAL": return "bg-orange-50 text-orange-700 border-orange-100";
-            case "APPROVED": return "bg-blue-50 text-blue-700 border-blue-100";
-            case "CONFIRMED": return "bg-green-50 text-green-700 border-green-100";
+            case "PENDING": return "bg-orange-50 text-orange-700 border-orange-100";
+            case "PAYMENT_SECURED": return "bg-blue-50 text-blue-700 border-blue-100";
+            case "RESERVED": return "bg-indigo-50 text-indigo-700 border-indigo-100";
             case "CHECKED_IN": return "bg-purple-50 text-purple-700 border-purple-100";
-            case "COMPLETED": return "bg-gray-50 text-gray-700 border-gray-100";
-            case "REJECTED":
+            case "COMPLETED": return "bg-green-50 text-green-700 border-green-100";
             case "CANCELLED": return "bg-red-50 text-red-700 border-red-100";
+            case "DISPUTED": return "bg-rose-50 text-rose-700 border-rose-100";
             default: return "bg-gray-50 text-gray-700 border-gray-100";
         }
     };
+
+    const tenantCheckInMutation = useMutation({
+        mutationFn: (id: string) => api.patch(`/bookings/${id}/tenant-check-in`),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["tenant-bookings"] });
+            toast.success("Check-in confirmed! Waiting for manager confirmation.");
+        },
+        onError: (err: any) => toast.error(err.response?.data?.message || "Failed to confirm check-in")
+    });
 
     if (isLoading) return (
         <div className="flex h-[60vh] items-center justify-center">
@@ -175,7 +184,7 @@ export default function TenantBookingsPage() {
                                     </div>
 
                                     <div className="space-y-3">
-                                        {booking.status === "APPROVED" && (
+                                        {booking.status === "PENDING" && (
                                             <div className="space-y-3">
                                                 <button
                                                     onClick={() => initPaymentMutation.mutate(booking.id)}
@@ -185,35 +194,48 @@ export default function TenantBookingsPage() {
                                                     {initPaymentMutation.isPending ? <Loader2 size={18} className="animate-spin" /> : <CreditCard size={18} />}
                                                     Pay with Card/Momo
                                                 </button>
-                                                <button
-                                                    onClick={() => {/* Open Offline Modal */ }}
-                                                    className="w-full bg-white text-gray-700 py-4 rounded-2xl font-bold text-sm border shadow-sm hover:bg-gray-50 transition-all flex items-center justify-center gap-2"
-                                                >
-                                                    <Info size={18} className="text-blue-500" />
-                                                    Upload Transfer Receipt
-                                                </button>
                                             </div>
                                         )}
 
-                                        {booking.payment?.status === "AWAITING_VERIFICATION" && (
-                                            <div className="bg-blue-50 text-blue-700 p-4 rounded-2xl border border-blue-100 flex items-center justify-center gap-2">
-                                                <Loader2 size={18} className="animate-spin" />
-                                                <span className="font-bold text-sm">Verifying Proof...</span>
+                                        {booking.status === "RESERVED" && !booking.userCheckedIn && (
+                                            <button
+                                                onClick={() => tenantCheckInMutation.mutate(booking.id)}
+                                                disabled={tenantCheckInMutation.isPending}
+                                                className="w-full bg-indigo-600 text-white py-4 rounded-2xl font-bold text-sm shadow-xl shadow-indigo-200 hover:opacity-90 active:scale-95 transition-all flex items-center justify-center gap-2"
+                                            >
+                                                {tenantCheckInMutation.isPending ? <Loader2 size={18} className="animate-spin" /> : <CheckCircle2 size={18} />}
+                                                Confirm Arrival
+                                            </button>
+                                        )}
+
+                                        {booking.userCheckedIn && !booking.managerConfirmed && (
+                                            <div className="bg-orange-50 text-orange-700 p-4 rounded-2xl border border-orange-100 flex flex-col items-center gap-2 text-center">
+                                                <Clock size={18} />
+                                                <span className="font-bold text-sm italic">Waiting for manager to confirm your arrival...</span>
                                             </div>
                                         )}
 
-                                        {booking.status === "CONFIRMED" && (
+                                        {booking.status === "CHECKED_IN" && (
+                                            <div className="bg-purple-50 text-purple-700 p-4 rounded-2xl border border-purple-100 flex items-center justify-center gap-2">
+                                                <CheckCircle2 size={18} />
+                                                <span className="font-bold text-sm">Successfully checked in</span>
+                                            </div>
+                                        )}
+
+                                        {booking.status === "COMPLETED" && (
                                             <div className="bg-green-50 text-green-700 p-4 rounded-2xl border border-green-100 flex items-center justify-center gap-2">
                                                 <CheckCircle2 size={18} />
-                                                <span className="font-bold text-sm">Booking Confirmed</span>
+                                                <span className="font-bold text-sm">Booking Completed</span>
                                             </div>
                                         )}
 
-                                        {booking.status === "PENDING_APPROVAL" && (
-                                            <div className="bg-orange-50 text-orange-700 p-4 rounded-2xl border border-orange-100 flex items-center justify-center gap-2 italic">
-                                                <Clock size={18} />
-                                                <span className="font-bold text-sm">Waiting for selection</span>
-                                            </div>
+                                        {(booking.status === "RESERVED" || booking.status === "CHECKED_IN") && (
+                                            <button
+                                                onClick={() => {/* Trigger Dispute Modal */ }}
+                                                className="w-full bg-white text-rose-600 py-3 rounded-2xl font-bold text-xs border border-rose-100 shadow-sm hover:bg-rose-50 transition-all flex items-center justify-center gap-2"
+                                            >
+                                                <XCircle size={16} /> Report Issue / Dispute
+                                            </button>
                                         )}
 
                                         <Link

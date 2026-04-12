@@ -4,73 +4,73 @@ import LogoAnimation from "./LogoAnimation";
 
 export default function Footer() {
     return (
-        <footer className="bg-zinc-50/50 border-t border-black/5 transition-colors duration-300 relative overflow-hidden">
-            {/* Subtle top glow to separate from previous sections smoothly */}
-            <div className="absolute top-0 inset-x-0 h-[1px] bg-gradient-to-r from-transparent via-black/5 to-transparent shadow-[0_1px_10px_rgba(0,0,0,0.05)]" />
+        <footer className="bg-background border-t border-border relative overflow-hidden">
+            {/* Subtle top glow */}
+            <div className="absolute top-0 inset-x-0 h-[1px] bg-gradient-to-r from-transparent via-primary/10 to-transparent" />
 
-            <div className="container mx-auto px-6 pt-20 pb-10">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-8 mb-16">
+            <div className="container mx-auto px-6 py-12">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 lg:gap-8 mb-12">
                     {/* Brand Section */}
-                    <div className="space-y-6 lg:pr-8">
-                        <Link href="/" className="flex items-center gap-3 group w-fit">
-                            <div className="p-1.5 bg-white rounded-xl shadow-sm border border-black/5 group-hover:scale-105 transition-transform duration-300">
+                    <div className="space-y-4">
+                        <Link href="/" className="flex items-center gap-2 group w-fit">
+                            <div className="p-1 group-hover:scale-110 transition-transform duration-500 animate-bounce-subtle">
                                 <LogoAnimation />
                             </div>
-                            <span className="text-xl font-black tracking-tighter text-foreground group-hover:text-blue-600 transition-colors">HostelGH</span>
+                            <span className="text-lg font-black tracking-[0.2em] text-foreground uppercase">HostelGH</span>
                         </Link>
-                        <p className="text-muted-foreground leading-relaxed text-sm font-medium">
-                            Ghana's premier student housing platform. We connect students with safe, verified, and comfortable hostels across all major university hubs.
+                        <p className="text-muted-foreground leading-relaxed text-[11px] font-bold uppercase tracking-tight max-w-xs">
+                            GHANA'S PREMIER STUDENT HOUSING PLATFORM. VERIFIED, COMPACT, AND SECURE SOLUTIONS FOR MODERN SCHOLARS.
                         </p>
-                        <div className="flex items-center gap-3 pt-2">
-                            <a href="#" className="p-2.5 bg-white rounded-full border border-black/5 shadow-sm text-muted-foreground hover:text-[#1877F2] hover:border-[#1877F2]/20 hover:shadow-md hover:-translate-y-1 transition-all"><Facebook size={18} /></a>
-                            <a href="#" className="p-2.5 bg-white rounded-full border border-black/5 shadow-sm text-muted-foreground hover:text-[#1c90ff] hover:border-[#1c90ff]/20 hover:shadow-md hover:-translate-y-1 transition-all"><Twitter size={18} /></a>
-                            <a href="#" className="p-2.5 bg-white rounded-full border border-black/5 shadow-sm text-muted-foreground hover:text-[#E4405F] hover:border-[#E4405F]/20 hover:shadow-md hover:-translate-y-1 transition-all"><Instagram size={18} /></a>
+                        <div className="flex items-center gap-2 pt-2">
+                            <a href="#" className="p-2 bg-muted rounded-sm border border-border text-muted-foreground hover:text-foreground transition-all"><Facebook size={14} /></a>
+                            <a href="#" className="p-2 bg-muted rounded-sm border border-border text-muted-foreground hover:text-foreground transition-all"><Twitter size={14} /></a>
+                            <a href="#" className="p-2 bg-muted rounded-sm border border-border text-muted-foreground hover:text-foreground transition-all"><Instagram size={14} /></a>
                         </div>
                     </div>
 
                     {/* Quick Explore */}
                     <div>
-                        <h4 className="font-black text-muted-foreground mb-6 uppercase text-[10px] tracking-[0.2em]">Regional Hubs</h4>
-                        <ul className="space-y-3.5 text-sm font-medium text-muted-foreground/80">
-                            <li><Link href="/hostels?city=Accra" className="group flex items-center gap-2.5 hover:text-blue-600 transition-colors"><MapPin size={14} className="group-hover:translate-x-1 group-hover:text-blue-500 transition-all" /> <span className="group-hover:translate-x-1 transition-transform">Greater Accra</span></Link></li>
-                            <li><Link href="/hostels?city=Kumasi" className="group flex items-center gap-2.5 hover:text-blue-600 transition-colors"><MapPin size={14} className="group-hover:translate-x-1 group-hover:text-blue-500 transition-all" /> <span className="group-hover:translate-x-1 transition-transform">Ashanti Region</span></Link></li>
-                            <li><Link href="/hostels?city=Cape Coast" className="group flex items-center gap-2.5 hover:text-blue-600 transition-colors"><MapPin size={14} className="group-hover:translate-x-1 group-hover:text-blue-500 transition-all" /> <span className="group-hover:translate-x-1 transition-transform">Central Region</span></Link></li>
-                            <li><Link href="/hostels?city=Tamale" className="group flex items-center gap-2.5 hover:text-blue-600 transition-colors"><MapPin size={14} className="group-hover:translate-x-1 group-hover:text-blue-500 transition-all" /> <span className="group-hover:translate-x-1 transition-transform">Northern Region</span></Link></li>
+                        <h4 className="font-black text-foreground mb-4 uppercase text-[10px] tracking-[0.3em] italic">Regional Hubs</h4>
+                        <ul className="space-y-2 text-[10px] font-black uppercase tracking-widest text-muted-foreground">
+                            <li><Link href="/hostels?city=Accra" className="group flex items-center gap-2 hover:text-primary transition-colors"><MapPin size={12} /> <span className="group-hover:translate-x-1 transition-transform">Greater Accra</span></Link></li>
+                            <li><Link href="/hostels?city=Kumasi" className="group flex items-center gap-2 hover:text-primary transition-colors"><MapPin size={12} /> <span className="group-hover:translate-x-1 transition-transform">Ashanti Region</span></Link></li>
+                            <li><Link href="/hostels?city=Cape Coast" className="group flex items-center gap-2 hover:text-primary transition-colors"><MapPin size={12} /> <span className="group-hover:translate-x-1 transition-transform">Central Region</span></Link></li>
+                            <li><Link href="/hostels?city=Tamale" className="group flex items-center gap-2 hover:text-primary transition-colors"><MapPin size={12} /> <span className="group-hover:translate-x-1 transition-transform">Northern Region</span></Link></li>
                         </ul>
                     </div>
 
                     {/* Support & Legal */}
                     <div>
-                        <h4 className="font-black text-muted-foreground mb-6 uppercase text-[10px] tracking-[0.2em]">Support</h4>
-                        <ul className="space-y-3.5 text-sm font-medium text-muted-foreground/80">
-                            <li><Link href="/support/help" className="inline-block hover:text-foreground hover:translate-x-1 transition-all">Help Center</Link></li>
-                            <li><Link href="/support/terms" className="inline-block hover:text-foreground hover:translate-x-1 transition-all">Terms of Service</Link></li>
-                            <li><Link href="/support/privacy" className="inline-block hover:text-foreground hover:translate-x-1 transition-all">Privacy Policy</Link></li>
-                            <li><Link href="/support/safety" className="inline-block hover:text-foreground hover:translate-x-1 transition-all">Safety Guidelines</Link></li>
+                        <h4 className="font-black text-foreground mb-4 uppercase text-[10px] tracking-[0.3em] italic">Operations</h4>
+                        <ul className="space-y-2 text-[10px] font-black uppercase tracking-widest text-muted-foreground">
+                            <li><Link href="/support/help" className="hover:text-foreground hover:translate-x-1 transition-all block">Help Center</Link></li>
+                            <li><Link href="/support/terms" className="hover:text-foreground hover:translate-x-1 transition-all block">Terms of Service</Link></li>
+                            <li><Link href="/support/privacy" className="hover:text-foreground hover:translate-x-1 transition-all block">Privacy Policy</Link></li>
+                            <li><Link href="/support/safety" className="hover:text-foreground hover:translate-x-1 transition-all block">Safety Guidelines</Link></li>
                         </ul>
                     </div>
 
                     {/* Contact Info */}
                     <div>
-                        <h4 className="font-black text-muted-foreground mb-6 uppercase text-[10px] tracking-[0.2em]">Contact Us</h4>
-                        <ul className="space-y-4 text-sm font-medium text-muted-foreground/80">
-                            <li className="flex items-center gap-3">
-                                <div className="p-1.5 rounded-full bg-blue-500/10 text-blue-600"><Mail size={14} /></div>
-                                <span>hello@hostelgh.com</span>
+                        <h4 className="font-black text-foreground mb-4 uppercase text-[10px] tracking-[0.3em] italic">Contact Center</h4>
+                        <ul className="space-y-3 text-[10px] font-black uppercase tracking-widest text-muted-foreground">
+                            <li className="flex items-center gap-2">
+                                <Mail size={12} className="text-primary" />
+                                <span className="lowercase">hello@hostelgh.com</span>
                             </li>
-                            <li className="flex items-center gap-3">
-                                <div className="p-1.5 rounded-full bg-blue-500/10 text-blue-600"><Phone size={14} /></div>
+                            <li className="flex items-center gap-2">
+                                <Phone size={12} className="text-primary" />
                                 <span>+233 59 849 4617</span>
                             </li>
-                            <li className="flex items-center gap-3">
-                                <div className="p-1.5 rounded-full bg-blue-500/10 text-blue-600"><Globe size={14} /></div>
-                                <span>Accra, Ghana</span>
+                            <li className="flex items-center gap-2">
+                                <Globe size={12} className="text-primary" />
+                                <span>Accra HQ, Ghana</span>
                             </li>
                         </ul>
-                        <div className="mt-8">
+                        <div className="mt-6">
                             <Link
                                 href="/auth/register?role=OWNER"
-                                className="inline-flex items-center gap-2 py-3 px-6 bg-white border border-black/5 rounded-full font-black tracking-tight text-blue-600 text-sm hover:bg-blue-50 hover:border-blue-100 hover:shadow-md hover:-translate-y-0.5 transition-all w-fit"
+                                className="inline-flex items-center gap-2 py-2 px-4 bg-foreground text-background rounded-sm font-black tracking-widest text-[9px] uppercase hover:opacity-90 transition-all active:scale-[0.98]"
                             >
                                 List Your Hostel
                             </Link>
@@ -78,21 +78,19 @@ export default function Footer() {
                     </div>
                 </div>
 
-                <div className="border-t border-black/5 pt-8 flex flex-col md:flex-row justify-between items-center gap-6 text-xs text-muted-foreground font-medium">
+                <div className="border-t border-border pt-8 flex flex-col md:flex-row justify-between items-center gap-6 text-[9px] text-muted-foreground font-black uppercase tracking-widest">
                     <div className="flex flex-col md:flex-row items-center gap-2 md:gap-4">
-                        <span className="font-black text-foreground tracking-tight flex items-center gap-1.5">
-                            <div className="w-1 h-1 bg-blue-500 rounded-full" />
-                            HostelGH
+                        <span className="text-foreground flex items-center gap-1.5 italic">
+                            HostelGH <span className="text-primary NOT-italic">.</span>
                         </span>
-                        <span className="hidden md:block w-1 h-1 bg-black/10 rounded-full" />
-                        <span>© {new Date().getFullYear()} All rights reserved.</span>
+                        <span className="hidden md:block w-1 h-1 bg-border rounded-full" />
+                        <span>© {new Date().getFullYear()} CORE UNIT RESERVED.</span>
                     </div>
-                    <div className="flex items-center gap-1 bg-white px-3 py-1.5 rounded-full border border-black/5 shadow-sm">
-                        Built with <span className="px-0.5">❤️</span> by <span className="font-black text-foreground tracking-tight">Minded Technologies</span>
+                    <div className="flex items-center gap-2 bg-muted px-4 py-1.5 rounded-sm border border-border shadow-sm">
+                        ENGINEERED BY <span className="text-foreground">MINDED TECHNOLOGIES</span>
                     </div>
                 </div>
             </div>
         </footer>
     );
 }
-

@@ -2,9 +2,10 @@
 
 import { useEffect, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { CheckCircle2, XCircle, Loader2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Check, X, Loader2, CreditCard, ShieldCheck, ChevronLeft, Zap } from "lucide-react";
 import { api } from "@/lib/api";
+import Link from "next/link";
+import { cn } from "@/lib/utils";
 
 function PaymentCallbackContent() {
     const [status, setStatus] = useState<"loading" | "success" | "error">("loading");
@@ -30,81 +31,108 @@ function PaymentCallbackContent() {
     }, [reference]);
 
     return (
-        <div className="min-h-[80vh] flex flex-col items-center justify-center p-6 text-center bg-gray-50/30">
-            <div className="w-full max-w-xl bg-white rounded-[3rem] border border-gray-100 p-12 shadow-2xl shadow-gray-200/40 animate-in fade-in zoom-in duration-700">
-                {status === "loading" && (
-                    <div className="space-y-6">
-                        <div className="w-24 h-24 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-8">
-                            <Loader2 className="w-12 h-12 text-blue-600 animate-spin" />
-                        </div>
-                        <h2 className="text-3xl font-black text-gray-900 tracking-tight italic">Verifying Payment...</h2>
-                        <p className="text-gray-500 font-medium text-lg leading-relaxed">Please wait while we secure your booking details.<br />Do not refresh this page.</p>
-                    </div>
-                )}
-
-                {status === "success" && (
-                    <div className="space-y-8">
-                        <div className="w-24 h-24 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-8 shadow-inner">
-                            <CheckCircle2 className="w-12 h-12 text-green-500" />
-                        </div>
-                        <div className="space-y-4">
-                            <h2 className="text-4xl font-black text-gray-900 tracking-tight italic uppercase">Success! 🏡</h2>
-                            <p className="text-gray-500 font-medium text-lg leading-relaxed">
-                                Your payment has been confirmed and room secured. A receipt has been sent to your email.
-                            </p>
-                        </div>
-
-                        <div className="pt-4 flex flex-col gap-4">
-                            <Button
-                                size="lg"
-                                className="w-full bg-black text-white hover:opacity-90 h-16 rounded-2xl font-bold text-lg shadow-xl shadow-black/10 active:scale-95 transition-all"
-                                onClick={() => router.push("/tenant/bookings")}
-                            >
-                                Go to My Bookings
-                            </Button>
-                            <Button
-                                variant="ghost"
-                                className="text-gray-400 font-bold hover:text-black uppercase tracking-widest text-xs"
-                                onClick={() => router.push("/")}
-                            >
-                                Back to Home
-                            </Button>
-                        </div>
-                    </div>
-                )}
-
-                {status === "error" && (
-                    <div className="space-y-8">
-                        <div className="w-24 h-24 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-8">
-                            <XCircle className="w-12 h-12 text-red-500" />
-                        </div>
-                        <div className="space-y-4">
-                            <h2 className="text-3xl font-black text-gray-900 tracking-tight italic uppercase">Verification Error</h2>
-                            <p className="text-gray-500 font-medium text-lg leading-relaxed">
-                                We couldn't verify your payment reference. If you were debited, don't worry—our team will reach out within 24 hours.
-                            </p>
-                        </div>
-                        <div className="pt-4">
-                            <Button
-                                variant="outline"
-                                className="w-full h-16 rounded-2xl border-gray-200 font-bold text-lg hover:bg-gray-50 active:scale-95 transition-all"
-                                onClick={() => router.push("/tenant/bookings")}
-                            >
-                                Back to My Bookings
-                            </Button>
-                        </div>
-                    </div>
-                )}
+        <div className="min-h-screen bg-background flex flex-col items-center justify-center p-6 relative overflow-hidden">
+            {/* Background Aesthetic */}
+            <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none opacity-20">
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/10 blur-[150px] rounded-full animate-pulse" />
+                <div className="absolute top-0 right-0 w-96 h-96 bg-primary/5 blur-[100px] rounded-full" />
             </div>
 
-            <p className="mt-12 text-[10px] font-black uppercase tracking-[0.2em] text-gray-300">HostelGH Secure Payments • Powered by Paystack</p>
+            <div className="relative z-10 w-full max-w-xl">
+                <div className="bg-card border border-border shadow-2xl rounded-sm p-10 md:p-12 text-center animate-in zoom-in-95 duration-700">
+                    
+                    {/* Status Icon */}
+                    <div className="relative w-24 h-24 mx-auto mb-10">
+                        <div className={cn(
+                            "absolute inset-0 rounded-sm border-2 transition-all duration-700",
+                            status === 'loading' ? "border-primary/10 animate-spin border-t-primary" : 
+                            status === 'success' ? "border-emerald-500/20" : "border-red-500/20"
+                        )} />
+                        <div className={cn(
+                            "absolute inset-2 rounded-sm border border-dashed transition-all duration-700 flex items-center justify-center",
+                            status === 'loading' ? "border-primary/30" : 
+                            status === 'success' ? "border-emerald-500/40 bg-emerald-500/5" : "border-red-500/40 bg-red-500/5"
+                        )}>
+                            {status === 'loading' && <CreditCard className="text-primary animate-pulse" size={32} />}
+                            {status === 'success' && <Check className="text-emerald-500 animate-in zoom-in duration-300" size={40} />}
+                            {status === 'error' && <X className="text-red-500 animate-in zoom-in duration-300" size={40} />}
+                        </div>
+                    </div>
+
+                    <div className="space-y-8">
+                        <div className="space-y-3">
+                            <span className="text-[10px] font-black uppercase tracking-[0.3em] text-primary">Transactional Registry</span>
+                            <h1 className="text-3xl font-black text-foreground tracking-tight uppercase italic">
+                                {status === 'loading' && "Verifying Asset Funding"}
+                                {status === 'success' && "Deployment Authorized"}
+                                {status === 'error' && "Funding Breach"}
+                                <span className="text-primary NOT-italic">.</span>
+                            </h1>
+                            <div className="h-px w-16 bg-border mx-auto" />
+                        </div>
+
+                        <div className="text-[12px] font-bold text-muted-foreground uppercase tracking-widest leading-relaxed max-w-md mx-auto">
+                            {status === 'loading' && "Authenticating payment reference with central gateway. Do not terminate session."}
+                            {status === 'success' && "Payment verified. Room allocation secured and asset is now active. Confirmation dispatched to registered address."}
+                            {status === 'error' && "Could not isolate payment reference. If funds were debited, automated reconciliation will occur within 24 hours."}
+                        </div>
+
+                        {status === "success" && (
+                            <div className="pt-6 flex flex-col gap-4">
+                                <button
+                                    onClick={() => router.push("/tenant/bookings")}
+                                    className="w-full bg-foreground text-background py-4 rounded-sm font-black text-[11px] uppercase tracking-[0.2em] shadow-xl shadow-foreground/10 hover:opacity-90 transition-all active:scale-[0.98] flex items-center justify-center gap-2"
+                                >
+                                    <Zap size={14} />
+                                    Access Operational Hub
+                                </button>
+                                <button
+                                    onClick={() => router.push("/")}
+                                    className="text-[10px] font-black text-muted-foreground uppercase tracking-widest hover:text-foreground transition-colors"
+                                >
+                                    Return to Overview
+                                </button>
+                            </div>
+                        )}
+
+                        {status === "error" && (
+                            <div className="pt-6 space-y-4">
+                                <button
+                                    onClick={() => router.push("/tenant/bookings")}
+                                    className="w-full bg-red-500 text-white py-4 rounded-sm font-black text-[11px] uppercase tracking-[0.2em] shadow-xl shadow-red-500/10 hover:opacity-90 transition-all active:scale-[0.98]"
+                                >
+                                    Report Transaction Issue
+                                </button>
+                                <Link 
+                                    href="/"
+                                    className="flex items-center justify-center gap-2 text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] hover:text-foreground transition-colors group"
+                                >
+                                    <ChevronLeft size={14} className="group-hover:-translate-x-1 transition-transform" />
+                                    Back to Home
+                                </Link>
+                            </div>
+                        )}
+                    </div>
+                </div>
+
+                <div className="mt-12 text-center">
+                    <p className="text-[9px] font-black uppercase tracking-[0.3em] text-muted-foreground/30 flex items-center justify-center gap-2">
+                        <ShieldCheck size={12} /> Encrypted Gateway Protocol • HosteGH Core
+                    </p>
+                </div>
+            </div>
         </div>
     );
 }
 
 export default function PaymentCallbackPage() {
     return (
-        <Suspense fallback={<div className="min-h-[60vh] flex items-center justify-center"><Loader2 className="w-16 h-16 text-primary animate-spin" /></div>}>
+        <Suspense fallback={
+            <div className="min-h-screen bg-background flex flex-col items-center justify-center p-6">
+                <div className="w-12 h-12 border-2 border-primary border-t-transparent rounded-sm animate-spin mb-6" />
+                <p className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em]">SYNCHRONIZING EXTERNAL HANDSHAKE...</p>
+            </div>
+        }>
             <PaymentCallbackContent />
         </Suspense>
     );

@@ -58,13 +58,13 @@ export default function HeroSearch() {
     });
 
     return (
-        <div className="relative w-full h-[70vh] md:h-[85vh] flex items-center justify-center overflow-hidden rounded-[2.5rem] mx-auto my-6 max-w-[98%] shadow-2xl">
+        <div className="relative w-full h-[60vh] md:h-[70vh] flex items-center justify-center overflow-hidden rounded-xl mx-auto my-4 max-w-[98%] shadow-xl border border-border/50">
             {/* Background Image Carousel with Ken Burns Effect */}
             {displayImages.map((img: string, index: number) => (
                 <div
                     key={img}
                     className={cn(
-                        "absolute inset-0 transition-opacity duration-[2000ms] ease-in-out overflow-hidden",
+                        "absolute inset-0 transition-opacity duration-[1500ms] ease-in-out overflow-hidden",
                         index === currentImageIndex ? "opacity-100 z-10" : "opacity-0 z-0"
                     )}
                 >
@@ -72,51 +72,48 @@ export default function HeroSearch() {
                         src={img}
                         alt={`Hostel Hero ${index + 1}`}
                         className={cn(
-                            "w-full h-full object-cover transition-transform duration-[8000ms] ease-linear scale-110",
+                            "w-full h-full object-cover transition-transform duration-[8000ms] ease-linear scale-105",
                             index === currentImageIndex && "scale-100"
                         )}
                     />
                     {/* Multi-layered Overlay for depth */}
-                    <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/20 to-black/70" />
-                    <div className="absolute inset-0 backdrop-blur-[2px]" />
+                    <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/30 to-black/80" />
                 </div>
             ))}
 
             {/* Content Container */}
-            <div className="relative z-20 w-full max-w-5xl px-6 flex flex-col items-center text-center">
-                {/* Floating Badge */}
-                <div className="mb-8 animate-in fade-in slide-in-from-top-4 duration-1000">
-                    <span className="inline-flex items-center px-4 py-2 rounded-full bg-white/10 backdrop-blur-xl border border-white/20 text-white text-sm font-medium tracking-wide">
-                        <Sparkles className="mr-2 h-4 w-4 text-blue-400" />
-                        Premium Student Hostels in Ghana
+            <div className="relative z-20 w-full max-w-4xl px-6 flex flex-col items-center text-center">
+                {/* Floating Badge - Minimalist */}
+                <div className="mb-6 animate-in fade-in slide-in-from-top-4 duration-1000">
+                    <span className="inline-flex items-center px-3 py-1.5 rounded-sm bg-primary/20 backdrop-blur-md border border-primary/30 text-primary-foreground text-[10px] uppercase font-black tracking-widest">
+                        <Sparkles className="mr-2 h-3 w-3 text-primary-foreground" />
+                        Premium Student Spaces
                     </span>
                 </div>
 
-                {/* Main Heading */}
-                <h1 className="text-5xl md:text-7xl lg:text-8xl font-black text-white mb-6 tracking-tighter drop-shadow-2xl animate-in fade-in slide-in-from-bottom-6 duration-1000 fill-mode-both">
-                    Find your <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-300">perfect</span> space
+                {/* Main Heading - Scaled Down */}
+                <h1 className="text-4xl md:text-6xl font-black text-white mb-4 tracking-tighter drop-shadow-xl animate-in fade-in slide-in-from-bottom-6 duration-1000 fill-mode-both uppercase">
+                    Your <span className="text-primary italic">next chapter</span> starts here
                 </h1>
 
-                {/* Subtitle */}
-                <p className="text-lg md:text-2xl text-white/80 mb-12 max-w-2xl drop-shadow-lg font-medium animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-300 fill-mode-both leading-relaxed">
-                    Connecting students with safe, vetted, and modern residences across Ghana's top campuses.
+                {/* Subtitle - More Compact */}
+                <p className="text-sm md:text-lg text-white/70 mb-10 max-w-xl drop-shadow-lg font-bold animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-300 fill-mode-both leading-relaxed">
+                    Vetted residences near Ghana's top campuses. Safe, modern, and student-focused.
                 </p>
 
-                {/* Modern GlassSearch Box */}
-                <div className="w-full max-w-3xl animate-in fade-in zoom-in-95 duration-1000 delay-500 fill-mode-both">
-                    <div className="bg-white/10 backdrop-blur-3xl p-3 rounded-[2rem] border border-white/30 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.5)] flex flex-col md:flex-row items-center gap-3 relative overflow-hidden">
-                        {/* Shimmer effect inside the glass box */}
-                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -skew-x-12 translate-x-[-150%] animate-[shimmer_3s_infinite]" />
-
+                {/* Modern Direct Search Box */}
+                <div className="w-full max-w-2xl animate-in fade-in zoom-in-95 duration-1000 delay-500 fill-mode-both px-4">
+                    <div className="bg-background/95 backdrop-blur-md p-1.5 rounded-lg border border-border shadow-2xl flex flex-col md:flex-row items-center gap-1.5 relative overflow-hidden">
+                        
                         {/* Location Input Group */}
-                        <div className="relative z-10 flex-1 flex items-center px-6 py-3 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 transition-colors w-full focus-within:ring-2 focus-within:ring-blue-400/50">
-                            <MapPin className="text-cyan-400 mr-4" size={24} />
+                        <div className="relative z-10 flex-1 flex items-center px-4 py-2.5 rounded-md bg-muted/30 border border-transparent hover:border-border transition-colors w-full focus-within:ring-1 focus-within:ring-primary/50">
+                            <MapPin className="text-primary mr-3" size={18} />
                             <div className="flex-1 text-left">
-                                <label className="block text-[10px] font-black text-white/60 uppercase tracking-[0.2em] mb-1">Campus or City</label>
+                                <label className="block text-[8px] font-black text-muted-foreground uppercase tracking-[0.2em] mb-0.5">Location</label>
                                 <input
                                     type="text"
-                                    placeholder="Enter Legon, KNUST, UCC..."
-                                    className="w-full text-white placeholder:text-white/40 font-bold bg-transparent border-none outline-none text-lg selection:bg-blue-500/30"
+                                    placeholder="Legon, KNUST, UCC..."
+                                    className="w-full text-foreground placeholder:text-muted-foreground/50 font-black bg-transparent border-none outline-none text-sm selection:bg-primary/30"
                                     value={city}
                                     onChange={(e) => setCity(e.target.value)}
                                     onKeyDown={(e) => e.key === "Enter" && handleSearch()}
@@ -127,19 +124,16 @@ export default function HeroSearch() {
                         {/* Search Button */}
                         <button
                             onClick={() => handleSearch()}
-                            className="relative z-10 bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 text-white px-8 h-full min-h-[64px] rounded-2xl transition-all shadow-xl hover:shadow-cyan-500/40 flex items-center justify-center gap-3 w-full md:w-auto font-black text-lg group active:scale-95 border border-white/10"
+                            className="relative z-10 bg-primary text-primary-foreground px-6 h-full min-h-[48px] rounded-md transition-all shadow-md hover:bg-primary/90 flex items-center justify-center gap-2 w-full md:w-auto font-black text-xs uppercase tracking-widest group active:scale-95"
                         >
-                            <Search size={24} className="group-hover:scale-110 group-hover:rotate-12 transition-transform duration-300" />
+                            <Search size={16} />
                             <span>Search</span>
                         </button>
                     </div>
 
-                    {/* Quick Links / Trending */}
-                    <div className="mt-8 flex flex-wrap justify-center gap-3 text-white/60 text-sm font-bold">
-                        <span className="uppercase tracking-widest text-[10px] mt-2.5 w-full md:w-auto flex items-center justify-center gap-2">
-                            {isLoadingTrending && <Loader2 className="animate-spin h-3 w-3" />}
-                            Trending:
-                        </span>
+                    {/* Quick Links - Slanted / Unique style */}
+                    <div className="mt-6 flex flex-wrap justify-center gap-2 text-white/50 text-[10px] font-black uppercase tracking-widest">
+                        <span className="mt-1.5 opacity-40">Trending:</span>
                         {trendingLocations && trendingLocations.length > 0 ? (
                             trendingLocations.map((loc) => (
                                 <button
@@ -148,35 +142,30 @@ export default function HeroSearch() {
                                         setCity(loc);
                                         handleSearch(loc);
                                     }}
-                                    className="px-5 py-2.5 rounded-full border border-white/10 hover:border-white/40 hover:bg-white/10 hover:text-white transition-all backdrop-blur-md flex items-center gap-2 text-xs md:text-sm active:scale-90"
+                                    className="px-3 py-1.5 rounded-sm border border-white/10 hover:border-primary/50 hover:bg-primary/10 hover:text-white transition-all backdrop-blur-sm active:scale-90"
                                 >
-                                    <Navigation className="h-3 w-3 text-blue-400" />
                                     {loc}
                                 </button>
                             ))
                         ) : (
-                            !isLoadingTrending && <span className="text-white/40 italic font-medium px-4">Exploring live activity...</span>
+                            !isLoadingTrending && <span className="opacity-30 italic font-medium px-4 lowercase">Discovering hotspots...</span>
                         )}
                     </div>
                 </div>
             </div>
 
-            {/* Premium Indicators */}
-            <div className="absolute bottom-8 flex gap-3 z-30">
+            {/* Small Indicators */}
+            <div className="absolute bottom-6 flex gap-1.5 z-30">
                 {displayImages.map((_, index) => (
                     <button
                         key={index}
                         onClick={() => setCurrentImageIndex(index)}
                         className={cn(
-                            "group relative h-1.5 transition-all duration-500 rounded-full bg-white/20",
-                            index === currentImageIndex ? "w-12 bg-blue-500" : "w-4 hover:bg-white/50"
+                            "h-1 transition-all duration-500 rounded-full",
+                            index === currentImageIndex ? "w-8 bg-primary" : "w-2 bg-white/20 hover:bg-white/40"
                         )}
                         aria-label={`Show image ${index + 1}`}
-                    >
-                        {index === currentImageIndex && (
-                            <span className="absolute inset-0 bg-blue-400 blur-sm opacity-50" />
-                        )}
-                    </button>
+                    />
                 ))}
             </div>
         </div>

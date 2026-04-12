@@ -16,33 +16,32 @@ export default function FeaturedHostels() {
     });
 
     return (
-        <div className="py-20 border-t border-border">
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-12">
+        <div className="py-12 border-t border-border/50">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
                 <div>
-                    <div className="flex items-center gap-2 mb-3">
-                        <span className="p-1 px-3 rounded-full bg-gradient-to-r from-blue-500/10 to-transparent text-blue-500 text-[10px] font-black uppercase tracking-[0.2em] border border-blue-500/20">
-                            Curated Selection
+                    <div className="flex items-center gap-2 mb-2">
+                        <span className="p-1 px-2 rounded-sm bg-primary/10 text-primary text-[9px] font-black uppercase tracking-[0.2em] border border-primary/20">
+                            Selection
                         </span>
-                        <div className="flex items-center text-orange-500 font-bold text-xs gap-1.5 bg-orange-500/10 px-2 py-1 rounded-full border border-orange-500/20">
-                            <Flame size={14} className="fill-orange-500" />
-                            <span>Trending Now</span>
+                        <div className="flex items-center text-orange-500 font-black text-[9px] gap-1 bg-orange-500/10 px-2 py-1 rounded-sm border border-orange-500/20 uppercase tracking-widest">
+                            <Flame size={12} className="fill-orange-500" />
+                            <span>Trending</span>
                         </div>
                     </div>
-                    <h3 className="text-3xl md:text-5xl font-black tracking-tighter text-foreground">
-                        Top Rated <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-cyan-400">Spaces</span>
+                    <h3 className="text-2xl md:text-4xl font-black tracking-tighter text-foreground uppercase">
+                        Top <span className="text-primary italic">Spaces</span>
                     </h3>
-                    <p className="text-muted-foreground mt-3 max-w-xl font-medium text-sm md:text-base leading-relaxed">
-                        Explore the highest-rated student residences across Ghana, vetted for safety, comfort, and proximity to campus.
+                    <p className="text-muted-foreground mt-2 max-w-lg font-bold text-xs md:text-sm leading-relaxed">
+                        Ghana's highest-vetted student residences. Safety and comfort guaranteed.
                     </p>
                 </div>
 
                 <a
                     href="/hostels"
-                    className="group relative inline-flex items-center gap-2 bg-gradient-to-r from-foreground to-foreground/80 text-background px-6 py-3.5 rounded-2xl font-black hover:shadow-[0_10px_40px_-10px_rgba(0,0,0,0.5)] transition-all duration-300 active:scale-[0.98] overflow-hidden"
+                    className="group relative inline-flex items-center gap-2 bg-foreground text-background px-5 py-2.5 rounded-sm font-black text-xs uppercase tracking-widest hover:bg-foreground/90 transition-all active:scale-[0.98]"
                 >
-                    <div className="absolute inset-0 bg-white/20 translate-y-[-100%] group-hover:translate-y-[100%] transition-transform duration-700 ease-in-out" />
-                    <span className="relative z-10">Explore All</span>
-                    <ArrowRight size={18} className="relative z-10 group-hover:translate-x-1.5 transition-transform duration-300" />
+                    <span>View All</span>
+                    <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
                 </a>
             </div>
 
@@ -59,7 +58,7 @@ export default function FeaturedHostels() {
                     ))}
                 </div>
             ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-8 gap-y-12">
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-4 gap-y-8">
                     {Array.isArray(hostels) && hostels.map((hostel: any) => (
                         <HostelCard key={hostel.id} hostel={hostel} />
                     ))}

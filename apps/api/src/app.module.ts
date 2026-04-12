@@ -8,6 +8,7 @@ import { HostelsModule } from "./modules/hostels/hostels.module";
 import { RoomsModule } from "./modules/rooms/rooms.module";
 import { BookingsModule } from "./modules/bookings/bookings.module";
 import { PaymentsModule } from "./modules/payments/payments.module";
+import { DisputesModule } from "./modules/disputes/disputes.module";
 import { HealthModule } from "./modules/health/health.module";
 import { NotificationsModule } from "./modules/notifications/notifications.module";
 import { PayoutsModule } from "./modules/payouts/payouts.module";
@@ -44,6 +45,7 @@ import { AppController } from "./app.controller";
     RoomsModule,
     BookingsModule,
     PaymentsModule,
+    DisputesModule,
     HealthModule,
     NotificationsModule,
     PayoutsModule,
