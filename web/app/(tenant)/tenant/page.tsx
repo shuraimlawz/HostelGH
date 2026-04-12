@@ -72,7 +72,15 @@ export default function TenantDashboardPage() {
         }
     });
 
-    if (bookingsLoading) {
+    const { data: wallet, isLoading: walletLoading } = useQuery({
+        queryKey: ["tenant-wallet"],
+        queryFn: async () => {
+            const res = await api.get("/wallets/me");
+            return res.data;
+        }
+    });
+
+    if (bookingsLoading || walletLoading) {
         return (
             <div className="flex h-[80vh] items-center justify-center">
                 <div className="flex flex-col items-center gap-4">
@@ -182,7 +190,7 @@ export default function TenantDashboardPage() {
                 />
                 <DashboardStat
                     title="Current Balance"
-                    value="₵0.0"
+                    value={`₵${((wallet?.balance || 0) / 100).toLocaleString()}`}
                     icon={Zap}
                     color="text-blue-600"
                     bgColor="bg-blue-50"
