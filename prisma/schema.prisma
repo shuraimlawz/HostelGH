@@ -14,15 +14,13 @@ enum UserRole {
 }
 
 enum BookingStatus {
-  PENDING_APPROVAL // tenant created, waiting owner action
-  APPROVED // owner approved, payment can proceed (or required)
-  REJECTED // owner rejected
-  CANCELLED // tenant/admin cancelled
-  CONFIRMED // payment verified (or marked confirmed)
-  CHECKED_IN // tenant has moved in
-  CHECKED_OUT // tenant has moved out
-  COMPLETED // booking fully finished
-  EXPIRED // auto-expired if not paid within window (optional)
+  PENDING
+  PAYMENT_SECURED
+  RESERVED
+  CHECKED_IN
+  COMPLETED
+  CANCELLED
+  DISPUTED
 }
 
 enum PaymentProvider {
@@ -75,10 +73,21 @@ enum HostelListingFeeModel {
   PER_ACCEPTANCE  // Fixed fee per accepted booking regardless of amount
 }
 
+enum RoomStatus {
+  AVAILABLE
+  RESERVED
+  OCCUPIED
+  ARCHIVED
+}
+
+enum DisputeRaisedBy {
+  USER
+  MANAGER
+}
+
 enum DisputeStatus {
   OPEN
   RESOLVED
-  ESCALATED
   REJECTED
 }
 
@@ -374,6 +383,7 @@ model Room {
   utilitiesIncluded String[]   @default([]) // ["water", "light", "gas"]
 
   isActive  Boolean  @default(true)
+  status    RoomStatus @default(AVAILABLE)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -389,7 +399,7 @@ model Booking {
   id       String        @id @default(cuid())
   hostelId String
   tenantId String
-  status   BookingStatus @default(PENDING_APPROVAL)
+  status   BookingStatus @default(PENDING)
 
   // term/time window (customize later)
   startDate DateTime
@@ -412,6 +422,12 @@ model Booking {
 
   deletionRequested Boolean @default(false)
   deletionReason    String?
+
+  // Escrow & Check-in
+  userCheckedIn     Boolean @default(false)
+  managerConfirmed  Boolean @default(false)
+  commissionAmount  Int?    // in pesewas
+  payoutAmount      Int?    // in pesewas
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -568,13 +584,14 @@ model InstallmentPlan {
 }
 
 model Dispute {
-  id        String        @id @default(cuid())
+  id        String          @id @default(cuid())
   bookingId String
+  raisedBy  DisputeRaisedBy
   reason    String
-  details   String?
-  status    DisputeStatus @default(OPEN)
-  createdAt DateTime      @default(now())
-  updatedAt DateTime      @updatedAt
+  details   String?         // description
+  status    DisputeStatus   @default(OPEN)
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
 
   booking Booking @relation(fields: [bookingId], references: [id])
 

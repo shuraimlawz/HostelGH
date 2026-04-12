@@ -44,55 +44,27 @@ export class BookingsController {
     return this.bookings.getOwnerBookings(req.user.id);
   }
 
-  @Roles(UserRole.OWNER, UserRole.ADMIN)
-  @Patch(":id/approve")
-  @ApiOperation({ summary: "Approve a booking request (Owner/Admin only)" })
-  approve(@Req() req: any, @Param("id") id: string) {
-    return this.bookings.approveBooking(
-      { id: req.user.id, role: req.user.role },
-      id,
-    );
-  }
-
-  @Roles(UserRole.OWNER, UserRole.ADMIN)
-  @Patch(":id/reject")
-  reject(
-    @Req() req: any,
-    @Param("id") id: string,
-    @Body() body: { reason?: string },
-  ) {
-    return this.bookings.rejectBooking(
-      { id: req.user.id, role: req.user.role },
-      id,
-      body.reason,
-    );
-  }
-
-  @Roles(UserRole.OWNER, UserRole.ADMIN)
-  @Patch(":id/check-in")
-  checkIn(@Req() req: any, @Param("id") id: string) {
-    return this.bookings.checkIn({ id: req.user.id, role: req.user.role }, id);
-  }
-
-  @Roles(UserRole.OWNER, UserRole.ADMIN)
-  @Patch(":id/check-out")
-  checkOut(@Req() req: any, @Param("id") id: string) {
-    return this.bookings.checkOut({ id: req.user.id, role: req.user.role }, id);
-  }
-
-  @Roles(UserRole.OWNER, UserRole.ADMIN)
-
   @Roles(UserRole.TENANT)
+  @Patch(":id/tenant-check-in")
+  @ApiOperation({ summary: "Tenant confirms they have checked in" })
+  tenantCheckIn(@Req() req: any, @Param("id") id: string) {
+    return this.bookings.setTenantCheckedIn(req.user.id, id);
+  }
+
+  @Roles(UserRole.OWNER, UserRole.ADMIN)
+  @Patch(":id/manager-confirm")
+  @ApiOperation({ summary: "Manager confirms tenant has arrived" })
+  managerConfirm(@Req() req: any, @Param("id") id: string) {
+    return this.bookings.setManagerConfirmed(req.user.id, id);
+  }
+
+  @Roles(UserRole.TENANT, UserRole.ADMIN)
   @Patch(":id/cancel")
-  @ApiOperation({ summary: "Cancel a booking (Tenant only)" })
+  @ApiOperation({ summary: "Cancel a booking" })
   cancel(@Req() req: any, @Param("id") id: string) {
     return this.bookings.cancelBooking({ id: req.user.id, role: req.user.role }, id);
   }
 
-  @Patch(":id/complete")
-  complete(@Req() req: any, @Param("id") id: string) {
-    return this.bookings.complete({ id: req.user.id, role: req.user.role }, id);
-  }
 
   @Roles(UserRole.OWNER, UserRole.ADMIN)
   @Patch(":id/request-deletion")

@@ -128,9 +128,11 @@ export class RoomsService {
         booking: {
           status: {
             in: [
-              BookingStatus.PENDING_APPROVAL,
-              BookingStatus.APPROVED,
-              BookingStatus.CONFIRMED,
+              BookingStatus.PENDING,
+              BookingStatus.PAYMENT_SECURED,
+              BookingStatus.RESERVED,
+              BookingStatus.CHECKED_IN,
+              BookingStatus.DISPUTED,
             ],
           },
         },

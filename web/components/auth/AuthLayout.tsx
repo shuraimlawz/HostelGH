@@ -105,7 +105,7 @@ export default function AuthLayout({ children, title, subtitle }: AuthLayoutProp
                     <div className="mb-8 text-center lg:text-left">
                         <div className="flex justify-center lg:justify-start mb-6">
                             <Link href="/" className="font-black tracking-tighter text-lg flex items-center gap-2 group">
-                                <span className="p-1.5 bg-foreground text-background rounded-sm">
+                                <span className="p-1 animate-bounce-subtle">
                                     <LogoAnimation />
                                 </span>
                                 <span className="uppercase tracking-[0.2em] text-xs">HostelGH</span>

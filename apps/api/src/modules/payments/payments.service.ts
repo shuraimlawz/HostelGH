@@ -6,6 +6,7 @@ import { ConfigService } from "@nestjs/config";
 import { randomBytes } from "crypto";
 import { NotificationsService } from "../notifications/notifications.service";
 import { FeeCalculationService } from "./fee-calculation.service";
+import { BookingsService } from "../bookings/bookings.service";
 
 @Injectable()
 export class PaymentsService {
@@ -15,6 +16,7 @@ export class PaymentsService {
     private readonly config: ConfigService,
     private readonly notifications: NotificationsService,
     private readonly feeCalc: FeeCalculationService,
+    private readonly bookingsService: BookingsService,
   ) { }
 
   private getCommissionRate() {
@@ -43,9 +45,9 @@ export class PaymentsService {
       throw new ForbiddenException("Not authorized to pay for this booking");
     }
 
-    if (booking.status !== BookingStatus.APPROVED) {
+    if (booking.status !== BookingStatus.PENDING) {
       throw new BadRequestException(
-        "Booking must be APPROVED by the owner before payment can be initiated.",
+        "Booking is not in a state that allows payment.",
       );
     }
 
@@ -329,43 +331,35 @@ export class PaymentsService {
       select: { ownerEarnings: true },
     });
 
-    const [paymentRow, bookingRow] = await this.prisma.$transaction([
-      this.prisma.payment.update({
-        where: { reference },
-        data: {
-          status: PaymentStatus.SUCCESS,
-          paidAt: paidAt ? new Date(paidAt) : new Date(),
-          rawWebhook: rawWebhook as any,
-        },
-      }),
-      this.prisma.booking.update({
-        where: { id: bookingId },
-        data: { status: BookingStatus.CONFIRMED },
-        include: { tenant: true, hostel: { include: { owner: true } } },
-      }),
-    ]);
+    const paymentRow = await this.prisma.payment.update({
+      where: { reference },
+      data: {
+        status: PaymentStatus.SUCCESS,
+        paidAt: paidAt ? new Date(paidAt) : new Date(),
+        rawWebhook: rawWebhook as any,
+      },
+    });
+
+    // Process the booking lifecycle (Mark PAYMENT_SECURED -> RESERVED)
+    const updatedBooking = await this.bookingsService.processSuccessfulPayment(bookingId);
 
     // Increment owner wallet pending balance (Escrow)
-    if (bookingRow.hostel.ownerId && payment?.ownerEarnings) {
+    if (updatedBooking.hostel.ownerId && payment?.ownerEarnings) {
       await this.prisma.wallet.upsert({
-        where: { ownerId: bookingRow.hostel.ownerId },
+        where: { ownerId: updatedBooking.hostel.ownerId },
         update: {
-          // @ts-ignore
           pendingBalance: { increment: payment.ownerEarnings },
         },
         create: {
-          ownerId: bookingRow.hostel.ownerId,
+          ownerId: updatedBooking.hostel.ownerId,
           balance: 0,
-          // @ts-ignore
           pendingBalance: payment.ownerEarnings,
-        // @ts-ignore
-        // @ts-ignore
-          hostelId: bookingRow.hostelId,
+          hostelId: updatedBooking.hostelId,
         },
       });
     }
 
-    return { paymentRow, bookingRow };
+    return { paymentRow, bookingRow: updatedBooking };
   }
 
   private sendPaymentConfirmationNotifications(

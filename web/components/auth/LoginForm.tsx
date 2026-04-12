@@ -93,19 +93,19 @@ export default function LoginForm({ onSuccess }: { onSuccess?: (user: any) => vo
         <div className="space-y-4">
             <form onSubmit={submit} className="space-y-3">
                 <div className="space-y-1 group">
-                    <label className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] px-0.5 group-focus-within:text-foreground transition-colors">Credential</label>
+                    <label className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] px-0.5 group-focus-within:text-foreground transition-colors">Email</label>
                     <input
                         type="email"
                         className="w-full px-3 py-2.5 bg-background border border-border rounded-sm outline-none focus:border-primary transition-all text-xs font-bold uppercase tracking-tight placeholder:text-muted-foreground/30 shadow-sm"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        placeholder="EMAIL@HOSTELGH.COM"
+                        placeholder="your@email.com"
                         required
                     />
                 </div>
 
                 <div className="space-y-1 group">
-                    <label className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] px-0.5 group-focus-within:text-foreground transition-colors">Passkey</label>
+                    <label className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] px-0.5 group-focus-within:text-foreground transition-colors">Password</label>
                     <div className="relative">
                         <input
                             type={showPassword ? "text" : "password"}
@@ -133,10 +133,10 @@ export default function LoginForm({ onSuccess }: { onSuccess?: (user: any) => vo
                             onChange={(e) => setRememberMe(e.target.checked)}
                             className="rounded-sm border-border w-3.5 h-3.5 text-primary focus:ring-primary bg-background"
                         />
-                        <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-tight group-hover/check:text-foreground transition-colors">Keep Session</span>
+                        <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-tight group-hover/check:text-foreground transition-colors">Remember me</span>
                     </label>
                     <Link href="/auth/forgot-password" className="text-[10px] font-black text-muted-foreground uppercase tracking-tight hover:text-primary transition-colors">
-                        Recovery?
+                        Forgot password?
                     </Link>
                 </div>
 
@@ -153,7 +153,7 @@ export default function LoginForm({ onSuccess }: { onSuccess?: (user: any) => vo
                         disabled={resendLoading}
                         className="w-full text-[9px] font-black uppercase tracking-[0.2em] text-primary hover:text-primary/80 transition-colors"
                     >
-                        {resendLoading ? "TRANSMITTING..." : "RESEND VERIFICATION"}
+                        {resendLoading ? "Resending..." : "Resend verification email"}
                     </button>
                 )}
 
@@ -167,10 +167,10 @@ export default function LoginForm({ onSuccess }: { onSuccess?: (user: any) => vo
                                 <div className="w-1 h-1 bg-background rounded-full animate-bounce [animation-delay:-0.3s]"></div>
                                 <div className="w-1 h-1 bg-background rounded-full animate-bounce [animation-delay:-0.15s]"></div>
                                 <div className="w-1 h-1 bg-background rounded-full animate-bounce"></div>
-                                <span className="ml-1 tracking-[0.2em]">VERIFYING...</span>
+                                <span className="ml-1 tracking-[0.2em]">Checking credentials...</span>
                             </div>
                         ) : (
-                            <span className="whitespace-nowrap">Authorize Session</span>
+                            <span className="whitespace-nowrap">Sign In</span>
                         )}
                     </button>
                 </div>
@@ -181,7 +181,7 @@ export default function LoginForm({ onSuccess }: { onSuccess?: (user: any) => vo
                     <div className="w-full border-t border-border"></div>
                 </div>
                 <div className="relative flex justify-center text-[9px] uppercase tracking-[0.4em] font-black">
-                    <span className="bg-card px-3 text-muted-foreground/50">OR</span>
+                    <span className="bg-card px-3 text-muted-foreground/50">or</span>
                 </div>
             </div>
 
@@ -196,7 +196,7 @@ export default function LoginForm({ onSuccess }: { onSuccess?: (user: any) => vo
                     <path fill="#FBBC05" d="M3.964 10.706A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.706V4.962H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.038l3.007-2.332z" />
                     <path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.962l3.007 2.332c.708-2.127 2.692-3.711 5.036-3.711z" />
                 </svg>
-                Google Identity
+                Continue with Google
             </button>
 
             <div className="text-center text-[10px] font-bold text-muted-foreground uppercase tracking-widest pt-2">

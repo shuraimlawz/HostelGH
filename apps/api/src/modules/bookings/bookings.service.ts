@@ -5,7 +5,7 @@ import {
   NotFoundException,
 } from "@nestjs/common";
 import { PrismaService } from "../../prisma/prisma.service";
-import { BookingStatus, UserRole, RoomGender, PaymentStatus } from "@prisma/client";
+import { BookingStatus, UserRole, RoomStatus } from "@prisma/client";
 import { Cron, CronExpression } from "@nestjs/schedule";
 import { CreateBookingDto } from "./dto/create-booking.dto";
 import { NotificationsService } from "../notifications/notifications.service";
@@ -52,77 +52,116 @@ export class BookingsService {
         );
     }
 
-    // Validate availability and create booking in a transaction
-    return await this.prisma.$transaction(async (tx) => {
-      await this.validateRoomAvailability(tx, dto, start, end, roomMap);
-
-      const now = new Date();
-      const paymentDeadline = new Date(now.getTime() + 72 * 60 * 60 * 1000); // 72 hours (3 days)
-
-      const booking = await tx.booking.create({
-        data: {
-          hostelId: dto.hostelId,
-          tenantId,
-          startDate: start,
-          endDate: end,
-          notes: dto.notes,
-          status: BookingStatus.PENDING_APPROVAL,
-          // @ts-ignore
-          paymentDeadline: paymentDeadline,
-          // @ts-ignore
-          autoReleaseAt: paymentDeadline,
-          expiresAt: paymentDeadline, // Keep for backward compatibility if needed
-
-          // KYC fields
-          levelOfStudy: dto.levelOfStudy,
-          guardianName: dto.guardianName,
-          guardianPhone: dto.guardianPhone,
-          admissionDocUrl: dto.admissionDocUrl,
-          passportPhotoUrl: dto.passportPhotoUrl,
-          items: {
-            create: dto.items.map((i) => {
-              const room = roomMap.get(i.roomId)!;
-              return {
-                roomId: i.roomId,
-                quantity: i.quantity,
-                unitPrice: room.pricePerTerm,
-              };
-            }),
-          },
-        },
-        include: { items: true },
-      });
-
-      this.sendBookingNotification(hostel.owner.email, hostel.owner.phone, {
-        tenantName:
-          `${tenant.firstName || ""} ${tenant.lastName || ""}`.trim() ||
-          tenant.email,
-        hostelName: hostel.name,
+    // Create booking in PENDING status
+    return await this.prisma.booking.create({
+      data: {
+        hostelId: dto.hostelId,
+        tenantId,
         startDate: start,
         endDate: end,
+        notes: dto.notes,
+        status: BookingStatus.PENDING,
+        // KYC fields
+        levelOfStudy: dto.levelOfStudy,
+        guardianName: dto.guardianName,
+        guardianPhone: dto.guardianPhone,
+        admissionDocUrl: dto.admissionDocUrl,
+        passportPhotoUrl: dto.passportPhotoUrl,
+        items: {
+          create: dto.items.map((i) => {
+            const room = roomMap.get(i.roomId)!;
+            return {
+              roomId: i.roomId,
+              quantity: i.quantity,
+              unitPrice: room.pricePerTerm,
+            };
+          }),
+        },
+      },
+      include: { items: true },
+    });
+  }
+
+  /**
+   * Called after successful payment (Webhook or Manual Verification)
+   * This method transitions PENDING -> PAYMENT_SECURED -> RESERVED (if available)
+   */
+  async processSuccessfulPayment(bookingId: string) {
+    return await this.prisma.$transaction(async (tx) => {
+      const booking = await tx.booking.findUnique({
+        where: { id: bookingId },
+        include: { items: true, hostel: { include: { owner: true } } },
       });
 
-      return booking;
+      if (!booking) throw new NotFoundException("Booking not found");
+
+      // 1. Mark as PAYMENT_SECURED
+      await tx.booking.update({
+        where: { id: bookingId },
+        data: { status: BookingStatus.PAYMENT_SECURED },
+      });
+
+      // 2. Check if slot is still available
+      const roomMap = new Map();
+      for (const item of booking.items) {
+        const room = await tx.room.findUnique({ where: { id: item.roomId } });
+        roomMap.set(item.roomId, room);
+      }
+
+      try {
+        await this.validateRoomAvailability(tx, booking.items, booking.startDate, booking.endDate, roomMap);
+        
+        // 3. Reserve the room
+        for (const item of booking.items) {
+          await tx.room.update({
+            where: { id: item.roomId },
+            data: {
+              availableSlots: { decrement: item.quantity },
+            },
+          });
+        }
+
+        const updatedBooking = await tx.booking.update({
+          where: { id: bookingId },
+          data: { status: BookingStatus.RESERVED },
+          include: { tenant: true, hostel: true },
+        });
+
+        // Notifications
+        this.notifications.sendBookingApprovedEmail(updatedBooking.tenant.email, {
+          hostelName: updatedBooking.hostel.name,
+          startDate: updatedBooking.startDate.toDateString(),
+          endDate: updatedBooking.endDate.toDateString(),
+        }).catch(() => {});
+
+        return updatedBooking;
+      } catch (e) {
+        // Handle rejection / refund flow placeholder
+        await tx.booking.update({
+          where: { id: bookingId },
+          data: { status: BookingStatus.CANCELLED, notes: "Room no longer available at time of payment secured." },
+        });
+        throw new BadRequestException("Room no longer available. Refund process initiated.");
+      }
     });
   }
 
   private async validateRoomAvailability(
     tx: any,
-    dto: CreateBookingDto,
+    items: any[],
     start: Date,
     end: Date,
     roomMap: Map<string, any>,
   ) {
     const overlappingItems = await tx.bookingItem.findMany({
       where: {
-        roomId: { in: dto.items.map((i) => i.roomId) },
+        roomId: { in: items.map((i) => i.roomId) },
         booking: {
-          hostelId: dto.hostelId,
           status: {
             in: [
-              BookingStatus.PENDING_APPROVAL,
-              BookingStatus.APPROVED,
-              BookingStatus.CONFIRMED,
+              BookingStatus.RESERVED,
+              BookingStatus.CHECKED_IN,
+              BookingStatus.COMPLETED,
             ],
           },
           startDate: { lt: end },
@@ -139,7 +178,7 @@ export class BookingsService {
         (bookedQty.get(row.roomId) ?? 0) + row.quantity,
       );
 
-    for (const item of dto.items) {
+    for (const item of items) {
       const room = roomMap.get(item.roomId)!;
       const alreadyBooked = bookedQty.get(item.roomId) ?? 0;
       if (alreadyBooked + item.quantity > room.totalUnits) {
@@ -150,189 +189,94 @@ export class BookingsService {
     }
   }
 
-  private sendBookingNotification(
-    ownerEmail: string,
-    ownerPhone: string | null,
-    payload: {
-      tenantName: string;
-      hostelName: string;
-      startDate: Date;
-      endDate: Date;
-    },
-  ) {
-    this.notifications
-      .sendBookingRequestEmail(ownerEmail, {
-        ...payload,
-        startDate: payload.startDate.toDateString(),
-        endDate: payload.endDate.toDateString(),
-      })
-      .catch((e) => console.error("Email failed", e));
-
-    if (ownerPhone) {
-      this.notifications
-        .sendBookingRequestSms(ownerPhone, payload)
-        .catch((e) => console.error("SMS failed", e));
-    }
-  }
-
-  async updateStatus(
-    actor: { id: string; role: UserRole },
-    bookingId: string,
-    status: BookingStatus,
-    allowedSourceStatuses: BookingStatus[],
-  ) {
+  async setTenantCheckedIn(tenantId: string, bookingId: string) {
     const booking = await this.prisma.booking.findUnique({
       where: { id: bookingId },
       include: { hostel: true },
     });
+
     if (!booking) throw new NotFoundException("Booking not found");
-
-    const isOwnerOfHostel = booking.hostel.ownerId === actor.id;
-    if (!(actor.role === UserRole.ADMIN || isOwnerOfHostel))
-      throw new ForbiddenException("Not authorized to update this booking");
-
-    if (!allowedSourceStatuses.includes(booking.status)) {
-      throw new BadRequestException(
-        `Booking cannot transition from ${booking.status} to ${status}.`,
-      );
-    }
-
-    return this.prisma.booking.update({
-      where: { id: bookingId },
-      data: { status },
-      include: { tenant: true, hostel: true },
-    });
-  }
-
-  async approveBooking(
-    actor: { id: string; role: UserRole },
-    bookingId: string,
-  ) {
-    return await this.prisma.$transaction(async (tx) => {
-      const booking = await tx.booking.findUnique({
-        where: { id: bookingId },
-        include: { items: true, hostel: { include: { owner: true } } },
-      });
-
-      if (!booking) throw new NotFoundException("Booking not found");
-      if (booking.status !== BookingStatus.PENDING_APPROVAL) {
-        throw new BadRequestException("Only pending bookings can be approved.");
-      }
-
-      // Verify ownership
-      if (
-        actor.role !== UserRole.ADMIN &&
-        booking.hostel.ownerId !== actor.id
-      ) {
-        throw new ForbiddenException("Not authorized to approve this booking");
-      }
-
-      // Assign slot number and update room availability
-      for (const item of booking.items) {
-        await tx.room.update({
-          where: { id: item.roomId },
-          data: {
-            // @ts-ignore
-            availableSlots: { decrement: item.quantity },
-          },
-        });
-      }
-
-      const updated: any = await tx.booking.update({
-        where: { id: bookingId },
-        data: {
-          status: BookingStatus.APPROVED,
-          // Refresh payment deadline and auto-release from approval time
-          // @ts-ignore
-          paymentDeadline: new Date(Date.now() + 72 * 60 * 60 * 1000),
-          // @ts-ignore
-          autoReleaseAt: new Date(Date.now() + 72 * 60 * 60 * 1000),
-        },
-        include: { tenant: true, hostel: true },
-      });
-
-      // Log audit
-      await this.audit.log(
-        { id: actor.id } as any,
-        AdminAction.APPROVE,
-        AdminEntity.BOOKING,
-        bookingId,
-        `Booking approved for tenant ${updated.tenant.email}`,
-        { tenantId: updated.tenantId, hostelId: updated.hostelId },
-      );
-
-      // Trigger notification
-      this.notifications
-        .sendBookingApprovedEmail(updated.tenant.email, {
-          hostelName: updated.hostel.name,
-          startDate: updated.startDate.toDateString(),
-          endDate: updated.endDate.toDateString(),
-        })
-        .catch((e) => console.error("Email failed", e));
-
-      if (updated.tenant.phone) {
-        this.notifications
-          .sendBookingApprovedSms(updated.tenant.phone, {
-            hostelName: updated.hostel.name,
-          })
-          .catch((e) => console.error("SMS failed", e));
-      }
-
-      return updated;
-    });
-  }
-
-  async rejectBooking(
-    actor: { id: string; role: UserRole },
-    bookingId: string,
-    reason?: string,
-  ) {
-    const booking = await this.prisma.booking.findUnique({
-      where: { id: bookingId },
-      include: { hostel: true },
-    });
-    if (!booking) throw new NotFoundException("Booking not found");
-
-    const isOwnerOfHostel = booking.hostel.ownerId === actor.id;
-    if (!(actor.role === UserRole.ADMIN || isOwnerOfHostel))
-      throw new ForbiddenException("Not authorized to reject this booking");
-
-    if (booking.status !== BookingStatus.PENDING_APPROVAL) {
-      throw new BadRequestException(
-        `Booking is in ${booking.status} state and cannot be rejected.`,
-      );
+    if (booking.tenantId !== tenantId) throw new ForbiddenException("Not authorized");
+    if (booking.status !== BookingStatus.RESERVED && booking.status !== BookingStatus.CHECKED_IN) {
+        throw new BadRequestException("Check-in only allowed for RESERVED bookings");
     }
 
     const updated = await this.prisma.booking.update({
       where: { id: bookingId },
-      data: {
-        status: BookingStatus.REJECTED,
-        notes: reason ? `Rejected: ${reason}` : booking.notes,
-      },
-      include: { tenant: true, hostel: true },
+      data: { userCheckedIn: true, status: BookingStatus.CHECKED_IN },
     });
 
-    // Log audit
-    this.audit
-      .log(
-        { id: actor.id } as any,
-        AdminAction.REJECT,
-        AdminEntity.BOOKING,
-        bookingId,
-        `Booking rejected: ${reason || "No reason provided"}`,
-        { tenantId: updated.tenantId, reason },
-      )
-      .catch(() => { });
-
-    // Trigger notification
-    this.notifications
-      .sendBookingRejectedEmail(updated.tenant.email, {
-        hostelName: updated.hostel.name,
-        reason: reason,
-      })
-      .catch((e) => console.error("Email failed", e));
-
+    await this.checkAndTriggerPaymentRelease(bookingId);
     return updated;
+  }
+
+  async setManagerConfirmed(managerId: string, bookingId: string) {
+    const booking = await this.prisma.booking.findUnique({
+      where: { id: bookingId },
+      include: { hostel: true },
+    });
+
+    if (!booking) throw new NotFoundException("Booking not found");
+    if (booking.hostel.ownerId !== managerId) throw new ForbiddenException("Not authorized");
+    if (booking.status !== BookingStatus.RESERVED && booking.status !== BookingStatus.CHECKED_IN) {
+        throw new BadRequestException("Confirmation only allowed for RESERVED or CHECKED_IN bookings");
+    }
+
+    const updated = await this.prisma.booking.update({
+      where: { id: bookingId },
+      data: { managerConfirmed: true },
+    });
+
+    await this.checkAndTriggerPaymentRelease(bookingId);
+    return updated;
+  }
+
+  private async checkAndTriggerPaymentRelease(bookingId: string) {
+    const booking = await this.prisma.booking.findUnique({
+      where: { id: bookingId },
+      include: { payment: true, hostel: true },
+    });
+
+    if (booking?.userCheckedIn && booking?.managerConfirmed && booking.status !== BookingStatus.COMPLETED) {
+      await this.triggerPaymentRelease(booking);
+    }
+  }
+
+  private async triggerPaymentRelease(booking: any) {
+    if (!booking.payment || booking.payment.status !== "SUCCESS") return;
+
+    const amountPaid = booking.payment.amount;
+    const commission = Math.round(amountPaid * 0.1); // 10% commission
+    const payoutAmount = amountPaid - commission;
+
+    await this.prisma.$transaction(async (tx) => {
+      // 1. Update booking
+      await tx.booking.update({
+        where: { id: booking.id },
+        data: {
+          status: BookingStatus.COMPLETED,
+          commissionAmount: commission,
+          payoutAmount: payoutAmount,
+        },
+      });
+
+      // 2. Transfer from pending to available balance
+      await tx.wallet.update({
+        where: { ownerId: booking.hostel.ownerId },
+        data: {
+          balance: { increment: payoutAmount },
+          pendingBalance: { decrement: booking.payment.ownerEarnings },
+        },
+      });
+      
+      console.log(`Payment released for booking ${booking.id}. Commission: ${commission}, Payout: ${payoutAmount}`);
+    });
+
+    this.notifications.sendPaymentConfirmedEmail(booking.hostel.ownerId, {
+        hostelName: booking.hostel.name,
+        amount: `GH₵ ${(payoutAmount / 100).toFixed(2)}`,
+        reference: booking.payment.reference
+    }).catch(() => {});
   }
 
   async getMyBookings(tenantId: string) {
@@ -360,65 +304,6 @@ export class BookingsService {
     });
   }
 
-  async checkIn(actor: { id: string; role: UserRole }, bookingId: string) {
-    return await this.prisma.$transaction(async (tx) => {
-      const booking = await tx.booking.findUnique({
-        where: { id: bookingId },
-        include: { hostel: true, payment: true },
-      });
-
-      if (!booking) throw new NotFoundException("Booking not found");
-
-      // Verify status and actor permissions
-      const isOwnerOfHostel = booking.hostel.ownerId === actor.id;
-      if (!(actor.role === UserRole.ADMIN || isOwnerOfHostel))
-        throw new ForbiddenException("Not authorized to update this booking");
-
-      if (
-        booking.status !== BookingStatus.CONFIRMED &&
-        booking.status !== BookingStatus.APPROVED
-      ) {
-        throw new BadRequestException(
-          `Booking cannot transition from ${booking.status} to CHECKED_IN.`,
-        );
-      }
-
-      // Update booking status
-      const updated = await tx.booking.update({
-        where: { id: bookingId },
-        data: { status: BookingStatus.CHECKED_IN },
-        include: { tenant: true, hostel: true },
-      });
-
-      // Transfer funds from pendingBalance to balance
-      if (booking.payment && (booking.payment.status as string) === "SUCCESS") {
-        await tx.wallet.update({
-          where: { ownerId: booking.hostel.ownerId },
-          data: {
-            balance: { increment: booking.payment.ownerEarnings },
-            // @ts-ignore
-            pendingBalance: { decrement: booking.payment.ownerEarnings },
-          },
-        });
-      }
-
-      return updated;
-    });
-  }
-
-  async checkOut(actor: { id: string; role: UserRole }, bookingId: string) {
-    return this.updateStatus(actor, bookingId, BookingStatus.CHECKED_OUT, [
-      BookingStatus.CHECKED_IN,
-    ]);
-  }
-
-  async complete(actor: { id: string; role: UserRole }, bookingId: string) {
-    return this.updateStatus(actor, bookingId, BookingStatus.COMPLETED, [
-      BookingStatus.CHECKED_OUT,
-    ]);
-  }
-
-
   async cancelBooking(
     actor: { id: string; role: UserRole },
     bookingId: string,
@@ -428,18 +313,20 @@ export class BookingsService {
       include: { items: true, hostel: true, payment: true },
     });
     if (!booking) throw new NotFoundException("Booking not found");
-    if (booking.tenantId !== actor.id) {
+    if (booking.tenantId !== actor.id && actor.role !== UserRole.ADMIN) {
       throw new ForbiddenException("Not authorized to cancel this booking");
     }
-    if (booking.status !== BookingStatus.PENDING_APPROVAL && booking.status !== BookingStatus.APPROVED) {
-      throw new BadRequestException(`Booking cannot be canceled from ${booking.status}.`);
+    
+    // Can only cancel before check-in
+    if (booking.status === BookingStatus.COMPLETED || booking.status === BookingStatus.CHECKED_IN) {
+      throw new BadRequestException("Cannot cancel booking after check-in");
     }
+
     return await this.prisma.$transaction(async (tx) => {
-      if (booking.status === BookingStatus.APPROVED) {
+      if (booking.status === BookingStatus.RESERVED) {
         for (const item of booking.items) {
           await tx.room.update({
             where: { id: item.roomId },
-            // @ts-ignore
             data: { availableSlots: { increment: item.quantity } },
           });
         }
@@ -478,7 +365,6 @@ export class BookingsService {
   }
 
   async confirmDeletion(bookingId: string) {
-    // Admin only action (guarded by controller)
     return this.prisma.booking.delete({
       where: { id: bookingId },
     });
@@ -496,51 +382,26 @@ export class BookingsService {
   }
 
   async getOwnerAnalytics(ownerId: string) {
-    // Get all bookings for owner's hostels
     const bookings = await this.prisma.booking.findMany({
       where: { hostel: { ownerId } },
-      include: { items: true, hostel: { include: { rooms: true } } },
+      include: { items: true, hostel: { include: { rooms: true } }, payment: true },
       orderBy: { createdAt: "asc" },
     });
 
-    // Calculate monthly trends for last 6 months
     const now = new Date();
-    const sixMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 5, 1);
-
     const monthlyData = [];
     for (let i = 0; i < 6; i++) {
-      const monthStart = new Date(
-        now.getFullYear(),
-        now.getMonth() - (5 - i),
-        1,
-      );
-      const monthEnd = new Date(
-        now.getFullYear(),
-        now.getMonth() - (5 - i) + 1,
-        0,
-      );
+      const monthStart = new Date(now.getFullYear(), now.getMonth() - (5 - i), 1);
+      const monthEnd = new Date(now.getFullYear(), now.getMonth() - (5 - i) + 1, 0);
 
       const monthBookings = bookings.filter((b) => {
         const createdDate = new Date(b.createdAt);
         return createdDate >= monthStart && createdDate <= monthEnd;
       });
 
-      const monthRevenue =
-        monthBookings
-          .filter(
-            (b) =>
-              b.status === "CONFIRMED" ||
-              b.status === "CHECKED_IN" ||
-              b.status === "CHECKED_OUT" ||
-              b.status === "COMPLETED",
-          )
-          .reduce((sum, b) => {
-            const itemTotal = b.items.reduce(
-              (itemSum, item) => itemSum + item.unitPrice * item.quantity,
-              0,
-            );
-            return sum + itemTotal;
-          }, 0) / 100; // Convert from cents
+      const monthRevenue = monthBookings
+          .filter((b) => b.status === BookingStatus.COMPLETED)
+          .reduce((sum, b) => sum + (b.payoutAmount || 0), 0) / 100;
 
       monthlyData.push({
         month: monthStart.toLocaleDateString("en-US", { month: "short" }),
@@ -549,121 +410,39 @@ export class BookingsService {
       });
     }
 
-    // Calculate occupancy rate
     const totalRooms = await this.prisma.room.count({
       where: { hostel: { ownerId }, isActive: true },
     });
 
     const currentOccupants = bookings.filter(
-      (b) => b.status === "CHECKED_IN",
+      (b) => b.status === BookingStatus.CHECKED_IN || b.status === BookingStatus.COMPLETED,
     ).length;
-    const occupancyRate =
-      totalRooms > 0 ? Math.round((currentOccupants / totalRooms) * 100) : 0;
-
-    // Calculate trend percentages (compare current month vs previous month)
-    const currentMonthBookings = monthlyData[5]?.bookings || 0;
-    const previousMonthBookings = monthlyData[4]?.bookings || 1; // Avoid division by zero
-    const bookingTrend =
-      previousMonthBookings > 0
-        ? Math.round(
-          ((currentMonthBookings - previousMonthBookings) /
-            previousMonthBookings) *
-          100,
-        )
-        : 0;
+    const occupancyRate = totalRooms > 0 ? Math.round((currentOccupants / totalRooms) * 100) : 0;
 
     return {
       monthlyTrends: monthlyData,
       occupancyRate,
       trends: {
-        bookings: bookingTrend,
+        bookings: 0, // Placeholder
       },
     };
   }
 
   @Cron(CronExpression.EVERY_HOUR)
   async handleAutoRelease() {
-    console.log("Running auto-release cron job...");
-    const now = new Date();
-
-    // Find expired bookings that are not yet confirmed
     const expiredBookings = await this.prisma.booking.findMany({
       where: {
-        status: {
-          in: [BookingStatus.PENDING_APPROVAL, BookingStatus.APPROVED],
-        },
-        // @ts-ignore
-        autoReleaseAt: { lt: now },
+        status: BookingStatus.PENDING,
+        autoReleaseAt: { lt: new Date() },
       },
-      include: { items: true },
     });
-
-    if (expiredBookings.length === 0) return;
-
-    console.log(`Found ${expiredBookings.length} expired bookings to release.`);
 
     for (const booking of expiredBookings) {
-      await this.prisma.$transaction(async (tx) => {
-        // Return slots to rooms if it was approved
-        if (booking.status === BookingStatus.APPROVED) {
-          // @ts-ignore
-          for (const item of booking.items) {
-            await tx.room.update({
-              where: { id: item.roomId },
-              // @ts-ignore
-              data: { availableSlots: { increment: item.quantity } },
-            });
-          }
-        }
-
-        // Update booking status to EXPIRED
-        await tx.booking.update({
-          where: { id: booking.id },
-          data: {
-            status: BookingStatus.EXPIRED,
-            notes: "Auto-released due to payment expiration (24h).",
-          },
-        });
+      await this.prisma.booking.update({
+        where: { id: booking.id },
+        data: { status: BookingStatus.CANCELLED },
       });
-    }
-
-    // Handle reminders (48h and 24h before expiry)
-    const fortyEightHoursFromNow = new Date(now.getTime() + 48 * 60 * 60 * 1000);
-    const twentyFourHoursFromNow = new Date(now.getTime() + 24 * 60 * 60 * 1000);
-
-    const pendingBookings = await this.prisma.booking.findMany({
-      where: {
-        status: BookingStatus.APPROVED,
-        // @ts-ignore
-        autoReleaseAt: {
-          gt: now,
-          lt: fortyEightHoursFromNow,
-        },
-      },
-      include: { tenant: true, hostel: true },
-    });
-
-    for (const booking of pendingBookings) {
-      // Logic to prevent double-sending reminders (could use a field or just narrow the window)
-      // For simplicity, we'll send if it's within the hour of the 48h or 24h mark
-      const expiry = new Date(booking.autoReleaseAt!);
-      const hoursLeft = Math.round(
-        (expiry.getTime() - now.getTime()) / (1000 * 60 * 60),
-      );
-
-      if (hoursLeft === 48 || hoursLeft === 24) {
-        if (booking.tenant.phone) {
-          const message = `Reminder: Your booking for ${booking.hostel.name} expires in ${hoursLeft} hours. Please pay now on HostelGH to secure your room.`;
-          this.notifications
-            .sendBookingApprovedSms(booking.tenant.phone, {
-              hostelName: booking.hostel.name,
-            })
-            .catch(() => { }); // Fallback or custom message
-
-          // Re-purposing or creating a specific reminder method would be better
-          // but for now we follow the existing pattern.
-        }
-      }
+      console.log(`Auto-released booking ${booking.id} due to payment timeout.`);
     }
   }
 }

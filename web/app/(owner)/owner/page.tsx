@@ -87,8 +87,8 @@ export default function OwnerDashboardPage() {
 
     const stats = {
         totalHostels,
-        totalApprovedBookings: bookings?.filter((b: any) => ["APPROVED", "CONFIRMED", "CHECKED_IN"].includes(b.status))?.length || 0,
-        totalPendingBookings: bookings?.filter((b: any) => b.status === "PENDING_APPROVAL")?.length || 0,
+        totalApprovedBookings: bookings?.filter((b: any) => ["RESERVED", "CHECKED_IN", "COMPLETED"].includes(b.status))?.length || 0,
+        totalPendingBookings: bookings?.filter((b: any) => ["PENDING", "PAYMENT_SECURED"].includes(b.status))?.length || 0,
     };
 
     const walletBalance = (wallet?.balance || 0) / 100;
@@ -96,21 +96,21 @@ export default function OwnerDashboardPage() {
 
     const filteredBookings = bookings?.filter((b: any) => {
         if (selectedTab === "all") return true;
-        if (selectedTab === "pending") return b.status === "PENDING_APPROVAL";
-        if (selectedTab === "active") return ["APPROVED", "CONFIRMED", "CHECKED_IN"].includes(b.status);
-        if (selectedTab === "completed") return ["CHECKED_OUT", "COMPLETED"].includes(b.status);
+        if (selectedTab === "pending") return ["PENDING", "PAYMENT_SECURED"].includes(b.status);
+        if (selectedTab === "active") return ["RESERVED", "CHECKED_IN", "DISPUTED"].includes(b.status);
+        if (selectedTab === "completed") return b.status === "COMPLETED";
         return true;
     }) || [];
 
     const getStatusStyles = (status: string) => {
         switch (status) {
-            case "PENDING_APPROVAL": return "bg-orange-500/10 text-orange-500 border-orange-500/20";
-            case "APPROVED": return "bg-blue-500/10 text-blue-500 border-blue-500/20";
-            case "CONFIRMED": return "bg-green-500/10 text-green-500 border-green-500/20";
+            case "PENDING": return "bg-orange-500/10 text-orange-500 border-orange-500/20";
+            case "PAYMENT_SECURED": return "bg-blue-500/10 text-blue-500 border-blue-500/20";
+            case "RESERVED": return "bg-indigo-500/10 text-indigo-500 border-indigo-500/20";
             case "CHECKED_IN": return "bg-purple-500/10 text-purple-500 border-purple-500/20";
-            case "CHECKED_OUT": return "bg-muted text-muted-foreground border-border";
             case "COMPLETED": return "bg-teal-500/10 text-teal-500 border-teal-500/20";
             case "CANCELLED": return "bg-red-500/10 text-red-500 border-red-500/20";
+            case "DISPUTED": return "bg-rose-500/10 text-rose-500 border-rose-500/20";
             default: return "bg-muted text-muted-foreground border-border";
         }
     };

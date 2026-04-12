@@ -13,7 +13,7 @@ export default function Footer() {
                     {/* Brand Section */}
                     <div className="space-y-4">
                         <Link href="/" className="flex items-center gap-2 group w-fit">
-                            <div className="p-1.5 bg-foreground text-background rounded-sm shadow-sm border border-border group-hover:scale-105 transition-transform duration-300">
+                            <div className="p-1 group-hover:scale-110 transition-transform duration-500 animate-bounce-subtle">
                                 <LogoAnimation />
                             </div>
                             <span className="text-lg font-black tracking-[0.2em] text-foreground uppercase">HostelGH</span>
@@ -72,7 +72,7 @@ export default function Footer() {
                                 href="/auth/register?role=OWNER"
                                 className="inline-flex items-center gap-2 py-2 px-4 bg-foreground text-background rounded-sm font-black tracking-widest text-[9px] uppercase hover:opacity-90 transition-all active:scale-[0.98]"
                             >
-                                Deploy Asset
+                                List Your Hostel
                             </Link>
                         </div>
                     </div>

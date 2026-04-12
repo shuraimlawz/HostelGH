@@ -4,7 +4,7 @@ import {
   NotFoundException,
 } from "@nestjs/common";
 import { PrismaService } from "../../prisma/prisma.service";
-import { UserRole, RoomGender } from "@prisma/client";
+import { UserRole, RoomGender, BookingStatus } from "@prisma/client";
 import { RedisService } from "../redis/redis.service";
 import { SubscriptionsService } from "../subscriptions/subscriptions.service";
 import {
@@ -465,7 +465,8 @@ export class HostelsService {
       this.prisma.booking.count({
         where: {
           hostel: { ownerId },
-          status: "PENDING_APPROVAL" as any,
+          status: BookingStatus.RESERVED,
+          managerConfirmed: false,
         },
       }),
     ]);

@@ -62,13 +62,13 @@ export default function OwnerBookingsPage() {
         onError: (err: any) => toast.error(err.response?.data?.message || "Failed to reject")
     });
 
-    const checkInMutation = useMutation({
-        mutationFn: (id: string) => api.patch(`/bookings/${id}/check-in`),
+    const managerConfirmMutation = useMutation({
+        mutationFn: (id: string) => api.patch(`/bookings/${id}/manager-confirm`),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["owner-bookings"] });
-            toast.success("Tenant checked in successfully!");
+            toast.success("Arrival confirmed! If tenant also confirmed, booking is now ACTIVE.");
         },
-        onError: (err: any) => toast.error(err.response?.data?.message || "Failed to check in")
+        onError: (err: any) => toast.error(err.response?.data?.message || "Failed to confirm arrival")
     });
 
     const checkOutMutation = useMutation({
@@ -84,7 +84,7 @@ export default function OwnerBookingsPage() {
         mutationFn: (id: string) => api.patch(`/bookings/${id}/complete`),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["owner-bookings"] });
-            toast.success("Booking marked as completed.");
+            toast.success("Booking completed.");
         },
         onError: (err: any) => toast.error(err.response?.data?.message || "Failed to complete")
     });
@@ -156,7 +156,7 @@ export default function OwnerBookingsPage() {
 
             {/* Filter Tabs */}
             <div className="flex gap-1.5 overflow-x-auto pb-2 no-scrollbar border-b border-border">
-                {["ALL", "PENDING_APPROVAL", "APPROVED", "CHECKED_IN", "CHECKED_OUT", "COMPLETED", "REJECTED"].map((f) => (
+                {["ALL", "PENDING", "PAYMENT_SECURED", "RESERVED", "COMPLETED", "DISPUTED", "CANCELLED"].map((f) => (
                     <button
                         key={f}
                         onClick={() => setFilter(f)}
@@ -167,7 +167,7 @@ export default function OwnerBookingsPage() {
                                 : "text-muted-foreground hover:bg-muted hover:text-foreground"
                         )}
                     >
-                        {f === "PENDING_APPROVAL" ? "Pending" : f === "ALL" ? "All" : f.replace('_', ' ')}
+                        {f === "ALL" ? "All" : f.replace('_', ' ')}
                     </button>
                 ))}
             </div>
@@ -207,13 +207,14 @@ export default function OwnerBookingsPage() {
                                     <div className="space-y-2">
                                         <div className={cn(
                                             "inline-flex items-center gap-1.5 px-3 py-1 rounded-sm text-[8px] font-black uppercase tracking-[0.1em] border",
-                                            booking.status === "PENDING_APPROVAL" ? "bg-orange-500/10 text-orange-600 border-orange-500/20" :
-                                                booking.status === "APPROVED" ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20" :
-                                                    booking.status === "CONFIRMED" ? "bg-primary/10 text-primary border-primary/20" :
-                                                        "bg-muted text-muted-foreground border-border"
+                                            booking.status === "PENDING" ? "bg-orange-500/10 text-orange-600 border-orange-500/20" :
+                                                booking.status === "PAYMENT_SECURED" ? "bg-blue-500/10 text-blue-600 border-blue-500/20" :
+                                                    booking.status === "RESERVED" ? "bg-indigo-500/10 text-indigo-600 border-indigo-500/20" :
+                                                        booking.status === "COMPLETED" ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20" :
+                                                            "bg-muted text-muted-foreground border-border"
                                         )}>
-                                            {booking.status === "PENDING_APPROVAL" ? <Clock size={10} /> :
-                                                booking.status === "APPROVED" || booking.status === "CONFIRMED" ? <CheckCircle2 size={10} /> : <XCircle size={10} />}
+                                            {booking.status === "PENDING" ? <Clock size={10} /> :
+                                                booking.status === "PAYMENT_SECURED" || booking.status === "RESERVED" || booking.status === "COMPLETED" ? <CheckCircle2 size={10} /> : <XCircle size={10} />}
                                             {booking.status.replace("_", " ")}
                                         </div>
                                         <div className="flex items-center gap-1.5 text-muted-foreground text-[9px] font-black uppercase tracking-widest pl-1">
@@ -266,100 +267,45 @@ export default function OwnerBookingsPage() {
 
                                 {/* Actions */}
                                 <div className="lg:w-56 flex flex-col justify-center gap-2">
-                                    {booking.payment?.status === "AWAITING_VERIFICATION" && (
-                                        <div className="mb-2 p-3 bg-primary/5 rounded-sm border border-primary/10 space-y-3">
-                                            <p className="text-[8px] font-black uppercase tracking-widest text-primary flex items-center gap-1.5">
-                                                <DollarSign size={10} /> Settle Offline
-                                            </p>
-                                            <a
-                                                href={booking.payment.offlineProofUrl}
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                className="block w-full h-16 rounded-sm bg-muted overflow-hidden relative group/proof border border-border"
-                                            >
-                                                <img src={booking.payment.offlineProofUrl} alt="Proof" className="w-full h-full object-cover group-hover/proof:scale-105 transition-transform" />
-                                                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/proof:opacity-100 transition-opacity flex items-center justify-center text-white text-[8px] font-black uppercase tracking-widest">View</div>
-                                            </a>
-                                            <div className="grid grid-cols-2 gap-1.5">
-                                                <button
-                                                    onClick={() => verifyOfflineMutation.mutate({ paymentId: booking.payment.id, status: "SUCCESS" })}
-                                                    disabled={verifyOfflineMutation.isPending}
-                                                    className="bg-primary text-background py-1.5 rounded-sm font-black text-[9px] uppercase tracking-widest hover:bg-primary/90 transition-all"
-                                                >
-                                                    Accept
-                                                </button>
-                                                <button
-                                                    onClick={() => verifyOfflineMutation.mutate({ paymentId: booking.payment.id, status: "FAILED" })}
-                                                    disabled={verifyOfflineMutation.isPending}
-                                                    className="bg-background border border-border text-red-500 py-1.5 rounded-sm font-black text-[9px] uppercase tracking-widest hover:bg-red-50 transition-all"
-                                                >
-                                                    Fail
-                                                </button>
-                                            </div>
-                                        </div>
-                                    )}
-
                                     <div className="space-y-2">
-                                        {booking.status === "PENDING_APPROVAL" && (
-                                            <>
-                                                <button
-                                                    onClick={() => approveMutation.mutate(booking.id)}
-                                                    disabled={approveMutation.isPending}
-                                                    className="w-full bg-foreground text-background py-3 rounded-sm font-black text-[9px] uppercase tracking-[0.2em] shadow-sm hover:bg-foreground/90 active:scale-[0.98] transition-all flex items-center justify-center gap-2"
-                                                >
-                                                    {approveMutation.isPending ? <Loader2 size={12} className="animate-spin" /> : <Check size={12} />}
-                                                    Authorize
-                                                </button>
-                                                <button
-                                                    onClick={() => {
-                                                        const reason = prompt("Enter rejection reason (optional):");
-                                                        if (reason !== null) rejectMutation.mutate({ id: booking.id, reason });
-                                                    }}
-                                                    disabled={rejectMutation.isPending}
-                                                    className="w-full bg-background text-red-600 border border-border py-3 rounded-sm font-black text-[9px] uppercase tracking-widest hover:bg-red-50 hover:border-red-500 transition-all flex items-center justify-center gap-2"
-                                                >
-                                                    <X size={12} /> Reject
-                                                </button>
-                                            </>
-                                        )}
-
-                                        {(booking.status === "APPROVED" || booking.status === "CONFIRMED") && (
+                                        {booking.status === "RESERVED" && !booking.managerConfirmed && (
                                             <button
-                                                onClick={() => checkInMutation.mutate(booking.id)}
-                                                disabled={checkInMutation.isPending}
+                                                onClick={() => managerConfirmMutation.mutate(booking.id)}
+                                                disabled={managerConfirmMutation.isPending}
                                                 className="w-full bg-primary text-background py-3 rounded-sm font-black text-[9px] uppercase tracking-[0.2em] hover:bg-primary/90 active:scale-[0.98] transition-all flex items-center justify-center gap-2"
                                             >
-                                                {checkInMutation.isPending ? <Loader2 size={12} className="animate-spin" /> : <LogIn size={12} />}
-                                                Check In
+                                                {managerConfirmMutation.isPending ? <Loader2 size={12} className="animate-spin" /> : <LogIn size={12} />}
+                                                Confirm Arrival
                                             </button>
                                         )}
 
-                                        {booking.status === "CHECKED_IN" && (
-                                            <button
-                                                onClick={() => checkOutMutation.mutate(booking.id)}
-                                                disabled={checkOutMutation.isPending}
-                                                className="w-full bg-background border border-border text-foreground py-3 rounded-sm font-black text-[9px] uppercase tracking-widest hover:bg-muted active:scale-[0.98] transition-all flex items-center justify-center gap-2"
-                                            >
-                                                {checkOutMutation.isPending ? <Loader2 size={12} className="animate-spin" /> : <LogOut size={12} />}
-                                                Check Out
-                                            </button>
+                                        {booking.managerConfirmed && !booking.userCheckedIn && (
+                                            <div className="p-3 bg-orange-500/10 border border-orange-500/20 rounded-sm text-center">
+                                                <p className="text-[9px] font-black text-orange-600 uppercase tracking-widest italic">Wait for Tenant...</p>
+                                            </div>
                                         )}
 
-                                        {booking.status === "CHECKED_OUT" && (
+                                        {booking.status === "COMPLETED" && (
+                                            <div className="p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-sm text-center">
+                                                <p className="text-[9px] font-black text-emerald-600 uppercase tracking-widest flex items-center justify-center gap-2">
+                                                    <CheckCircle2 size={10} /> Released
+                                                </p>
+                                            </div>
+                                        )}
+
+                                        {booking.status === "DISPUTED" && (
                                             <button
-                                                onClick={() => completeMutation.mutate(booking.id)}
-                                                disabled={completeMutation.isPending}
-                                                className="w-full bg-emerald-500 text-white py-3 rounded-sm font-black text-[9px] uppercase tracking-widest hover:bg-emerald-600 active:scale-[0.98] transition-all flex items-center justify-center gap-2"
+                                                onClick={() => {/* Trigger Resolve Modal */ }}
+                                                className="w-full bg-rose-500 text-white py-3 rounded-sm font-black text-[9px] uppercase tracking-widest hover:bg-rose-600 transition-all flex items-center justify-center gap-2"
                                             >
-                                                {completeMutation.isPending ? <Loader2 size={12} className="animate-spin" /> : <CheckCircle2 size={12} />}
-                                                Finalize
+                                                <MessageSquare size={12} /> Resolve Dispute
                                             </button>
                                         )}
                                     </div>
 
                                     {/* More Actions */}
-                                    {(booking.status !== "PENDING_APPROVAL" && booking.status !== "REJECTED") && (
-                                        <div className="flex justify-center">
+                                    {(booking.status !== "CANCELLED" && booking.status !== "REJECTED") && (
+                                        <div className="flex justify-center mt-2">
                                             <DropdownMenu>
                                                 <DropdownMenuTrigger asChild>
                                                     <button className="text-muted-foreground hover:text-foreground p-1.5 rounded-sm transition-colors border border-transparent hover:border-border">

@@ -85,15 +85,15 @@ export default function TenantDashboardPage() {
 
     // Calculation Logic
     const activeBookings = bookings?.filter((b: any) =>
-        ["APPROVED", "CONFIRMED", "CHECKED_IN"].includes(b.status)
+        ["RESERVED", "CHECKED_IN", "DISPUTED"].includes(b.status)
     ) || [];
 
     const pendingBookings = bookings?.filter((b: any) =>
-        b.status === "PENDING_APPROVAL"
+        ["PENDING", "PAYMENT_SECURED"].includes(b.status)
     ) || [];
 
     const totalSpent = (bookings?.filter((b: any) =>
-        ["CONFIRMED", "CHECKED_IN", "CHECKED_OUT", "COMPLETED"].includes(b.status)
+        ["PAYMENT_SECURED", "RESERVED", "CHECKED_IN", "COMPLETED"].includes(b.status)
     )?.reduce((acc: number, b: any) =>
         acc + (b.items?.[0]?.unitPrice * b.items?.[0]?.quantity || 0), 0
     ) / 100) || 0;
@@ -108,12 +108,12 @@ export default function TenantDashboardPage() {
 
     const getStatusStyles = (status: string) => {
         switch (status) {
-            case "PENDING_APPROVAL": return "bg-orange-50 text-orange-700 border-orange-100";
-            case "APPROVED": return "bg-blue-50 text-blue-700 border-blue-100";
-            case "CONFIRMED": return "bg-green-50 text-green-700 border-green-100";
+            case "PENDING": return "bg-orange-50 text-orange-700 border-orange-100";
+            case "PAYMENT_SECURED": return "bg-blue-50 text-blue-700 border-blue-100";
+            case "RESERVED": return "bg-indigo-50 text-indigo-700 border-indigo-100";
             case "CHECKED_IN": return "bg-purple-50 text-purple-700 border-purple-100";
-            case "CHECKED_OUT": return "bg-gray-50 text-gray-700 border-gray-100";
             case "COMPLETED": return "bg-teal-50 text-teal-700 border-teal-100";
+            case "DISPUTED": return "bg-rose-50 text-rose-700 border-rose-100";
             default: return "bg-gray-50 text-gray-700 border-gray-100";
         }
     };
@@ -353,10 +353,10 @@ export default function TenantDashboardPage() {
                                                 <p className="text-[10px] text-gray-500 font-medium truncate">
                                                     Ref: <span className="text-gray-900 font-bold tracking-tighter">#{booking.id.slice(0, 8).toUpperCase()}</span>
                                                 </p>
-                                                <div className={cn("w-1 h-1 rounded-full", booking.status === 'APPROVED' ? "bg-green-500" : "bg-orange-500")} />
+                                                <div className={cn("w-1 h-1 rounded-full", ["RESERVED", "CHECKED_IN", "COMPLETED"].includes(booking.status) ? "bg-green-500" : "bg-orange-500")} />
                                                 <span className={cn(
                                                     "text-[8px] font-black uppercase tracking-widest",
-                                                    booking.status === 'APPROVED' ? "text-green-600" : "text-orange-600"
+                                                    ["RESERVED", "CHECKED_IN", "COMPLETED"].includes(booking.status) ? "text-green-600" : "text-orange-600"
                                                 )}>
                                                     {booking.status.replace(/_/g, " ")}
                                                 </span>
