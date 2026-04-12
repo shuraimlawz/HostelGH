@@ -112,12 +112,6 @@ export default function Navbar() {
                             Browse
                         </Link>
                         <Link
-                            href="/feed"
-                            className="text-xs font-black uppercase tracking-widest px-4 py-2 text-muted-foreground hover:text-foreground transition-all"
-                        >
-                            Community
-                        </Link>
-                        <Link
                             href="/support"
                             className="text-xs font-black uppercase tracking-widest px-4 py-2 text-muted-foreground hover:text-foreground transition-all"
                         >
@@ -172,13 +166,6 @@ export default function Navbar() {
                                     onClick={() => setIsOpen(false)}
                                 >
                                     Browse Hostels
-                                </Link>
-                                <Link
-                                    href="/feed"
-                                    className="block px-5 py-2.5 hover:bg-zinc-50 text-sm font-bold text-foreground transition-colors lg:hidden"
-                                    onClick={() => setIsOpen(false)}
-                                >
-                                    Community Feed
                                 </Link>
                                 <Link
                                     href="/support"
