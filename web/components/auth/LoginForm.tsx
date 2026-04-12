@@ -135,7 +135,7 @@ export default function LoginForm({ onSuccess }: { onSuccess?: (user: any) => vo
                         />
                         <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-tight group-hover/check:text-foreground transition-colors">Keep Session</span>
                     </label>
-                    <Link href="/auth/forgot-password" weights="bold" className="text-[10px] font-black text-muted-foreground uppercase tracking-tight hover:text-primary transition-colors">
+                    <Link href="/auth/forgot-password" className="text-[10px] font-black text-muted-foreground uppercase tracking-tight hover:text-primary transition-colors">
                         Recovery?
                     </Link>
                 </div>
