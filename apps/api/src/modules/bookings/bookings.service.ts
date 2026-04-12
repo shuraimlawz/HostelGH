@@ -15,12 +15,15 @@ import {
   AdminEntity,
 } from "../admin/admin-audit.service";
 
+import { ConfigService } from "@nestjs/config";
+
 @Injectable()
 export class BookingsService {
   constructor(
     private prisma: PrismaService,
     private notifications: NotificationsService,
     private audit: AdminAuditLogService,
+    private config: ConfigService,
   ) { }
 
   async createBooking(tenantId: string, dto: CreateBookingDto) {
@@ -242,11 +245,19 @@ export class BookingsService {
     }
   }
 
+  private getCommissionRate() {
+    const envRate = this.config.get<string>("COMMISSION_RATE");
+    const parsed = envRate ? Number(envRate) : NaN;
+    if (!Number.isFinite(parsed) || parsed <= 0 || parsed >= 1) return 0.1;
+    return parsed;
+  }
+
   private async triggerPaymentRelease(booking: any) {
     if (!booking.payment || booking.payment.status !== "SUCCESS") return;
 
     const amountPaid = booking.payment.amount;
-    const commission = Math.round(amountPaid * 0.1); // 10% commission
+    const rate = this.getCommissionRate();
+    const commission = Math.round(amountPaid * rate);
     const payoutAmount = amountPaid - commission;
 
     await this.prisma.$transaction(async (tx) => {

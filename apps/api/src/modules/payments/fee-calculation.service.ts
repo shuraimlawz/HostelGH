@@ -13,9 +13,21 @@ interface FeeCalculationOutput {
   description: string;
 }
 
+import { ConfigService } from "@nestjs/config";
+
 @Injectable()
 export class FeeCalculationService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly config: ConfigService
+  ) {}
+
+  private getCommissionRate() {
+    const envRate = this.config.get<string>("COMMISSION_RATE");
+    const parsed = envRate ? Number(envRate) : NaN;
+    if (!Number.isFinite(parsed) || parsed <= 0 || parsed >= 1) return 0.1;
+    return parsed;
+  }
 
   /**
    * Calculate the fee to charge based on the hostel's listing fee model
@@ -41,12 +53,12 @@ export class FeeCalculationService {
     switch (feeModel) {
       case "STANDARD":
         // Standard per-booking fee - use default platform fee
-        // Default: 5% of booking amount
-        const standardFee = Math.ceil(input.bookingAmount * 0.05);
+        const rate = this.getCommissionRate();
+        const standardFee = Math.ceil(input.bookingAmount * rate);
         return {
           feeAmount: standardFee,
           feeType: "STANDARD",
-          description: `Standard fee (5% of ${(input.bookingAmount / 100).toFixed(2)} GHS)`,
+          description: `Standard fee (${(rate * 100).toFixed(0)}% of ${(input.bookingAmount / 100).toFixed(2)} GHS)`,
         };
 
       case "MONTHLY_LISTING":

@@ -99,44 +99,44 @@ function RegisterContent({ onSuccess }: { onSuccess?: () => void }) {
             <form onSubmit={submit} className="space-y-3">
                 <div className="grid grid-cols-2 gap-3">
                     <div className="space-y-1 group">
-                        <label className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] px-0.5 group-focus-within:text-foreground">First</label>
+                        <label className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] px-0.5 group-focus-within:text-foreground">First Name</label>
                         <input
                             type="text"
                             className="w-full px-3 py-2.5 bg-background border border-border rounded-sm outline-none focus:border-primary transition-all text-xs font-bold uppercase tracking-tight placeholder:text-muted-foreground/30 shadow-sm"
                             value={firstName}
                             onChange={(e) => setFirstName(e.target.value)}
-                            placeholder="JOHN"
+                            placeholder="Isaac"
                             required
                         />
                     </div>
 
                     <div className="space-y-1 group">
-                        <label className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] px-0.5 group-focus-within:text-foreground">Last</label>
+                        <label className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] px-0.5 group-focus-within:text-foreground">Last Name</label>
                         <input
                             type="text"
                             className="w-full px-3 py-2.5 bg-background border border-border rounded-sm outline-none focus:border-primary transition-all text-xs font-bold uppercase tracking-tight placeholder:text-muted-foreground/30 shadow-sm"
                             value={lastName}
                             onChange={(e) => setLastName(e.target.value)}
-                            placeholder="DOE"
+                            placeholder="Mensah"
                             required
                         />
                     </div>
                 </div>
 
                 <div className="space-y-1 group">
-                    <label className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] px-0.5 group-focus-within:text-foreground">Identity Email</label>
+                    <label className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] px-0.5 group-focus-within:text-foreground">Email</label>
                     <input
                         type="email"
                         className="w-full px-3 py-2.5 bg-background border border-border rounded-sm outline-none focus:border-primary transition-all text-xs font-bold uppercase tracking-tight placeholder:text-muted-foreground/30 shadow-sm"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        placeholder="NAME@DOMAIN.COM"
+                        placeholder="[EMAIL_ADDRESS]"
                         required
                     />
                 </div>
 
                 <div className="space-y-1 group">
-                    <label className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] px-0.5 group-focus-within:text-foreground">Passkey</label>
+                    <label className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] px-0.5 group-focus-within:text-foreground">Password</label>
                     <div className="relative">
                         <input
                             type={showPassword ? "text" : "password"}
@@ -157,7 +157,7 @@ function RegisterContent({ onSuccess }: { onSuccess?: () => void }) {
                 </div>
 
                 <div className="space-y-1 group">
-                    <label className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] px-0.5 group-focus-within:text-foreground transition-colors">Intent</label>
+                    <label className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] px-0.5 group-focus-within:text-foreground transition-colors">Account Type</label>
                     <div className="relative">
                         <select
                             className="w-full px-3 py-2.5 bg-background border border-border rounded-sm outline-none focus:border-primary transition-all text-xs font-black uppercase tracking-widest shadow-sm appearance-none cursor-pointer"
@@ -206,7 +206,7 @@ function RegisterContent({ onSuccess }: { onSuccess?: () => void }) {
                     <div className="w-full border-t border-border"></div>
                 </div>
                 <div className="relative flex justify-center text-[9px] uppercase tracking-[0.4em] font-black">
-                    <span className="bg-card px-3 text-muted-foreground/50">OR</span>
+                    <span className="bg-card px-3 text-muted-foreground/50">or</span>
                 </div>
             </div>
 
@@ -221,11 +221,11 @@ function RegisterContent({ onSuccess }: { onSuccess?: () => void }) {
                     <path fill="#FBBC05" d="M3.964 10.706A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.706V4.962H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.038l3.007-2.332z" />
                     <path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.962l3.007 2.332c.708-2.127 2.692-3.711 5.036-3.711z" />
                 </svg>
-                Google Identity
+                Continue with Google
             </button>
 
             <div className="text-center text-[10px] font-bold text-muted-foreground uppercase tracking-widest pt-1">
-                Found your key? <Link href="/auth/login" className="font-black text-foreground border-b border-foreground/50 hover:border-foreground transition-all ml-1">Sign In</Link>
+                Already have an account? <Link href="/auth/login" className="font-black text-foreground border-b border-foreground/50 hover:border-foreground transition-all ml-1">Sign In</Link>
             </div>
         </div>
     );

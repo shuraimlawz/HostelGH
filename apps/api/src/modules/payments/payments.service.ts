@@ -22,7 +22,7 @@ export class PaymentsService {
   private getCommissionRate() {
     const envRate = this.config.get<string>("COMMISSION_RATE");
     const parsed = envRate ? Number(envRate) : NaN;
-    if (!Number.isFinite(parsed) || parsed <= 0 || parsed >= 1) return 0.05;
+    if (!Number.isFinite(parsed) || parsed <= 0 || parsed >= 1) return 0.1;
     return parsed;
   }
 

@@ -200,7 +200,7 @@ export default function LoginForm({ onSuccess }: { onSuccess?: (user: any) => vo
             </button>
 
             <div className="text-center text-[10px] font-bold text-muted-foreground uppercase tracking-widest pt-2">
-                New Prospect? <Link href="/auth/register" className="font-black text-foreground border-b border-foreground/50 hover:border-foreground transition-all ml-1">Create Account</Link>
+                New here? <Link href="/auth/register" className="font-black text-foreground border-b border-foreground/50 hover:border-foreground transition-all ml-1">Create Account</Link>
             </div>
         </div>
     );

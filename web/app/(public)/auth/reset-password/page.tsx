@@ -66,7 +66,7 @@ function ResetPasswordContent() {
 
             <div className="relative z-10 w-full max-w-md">
                 <div className="bg-card border border-border shadow-2xl rounded-sm p-8 md:p-10 animate-in zoom-in-95 duration-500">
-                    
+
                     <div className="mb-8 space-y-2">
                         <div className="flex items-center gap-2 mb-1">
                             <span className="px-1.5 py-0.5 bg-foreground text-background rounded-sm text-[8px] font-black uppercase tracking-widest">
@@ -94,7 +94,7 @@ function ResetPasswordContent() {
                                 href="/auth/login"
                                 className="flex items-center justify-center gap-2 w-full py-4 bg-foreground text-background rounded-sm text-[10px] font-black uppercase tracking-[0.2em] hover:opacity-90 transition-all shadow-xl shadow-foreground/10 active:scale-[0.98]"
                             >
-                                Authorize Session
+                                Proceed to Login
                             </Link>
                         </div>
                     ) : (
@@ -172,8 +172,8 @@ function ResetPasswordContent() {
 
                 {/* Footer Link */}
                 <div className="mt-8 text-center">
-                    <Link 
-                        href="/" 
+                    <Link
+                        href="/"
                         className="inline-flex items-center gap-2 text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] hover:text-foreground transition-colors group"
                     >
                         <ChevronLeft size={14} className="group-hover:-translate-x-1 transition-transform" />
