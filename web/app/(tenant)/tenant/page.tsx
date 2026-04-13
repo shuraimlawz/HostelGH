@@ -42,20 +42,21 @@ function DashboardStat({
     trend?: string;
 }) {
     return (
-        <div className="bg-white p-6 rounded-[2rem] border border-gray-100 shadow-sm hover:shadow-md transition-all group">
-            <div className="flex items-start justify-between mb-4">
-                <div className={cn("w-12 h-12 rounded-2xl flex items-center justify-center transition-transform group-hover:scale-110", bgColor, color)}>
-                    <Icon size={24} />
+        <div className="bg-white p-8 rounded-[2.5rem] border border-muted shadow-sm hover:shadow-2xl hover:-translate-y-1 transition-all group relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-700 blur-3xl opacity-0 group-hover:opacity-100" />
+            <div className="flex items-start justify-between mb-6 relative z-10">
+                <div className={cn("w-14 h-14 rounded-2xl flex items-center justify-center transition-all group-hover:rotate-6 duration-500 shadow-inner", bgColor, color)}>
+                    <Icon size={28} />
                 </div>
                 {trend && (
-                    <span className="text-xs font-black text-green-600 bg-green-50 px-2 py-1 rounded-lg">
+                    <span className="text-[10px] font-black text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full uppercase tracking-widest border border-emerald-100">
                         {trend}
                     </span>
                 )}
             </div>
-            <div>
-                <p className="text-xs font-black text-gray-400 uppercase tracking-widest mb-1">{title}</p>
-                <h3 className="text-2xl font-black text-gray-900">{value}</h3>
+            <div className="relative z-10">
+                <p className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] mb-1">{title}</p>
+                <h3 className="text-3xl font-black text-foreground tracking-tighter">{value}</h3>
             </div>
         </div>
     );
@@ -82,16 +83,15 @@ export default function TenantDashboardPage() {
 
     if (bookingsLoading || walletLoading) {
         return (
-            <div className="flex h-[80vh] items-center justify-center">
+            <div className="flex h-[80vh] items-center justify-center bg-white transition-colors duration-300">
                 <div className="flex flex-col items-center gap-4">
                     <Loader2 className="animate-spin text-blue-600" size={40} />
-                    <p className="text-sm font-black text-gray-400 uppercase tracking-widest animate-pulse">Loading Dashboard...</p>
+                    <p className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.5em] animate-pulse">Establishing Portal Link...</p>
                 </div>
             </div>
         );
     }
 
-    // Calculation Logic
     const activeBookings = bookings?.filter((b: any) =>
         ["RESERVED", "CHECKED_IN", "DISPUTED"].includes(b.status)
     ) || [];
@@ -116,56 +116,56 @@ export default function TenantDashboardPage() {
 
     const getStatusStyles = (status: string) => {
         switch (status) {
-            case "PENDING": return "bg-orange-50 text-orange-700 border-orange-100";
-            case "PAYMENT_SECURED": return "bg-blue-50 text-blue-700 border-blue-100";
-            case "RESERVED": return "bg-indigo-50 text-indigo-700 border-indigo-100";
-            case "CHECKED_IN": return "bg-purple-50 text-purple-700 border-purple-100";
-            case "COMPLETED": return "bg-teal-50 text-teal-700 border-teal-100";
-            case "DISPUTED": return "bg-rose-50 text-rose-700 border-rose-100";
-            default: return "bg-gray-50 text-gray-700 border-gray-100";
+            case "PENDING": return "bg-orange-500/5 text-orange-600 border-orange-500/10";
+            case "PAYMENT_SECURED": return "bg-blue-500/5 text-blue-600 border-blue-500/10";
+            case "RESERVED": return "bg-indigo-500/5 text-indigo-600 border-indigo-500/10";
+            case "CHECKED_IN": return "bg-emerald-500/5 text-emerald-600 border-emerald-500/10";
+            case "COMPLETED": return "bg-teal-500/5 text-teal-600 border-teal-500/10";
+            case "DISPUTED": return "bg-rose-500/5 text-rose-600 border-rose-500/10";
+            default: return "bg-muted text-muted-foreground border-border";
         }
     };
 
     return (
-        <div className="max-w-[1400px] mx-auto space-y-10 pb-20">
-            {/* Header / Welcome Section */}
-            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8 pt-4">
-                <div className="space-y-2">
-                    <div className="flex items-center gap-2 mb-2">
-                        <span className="px-2.5 py-1 bg-blue-50 text-blue-600 rounded-full text-[9px] font-black uppercase tracking-widest border border-blue-100">
-                            Student Portal
+        <div className="max-w-[1500px] mx-auto space-y-12 pb-20 pt-6">
+            {/* Header / Student Profile Insights */}
+            <div className="flex flex-col xl:flex-row xl:items-end justify-between gap-10">
+                <div className="space-y-4 max-w-2xl">
+                    <div className="flex items-center gap-3">
+                        <span className="px-3 py-1 bg-blue-600/10 text-blue-600 rounded-full text-[9px] font-black uppercase tracking-[0.3em] border border-blue-600/20">
+                            Student Hub
                         </span>
-                        <div className="flex items-center gap-1.5 text-[10px] font-bold text-gray-400 ml-2">
-                            <Clock size={12} />
-                            Active Session
+                        <div className="flex items-center gap-2">
+                            <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
+                            <span className="text-[9px] font-black text-muted-foreground uppercase tracking-widest italic">Portal Online</span>
                         </div>
                     </div>
-                    <h1 className="text-3xl font-black text-gray-900 tracking-tight">
-                        Welcome back, {user?.firstName || "Student"} <span className="text-blue-600">.</span>
+                    <h1 className="text-5xl md:text-6xl font-black text-foreground tracking-tighter uppercase italic leading-[0.9]">
+                        Welcome back, <br/>{user?.firstName || "Resident"} <span className="text-blue-600 NOT-italic opacity-50">.</span>
                     </h1>
-                    <p className="text-gray-500 font-medium text-base">
-                        Your academic stay management, simplified.
+                    <p className="text-muted-foreground text-[11px] font-bold uppercase tracking-[0.1em] max-w-md">
+                        Your academic stay management, simplified through the HostelGH network.
                     </p>
                 </div>
 
-                {/* Profile Strength Component */}
-                <div className="bg-white p-5 rounded-[2rem] border border-gray-100 shadow-sm min-w-[300px] relative overflow-hidden group">
-                    <div className="absolute top-0 right-0 w-24 h-24 bg-blue-50 rounded-full -mr-8 -mt-8 group-hover:scale-110 transition-transform duration-500" />
+                {/* Profile Strength - Modernized */}
+                <div className="bg-black text-white p-8 rounded-[3rem] shadow-2xl min-w-[320px] relative overflow-hidden group border border-white/5">
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-blue-600/20 rounded-full -mr-16 -mt-16 blur-2xl group-hover:scale-125 transition-transform duration-700" />
                     <div className="relative z-10">
-                        <div className="flex items-center justify-between mb-3">
-                            <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Profile Strength</p>
-                            <span className="text-xs font-black text-blue-600">{profileCompletion}%</span>
+                        <div className="flex items-center justify-between mb-4">
+                            <p className="text-[10px] font-black text-white/40 uppercase tracking-[0.2em]">Profile Strength</p>
+                            <span className="text-xs font-black text-blue-400">{profileCompletion}%</span>
                         </div>
-                        <div className="h-2 w-full bg-gray-100 rounded-full overflow-hidden mb-3">
+                        <div className="h-2 w-full bg-white/5 rounded-full overflow-hidden mb-4 border border-white/5">
                             <div
-                                className="h-full bg-blue-600 transition-all duration-1000 ease-out"
+                                className="h-full bg-blue-500 transition-all duration-1000 ease-out shadow-[0_0_15px_rgba(59,130,246,0.5)]"
                                 style={{ width: `${profileCompletion}%` }}
                             />
                         </div>
-                        <p className="text-[10px] text-gray-500 font-medium">
+                        <p className="text-[9px] text-white/50 font-bold uppercase tracking-widest leading-none">
                             {profileCompletion < 100
-                                ? "Complete your profile to unlock all features."
-                                : "Your profile is fully verified and optimized."
+                                ? "Action Required: Complete verification."
+                                : "Identity Status: Fully Authenticated."
                             }
                         </p>
                     </div>
@@ -173,13 +173,13 @@ export default function TenantDashboardPage() {
             </div>
 
             {/* Stats Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6">
                 <DashboardStat
                     title="Active Stays"
                     value={activeBookings.length}
                     icon={CheckCircle2}
-                    color="text-green-600"
-                    bgColor="bg-green-50"
+                    color="text-emerald-600"
+                    bgColor="bg-emerald-50"
                 />
                 <DashboardStat
                     title="Pending Requests"
@@ -194,6 +194,7 @@ export default function TenantDashboardPage() {
                     icon={Zap}
                     color="text-blue-600"
                     bgColor="bg-blue-50"
+                    trend="+12% Credit"
                 />
                 <DashboardStat
                     title="Total Investment"
@@ -205,166 +206,151 @@ export default function TenantDashboardPage() {
             </div>
 
             {/* Main Content Area */}
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+            <div className="grid grid-cols-1 xl:grid-cols-12 gap-10">
                 {/* Bookings Section (Left) */}
-                <div className="lg:col-span-8 space-y-8">
-                    <div className="flex items-center justify-between mb-2">
-                        <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 bg-gray-950 rounded-xl flex items-center justify-center text-white shadow-lg">
-                                <CalendarCheck size={20} />
+                <div className="xl:col-span-8 space-y-10">
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-4">
+                            <div className="w-12 h-12 bg-black text-white rounded-2xl flex items-center justify-center shadow-xl">
+                                <CalendarCheck size={24} />
                             </div>
-                            <h2 className="text-xl font-black text-gray-900 tracking-tight italic uppercase tracking-wider">Next Stay</h2>
+                            <div className="space-y-0.5">
+                                <h2 className="text-xl font-black text-foreground tracking-tight uppercase italic leading-none">Next Tenure <span className="text-blue-600 NOT-italic">.</span></h2>
+                                <p className="text-[10px] text-muted-foreground font-black uppercase tracking-[0.3em]">Accommodation Lifecycle</p>
+                            </div>
                         </div>
-                        <Link href="/bookings" className="text-[10px] font-black text-blue-600 uppercase tracking-widest hover:underline flex items-center gap-2">
-                            View Archive <ArrowUpRight size={14} />
+                        <Link href="/bookings" className="text-[10px] font-black text-blue-600 uppercase tracking-widest hover:underline flex items-center gap-2 group">
+                            VIEW ARCHIVE <ArrowUpRight size={16} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
                         </Link>
                     </div>
 
                     {nextBooking ? (
-                        <div className="relative group overflow-hidden rounded-[2.5rem] bg-gray-900 text-white p-8 md:p-10 shadow-2xl">
+                        <div className="relative group overflow-hidden rounded-[3.5rem] bg-black text-white p-10 md:p-14 shadow-2xl border border-white/5">
                             {/* Visual Accents */}
-                            <div className="absolute top-0 right-0 w-80 h-80 bg-blue-600 rounded-full -mr-32 -mt-32 blur-[100px] opacity-40 group-hover:opacity-60 transition-opacity" />
-                            <div className="absolute bottom-0 left-0 w-40 h-40 bg-purple-600/20 rounded-full -ml-20 -mb-20 blur-3xl opacity-30" />
+                            <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-blue-600/10 rounded-full -mr-[250px] -mt-[250px] blur-[120px] group-hover:opacity-60 transition-opacity duration-1000" />
+                            <div className="absolute bottom-0 left-0 w-80 h-80 bg-purple-600/5 rounded-full -ml-40 -mb-40 blur-[100px] opacity-30" />
 
-                            <div className="relative z-10 space-y-6">
-                                <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
-                                    <div className="space-y-3">
-                                        <div className="flex items-center gap-2">
-                                            <div className="px-2.5 py-1 bg-white/10 backdrop-blur-md rounded-lg text-[9px] font-black uppercase tracking-widest text-blue-300 border border-white/5">
-                                                Active Booking
+                            <div className="relative z-10 space-y-10">
+                                <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-10">
+                                    <div className="space-y-5">
+                                        <div className="flex flex-wrap items-center gap-3">
+                                            <div className="px-3 py-1 bg-white/5 backdrop-blur-xl rounded-lg text-[10px] font-black uppercase tracking-[0.2em] text-blue-400 border border-white/10">
+                                                Active Session
                                             </div>
-                                            <div className="px-2.5 py-1 bg-green-500/20 rounded-lg text-[9px] font-black uppercase tracking-widest text-green-400 border border-green-500/10">
-                                                Paid
+                                            <div className="px-3 py-1 bg-emerald-500/10 rounded-lg text-[10px] font-black uppercase tracking-[0.2em] text-emerald-400 border border-emerald-500/5">
+                                                Settled
                                             </div>
                                         </div>
-                                        <h3 className="text-2xl md:text-3xl font-black tracking-tight group-hover:translate-x-1 transition-transform">{nextBooking.hostel.name}</h3>
-                                        <div className="flex items-center gap-2 text-gray-400 font-medium text-sm">
-                                            <div className="w-6 h-6 rounded-full bg-white/5 flex items-center justify-center">
-                                                <MapPin size={12} className="text-blue-500" />
+                                        <h3 className="text-4xl md:text-5xl font-black tracking-tighter uppercase italic group-hover:translate-x-2 transition-transform duration-500">{nextBooking.hostel.name}</h3>
+                                        <div className="flex items-center gap-3 text-white/40 font-bold text-sm uppercase tracking-widest">
+                                            <div className="w-8 h-8 rounded-xl bg-white/5 flex items-center justify-center border border-white/5">
+                                                <MapPin size={14} className="text-blue-500" />
                                             </div>
                                             {nextBooking.hostel.location}
                                         </div>
                                     </div>
-                                    <div className="text-right">
-                                        <div className="text-3xl font-black mb-1 p-4 bg-white/5 backdrop-blur-md rounded-2xl border border-white/10">₵{((nextBooking.items?.[0]?.unitPrice * nextBooking.items?.[0]?.quantity || 0) / 100).toLocaleString()}</div>
-                                        <p className="text-[9px] font-black text-gray-500 uppercase tracking-widest mt-2 uppercase italic">Full Term Amount</p>
+                                    <div className="bg-white/5 backdrop-blur-2xl p-8 rounded-[2.5rem] border border-white/10 text-center min-w-[200px]">
+                                        <div className="text-4xl font-black mb-1 tracking-tighter">₵{((nextBooking.items?.[0]?.unitPrice * nextBooking.items?.[0]?.quantity || 0) / 100).toLocaleString()}</div>
+                                        <p className="text-[10px] font-black text-white/30 uppercase tracking-[0.3em] italic">Full Tenure Engagement</p>
                                     </div>
                                 </div>
 
-                                <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 pt-8 border-t border-white/5">
+                                <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 pt-10 border-t border-white/10">
                                     <div>
-                                        <p className="text-[9px] font-black text-gray-500 uppercase tracking-[0.2em] mb-1">Check-in</p>
-                                        <p className="text-base font-bold">{new Date(nextBooking.items?.[0]?.startDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</p>
+                                        <p className="text-[10px] font-black text-white/30 uppercase tracking-[0.4em] mb-2">Check-in</p>
+                                        <p className="text-lg font-black italic">{new Date(nextBooking.items?.[0]?.startDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</p>
                                     </div>
                                     <div>
-                                        <p className="text-[9px] font-black text-gray-500 uppercase tracking-[0.2em] mb-1">Check-out</p>
-                                        <p className="text-base font-bold">{new Date(nextBooking.items?.[0]?.endDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</p>
+                                        <p className="text-[10px] font-black text-white/30 uppercase tracking-[0.4em] mb-2">Check-out</p>
+                                        <p className="text-lg font-black italic">{new Date(nextBooking.items?.[0]?.endDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</p>
                                     </div>
                                     <div>
-                                        <p className="text-[9px] font-black text-gray-500 uppercase tracking-[0.2em] mb-1">Room Config</p>
-                                        <div className="flex items-center gap-1.5 leading-none">
-                                            <div className="w-1.5 h-1.5 rounded-full bg-blue-500" />
-                                            <p className="text-base font-bold uppercase tracking-tighter">Shared <span className="text-[10px] text-gray-400 font-medium">(2 in 1)</span></p>
+                                        <p className="text-[10px] font-black text-white/30 uppercase tracking-[0.4em] mb-2">Operational Unit</p>
+                                        <div className="flex items-center gap-2 leading-none">
+                                            <div className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
+                                            <p className="text-lg font-black uppercase tracking-widest">{nextBooking.items?.[0]?.room?.name || "Shared Suite"}</p>
                                         </div>
                                     </div>
-                                    <div className="flex items-center justify-end">
-                                        <Link href={`/bookings/${nextBooking.id}`} className="bg-white text-black hover:bg-blue-600 hover:text-white px-6 py-2.5 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all shadow-xl shadow-black/20">
-                                            Manage Boarding
+                                    <div className="flex items-end justify-end">
+                                        <Link href={`/bookings/${nextBooking.id}`} className="bg-white text-black hover:bg-blue-600 hover:text-white px-8 py-4 rounded-2xl font-black text-[11px] uppercase tracking-[0.3em] transition-all shadow-2xl hover:scale-105">
+                                            MANAGE BOARDING
                                         </Link>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     ) : (
-                        <div className="p-12 bg-white rounded-[2.5rem] border border-gray-100 flex flex-col items-center text-center space-y-4 shadow-sm">
-                            <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center text-gray-300">
-                                <Building2 size={32} />
+                        <div className="p-20 bg-white rounded-[4rem] border border-muted flex flex-col items-center text-center space-y-6 shadow-sm group">
+                            <div className="w-24 h-24 bg-muted/30 rounded-full flex items-center justify-center text-muted transition-transform group-hover:scale-110 duration-500">
+                                <Building2 size={48} />
                             </div>
-                            <div className="space-y-1">
-                                <h3 className="text-xl font-black text-gray-900">Ready to find a home?</h3>
-                                <p className="text-gray-500 font-medium text-sm">You haven't booked any hostels yet. Start your search now.</p>
+                            <div className="space-y-2">
+                                <h3 className="text-2xl font-black text-foreground uppercase tracking-tight italic">Find Your Base Bases <span className="text-blue-600 NOT-italic">.</span></h3>
+                                <p className="text-muted-foreground font-bold text-sm uppercase tracking-widest max-w-sm">You haven't deployed to any hostels yet. Engage the search engine.</p>
                             </div>
-                            <Link href="/hostels" className="bg-blue-600 text-white px-8 py-3 rounded-xl font-black text-[10px] uppercase tracking-widest hover:scale-105 transition-all shadow-lg shadow-blue-100">
-                                Explore Hostels
+                            <Link href="/hostels" className="bg-blue-600 text-white px-10 py-5 rounded-2xl font-black text-[11px] uppercase tracking-[0.3em] hover:scale-105 transition-all shadow-2xl shadow-blue-500/20">
+                                EXPLORE NETWORK
                             </Link>
                         </div>
                     )}
 
-                    {/* Quick Hub Grid */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pt-4">
-                        <Link href="/account/payments" className="p-6 bg-white border border-gray-100 rounded-3xl hover:shadow-xl hover:-translate-y-1 transition-all group overflow-hidden relative">
-                            <div className="absolute top-0 right-0 w-20 h-20 bg-green-50 rounded-full -mr-8 -mt-8 grayscale group-hover:grayscale-0 transition-all opacity-50" />
-                            <div className="relative z-10 flex flex-col gap-4">
-                                <div className="w-12 h-12 bg-green-50 text-green-600 rounded-2xl flex items-center justify-center group-hover:rotate-12 transition-transform">
-                                    <CreditCard size={24} />
+                    {/* Quick Hub Grid - Modernized */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 pt-4">
+                        {[
+                            { href: "/account/payments", icon: CreditCard, color: "emerald", label: "Ledger", sub: "Payment Invoices", bg: "bg-emerald-50", text: "text-emerald-600" },
+                            { href: "/account/settings", icon: Settings, color: "blue", label: "Identity", sub: "Security Protocol", bg: "bg-blue-50", text: "text-blue-600" },
+                            { href: "/support", icon: LifeBuoy, color: "purple", label: "Nexus", sub: "Support Dispatch", bg: "bg-purple-50", text: "text-purple-600" }
+                        ].map((hub, i) => (
+                            <Link key={i} href={hub.href} className="p-8 bg-white border border-muted rounded-[2.5rem] hover:shadow-2xl hover:-translate-y-2 transition-all group overflow-hidden relative">
+                                <div className={cn("absolute top-0 right-0 w-24 h-24 rounded-full -mr-12 -mt-12 transition-all opacity-40 blur-2xl group-hover:opacity-60", hub.bg)} />
+                                <div className="relative z-10 flex flex-col gap-6">
+                                    <div className={cn("w-14 h-14 rounded-2xl flex items-center justify-center group-hover:rotate-12 transition-transform shadow-inner", hub.bg, hub.text)}>
+                                        <hub.icon size={28} />
+                                    </div>
+                                    <div>
+                                        <h4 className="font-black text-foreground text-sm italic uppercase tracking-[0.2em]">{hub.label}</h4>
+                                        <p className="text-[10px] text-muted-foreground font-black uppercase tracking-widest">{hub.sub}</p>
+                                    </div>
                                 </div>
-                                <div>
-                                    <h4 className="font-black text-gray-900 text-sm italic uppercase tracking-wider">Payments</h4>
-                                    <p className="text-xs text-gray-400 font-medium tracking-tight">Invoices & Receipts</p>
-                                </div>
-                            </div>
-                        </Link>
-                        <Link href="/account/settings" className="p-6 bg-white border border-gray-100 rounded-3xl hover:shadow-xl hover:-translate-y-1 transition-all group overflow-hidden relative">
-                            <div className="absolute top-0 right-0 w-20 h-20 bg-blue-50 rounded-full -mr-8 -mt-8 grayscale group-hover:grayscale-0 transition-all opacity-50" />
-                            <div className="relative z-10 flex flex-col gap-4">
-                                <div className="w-12 h-12 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center group-hover:rotate-12 transition-transform">
-                                    <Settings size={24} />
-                                </div>
-                                <div>
-                                    <h4 className="font-black text-gray-900 text-sm italic uppercase tracking-wider">Security</h4>
-                                    <p className="text-xs text-gray-400 font-medium tracking-tight">Privacy & Settings</p>
-                                </div>
-                            </div>
-                        </Link>
-                        <Link href="/support" className="p-6 bg-white border border-gray-100 rounded-3xl hover:shadow-xl hover:-translate-y-1 transition-all group overflow-hidden relative">
-                            <div className="absolute top-0 right-0 w-20 h-20 bg-purple-50 rounded-full -mr-8 -mt-8 grayscale group-hover:grayscale-0 transition-all opacity-50" />
-                            <div className="relative z-10 flex flex-col gap-4">
-                                <div className="w-12 h-12 bg-purple-50 text-purple-600 rounded-2xl flex items-center justify-center group-hover:rotate-12 transition-transform">
-                                    <LifeBuoy size={24} />
-                                </div>
-                                <div>
-                                    <h4 className="font-black text-gray-900 text-sm italic uppercase tracking-wider">Help Desk</h4>
-                                    <p className="text-xs text-gray-400 font-medium tracking-tight">24/7 Support Access</p>
-                                </div>
-                            </div>
-                        </Link>
+                            </Link>
+                        ))}
                     </div>
                 </div>
 
-                {/* Activity Feed (Right) */}
-                <div className="lg:col-span-4 space-y-8">
-                    <div className="flex items-center justify-between mb-2">
-                        <h2 className="text-xl font-black text-gray-900 italic uppercase tracking-wider">Recent Drift</h2>
+                {/* Recent Drift (Right) */}
+                <div className="xl:col-span-4 space-y-10">
+                    <div className="flex items-center justify-between">
+                        <h2 className="text-xl font-black text-foreground italic uppercase tracking-widest">Recent Drift <span className="text-blue-600 NOT-italic">.</span></h2>
                     </div>
-                    <div className="bg-white rounded-[2.5rem] border border-gray-100 shadow-sm p-6 space-y-6">
+                    <div className="bg-white rounded-[3.5rem] border border-muted shadow-sm p-10 space-y-10 group">
                         {bookings && bookings.length > 0 ? (
-                            <div className="space-y-6">
-                                {bookings.slice(0, 4).map((booking: any, idx: number) => (
-                                    <div key={booking.id} className="flex gap-4 group cursor-default">
+                            <div className="space-y-10">
+                                {bookings.slice(0, 5).map((booking: any, idx: number) => (
+                                    <div key={booking.id} className="flex gap-6 group/item cursor-default">
                                         <div className="relative">
                                             <div className={cn(
-                                                "w-10 h-10 rounded-xl flex items-center justify-center shrink-0 border border-gray-100 shadow-sm transition-colors",
-                                                idx === 0 ? "bg-gray-950 text-white" : "bg-gray-50 text-gray-400 group-hover:bg-gray-100"
+                                                "w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 border shadow-lg transition-all duration-500",
+                                                idx === 0 ? "bg-black text-white border-black scale-110" : "bg-muted/10 text-muted-foreground group-hover/item:bg-muted/20 border-muted"
                                             )}>
-                                                {idx === 0 ? <Zap size={18} /> : <Clock size={18} />}
+                                                {idx === 0 ? <Zap size={22} className="animate-pulse" /> : <Clock size={22} />}
                                             </div>
-                                            {idx < (bookings.slice(0, 4).length - 1) && <div className="absolute top-10 left-1/2 -translate-x-1/2 w-0.5 h-6 bg-gray-50" />}
+                                            {idx < (bookings.slice(0, 5).length - 1) && <div className="absolute top-14 left-1/2 -translate-x-1/2 w-0.5 h-10 bg-muted/20" />}
                                         </div>
-                                        <div className="flex-1 min-w-0">
-                                            <div className="flex items-center justify-between mb-0.5">
-                                                <p className="text-[11px] font-black text-gray-900 tracking-tight uppercase italic truncate pr-2">{booking.hostel.name}</p>
-                                                <span className="text-[9px] font-bold text-gray-400 shrink-0">
+                                        <div className="flex-1 min-w-0 pt-1">
+                                            <div className="flex items-center justify-between mb-1">
+                                                <p className="text-[12px] font-black text-foreground tracking-tight uppercase italic pr-4 truncate">{booking.hostel.name}</p>
+                                                <span className="text-[10px] font-bold text-muted-foreground shrink-0 uppercase tracking-widest">
                                                     {new Date(booking.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}
                                                 </span>
                                             </div>
-                                            <div className="flex items-center gap-2">
-                                                <p className="text-[10px] text-gray-500 font-medium truncate">
-                                                    Ref: <span className="text-gray-900 font-bold tracking-tighter">#{booking.id.slice(0, 8).toUpperCase()}</span>
+                                            <div className="flex items-center gap-3">
+                                                <p className="text-[10px] text-muted-foreground font-black uppercase tracking-widest truncate">
+                                                    REF: <span className="text-foreground tracking-tighter">#{booking.id.slice(0, 8).toUpperCase()}</span>
                                                 </p>
-                                                <div className={cn("w-1 h-1 rounded-full", ["RESERVED", "CHECKED_IN", "COMPLETED"].includes(booking.status) ? "bg-green-500" : "bg-orange-500")} />
+                                                <div className={cn("w-1.5 h-1.5 rounded-full", ["RESERVED", "CHECKED_IN", "COMPLETED"].includes(booking.status) ? "bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]" : "bg-orange-500")} />
                                                 <span className={cn(
-                                                    "text-[8px] font-black uppercase tracking-widest",
-                                                    ["RESERVED", "CHECKED_IN", "COMPLETED"].includes(booking.status) ? "text-green-600" : "text-orange-600"
+                                                    "text-[9px] font-black uppercase tracking-widest",
+                                                    ["RESERVED", "CHECKED_IN", "COMPLETED"].includes(booking.status) ? "text-emerald-600" : "text-orange-600"
                                                 )}>
                                                     {booking.status.replace(/_/g, " ")}
                                                 </span>
@@ -374,29 +360,31 @@ export default function TenantDashboardPage() {
                                 ))}
                             </div>
                         ) : (
-                            <div className="text-center py-12 space-y-3">
-                                <div className="w-12 h-12 bg-gray-50 rounded-xl flex items-center justify-center text-gray-300 mx-auto">
-                                    <TrendingUp size={24} />
-                                </div>
-                                <p className="text-gray-400 text-[10px] font-black uppercase tracking-widest italic">No recent shifts</p>
+                            <div className="text-center py-20 space-y-4 opacity-30">
+                                <TrendingUp size={48} className="mx-auto" />
+                                <p className="text-muted-foreground text-[11px] font-black uppercase tracking-[0.5em] italic">No Recent Drift</p>
                             </div>
                         )}
-                        <Link href="/bookings" className="block w-full text-center py-4 bg-gray-50 hover:bg-gray-900 hover:text-white rounded-2xl text-[10px] font-black text-gray-900 uppercase tracking-widest transition-all">
-                            View All Activity
+                        <Link href="/bookings" className="block w-full text-center py-5 bg-muted/20 hover:bg-black hover:text-white rounded-[2rem] text-[11px] font-black uppercase tracking-[0.5em] transition-all">
+                            VIEW FULL LEDGER
                         </Link>
                     </div>
 
                     {/* Safety Alert (Premium) */}
-                    <div className="bg-gray-900 rounded-[2.5rem] p-8 text-white relative overflow-hidden group shadow-2xl">
-                        <div className="absolute top-0 right-0 w-32 h-32 bg-blue-600/20 rounded-full -mr-16 -mt-16 blur-2xl group-hover:scale-125 transition-transform duration-700" />
-                        <div className="relative z-10">
-                            <ShieldCheck className="text-blue-400 mb-4" size={24} />
-                            <h3 className="text-sm font-black italic uppercase tracking-wider mb-2">Secure Payments <span className="text-blue-500">.</span></h3>
-                            <p className="text-[10px] text-gray-400 font-medium leading-relaxed mb-6">
-                                Always use the platform to process your rent. We never ask for payments via third-party direct MoMo numbers.
-                            </p>
-                            <Link href="/support/safety" className="inline-flex items-center gap-2 text-[9px] font-black bg-white text-black px-5 py-2.5 rounded-xl hover:bg-blue-50 transition-all uppercase tracking-widest">
-                                Safety Guide <ArrowUpRight size={12} />
+                    <div className="bg-black rounded-[3.5rem] p-10 text-white relative overflow-hidden group shadow-2xl border border-white/5">
+                        <div className="absolute top-0 right-0 w-64 h-64 bg-blue-600/20 rounded-full -mr-32 -mt-32 blur-[100px] group-hover:scale-125 transition-transform duration-1000" />
+                        <div className="relative z-10 space-y-6">
+                            <div className="w-12 h-12 bg-white/5 rounded-2xl flex items-center justify-center border border-white/10 backdrop-blur-md">
+                                <ShieldCheck className="text-blue-400" size={24} />
+                            </div>
+                            <div className="space-y-2">
+                                <h3 className="text-xl font-black italic uppercase tracking-tight leading-none">Protocols <span className="text-blue-500 NOT-italic">.</span></h3>
+                                <p className="text-[11px] text-white/40 font-bold leading-relaxed uppercase tracking-widest">
+                                    Secure your stay through the network. Avoid external direct MoMo engagements to bypass fraud vectors.
+                                </p>
+                            </div>
+                            <Link href="/support/safety" className="inline-flex items-center gap-3 text-[10px] font-black bg-white text-black px-8 py-4 rounded-2xl hover:bg-blue-50 transition-all uppercase tracking-[0.3em]">
+                                SAFETY GUIDE <ArrowUpRight size={16} />
                             </Link>
                         </div>
                     </div>
