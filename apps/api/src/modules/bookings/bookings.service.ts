@@ -264,6 +264,7 @@ export class BookingsService {
         hostel: {
           select: {
             id: true,
+            name: true,
             ownerId: true,
             owner: {
               include: {

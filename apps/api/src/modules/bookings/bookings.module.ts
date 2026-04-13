@@ -4,10 +4,9 @@ import { BookingsController } from "./bookings.controller";
 import { NotificationsModule } from "../notifications/notifications.module";
 import { ConfigModule } from "@nestjs/config";
 import { PaymentsModule } from "../payments/payments.module";
-import { AdminAuditLogModule } from "../admin/admin-audit.module";
 
 @Module({
-  imports: [NotificationsModule, ConfigModule, PaymentsModule, AdminAuditLogModule],
+  imports: [NotificationsModule, ConfigModule, PaymentsModule],
   controllers: [BookingsController],
   providers: [BookingsService],
   exports: [BookingsService],
