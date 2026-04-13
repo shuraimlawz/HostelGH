@@ -11,19 +11,20 @@ const TIPS = [
     "📱 On mobile? You're good — but HostelGH shines brightest on a PC or laptop!",
 ];
 
-const SHOW_DELAY = 4000;        // 4s after load, show first tip
-const INTERVAL = 90_000;        // repeat every 90s
-const SESSION_KEY = "hostelgh_tip_session";
+const SHOW_DELAY = 6000;        // 6s after load, show first tip
+const PERSISTENT_KEY = "hostelgh_tip_dismissed";
 
 export default function BrowsingTip() {
     const [visible, setVisible] = useState(false);
     const [tip, setTip] = useState(TIPS[0]);
-    const [dismissed, setDismissed] = useState(false);
     const [animating, setAnimating] = useState(false);
 
     const pickTip = () => TIPS[Math.floor(Math.random() * TIPS.length)];
 
     const showTip = () => {
+        // Double check local storage before showing
+        if (localStorage.getItem(PERSISTENT_KEY) === "true") return;
+        
         setTip(pickTip());
         setAnimating(false);
         setVisible(true);
@@ -38,30 +39,22 @@ export default function BrowsingTip() {
     };
 
     useEffect(() => {
-        // Don't show if user has permanently dismissed this session
-        if (sessionStorage.getItem(SESSION_KEY) === "dismissed") {
-            setDismissed(true);
-            return;
-        }
+        // Initial check
+        if (localStorage.getItem(PERSISTENT_KEY) === "true") return;
 
         const initial = setTimeout(showTip, SHOW_DELAY);
-        const interval = setInterval(() => {
-            if (!dismissed) showTip();
-        }, INTERVAL);
-
+        
         return () => {
             clearTimeout(initial);
-            clearInterval(interval);
         };
-    }, [dismissed]);
+    }, []);
 
     const handleDismiss = () => {
         dismiss();
     };
 
     const handlePermanentDismiss = () => {
-        sessionStorage.setItem(SESSION_KEY, "dismissed");
-        setDismissed(true);
+        localStorage.setItem(PERSISTENT_KEY, "true");
         dismiss();
     };
 
