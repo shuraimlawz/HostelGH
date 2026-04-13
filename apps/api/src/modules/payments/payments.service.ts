@@ -1,4 +1,4 @@
-import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from "@nestjs/common";
+import { BadRequestException, ForbiddenException, Injectable, NotFoundException, Inject, forwardRef } from "@nestjs/common";
 import { PrismaService } from "../../prisma/prisma.service";
 import { BookingStatus, PaymentStatus, UserRole, PaymentProvider } from "@prisma/client";
 import { PaystackService } from "./paystack.service";
@@ -16,6 +16,7 @@ export class PaymentsService {
     private readonly config: ConfigService,
     private readonly notifications: NotificationsService,
     private readonly feeCalc: FeeCalculationService,
+    @Inject(forwardRef(() => BookingsService))
     private readonly bookingsService: BookingsService,
   ) { }
 
