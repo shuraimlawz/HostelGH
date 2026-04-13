@@ -11,12 +11,14 @@ import {
     Shield,
     X,
     LogOut,
-    HelpCircle
+    HelpCircle,
+    LayoutDashboard
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/lib/auth-context";
 
 const links = [
+    { name: "Dashboard", href: "/tenant", icon: LayoutDashboard },
     { name: "My Profile", href: "/account", icon: User },
     { name: "My Bookings", href: "/bookings", icon: CalendarCheck },
     { name: "Payments", href: "/account/payments", icon: CreditCard },
@@ -33,16 +35,16 @@ export default function TenantSidebar({ isOpen = false, onClose = () => { } }: T
     const { user, logout } = useAuth();
 
     const SidebarContent = () => (
-        <div className="flex flex-col h-full bg-[#0a0a0a] text-white">
-            {/* Header */}
-            <div className="mb-10 px-2 pt-2 text-center">
-                <div className="flex items-center gap-3 px-4 py-3 bg-white/5 rounded-2xl border border-white/10 backdrop-blur-md">
-                    <div className="w-8 h-8 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-500/20">
-                        <Shield size={18} />
+        <div className="flex flex-col h-full bg-white text-gray-900 px-6 py-8">
+            {/* Header / Logo Section */}
+            <div className="mb-10 px-2">
+                <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-500/20">
+                        <Shield size={20} />
                     </div>
                     <div>
-                        <p className="text-[9px] font-black text-blue-400 uppercase tracking-[0.2em] leading-none mb-1">Students</p>
-                        <h2 className="text-sm font-black text-white tracking-tight uppercase italic">Resident <span className="text-blue-500 NOT-italic">.</span></h2>
+                        <p className="text-[10px] font-bold text-blue-600 uppercase tracking-widest leading-none mb-1">Students</p>
+                        <h2 className="text-lg font-bold text-gray-900 tracking-tight leading-none">Resident<span className="text-blue-600">.</span></h2>
                     </div>
                 </div>
             </div>
@@ -57,23 +59,23 @@ export default function TenantSidebar({ isOpen = false, onClose = () => { } }: T
                             href={link.href}
                             onClick={onClose}
                             className={cn(
-                                "flex items-center justify-between px-4 py-3 rounded-2xl transition-all duration-300 group relative overflow-hidden",
+                                "flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-200 group relative",
                                 isActive
-                                    ? "bg-white text-black shadow-2xl shadow-white/5"
-                                    : "text-muted-foreground hover:bg-white/5 hover:text-white"
+                                    ? "bg-blue-50 text-blue-700"
+                                    : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"
                             )}
                         >
-                            <div className="flex items-center gap-4 relative z-10">
+                            <div className="flex items-center gap-3.5">
                                 <link.icon size={18} className={cn(
                                     "transition-colors",
-                                    isActive ? "text-blue-500 px-0.5" : "text-muted-foreground group-hover:text-white"
+                                    isActive ? "text-blue-600" : "text-gray-400 group-hover:text-gray-600"
                                 )} />
                                 <span className={cn(
-                                    "font-black text-[10px] uppercase tracking-[0.15em] transition-transform duration-300",
-                                    isActive ? "translate-x-1" : "group-hover:translate-x-1"
+                                    "text-sm font-semibold tracking-tight transition-transform duration-200",
+                                    isActive ? "translate-x-0.5" : "group-hover:translate-x-0.5"
                                 )}>{link.name}</span>
                             </div>
-                            {isActive && <ChevronRight size={14} className="relative z-10 text-blue-500" />}
+                            {isActive && <div className="w-1.5 h-1.5 rounded-full bg-blue-600 shadow-sm" />}
                         </Link>
                     );
                 })}
@@ -81,28 +83,29 @@ export default function TenantSidebar({ isOpen = false, onClose = () => { } }: T
 
             {/* Bottom Section */}
             <div className="mt-auto space-y-6">
-                {/* Help Card */}
-                <div className="bg-gradient-to-br from-blue-600/10 to-transparent rounded-[2rem] p-6 border border-blue-600/20 relative overflow-hidden group/help">
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-blue-600/20 rounded-full -mr-16 -mt-16 blur-3xl opacity-50 group-hover/help:scale-125 transition-transform duration-700" />
-                    <div className="relative z-10">
-                        <div className="w-10 h-10 bg-black/40 backdrop-blur-md rounded-xl flex items-center justify-center border border-white/10 mb-4 shadow-xl">
-                            <HelpCircle size={18} className="text-blue-400" />
+                {/* Support Card */}
+                <div className="bg-gray-50 rounded-2xl p-5 border border-gray-100 relative overflow-hidden group/help">
+                    <div className="relative z-10 flex flex-col gap-3">
+                        <div className="w-9 h-9 bg-white rounded-lg flex items-center justify-center border border-gray-100 shadow-sm">
+                            <HelpCircle size={18} className="text-blue-600" />
                         </div>
-                        <h3 className="text-[11px] font-black mb-1 uppercase tracking-widest text-white">Support Hub</h3>
-                        <p className="text-[9px] text-muted-foreground font-bold uppercase leading-relaxed mb-4">
-                            24/7 assistance for all your academic stay needs.
-                        </p>
-                        <Link href="/support" className="inline-flex items-center gap-2 text-[10px] font-black text-blue-400 hover:text-white transition-colors uppercase tracking-widest group/link">
-                            GET HELP <ChevronRight size={12} className="group-hover/link:translate-x-1 transition-transform" />
+                        <div className="space-y-1">
+                            <h3 className="text-xs font-bold text-gray-900">Support Hub</h3>
+                            <p className="text-[11px] text-gray-500 leading-relaxed">
+                                Get 24/7 assistance for your hostel stay.
+                            </p>
+                        </div>
+                        <Link href="/support" className="inline-flex items-center gap-1.5 text-[11px] font-bold text-blue-600 hover:text-blue-700 transition-colors group/link">
+                            Get Help <ChevronRight size={12} className="group-hover/link:translate-x-0.5 transition-transform" />
                         </Link>
                     </div>
                 </div>
 
                 {/* User Profile Chip */}
-                <div className="pt-6 border-t border-white/10">
-                    <div className="flex items-center justify-between p-2 pl-3 bg-white/5 rounded-2xl border border-white/10 backdrop-blur-lg">
+                <div className="pt-6 border-t border-gray-100">
+                    <div className="flex items-center justify-between p-2 pl-3 bg-gray-50 rounded-xl border border-gray-100">
                         <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 bg-blue-600/20 text-blue-400 rounded-xl flex items-center justify-center text-[11px] font-black overflow-hidden border border-blue-600/20 uppercase shadow-inner">
+                            <div className="w-9 h-9 bg-blue-100 text-blue-700 rounded-lg flex items-center justify-center text-xs font-bold border border-blue-200 uppercase">
                                 {user?.avatarUrl ? (
                                     <img src={user.avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
                                 ) : (
@@ -110,13 +113,13 @@ export default function TenantSidebar({ isOpen = false, onClose = () => { } }: T
                                 )}
                             </div>
                             <div className="min-w-0">
-                                <p className="text-[11px] font-black text-white truncate tracking-tight uppercase leading-none mb-1">{user?.firstName || "Resident"}</p>
-                                <p className="text-[9px] font-bold text-blue-400/60 truncate uppercase tracking-widest leading-none">Verified Student</p>
+                                <p className="text-xs font-bold text-gray-900 truncate leading-none mb-1">{user?.firstName || "Resident"}</p>
+                                <p className="text-[10px] text-gray-500 truncate font-medium">Verified Student</p>
                             </div>
                         </div>
                         <button
                             onClick={() => logout()}
-                            className="p-3 text-muted-foreground hover:text-blue-500 hover:bg-white/5 rounded-xl transition-all"
+                            className="p-2.5 text-gray-400 hover:text-red-600 hover:bg-gray-100 rounded-lg transition-all"
                             title="Sign out"
                         >
                             <LogOut size={16} />
@@ -140,7 +143,7 @@ export default function TenantSidebar({ isOpen = false, onClose = () => { } }: T
             {/* Mobile Drawer */}
             <aside
                 className={cn(
-                    "md:hidden fixed top-0 left-0 bottom-0 w-72 bg-white border-r p-6 z-50 transition-transform duration-500 cubic-bezier(0.4, 0, 0.2, 1)",
+                    "md:hidden fixed top-0 left-0 bottom-0 w-72 bg-white border-r z-50 transition-transform duration-500 cubic-bezier(0.4, 0, 0.2, 1)",
                     isOpen ? "translate-x-0" : "-translate-x-full"
                 )}
             >
@@ -148,7 +151,7 @@ export default function TenantSidebar({ isOpen = false, onClose = () => { } }: T
             </aside>
 
             {/* Desktop Sidebar */}
-            <aside className="hidden md:flex flex-col w-72 bg-white border-r h-screen sticky top-0 p-8">
+            <aside className="hidden md:flex flex-col w-72 bg-white border-r h-screen sticky top-0">
                 <SidebarContent />
             </aside>
         </>
