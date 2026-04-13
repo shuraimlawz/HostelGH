@@ -177,7 +177,7 @@ export default function TenantBookingsPage() {
                                         
                                         <div className="space-y-1">
                                             <h2 className="text-3xl font-black text-foreground italic uppercase tracking-tighter leading-none">
-                                                {booking.hostel.name} <span className="text-blue-600 NOT-italic opacity-40">/</span> {booking.items[0]?.room.name || "UNASSIGNED"}
+                                                {booking.hostel.name} <span className="text-blue-600 NOT-italic opacity-40">/</span> {booking.items?.[0]?.room.name || "UNASSIGNED"}
                                             </h2>
                                             <p className="text-[11px] text-muted-foreground font-black uppercase tracking-widest flex items-center gap-2">
                                                 <Building2 size={12} /> HOSTEL ID: #{booking.id.slice(-6).toUpperCase()}
