@@ -85,4 +85,56 @@ export class PaystackService {
       throw new BadRequestException("Failed to verify Paystack transaction");
     }
   }
+
+  async getBanks() {
+    try {
+      const res = await axios.get(`${this.baseUrl}/bank?country=ghana`, {
+        headers: { Authorization: `Bearer ${this.secretKey}` },
+      });
+      return res.data;
+    } catch (error) {
+      this.logger.error(`Paystack Get Banks Error: ${error.message}`);
+      throw new BadRequestException("Failed to fetch banks from Paystack");
+    }
+  }
+
+  async createTransferRecipient(params: {
+    type: string;
+    name: string;
+    account_number: string;
+    bank_code: string;
+    currency: string;
+  }) {
+    try {
+      const res = await axios.post(`${this.baseUrl}/transferrecipient`, params, {
+        headers: { Authorization: `Bearer ${this.secretKey}` },
+      });
+      return res.data;
+    } catch (error) {
+      this.logger.error(
+        `Paystack Recipient Error: ${error.response?.data?.message || error.message}`,
+      );
+      throw new BadRequestException("Failed to create transfer recipient");
+    }
+  }
+
+  async initiateTransfer(params: {
+    source: string;
+    amount: number;
+    recipient: string;
+    reason?: string;
+    reference?: string;
+  }) {
+    try {
+      const res = await axios.post(`${this.baseUrl}/transfer`, params, {
+        headers: { Authorization: `Bearer ${this.secretKey}` },
+      });
+      return res.data;
+    } catch (error) {
+      this.logger.error(
+        `Paystack Transfer Error: ${error.response?.data?.message || error.message}`,
+      );
+      throw new BadRequestException("Failed to initiate transfer");
+    }
+  }
 }

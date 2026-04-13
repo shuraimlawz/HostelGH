@@ -93,7 +93,7 @@ export default function AdminSettingsPage() {
                 <div className="lg:col-span-2 space-y-6">
                     {/* Profile Settings */}
                     <form onSubmit={handleUpdate} className="bg-white rounded-2xl border p-6 shadow-sm space-y-4">
-                        <h3 className="text-lg font-bold mb-4">Profile Information</h3>
+                        <h3 className="text-lg font-bold mb-4">Profile Info</h3>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div className="space-y-2">
@@ -126,7 +126,7 @@ export default function AdminSettingsPage() {
                         </div>
 
                         <div className="space-y-2">
-                            <label className="text-sm font-medium text-gray-700">Email Address</label>
+                            <label className="text-sm font-medium text-gray-700">Email</label>
                             <div className="relative opacity-60">
                                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
                                 <input
@@ -149,9 +149,8 @@ export default function AdminSettingsPage() {
                         </button>
                     </form>
 
-                    {/* System Preferences */}
                     <div className="bg-white rounded-2xl border p-6 shadow-sm">
-                        <h3 className="text-lg font-bold mb-4">System Preferences</h3>
+                        <h3 className="text-lg font-bold mb-4">Preferences</h3>
                         <div className="space-y-4">
                             <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
                                 <div className="flex items-center gap-3">

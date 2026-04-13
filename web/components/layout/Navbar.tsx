@@ -180,7 +180,7 @@ export default function Navbar() {
                                         <div className="border-t border-black/5 my-2 mx-5" />
                                         <div className="px-5 py-3 border-b border-black/5 mb-1 bg-zinc-50/50">
                                             <div className="font-bold text-sm truncate text-foreground">{user.email}</div>
-                                            <div className="text-[10px] font-bold text-muted-foreground mt-0.5 uppercase tracking-widest">{user.role.toLowerCase()} Account</div>
+                                            <div className="text-[10px] font-bold text-muted-foreground mt-0.5 uppercase tracking-widest">{user.role.toLowerCase()} Account Type</div>
                                         </div>
 
                                         <div className="max-h-[60vh] overflow-y-auto">

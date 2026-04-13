@@ -49,22 +49,22 @@ export default function OwnerSidebar({ isOpen = false, onClose = () => { } }: Ow
     });
 
     const SidebarContent = () => (
-        <div className="flex flex-col h-full bg-card">
+        <div className="flex flex-col h-full bg-[#0a0a0a] text-white">
             {/* Header */}
-            <div className="mb-8 px-2 pt-0">
-                <div className="flex items-center gap-2 px-3 py-2 bg-primary/5 rounded-sm border border-primary/10">
-                    <div className="w-7 h-7 bg-primary rounded-sm flex items-center justify-center text-background">
-                        <Zap size={14} className="fill-current" />
+            <div className="mb-10 px-2 pt-2 text-center">
+                <div className="flex items-center gap-3 px-4 py-3 bg-white/5 rounded-2xl border border-white/10 backdrop-blur-md">
+                    <div className="w-8 h-8 bg-primary rounded-xl flex items-center justify-center text-background shadow-lg shadow-primary/20">
+                        <Zap size={16} className="fill-current" />
                     </div>
                     <div>
-                        <p className="text-[8px] font-black text-muted-foreground uppercase tracking-widest leading-none mb-0.5">HUB</p>
-                        <h2 className="text-xs font-black text-foreground tracking-tight uppercase">Proprietor</h2>
+                        <p className="text-[9px] font-black text-primary uppercase tracking-[0.2em] leading-none mb-1">Network</p>
+                        <h2 className="text-sm font-black text-white tracking-tight uppercase italic">Proprietor <span className="text-primary NOT-italic">.</span></h2>
                     </div>
                 </div>
             </div>
 
             {/* Main Nav */}
-            <nav className="space-y-1 flex-1">
+            <nav className="space-y-1.5 flex-1">
                 {links.map((link) => {
                     const isActive = pathname === link.href;
                     return (
@@ -73,68 +73,72 @@ export default function OwnerSidebar({ isOpen = false, onClose = () => { } }: Ow
                             href={link.href}
                             onClick={onClose}
                             className={cn(
-                                "flex items-center justify-between px-3 py-2 rounded-sm transition-all duration-200 group relative",
+                                "flex items-center justify-between px-4 py-3 rounded-2xl transition-all duration-300 group relative overflow-hidden",
                                 isActive
-                                    ? "bg-foreground text-background shadow-sm"
-                                    : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                                    ? "bg-white text-black shadow-2xl shadow-white/5"
+                                    : "text-muted-foreground hover:bg-white/5 hover:text-white"
                             )}
                         >
-                            <div className="flex items-center gap-3 relative z-10">
-                                <link.icon size={16} className={cn(
+                            <div className="flex items-center gap-4 relative z-10">
+                                <link.icon size={18} className={cn(
                                     "transition-colors",
-                                    isActive ? "text-primary" : "text-muted-foreground group-hover:text-foreground"
+                                    isActive ? "text-primary px-0.5" : "text-muted-foreground group-hover:text-white"
                                 )} />
-                                <span className="font-black text-[11px] uppercase tracking-wider">{link.name}</span>
-                                {link.href === "/owner/bookings" && counts?.bookings > 0 && (
-                                    <span className="flex h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
+                                <span className={cn(
+                                    "font-black text-[10px] uppercase tracking-[0.15em] transition-transform duration-300",
+                                    isActive ? "translate-x-1" : "group-hover:translate-x-1"
+                                )}>{link.name}</span>
+                                {link.href === "/owner/bookings" && (counts?.bookings > 0 || counts?.notStartedBookings > 0) && (
+                                    <span className="flex h-2 w-2 rounded-full bg-primary animate-pulse" />
                                 )}
                             </div>
-                            {isActive && <ChevronRight size={12} className="relative z-10" />}
+                            {isActive && <ChevronRight size={14} className="relative z-10 text-primary" />}
                         </Link>
                     );
                 })}
             </nav>
 
             {/* Bottom Section */}
-            <div className="mt-auto space-y-4">
-                {/* PRO Card - Slimmer */}
-                <div className="bg-muted/50 rounded-sm p-4 border border-border relative overflow-hidden group/pro">
+            <div className="mt-auto space-y-6">
+                {/* PRO Card - Futuristic */}
+                <div className="bg-gradient-to-br from-primary/10 to-transparent rounded-[2rem] p-6 border border-primary/20 relative overflow-hidden group/pro">
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-primary/20 rounded-full -mr-16 -mt-16 blur-3xl opacity-50 group-hover/pro:scale-125 transition-transform duration-700" />
                     <div className="relative z-10">
-                        <div className="w-6 h-6 bg-primary/10 rounded-sm flex items-center justify-center border border-primary/20 mb-2">
-                            <Zap size={12} className="text-primary fill-primary" />
+                        <div className="w-10 h-10 bg-black/40 backdrop-blur-md rounded-xl flex items-center justify-center border border-white/10 mb-4 shadow-xl">
+                            <Zap size={18} className="text-primary fill-primary" />
                         </div>
-                        <h3 className="text-[10px] font-black mb-1 uppercase tracking-widest text-foreground">Pro Tier</h3>
-                        <p className="text-[9px] text-muted-foreground font-bold uppercase leading-relaxed mb-3">
-                            Advanced analytics & exposure.
+                        <h3 className="text-[11px] font-black mb-1 uppercase tracking-widest text-white">Scale Portfolio</h3>
+                        <p className="text-[9px] text-muted-foreground font-bold uppercase leading-relaxed mb-4">
+                            Unlock high-tier analytics and market exposure.
                         </p>
-                        <Link href="/owner/subscription" className="inline-flex items-center gap-1 text-[9px] font-black text-primary hover:underline transition-colors uppercase tracking-widest">
-                            UPGRADE <ChevronRight size={10} />
+                        <Link href="/owner/subscription" className="inline-flex items-center gap-2 text-[10px] font-black text-primary hover:text-white transition-colors uppercase tracking-widest group/link">
+                            UPGRADE NOW <ChevronRight size={12} className="group-hover/link:translate-x-1 transition-transform" />
                         </Link>
                     </div>
                 </div>
 
                 {/* User Profile Chip */}
-                <div className="pt-4 border-t border-border">
-                    <div className="flex items-center justify-between p-1.5 bg-muted/50 rounded-sm border border-border">
-                        <div className="flex items-center gap-2">
-                            <div className="w-8 h-8 bg-foreground text-background rounded-sm flex items-center justify-center text-[10px] font-black overflow-hidden uppercase">
+                <div className="pt-6 border-t border-white/10">
+                    <div className="flex items-center justify-between p-2 pl-3 bg-white/5 rounded-2xl border border-white/10 backdrop-blur-lg">
+                        <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 bg-primary/20 text-primary rounded-xl flex items-center justify-center text-[11px] font-black overflow-hidden border border-primary/20 uppercase shadow-inner">
                                 {user?.avatarUrl ? (
                                     <img src={user.avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
                                 ) : (
-                                    user?.firstName?.[0] || user?.email?.[0].toUpperCase()
+                                    user?.firstName?.[0] || user?.email?.[0].toUpperCase() || "P"
                                 )}
                             </div>
                             <div className="min-w-0">
-                                <p className="text-[10px] font-black text-foreground truncate tracking-tight uppercase">{user?.firstName || "Member"}</p>
-                                <p className="text-[8px] font-bold text-muted-foreground truncate uppercase tracking-[0.05em]">Business</p>
+                                <p className="text-[11px] font-black text-white truncate tracking-tight uppercase leading-none mb-1">{user?.firstName || "Proprietor"}</p>
+                                <p className="text-[9px] font-bold text-primary/60 truncate uppercase tracking-widest leading-none">Verified Partner</p>
                             </div>
                         </div>
                         <button
                             onClick={() => logout()}
-                            className="p-2 text-muted-foreground hover:text-primary transition-all"
+                            className="p-3 text-muted-foreground hover:text-primary hover:bg-white/5 rounded-xl transition-all"
                             title="Sign out"
                         >
-                            <LogOut size={14} />
+                            <LogOut size={16} />
                         </button>
                     </div>
                 </div>

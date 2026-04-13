@@ -3,12 +3,14 @@ import {
   ForbiddenException,
   Injectable,
   NotFoundException,
+  Logger,
 } from "@nestjs/common";
 import { PrismaService } from "../../prisma/prisma.service";
 import { BookingStatus, UserRole, RoomStatus } from "@prisma/client";
 import { Cron, CronExpression } from "@nestjs/schedule";
 import { CreateBookingDto } from "./dto/create-booking.dto";
 import { NotificationsService } from "../notifications/notifications.service";
+import { PaystackService } from "../payments/paystack.service";
 import {
   AdminAuditLogService,
   AdminAction,
@@ -19,11 +21,14 @@ import { ConfigService } from "@nestjs/config";
 
 @Injectable()
 export class BookingsService {
+  private readonly logger = new Logger(BookingsService.name);
+
   constructor(
     private prisma: PrismaService,
     private notifications: NotificationsService,
     private audit: AdminAuditLogService,
     private config: ConfigService,
+    private paystack: PaystackService,
   ) { }
 
   async createBooking(tenantId: string, dto: CreateBookingDto) {
@@ -241,7 +246,7 @@ export class BookingsService {
     });
 
     if (booking?.userCheckedIn && booking?.managerConfirmed && booking.status !== BookingStatus.COMPLETED) {
-      await this.triggerPaymentRelease(booking);
+      await this.triggerPaymentRelease(bookingId);
     }
   }
 
@@ -252,36 +257,77 @@ export class BookingsService {
     return parsed;
   }
 
-  private async triggerPaymentRelease(booking: any) {
-    if (!booking.payment || booking.payment.status !== "SUCCESS") return;
-
-    const amountPaid = booking.payment.amount;
-    const rate = this.getCommissionRate();
-    const commission = Math.round(amountPaid * rate);
-    const payoutAmount = amountPaid - commission;
-
-    await this.prisma.$transaction(async (tx) => {
-      // 1. Update booking
-      await tx.booking.update({
-        where: { id: booking.id },
-        data: {
-          status: BookingStatus.COMPLETED,
-          commissionAmount: commission,
-          payoutAmount: payoutAmount,
+  private async triggerPaymentRelease(bookingId: string) {
+    const booking = await this.prisma.booking.findUnique({
+      where: { id: bookingId },
+      include: {
+        hostel: {
+          select: {
+            id: true,
+            ownerId: true,
+            owner: {
+              include: {
+                wallets: true,
+                settlementAccount: true,
+              },
+            },
+          },
         },
-      });
-
-      // 2. Transfer from pending to available balance
-      await tx.wallet.update({
-        where: { ownerId: booking.hostel.ownerId },
-        data: {
-          balance: { increment: payoutAmount },
-          pendingBalance: { decrement: booking.payment.ownerEarnings },
-        },
-      });
-      
-      console.log(`Payment released for booking ${booking.id}. Commission: ${commission}, Payout: ${payoutAmount}`);
+        payment: true,
+      },
     });
+
+    if (!booking || !booking.payment || !booking.hostel.owner) return;
+
+    const totalAmount = booking.payment.amount;
+    const commissionRate = this.getCommissionRate();
+    const commissionAmount = Math.round(totalAmount * commissionRate);
+    const payoutAmount = totalAmount - commissionAmount;
+
+    // 1. Update booking with amounts
+    await this.prisma.booking.update({
+      where: { id: bookingId },
+      data: {
+        commissionAmount,
+        payoutAmount,
+        status: BookingStatus.COMPLETED,
+      },
+    });
+
+    // 2. Automated Direct Payout (if settlement account exists)
+    const settlement = booking.hostel.owner.settlementAccount;
+    let transferId = null;
+
+    if (settlement && settlement.recipientCode) {
+      try {
+        const transferRes = await this.paystack.initiateTransfer({
+          source: "balance",
+          amount: payoutAmount,
+          recipient: settlement.recipientCode,
+          reason: `Payout for Booking #${booking.id}`,
+          reference: `payout_${booking.id}_${Date.now()}`,
+        });
+        transferId = transferRes.data.transfer_code;
+        this.logger.log(`Direct payout initiated for booking ${booking.id}: ${transferId}`);
+      } catch (error) {
+        this.logger.error(`Failed to initiate direct payout for booking ${booking.id}. Falling back to wallet.`);
+      }
+    }
+
+    // 3. Update Manager Wallet (or just mark as paid if transfer succeeded)
+    // Even if transfer succeeds, we update the wallet balance for accounting
+    await this.prisma.wallet.upsert({
+      where: { ownerId: booking.hostel.ownerId },
+      create: {
+        ownerId: booking.hostel.ownerId,
+        balance: payoutAmount,
+      },
+      update: {
+        balance: { increment: payoutAmount },
+      },
+    });
+
+    this.logger.log(`Payment released for booking ${bookingId}. Payout: ${payoutAmount}, Commission: ${commissionAmount}`);
 
     this.notifications.sendPaymentConfirmedEmail(booking.hostel.ownerId, {
         hostelName: booking.hostel.name,

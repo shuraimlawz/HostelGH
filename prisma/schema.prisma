@@ -149,6 +149,7 @@ model User {
 
 
   paystackSubaccountCode String? // For automated split payments
+  settlementAccount      SettlementAccount?
 
   @@index([role])
 }
@@ -598,4 +599,19 @@ model Dispute {
   @@index([bookingId])
 }
 
+model SettlementAccount {
+  id            String           @id @default(cuid())
+  ownerId       String           @unique
+  accountNumber String
+  bankCode      String
+  bankName      String
+  accountName   String
+  recipientCode String?          // Paystack recipient code
+  method        PayoutMethodType @default(MOBILE_MONEY)
+  currency      String           @default("GHS")
+  
+  owner User @relation(fields: [ownerId], references: [id])
 
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

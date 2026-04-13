@@ -81,7 +81,7 @@ export default function AccountPage() {
     return (
         <div className="max-w-4xl mx-auto px-4 py-12">
             <div className="mb-10">
-                <h1 className="text-2xl font-black tracking-tight text-gray-900 mb-2">Personal info</h1>
+                <h1 className="text-2xl font-black tracking-tight text-gray-900 mb-2">Personal Info</h1>
                 <p className="text-gray-500 font-medium text-base tracking-tight">Manage the information we use to verify your identity.</p>
             </div>
 
@@ -103,7 +103,7 @@ export default function AccountPage() {
                         <p className="text-gray-500 text-sm mb-6">{user.email}</p>
                         <div className="inline-flex items-center gap-2 px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-xs font-bold uppercase tracking-wider">
                             <Shield size={12} />
-                            {user.role} ACCOUNT
+                            {user.role} Account
                         </div>
                     </div>
                 </div>
@@ -111,7 +111,7 @@ export default function AccountPage() {
                 {/* Forms Section */}
                 <div className="lg:col-span-2 space-y-8">
                     <form onSubmit={handleUpdate} className="bg-white rounded-3xl border p-8 shadow-sm space-y-6">
-                        <h3 className="text-xl font-bold mb-4">Profile Details</h3>
+                        <h3 className="text-xl font-bold mb-4">Profile Info</h3>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div className="space-y-2">
@@ -158,7 +158,7 @@ export default function AccountPage() {
                         </div>
 
                         <div className="space-y-2">
-                            <label className="text-sm font-semibold text-gray-700 ml-1">Email Address</label>
+                            <label className="text-sm font-semibold text-gray-700 ml-1">Email</label>
                             <div className="relative opacity-60">
                                 <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
                                 <input

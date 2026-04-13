@@ -33,16 +33,16 @@ export default function TenantSidebar({ isOpen = false, onClose = () => { } }: T
     const { user, logout } = useAuth();
 
     const SidebarContent = () => (
-        <div className="flex flex-col h-full bg-white">
+        <div className="flex flex-col h-full bg-[#0a0a0a] text-white">
             {/* Header */}
-            <div className="mb-10 px-2 pt-2">
-                <div className="flex items-center gap-3 px-4 py-2 bg-blue-50/50 rounded-2xl border border-blue-100/50">
-                    <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white">
+            <div className="mb-10 px-2 pt-2 text-center">
+                <div className="flex items-center gap-3 px-4 py-3 bg-white/5 rounded-2xl border border-white/10 backdrop-blur-md">
+                    <div className="w-8 h-8 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-500/20">
                         <Shield size={18} />
                     </div>
                     <div>
-                        <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-none mb-1">Portal</p>
-                        <h2 className="text-sm font-black text-gray-900 tracking-tight">Student Hub</h2>
+                        <p className="text-[9px] font-black text-blue-400 uppercase tracking-[0.2em] leading-none mb-1">Students</p>
+                        <h2 className="text-sm font-black text-white tracking-tight uppercase italic">Resident <span className="text-blue-500 NOT-italic">.</span></h2>
                     </div>
                 </div>
             </div>
@@ -59,21 +59,21 @@ export default function TenantSidebar({ isOpen = false, onClose = () => { } }: T
                             className={cn(
                                 "flex items-center justify-between px-4 py-3 rounded-2xl transition-all duration-300 group relative overflow-hidden",
                                 isActive
-                                    ? "bg-gray-900 text-white shadow-lg shadow-gray-200"
-                                    : "text-gray-500 hover:bg-gray-100 hover:text-gray-900"
+                                    ? "bg-white text-black shadow-2xl shadow-white/5"
+                                    : "text-muted-foreground hover:bg-white/5 hover:text-white"
                             )}
                         >
-                            {isActive && (
-                                <div className="absolute inset-0 bg-gradient-to-r from-blue-600/20 to-transparent opacity-50" />
-                            )}
-                            <div className="flex items-center gap-3 relative z-10">
+                            <div className="flex items-center gap-4 relative z-10">
                                 <link.icon size={18} className={cn(
                                     "transition-colors",
-                                    isActive ? "text-blue-400" : "text-gray-400 group-hover:text-gray-900"
+                                    isActive ? "text-blue-500 px-0.5" : "text-muted-foreground group-hover:text-white"
                                 )} />
-                                <span className="font-bold text-[13px] tracking-tight">{link.name}</span>
+                                <span className={cn(
+                                    "font-black text-[10px] uppercase tracking-[0.15em] transition-transform duration-300",
+                                    isActive ? "translate-x-1" : "group-hover:translate-x-1"
+                                )}>{link.name}</span>
                             </div>
-                            {isActive && <ChevronRight size={14} className="text-blue-400 relative z-10" />}
+                            {isActive && <ChevronRight size={14} className="relative z-10 text-blue-500" />}
                         </Link>
                     );
                 })}
@@ -82,37 +82,41 @@ export default function TenantSidebar({ isOpen = false, onClose = () => { } }: T
             {/* Bottom Section */}
             <div className="mt-auto space-y-6">
                 {/* Help Card */}
-                <div className="bg-gray-50 rounded-[2rem] p-5 border border-gray-100 relative overflow-hidden group/help">
-                    <div className="absolute top-0 right-0 w-24 h-24 bg-blue-600/5 rounded-full -mr-12 -mt-12 group-hover/help:scale-110 transition-transform duration-500" />
+                <div className="bg-gradient-to-br from-blue-600/10 to-transparent rounded-[2rem] p-6 border border-blue-600/20 relative overflow-hidden group/help">
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-blue-600/20 rounded-full -mr-16 -mt-16 blur-3xl opacity-50 group-hover/help:scale-125 transition-transform duration-700" />
                     <div className="relative z-10">
-                        <div className="w-8 h-8 bg-white rounded-xl flex items-center justify-center border border-gray-200 mb-3 shadow-sm">
-                            <HelpCircle size={16} className="text-blue-600" />
+                        <div className="w-10 h-10 bg-black/40 backdrop-blur-md rounded-xl flex items-center justify-center border border-white/10 mb-4 shadow-xl">
+                            <HelpCircle size={18} className="text-blue-400" />
                         </div>
-                        <h3 className="text-xs font-black text-gray-900 mb-1">Need assistance?</h3>
-                        <p className="text-[10px] text-gray-500 font-medium leading-relaxed mb-3">
-                            Our support team is available 24/7 for you.
+                        <h3 className="text-[11px] font-black mb-1 uppercase tracking-widest text-white">Support Hub</h3>
+                        <p className="text-[9px] text-muted-foreground font-bold uppercase leading-relaxed mb-4">
+                            24/7 assistance for all your academic stay needs.
                         </p>
-                        <Link href="/support" className="text-[10px] font-black text-blue-600 uppercase tracking-widest hover:underline">
-                            Open Support Center
+                        <Link href="/support" className="inline-flex items-center gap-2 text-[10px] font-black text-blue-400 hover:text-white transition-colors uppercase tracking-widest group/link">
+                            GET HELP <ChevronRight size={12} className="group-hover/link:translate-x-1 transition-transform" />
                         </Link>
                     </div>
                 </div>
 
                 {/* User Profile Chip */}
-                <div className="pt-6 border-t border-gray-100">
-                    <div className="flex items-center justify-between p-2 pl-3 bg-gray-50 rounded-2xl border border-gray-100">
+                <div className="pt-6 border-t border-white/10">
+                    <div className="flex items-center justify-between p-2 pl-3 bg-white/5 rounded-2xl border border-white/10 backdrop-blur-lg">
                         <div className="flex items-center gap-3">
-                            <div className="w-9 h-9 bg-gray-950 rounded-xl flex items-center justify-center text-white text-xs font-black">
-                                {user?.firstName?.[0] || user?.email?.[0].toUpperCase()}
+                            <div className="w-10 h-10 bg-blue-600/20 text-blue-400 rounded-xl flex items-center justify-center text-[11px] font-black overflow-hidden border border-blue-600/20 uppercase shadow-inner">
+                                {user?.avatarUrl ? (
+                                    <img src={user.avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
+                                ) : (
+                                    user?.firstName?.[0] || user?.email?.[0].toUpperCase() || "S"
+                                )}
                             </div>
                             <div className="min-w-0">
-                                <p className="text-[11px] font-black text-gray-900 truncate tracking-tight">{user?.firstName || "Student"}</p>
-                                <p className="text-[9px] font-bold text-gray-400 truncate uppercase tracking-widest">Verified Account</p>
+                                <p className="text-[11px] font-black text-white truncate tracking-tight uppercase leading-none mb-1">{user?.firstName || "Resident"}</p>
+                                <p className="text-[9px] font-bold text-blue-400/60 truncate uppercase tracking-widest leading-none">Verified Student</p>
                             </div>
                         </div>
                         <button
                             onClick={() => logout()}
-                            className="p-2.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all"
+                            className="p-3 text-muted-foreground hover:text-blue-500 hover:bg-white/5 rounded-xl transition-all"
                             title="Sign out"
                         >
                             <LogOut size={16} />

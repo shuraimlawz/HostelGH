@@ -2,9 +2,11 @@
 
 import { useAuth } from "@/lib/auth-context";
 import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { cn } from "@/lib/utils";
 import { api } from "@/lib/api";
 import { toast } from "sonner";
-import { User, Mail, Phone, Shield, Camera, Loader2, Bell, XCircle, ArrowRightLeft, TriangleAlert } from "lucide-react";
+import { User, Mail, Phone, Shield, Camera, Loader2, Bell, XCircle, ArrowRightLeft, TriangleAlert, Landmark, Smartphone, Check } from "lucide-react";
 import { PasswordField } from "@/components/ui/PasswordField";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -40,8 +42,7 @@ export default function OwnerAccountPage() {
     useEffect(() => {
         const fetchProfile = async () => {
             try {
-                const res = await api.get("/users/me");
-                const data = res.data;
+                const { data } = await api.get("/users/me");
                 setFormData({
                     firstName: data.firstName || "",
                     lastName: data.lastName || "",
@@ -49,7 +50,7 @@ export default function OwnerAccountPage() {
                     emailNotifications: data.emailNotifications ?? true,
                 });
             } catch (error) {
-                console.error("Failed to fetch profile", error);
+                console.error("Failed to fetch data", error);
             }
         };
 
@@ -132,7 +133,7 @@ export default function OwnerAccountPage() {
             <div className="flex h-[80vh] items-center justify-center">
                 <div className="flex flex-col items-center gap-4">
                     <Loader2 className="animate-spin text-primary" size={40} />
-                    <p className="text-sm font-black text-muted-foreground uppercase tracking-widest animate-pulse">Syncing Proprietor Data...</p>
+                    <p className="text-sm font-black text-muted-foreground uppercase tracking-widest animate-pulse">Syncing Owner Data...</p>
                 </div>
             </div>
         );
@@ -142,7 +143,7 @@ export default function OwnerAccountPage() {
         return (
             <div className="text-center py-20">
                 <h1 className="text-2xl font-black uppercase tracking-tight text-foreground mb-2">Unauthorized Access</h1>
-                <p className="text-muted-foreground font-medium">Please log in to manage your hub.</p>
+                <p className="text-muted-foreground font-medium">Please log in to manage your account.</p>
             </div>
         );
     }
@@ -156,13 +157,13 @@ export default function OwnerAccountPage() {
                         Management
                     </span>
                     <div className="flex items-center gap-2 text-[10px] font-bold text-muted-foreground">
-                        <Shield size={12} className="text-primary/60" /> Secure Hub
+                        <Shield size={12} className="text-primary/60" /> Secure Account
                     </div>
                 </div>
                 <h1 className="text-3xl font-black text-foreground tracking-tight mb-2">
                     Account Settings <span className="text-primary">.</span>
                 </h1>
-                <p className="text-muted-foreground font-medium text-base">Manage your proprietor profile and security preferences.</p>
+                <p className="text-muted-foreground font-medium text-base">Manage your owner profile and security preferences.</p>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
@@ -212,7 +213,7 @@ export default function OwnerAccountPage() {
                             </div>
                             <div className="space-y-1">
                                 <h2 className="text-xl font-black text-foreground italic uppercase tracking-tight">
-                                    {formData.firstName ? `${formData.firstName} ${formData.lastName}` : "Proprietor"}
+                                    {formData.firstName ? `${formData.firstName} ${formData.lastName}` : "Owner"}
                                 </h2>
                                 {user.avatarUrl && (
                                     <div className="absolute inset-0 w-24 h-24 rounded-[2rem] overflow-hidden rotate-3 group-hover:rotate-0 transition-transform">
@@ -222,7 +223,7 @@ export default function OwnerAccountPage() {
                             </div>
                             <div className="pt-4">
                                 <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 text-primary rounded-xl text-[10px] font-black uppercase tracking-widest border border-primary/20">
-                                    {user.role} Partner
+                                    {user.role} Account
                                 </div>
                             </div>
                         </div>
@@ -234,16 +235,16 @@ export default function OwnerAccountPage() {
                     {/* General Settings */}
                     <form onSubmit={handleUpdate} className="bg-card rounded-[2.5rem] border border-border p-8 shadow-sm space-y-8">
                         <div className="flex items-center justify-between border-b border-border pb-6">
-                            <h3 className="text-sm font-black text-foreground uppercase tracking-widest italic">General Identity</h3>
+                            <h3 className="text-sm font-black text-foreground uppercase tracking-widest italic">General Info</h3>
                             <div className="flex items-center gap-2">
                                 <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-                                <span className="text-[10px] font-bold text-muted-foreground">Identity Mode</span>
+                                <span className="text-[10px] font-bold text-muted-foreground">Active Mode</span>
                             </div>
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                             <div className="space-y-2">
-                                <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">First/Last/Contact</label>
+                                <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">First Name</label>
                                 <div className="relative">
                                     <input
                                         type="text"
@@ -299,13 +300,13 @@ export default function OwnerAccountPage() {
                     {/* Security Hub */}
                     <div className="bg-card rounded-[2.5rem] border border-border p-8 shadow-sm space-y-6">
                         <div className="flex items-center justify-between border-b border-border pb-6">
-                            <h3 className="text-sm font-black text-foreground uppercase tracking-widest italic">Security Hub</h3>
+                            <h3 className="text-sm font-black text-foreground uppercase tracking-widest italic">Security Settings</h3>
                             <Shield size={20} className="text-primary" />
                         </div>
 
                         <div className="flex items-center justify-between p-6 bg-muted/30 rounded-[2rem] border border-border">
                             <div>
-                                <p className="font-black text-foreground uppercase tracking-widest text-[11px] mb-1">System Password</p>
+                                <p className="font-black text-foreground uppercase tracking-widest text-[11px] mb-1">Password</p>
                                 <p className="text-xs text-muted-foreground font-medium">Rotate your password periodically.</p>
                             </div>
 
@@ -317,14 +318,14 @@ export default function OwnerAccountPage() {
                                 </DialogTrigger>
                                 <DialogContent className="sm:max-w-md rounded-[2.5rem] border-gray-100 shadow-2xl">
                                     <DialogHeader>
-                                        <DialogTitle className="font-black italic uppercase tracking-wider">Secure Rotation</DialogTitle>
+                                        <DialogTitle className="font-black italic uppercase tracking-wider">Update Password</DialogTitle>
                                         <DialogDescription className="text-xs font-medium text-gray-500">
-                                            Confirm your identity by entering your previous password.
+                                            Confirm your identity by entering your current password.
                                         </DialogDescription>
                                     </DialogHeader>
                                     <form onSubmit={handleChangePassword} className="space-y-6 py-4">
                                         <div className="space-y-2">
-                                            <Label htmlFor="current" className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">Current Credential</Label>
+                                            <Label htmlFor="current" className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">Current Password</Label>
                                             <PasswordField
                                                 id="current"
                                                 value={passwordData.oldPassword}
@@ -334,7 +335,7 @@ export default function OwnerAccountPage() {
                                             />
                                         </div>
                                         <div className="space-y-2">
-                                            <Label htmlFor="new" className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">New Credential</Label>
+                                            <Label htmlFor="new" className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">New Password</Label>
                                             <PasswordField
                                                 id="new"
                                                 value={passwordData.newPassword}
@@ -344,7 +345,7 @@ export default function OwnerAccountPage() {
                                             />
                                         </div>
                                         <div className="space-y-2">
-                                            <Label htmlFor="confirm" className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">Confirm New Credential</Label>
+                                            <Label htmlFor="confirm" className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">Confirm New Password</Label>
                                             <PasswordField
                                                 id="confirm"
                                                 value={passwordData.confirmPassword}
@@ -368,14 +369,14 @@ export default function OwnerAccountPage() {
 
                     {/* Preferences Hub */}
                     <div className="bg-card rounded-[2.5rem] border border-border p-8 shadow-sm space-y-6">
-                        <h3 className="text-sm font-black text-foreground uppercase tracking-widest italic">Preference Hub</h3>
+                        <h3 className="text-sm font-black text-foreground uppercase tracking-widest italic">Preferences</h3>
                         <div className="flex items-center justify-between p-6 bg-muted/30 rounded-[2rem] border border-border">
                             <div className="flex items-center gap-4">
                                 <div className="w-12 h-12 bg-background rounded-2xl flex items-center justify-center border shadow-sm text-primary group-hover:scale-110 transition-transform">
                                     <Bell size={24} />
                                 </div>
                                 <div>
-                                    <p className="font-black text-foreground uppercase tracking-widest text-[11px] mb-1">Email Drifts</p>
+                                    <p className="font-black text-foreground uppercase tracking-widest text-[11px] mb-1">Email Notifications</p>
                                     <p className="text-xs text-muted-foreground font-medium">System alerts & booking notifications.</p>
                                 </div>
                             </div>
@@ -399,6 +400,9 @@ export default function OwnerAccountPage() {
                         </div>
                     </div>
 
+                    {/* Settlement Hub (Direct Payouts) */}
+                    <SettlementSettings />
+
                     {/* Account Type / Role Management */}
                     <div className="bg-orange-50/50 rounded-[2.5rem] border border-orange-100 p-8 shadow-sm space-y-6">
                         <div className="flex items-center justify-between border-b border-orange-100 pb-6">
@@ -407,7 +411,7 @@ export default function OwnerAccountPage() {
                         </div>
                         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-6 bg-white/60 rounded-[2rem] border border-orange-100">
                             <div>
-                                <p className="font-black text-orange-950 uppercase tracking-widest text-[11px] mb-1">Switch to Student/Tenant</p>
+                                <p className="font-black text-orange-950 uppercase tracking-widest text-[11px] mb-1">Switch to Student / Resident</p>
                                 <p className="text-xs text-orange-900/70 font-medium">Change how you use HostelGH.</p>
                             </div>
 
@@ -423,10 +427,10 @@ export default function OwnerAccountPage() {
                                             <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center text-red-600">
                                                 <TriangleAlert size={20} />
                                             </div>
-                                            <DialogTitle className="font-black italic uppercase tracking-wider text-red-600">Warning: Critical Action</DialogTitle>
+                                            <DialogTitle className="font-black italic uppercase tracking-wider text-red-600">Critical Action</DialogTitle>
                                         </div>
                                         <DialogDescription className="text-sm font-medium text-gray-600 leading-relaxed pt-2">
-                                            Switching to a <span className="font-bold text-gray-900">Student/Tenant</span> account will
+                                            Switching to a <span className="font-bold text-gray-900">Student / Resident</span> account will
                                             <span className="font-bold text-red-600"> permanently delete</span> all your listed hostels, rooms, booking history as an owner, and payout records. This action cannot be undone.
                                         </DialogDescription>
                                     </DialogHeader>
@@ -450,7 +454,7 @@ export default function OwnerAccountPage() {
                     {/* Danger Zone */}
                     <div className="bg-red-50/50 rounded-[2.5rem] p-8 border border-red-100 space-y-6">
                         <div className="flex items-center justify-between border-b border-red-100/50 pb-6">
-                            <h3 className="text-sm font-black text-red-900 uppercase tracking-widest italic leading-none">Termination Zone</h3>
+                            <h3 className="text-sm font-black text-red-900 uppercase tracking-widest italic leading-none">Danger Zone</h3>
                             <XCircle size={20} className="text-red-600" />
                         </div>
                         <p className="text-red-800 text-xs font-medium leading-relaxed">
@@ -465,6 +469,177 @@ export default function OwnerAccountPage() {
                     </div>
                 </div>
             </div>
+        </div>
+    );
+}
+
+function SettlementSettings() {
+    const [isSaving, setIsSaving] = useState(false);
+    const [method, setMethod] = useState<"MOBILE_MONEY" | "BANK">("MOBILE_MONEY");
+    const [accountDetail, setAccountDetail] = useState({
+        accountNumber: "",
+        bankCode: "",
+        bankName: "",
+        accountName: "",
+    });
+
+    const { data: currentSettlement, isLoading: settlementLoading, refetch: refetchSettlement } = useQuery({
+        queryKey: ["settlement-me"],
+        queryFn: async () => {
+            const res = await api.get("/wallets/settlement/me");
+            return res.data;
+        }
+    });
+
+    const { data: banksData, isLoading: banksLoading } = useQuery({
+        queryKey: ["paystack-banks"],
+        queryFn: async () => {
+            const res = await api.get("/wallets/banks");
+            return res.data;
+        }
+    });
+
+    useEffect(() => {
+        if (currentSettlement) {
+            setMethod(currentSettlement.method);
+            setAccountDetail({
+                accountNumber: currentSettlement.accountNumber,
+                bankCode: currentSettlement.bankCode,
+                bankName: currentSettlement.bankName,
+                accountName: currentSettlement.accountName,
+            });
+        }
+    }, [currentSettlement]);
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setIsSaving(true);
+        try {
+            await api.post("/wallets/settlement", {
+                ...accountDetail,
+                method
+            });
+            toast.success("Payout account linked successfully!");
+            refetchSettlement();
+        } catch (error: any) {
+            toast.error(error.response?.data?.message || "Failed to link payout account");
+        } finally {
+            setIsSaving(false);
+        }
+    };
+
+    const banks = banksData?.data || [];
+    const filteredBanks = banks.filter((b: any) => 
+        method === "MOBILE_MONEY" ? b.type === "ghipss" : b.type === "nuban"
+    );
+
+    return (
+        <div className="bg-card rounded-[2.5rem] border border-border p-8 shadow-sm space-y-6">
+            <div className="flex items-center justify-between border-b border-border pb-6">
+                <div>
+                    <h3 className="text-sm font-black text-foreground uppercase tracking-widest italic leading-none mb-1">Direct Payouts</h3>
+                    <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest">Auto-Settlement Hub</p>
+                </div>
+                <div className="bg-primary/10 p-2 rounded-xl text-primary border border-primary/20">
+                    <Landmark size={20} />
+                </div>
+            </div>
+
+            <form onSubmit={handleSubmit} className="space-y-6">
+                {/* Method Toggles */}
+                <div className="grid grid-cols-2 gap-4">
+                    <button
+                        type="button"
+                        onClick={() => setMethod("MOBILE_MONEY")}
+                        className={cn(
+                            "flex items-center justify-center gap-3 p-4 rounded-2xl border transition-all font-black uppercase tracking-widest text-[10px]",
+                            method === "MOBILE_MONEY" 
+                                ? "bg-foreground text-background border-foreground" 
+                                : "bg-muted/30 border-transparent text-muted-foreground hover:bg-muted"
+                        )}
+                    >
+                        <Smartphone size={16} /> Mobile Money
+                    </button>
+                    <button
+                        type="button"
+                        onClick={() => setMethod("BANK")}
+                        className={cn(
+                            "flex items-center justify-center gap-3 p-4 rounded-2xl border transition-all font-black uppercase tracking-widest text-[10px]",
+                            method === "BANK" 
+                                ? "bg-foreground text-background border-foreground" 
+                                : "bg-muted/30 border-transparent text-muted-foreground hover:bg-muted"
+                        )}
+                    >
+                        <Landmark size={16} /> Bank Account
+                    </button>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                        <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Select Provider</label>
+                        <select
+                            disabled={banksLoading}
+                            className="w-full px-5 py-4 bg-muted/30 border border-transparent rounded-2xl outline-none focus:bg-background focus:border-primary transition-all font-bold text-foreground text-sm appearance-none cursor-pointer"
+                            value={accountDetail.bankCode}
+                            onChange={(e) => {
+                                const b = banks.find((x: any) => x.code === e.target.value);
+                                setAccountDetail({ ...accountDetail, bankCode: e.target.value, bankName: b?.name || "" });
+                            }}
+                            required
+                        >
+                            <option value="">{banksLoading ? "Syncing Networks..." : "Choose Provider"}</option>
+                            {filteredBanks.map((b: any) => (
+                                <option key={b.code} value={b.code}>{b.name}</option>
+                            ))}
+                        </select>
+                    </div>
+
+                    <div className="space-y-2">
+                        <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">
+                            {method === "MOBILE_MONEY" ? "Phone Number" : "Account Number"}
+                        </label>
+                        <input
+                            type="text"
+                            className="w-full px-5 py-4 bg-muted/30 border border-transparent rounded-2xl outline-none focus:bg-background focus:border-primary transition-all font-bold text-foreground text-sm"
+                            value={accountDetail.accountNumber}
+                            onChange={(e) => setAccountDetail({ ...accountDetail, accountNumber: e.target.value })}
+                            placeholder={method === "MOBILE_MONEY" ? "055XXXXXXX" : "XXXXXXXXXX"}
+                            required
+                        />
+                    </div>
+                </div>
+
+                <div className="space-y-2">
+                    <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Account Holder Name</label>
+                    <input
+                        type="text"
+                        className="w-full px-5 py-4 bg-muted/30 border border-transparent rounded-2xl outline-none focus:bg-background focus:border-primary transition-all font-bold text-foreground text-sm"
+                        value={accountDetail.accountName}
+                        onChange={(e) => setAccountDetail({ ...accountDetail, accountName: e.target.value })}
+                        placeholder="John Doe"
+                        required
+                    />
+                    <p className="text-[9px] text-muted-foreground font-black uppercase tracking-wider ml-1 mt-1 opacity-60">
+                        Must match the name on your {method === "MOBILE_MONEY" ? "Momo" : "Bank"} account.
+                    </p>
+                </div>
+
+                <div className="pt-4 flex flex-col md:flex-row gap-4">
+                    <button
+                        type="submit"
+                        disabled={isSaving}
+                        className="px-10 py-4 bg-foreground text-background rounded-2xl font-black text-[10px] uppercase tracking-widest hover:opacity-90 transition-all shadow-xl shadow-foreground/5 flex items-center justify-center gap-3 active:scale-[0.98] disabled:opacity-50"
+                    >
+                        {isSaving ? <Loader2 className="animate-spin text-primary" size={18} /> : <Check size={18} />}
+                        {isSaving ? "Authorizing with Paystack..." : currentSettlement ? "Update Account" : "Link Account"}
+                    </button>
+                    {currentSettlement && (
+                        <div className="flex items-center gap-2 px-4 py-2 bg-emerald-50 text-emerald-700 rounded-xl border border-emerald-100 text-[9px] font-black uppercase tracking-widest">
+                            <Check size={14} /> Active for Direct Payouts
+                        </div>
+                    )}
+                </div>
+            </form>
         </div>
     );
 }

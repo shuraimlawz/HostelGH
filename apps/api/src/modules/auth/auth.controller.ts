@@ -124,9 +124,6 @@ export class AuthController {
 
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
-
-  @ApiBearerAuth()
-  @UseGuards(JwtAuthGuard)
   @Post("impersonate")
   @ApiOperation({ summary: "Admin impersonate a user" })
   impersonate(@Req() req: any, @Body("userId") userId: string) {
@@ -134,6 +131,8 @@ export class AuthController {
     return this.auth.impersonateUser(req.user.userId, userId);
   }
 
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
   @Patch("onboard")
   @ApiOperation({ summary: "Complete onboarding role selection" })
   async onboard(@Req() req: any, @Body() body: { role: UserRole }, @Res({ passthrough: true }) res: Response) {
@@ -147,7 +146,7 @@ export class AuthController {
   @Patch("role")
   @ApiOperation({ summary: "Switch user account role (TENANT/OWNER)" })
   async switchRole(@Req() req: any, @Body() body: { role: UserRole }, @Res({ passthrough: true }) res: Response) {
-    const result = await this.auth.switchRole(req.user.id, body.role);
+    const result = await this.auth.switchRole(req.user.userId, body.role);
     this.setRefreshCookie(res, result.refreshToken);
     return result;
   }

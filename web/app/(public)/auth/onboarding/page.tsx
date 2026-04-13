@@ -43,12 +43,12 @@ export default function OnboardingPage() {
 
             <div className="relative z-10 w-full max-w-2xl text-center space-y-12">
                 <div className="space-y-3 animate-in fade-in slide-in-from-top-4 duration-500">
-                    <span className="text-[10px] font-black uppercase tracking-[0.4em] text-primary">Deployment Phase 02</span>
+                    <span className="text-[10px] font-black uppercase tracking-[0.4em] text-primary">Account Creation Phase 02</span>
                     <h1 className="text-4xl md:text-5xl font-black tracking-tighter uppercase italic text-foreground">
-                        Initialization <span className="text-primary NOT-italic">.</span>
+                        Account Type <span className="text-primary NOT-italic">.</span>
                     </h1>
                     <p className="text-[11px] font-bold text-muted-foreground uppercase tracking-widest">
-                        Defining your operational role within the HostelGH network.
+                        Defining your account type within the HostelGH network.
                     </p>
                 </div>
 
@@ -70,11 +70,11 @@ export default function OnboardingPage() {
                         </div>
                         <div className="space-y-2">
                             <h3 className="font-black text-xs uppercase tracking-widest italic flex items-center gap-2">
-                                Operator / Tenant
+                                Student / Resident
                                 {role === "TENANT" && <div className="w-1 h-1 bg-primary rounded-full animate-ping" />}
                             </h3>
                             <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest leading-none opacity-70">
-                                Seeking asset allocation & secure living quarters.
+                                Find and rent your perfect home.
                             </p>
                         </div>
                         {role === "TENANT" && (
@@ -101,11 +101,11 @@ export default function OnboardingPage() {
                         </div>
                         <div className="space-y-2">
                             <h3 className="font-black text-xs uppercase tracking-widest italic flex items-center gap-2">
-                                Proprietor / Owner
+                                Owner / Proprietor
                                 {role === "OWNER" && <div className="w-1 h-1 bg-foreground rounded-full animate-ping" />}
                             </h3>
                             <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest leading-none opacity-70">
-                                Asset deployment & portfolio management.
+                                Manage your properties and bookings.
                             </p>
                         </div>
                         {role === "OWNER" && (
@@ -122,20 +122,19 @@ export default function OnboardingPage() {
                         disabled={!role || isLoading}
                         className="w-full h-16 bg-foreground text-background rounded-sm font-black text-[11px] uppercase tracking-[0.3em] shadow-2xl shadow-foreground/20 hover:opacity-90 transition-all active:scale-[0.98] disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center gap-2 group"
                     >
-                        {isLoading ? (
                             <>
                                 <Loader2 className="animate-spin" size={18} />
-                                SYNCHRONIZING CORE...
+                                SYNCHRONIZING...
                             </>
                         ) : (
                             <>
                                 <Zap size={14} className={cn("transition-transform group-hover:scale-110", role && "text-primary animate-pulse")} />
-                                Confirm Deployment
+                                Confirm Account Type
                             </>
                         )}
                     </button>
                     <p className="mt-8 text-[9px] font-black text-muted-foreground/40 uppercase tracking-[0.2em] flex items-center justify-center gap-2">
-                        <ShieldCheck size={12} /> Registry protocols will be enforced upon confirmation.
+                        <ShieldCheck size={12} /> Your selections will be finalized upon confirmation.
                     </p>
                 </div>
             </div>
