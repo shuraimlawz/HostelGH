@@ -4,7 +4,19 @@ import { useAuth } from "@/lib/auth-context";
 import { useEffect, useState } from "react";
 import { api } from "@/lib/api";
 import { toast } from "sonner";
-import { User, Mail, Shield, Loader2, Bell, Lock } from "lucide-react";
+import { 
+    User, 
+    Mail, 
+    Shield, 
+    Loader2, 
+    Bell, 
+    Lock, 
+    ShieldCheck, 
+    ChevronRight,
+    Camera,
+    Zap
+} from "lucide-react";
+import { cn } from "@/lib/utils";
 
 export default function AdminSettingsPage() {
     const { user, isLoading, updateUser } = useAuth();
@@ -49,137 +61,215 @@ export default function AdminSettingsPage() {
 
     if (isLoading) {
         return (
-            <div className="flex flex-col items-center justify-center min-h-[60vh]">
-                <Loader2 className="animate-spin text-blue-600 mb-4" size={40} />
-                <p className="text-gray-500 font-medium">Loading settings...</p>
+            <div className="flex h-[80vh] items-center justify-center bg-white">
+                <div className="flex flex-col items-center gap-4">
+                    <Loader2 className="animate-spin text-blue-600" size={40} />
+                    <p className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.5em] animate-pulse">Syncing Admin Matrix...</p>
+                </div>
             </div>
         );
     }
 
     if (!user) {
         return (
-            <div className="text-center py-20">
-                <h1 className="text-2xl font-bold">Please log in to view settings.</h1>
+            <div className="text-center py-40">
+                <h1 className="text-2xl font-black uppercase tracking-tighter italic text-foreground mb-2">Access Unauthorized <span className="text-blue-600">.</span></h1>
+                <p className="text-muted-foreground font-bold text-[10px] uppercase tracking-widest">Login required for system terminal.</p>
             </div>
         );
     }
 
     return (
-        <div className="max-w-4xl mx-auto space-y-8">
-            <div>
-                <h1 className="text-3xl font-bold tracking-tight mb-2">Admin Settings</h1>
-                <p className="text-gray-500">Manage your admin account and system preferences</p>
+        <div className="max-w-[1200px] mx-auto px-4 py-12 space-y-16">
+            {/* Header */}
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-10">
+                <div className="space-y-4">
+                    <div className="flex items-center gap-3">
+                        <span className="px-3 py-1 bg-black text-white rounded-full text-[9px] font-black uppercase tracking-[0.3em] border border-white/10 shadow-xl">
+                            System Control
+                        </span>
+                        <div className="flex items-center gap-2">
+                            <ShieldCheck size={14} className="text-blue-500" />
+                            <span className="text-[9px] font-black text-muted-foreground uppercase tracking-widest italic">Terminal Access 01</span>
+                        </div>
+                    </div>
+                    <h1 className="text-5xl font-black text-foreground tracking-tighter uppercase italic leading-none">
+                        Admin Protocol <span className="text-blue-600 NOT-italic opacity-40">.</span>
+                    </h1>
+                    <p className="text-muted-foreground text-[11px] font-bold uppercase tracking-[0.1em] max-w-sm">
+                        Synchronize your administrative profile and system preferences.
+                    </p>
+                </div>
+
+                <div className="bg-blue-600 text-white p-6 rounded-[2.5rem] flex items-center gap-4 shadow-2xl relative overflow-hidden group">
+                    <div className="absolute top-0 right-0 w-24 h-24 bg-white/20 rounded-full -mr-12 -mt-12 blur-2xl group-hover:scale-125 transition-transform duration-700" />
+                    <div className="relative z-10 w-12 h-12 flex items-center justify-center rounded-2xl bg-white/10 border border-white/20">
+                        <Lock size={20} />
+                    </div>
+                    <div className="relative z-10">
+                        <p className="text-[10px] font-black text-white/50 uppercase tracking-widest leading-none mb-1">Authorization</p>
+                        <p className="text-[11px] font-bold uppercase tracking-widest text-white">Master Admin</p>
+                    </div>
+                </div>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                {/* Profile Card */}
-                <div className="lg:col-span-1">
-                    <div className="bg-white rounded-2xl border p-6 shadow-sm text-center">
-                        <div className="w-20 h-20 bg-gradient-to-br from-blue-600 to-purple-600 text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">
-                            {formData.firstName ? formData.firstName[0] : (user.email ? user.email[0].toUpperCase() : "A")}
+            <div className="grid grid-cols-1 xl:grid-cols-12 gap-12">
+                {/* Sidebar: Profile */}
+                <div className="xl:col-span-4 space-y-10">
+                    <div className="bg-white rounded-[3.5rem] border border-muted p-10 shadow-sm text-center relative overflow-hidden group">
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-blue-600/5 rounded-full -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-700 blur-3xl opacity-0 group-hover:opacity-100" />
+                        
+                        <div className="relative z-10 space-y-8">
+                            <div className="relative inline-block">
+                                <div className="w-32 h-32 bg-black text-white rounded-[2.5rem] flex items-center justify-center text-4xl font-black shadow-2xl rotate-3 group-hover:rotate-0 transition-transform duration-500 overflow-hidden border-4 border-white">
+                                    {user.avatarUrl ? (
+                                        <img src={user.avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
+                                    ) : (
+                                        formData.firstName ? formData.firstName[0] : (user.email ? user.email[0].toUpperCase() : "A")
+                                    )}
+                                </div>
+                                <button className="absolute -bottom-2 -right-2 bg-white border-2 border-muted shadow-xl rounded-2xl p-3 hover:scale-110 transition-all text-blue-600 hover:bg-black hover:text-white">
+                                    <Camera size={18} />
+                                </button>
+                            </div>
+                            
+                            <div className="space-y-1">
+                                <h2 className="text-2xl font-black text-foreground italic uppercase tracking-tighter leading-none">
+                                    {formData.firstName ? `${formData.firstName} ${formData.lastName}` : "Command Leader"}
+                                </h2>
+                                <p className="text-[11px] text-muted-foreground font-black uppercase tracking-widest">{user.email}</p>
+                            </div>
+
+                            <div className="pt-4">
+                                <div className="inline-flex items-center gap-3 px-6 py-3 bg-black text-white rounded-2xl text-[10px] font-black uppercase tracking-[0.3em] border border-white/10 shadow-xl">
+                                    {user.role} CHANNEL
+                                </div>
+                            </div>
                         </div>
-                        <h2 className="text-lg font-bold mb-1">
-                            {formData.firstName ? `${formData.firstName} ${formData.lastName}` : "Admin User"}
-                        </h2>
-                        <p className="text-gray-500 text-sm mb-4">{user.email}</p>
-                        <div className="inline-flex items-center gap-2 px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-xs font-bold uppercase">
-                            <Shield size={12} />
-                            {user.role}
+                    </div>
+
+                    {/* Quick Access Sidebar Card */}
+                    <div className="bg-black text-white rounded-[3.5rem] p-10 shadow-2xl relative overflow-hidden group border border-white/5">
+                        <div className="absolute top-0 right-0 w-40 h-40 bg-blue-600/20 rounded-full -mr-20 -mt-20 blur-3xl opacity-50 group-hover:scale-125 transition-transform duration-700" />
+                        <div className="relative z-10 space-y-6">
+                            <div className="w-12 h-12 bg-white/5 rounded-2xl flex items-center justify-center border border-white/10 backdrop-blur-md">
+                                <Zap size={24} className="text-blue-400" />
+                            </div>
+                            <div className="space-y-2">
+                                <h3 className="text-xl font-black italic uppercase tracking-tight leading-none">System Nexus <span className="text-blue-500 NOT-italic">.</span></h3>
+                                <p className="text-[10px] text-white/40 font-bold leading-relaxed uppercase tracking-widest">
+                                    Execute high-level administrative tasks and network audits.
+                                </p>
+                            </div>
+                            <button className="w-full bg-white text-black py-4 rounded-2xl font-black text-[10px] uppercase tracking-[0.3em] hover:bg-blue-600 hover:text-white transition-all">
+                                VIEW SYSTEM LOGS
+                            </button>
                         </div>
                     </div>
                 </div>
 
-                {/* Settings Forms */}
-                <div className="lg:col-span-2 space-y-6">
-                    {/* Profile Settings */}
-                    <form onSubmit={handleUpdate} className="bg-white rounded-2xl border p-6 shadow-sm space-y-4">
-                        <h3 className="text-lg font-bold mb-4">Profile Info</h3>
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div className="space-y-2">
-                                <label className="text-sm font-medium text-gray-700">First Name</label>
-                                <div className="relative">
-                                    <User className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
-                                    <input
-                                        type="text"
-                                        className="w-full pl-10 pr-4 py-3 bg-gray-50 rounded-xl outline-none focus:ring-2 focus:ring-blue-600 transition-all"
-                                        value={formData.firstName}
-                                        onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
-                                        placeholder="John"
-                                    />
-                                </div>
+                {/* Main Content Area */}
+                <div className="xl:col-span-8 space-y-10">
+                    {/* Identity Form */}
+                    <form onSubmit={handleUpdate} className="bg-white rounded-[3.5rem] border border-muted p-10 shadow-sm space-y-10 group">
+                        <div className="flex items-center justify-between border-b border-muted pb-8">
+                            <div className="space-y-1">
+                                <h3 className="text-xl font-black text-foreground uppercase tracking-tight italic">Identity Matrix</h3>
+                                <p className="text-[10px] text-muted-foreground font-black uppercase tracking-[0.3em]">Core administrative baseline</p>
                             </div>
-
-                            <div className="space-y-2">
-                                <label className="text-sm font-medium text-gray-700">Last Name</label>
-                                <div className="relative">
-                                    <User className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
-                                    <input
-                                        type="text"
-                                        className="w-full pl-10 pr-4 py-3 bg-gray-50 rounded-xl outline-none focus:ring-2 focus:ring-blue-600 transition-all"
-                                        value={formData.lastName}
-                                        onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
-                                        placeholder="Doe"
-                                    />
-                                </div>
+                            <div className="w-10 h-10 bg-muted/30 rounded-2xl flex items-center justify-center text-muted-foreground group-hover:rotate-12 transition-transform duration-500">
+                                <User size={20} />
                             </div>
                         </div>
 
-                        <div className="space-y-2">
-                            <label className="text-sm font-medium text-gray-700">Email</label>
-                            <div className="relative opacity-60">
-                                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                            <div className="space-y-3">
+                                <label className="text-[10px] font-black uppercase tracking-[0.4em] text-muted-foreground ml-1 italic leading-none">First Name</label>
+                                <input
+                                    type="text"
+                                    className="w-full px-6 py-5 bg-muted/20 border-2 border-transparent rounded-[1.5rem] outline-none focus:bg-white focus:border-black transition-all font-black text-foreground text-sm uppercase tracking-tight"
+                                    value={formData.firstName}
+                                    onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
+                                />
+                            </div>
+
+                            <div className="space-y-3">
+                                <label className="text-[10px] font-black uppercase tracking-[0.4em] text-muted-foreground ml-1 italic leading-none">Last Name</label>
+                                <input
+                                    type="text"
+                                    className="w-full px-6 py-5 bg-muted/20 border-2 border-transparent rounded-[1.5rem] outline-none focus:bg-white focus:border-black transition-all font-black text-foreground text-sm uppercase tracking-tight"
+                                    value={formData.lastName}
+                                    onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
+                                />
+                            </div>
+                        </div>
+
+                        <div className="space-y-3 opacity-60 grayscale cursor-not-allowed">
+                            <label className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground ml-1 italic">Email (Locked)</label>
+                            <div className="relative">
                                 <input
                                     type="email"
                                     disabled
-                                    className="w-full pl-10 pr-4 py-3 bg-gray-100 rounded-xl cursor-not-allowed"
+                                    className="w-full pl-6 pr-6 py-5 bg-muted/10 border-2 border-transparent rounded-[1.5rem] font-black text-foreground text-sm uppercase tracking-tight overflow-hidden text-ellipsis"
                                     value={user.email}
                                 />
                             </div>
-                            <p className="text-xs text-gray-400">Email cannot be changed</p>
                         </div>
 
-                        <button
-                            type="submit"
-                            disabled={updating}
-                            className="w-full md:w-auto px-6 py-3 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 transition-all disabled:opacity-60 flex items-center justify-center gap-2"
-                        >
-                            {updating && <Loader2 className="animate-spin" size={18} />}
-                            {updating ? "Saving..." : "Save Changes"}
-                        </button>
+                        <div className="pt-6">
+                            <button
+                                type="submit"
+                                disabled={updating}
+                                className="w-full md:w-auto px-12 py-5 bg-black text-white rounded-2xl font-black text-[11px] uppercase tracking-[0.4em] hover:bg-blue-600 transition-all shadow-2xl flex items-center justify-center gap-4 active:scale-[0.98] group/btn"
+                            >
+                                {updating ? <Loader2 className="animate-spin text-blue-400" size={20} /> : <ShieldCheck size={20} className="group-hover/btn:scale-110 transition-transform" />}
+                                {updating ? "UPDATING MATRIX..." : "AUTHORIZE CHANGES"}
+                            </button>
+                        </div>
                     </form>
 
-                    <div className="bg-white rounded-2xl border p-6 shadow-sm">
-                        <h3 className="text-lg font-bold mb-4">Preferences</h3>
-                        <div className="space-y-4">
-                            <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
-                                <div className="flex items-center gap-3">
-                                    <Bell size={20} className="text-gray-600" />
-                                    <div>
-                                        <p className="font-medium text-sm">Email Notifications</p>
-                                        <p className="text-xs text-gray-500">Receive system alerts via email</p>
-                                    </div>
-                                </div>
-                                <label className="relative inline-flex items-center cursor-pointer">
-                                    <input
-                                        type="checkbox"
-                                        className="sr-only peer"
-                                        checked={formData.emailNotifications}
-                                        onChange={async (e) => {
-                                            const newValue = e.target.checked;
-                                            setFormData({ ...formData, emailNotifications: newValue });
-                                            try {
-                                                await api.patch("/users/me", { emailNotifications: newValue });
-                                                toast.success("Notification preferences updated");
-                                            } catch (error: any) {
-                                                toast.error(error.message || "Failed to update notification settings");
-                                                setFormData({ ...formData, emailNotifications: !newValue });
-                                            }
-                                        }}
-                                    />
-                                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-                                </label>
+                    {/* Preferences Hub */}
+                    <div className="bg-white rounded-[3.5rem] border border-muted p-10 shadow-sm space-y-10">
+                        <div className="flex items-center justify-between border-b border-muted pb-8">
+                            <div className="space-y-1">
+                                <h3 className="text-xl font-black text-foreground uppercase tracking-tight italic">Communication Drift</h3>
+                                <p className="text-[10px] text-muted-foreground font-black uppercase tracking-[0.3em]">Network signaling protocols</p>
                             </div>
+                            <Bell size={20} className="text-blue-500" />
+                        </div>
+
+                        <div className="flex items-center justify-between p-8 bg-muted/20 rounded-[2.5rem] border border-muted group hover:border-blue-600/20 transition-all">
+                            <div className="flex items-center gap-6">
+                                <div className="w-14 h-14 bg-white rounded-2xl flex items-center justify-center border shadow-sm group-hover:scale-110 transition-transform">
+                                    <Mail size={24} className="text-blue-600" />
+                                </div>
+                                <div className="space-y-1">
+                                    <p className="font-black text-foreground uppercase tracking-[0.2em] text-[12px] italic">Email Signaling</p>
+                                    <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest">System alerts & critical logs.</p>
+                                </div>
+                            </div>
+                            <button 
+                                onClick={async () => {
+                                    const newValue = !formData.emailNotifications;
+                                    setFormData({ ...formData, emailNotifications: newValue });
+                                    try {
+                                        await api.patch("/users/me", { emailNotifications: newValue });
+                                        toast.success("Protocol updated");
+                                    } catch (error: any) {
+                                        toast.error("Signal failure");
+                                        setFormData({ ...formData, emailNotifications: !newValue });
+                                    }
+                                }}
+                                className={cn(
+                                    "w-14 h-8 rounded-full transition-all duration-500 flex items-center px-1.5 shadow-inner",
+                                    formData.emailNotifications ? "bg-blue-600" : "bg-muted-foreground/20"
+                                )}
+                            >
+                                <div className={cn(
+                                    "w-5 h-5 bg-white rounded-full shadow-xl transition-transform duration-500",
+                                    formData.emailNotifications ? "translate-x-6" : "translate-x-0"
+                                )} />
+                            </button>
                         </div>
                     </div>
                 </div>

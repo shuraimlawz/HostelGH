@@ -33,6 +33,24 @@ export default function OnboardingPage() {
         }
     };
 
+    const buttonContent = isLoading ? (
+        <>
+            <Loader2 className="animate-spin" size={18} />
+            SYNCHRONIZING...
+        </>
+    ) : (
+        <>
+            <Zap 
+                size={14} 
+                className={cn(
+                    "transition-transform group-hover:scale-110", 
+                    role && "text-primary animate-pulse"
+                )} 
+            />
+            Confirm Account Type
+        </>
+    );
+
     return (
         <div className="min-h-screen bg-background flex flex-col items-center justify-center p-6 relative overflow-hidden">
             {/* Background Aesthetic */}
@@ -122,16 +140,7 @@ export default function OnboardingPage() {
                         disabled={!role || isLoading}
                         className="w-full h-16 bg-foreground text-background rounded-sm font-black text-[11px] uppercase tracking-[0.3em] shadow-2xl shadow-foreground/20 hover:opacity-90 transition-all active:scale-[0.98] disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center gap-2 group"
                     >
-                            <>
-                                <Loader2 className="animate-spin" size={18} />
-                                SYNCHRONIZING...
-                            </>
-                        ) : (
-                            <>
-                                <Zap size={14} className={cn("transition-transform group-hover:scale-110", role && "text-primary animate-pulse")} />
-                                Confirm Account Type
-                            </>
-                        )}
+                        {buttonContent}
                     </button>
                     <p className="mt-8 text-[9px] font-black text-muted-foreground/40 uppercase tracking-[0.2em] flex items-center justify-center gap-2">
                         <ShieldCheck size={12} /> Your selections will be finalized upon confirmation.
