@@ -600,7 +600,7 @@ function SettlementSettings() {
 
     const banks = banksData?.data || [];
     const filteredBanks = banks.filter((b: any) => 
-        method === "MOBILE_MONEY" ? b.type === "ghipss" : b.type === "nuban"
+        method === "MOBILE_MONEY" ? b.is_mobile_money : !b.is_mobile_money
     );
 
     return (

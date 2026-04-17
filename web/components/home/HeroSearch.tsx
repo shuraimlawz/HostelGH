@@ -46,7 +46,7 @@ export default function HeroSearch() {
 
     const handleSearch = (overrideCity?: string) => {
         const searchCity = overrideCity !== undefined ? overrideCity : city;
-        router.push(`/find${searchCity ? `?city=${encodeURIComponent(searchCity)}` : ""}`);
+        router.push(`/hostels${searchCity ? `?city=${encodeURIComponent(searchCity)}` : ""}`);
     };
 
     const { data: trendingLocations, isLoading: isLoadingLocations } = useQuery({
@@ -87,7 +87,7 @@ export default function HeroSearch() {
                 <div className="animate-in fade-in slide-in-from-top-6 duration-1000">
                     <div className="inline-flex items-center px-4 py-2 rounded-xl bg-blue-600/20 backdrop-blur-xl border border-blue-500/30 text-white text-[10px] uppercase font-bold tracking-[0.2em] shadow-xl">
                         <Sparkles className="mr-3 h-4 w-4 text-blue-400 animate-pulse" />
-                        PREMIUM ARCHIVE ACCESS
+                        PREMIUM HOSTEL ACCESS
                     </div>
                 </div>
 
@@ -128,7 +128,7 @@ export default function HeroSearch() {
                             className="relative z-10 bg-blue-600 text-white h-16 px-10 rounded-2xl transition-all shadow-xl shadow-blue-600/20 hover:bg-blue-700 flex items-center justify-center gap-3 w-full md:w-auto font-bold text-[11px] uppercase tracking-widest group active:scale-95"
                         >
                             <Search size={20} className="group-hover:scale-110 transition-transform" />
-                            <span>Locate Asset</span>
+                            <span>Search Now</span>
                         </button>
                     </div>
 

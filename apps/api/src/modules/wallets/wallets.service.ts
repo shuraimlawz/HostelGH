@@ -40,7 +40,7 @@ export class WalletsService {
 
     try {
       const recipientRes = await this.paystack.createTransferRecipient({
-        type: dto.method === "BANK" ? "nuban" : "ghipss", // nuban for banks, ghipss for mobile money in Ghana
+        type: "ghipss", // Both bank and mobile money accounts in Ghana use the GHIPSS network via Paystack
         name: dto.accountName,
         account_number: dto.accountNumber,
         bank_code: dto.bankCode,
