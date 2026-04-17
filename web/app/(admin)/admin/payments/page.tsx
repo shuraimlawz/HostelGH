@@ -308,9 +308,16 @@ function AdminPaymentsContent() {
                                             <td className="px-8 py-6">
                                                 <div className="flex items-center gap-2">
                                                     <CreditCard size={14} className="text-gray-400" />
-                                                    <span className="text-sm font-bold text-gray-900 tracking-tight">
-                                                        GH₵ {((payment.amount || 0) / 100).toLocaleString()}
-                                                    </span>
+                                                    <div>
+                                                        <span className="text-sm font-bold text-gray-900 tracking-tight">
+                                                            GH₵ {((payment.amount || 0) / 100).toLocaleString()}
+                                                        </span>
+                                                        {payment.processingFee > 0 && (
+                                                            <p className="text-[10px] text-blue-600 font-bold uppercase tracking-tight">
+                                                                Incl. GH₵ {(payment.processingFee / 100).toLocaleString()} Fee
+                                                            </p>
+                                                        )}
+                                                    </div>
                                                 </div>
                                             </td>
                                             <td className="px-8 py-6 text-right">

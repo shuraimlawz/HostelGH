@@ -469,6 +469,7 @@ model Payment {
   status    PaymentStatus   @default(INITIATED)
 
   amount        Int // in minor unit
+  processingFee Int? @default(0)
   platformFee   Int @default(0)
   ownerEarnings Int @default(0)
   currency      String @default("GHS")

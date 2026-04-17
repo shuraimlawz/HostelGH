@@ -189,14 +189,37 @@ export default function TenantBookingsPage() {
 
                                 {/* Financial Ledger / Actions */}
                                 <div className="bg-gray-50/50 p-6 md:p-8 lg:w-72 flex flex-col justify-between border-t lg:border-t-0 lg:border-l border-gray-100">
-                                    <div className="mb-6 lg:mb-0">
-                                        <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-1">Total Obligation</p>
-                                        <div className="flex items-baseline gap-1.5">
-                                            <span className="text-sm font-bold text-gray-400">GHS</span>
-                                            <span className="text-3xl font-bold text-gray-900 tracking-tight">
-                                                {(booking.items?.reduce((acc: number, item: any) => acc + (item.unitPrice * item.quantity), 0) / 100).toLocaleString(undefined, { minimumFractionDigits: 2 })}
-                                            </span>
+                                    <div className="mb-6 lg:mb-0 space-y-3">
+                                        <div>
+                                            <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-1">Base Price</p>
+                                            <p className="text-sm font-bold text-gray-700">
+                                                ₵{(booking.items?.reduce((acc: number, item: any) => acc + (item.unitPrice * item.quantity), 0) / 100).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                                            </p>
                                         </div>
+                                        
+                                        {booking.status === "PENDING" && (
+                                            <div className="pt-3 border-t border-gray-100 space-y-2">
+                                                <div className="flex items-center justify-between text-[10px] font-bold uppercase tracking-widest">
+                                                    <span className="text-gray-400">Processing Fee</span>
+                                                    <span className="text-blue-600">+ ₵{(Math.ceil((booking.items?.reduce((acc: number, item: any) => acc + (item.unitPrice * item.quantity), 0) / 0.9805) - (booking.items?.reduce((acc: number, item: any) => acc + (item.unitPrice * item.quantity), 0))) / 100).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                                                </div>
+                                                <div className="flex items-center justify-between text-xs font-bold text-gray-900">
+                                                    <span>Grand Total</span>
+                                                    <span className="text-lg">
+                                                        ₵{(Math.ceil(booking.items?.reduce((acc: number, item: any) => acc + (item.unitPrice * item.quantity), 0) / 0.9805) / 100).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        {booking.payment?.status === "SUCCESS" && (
+                                            <div className="pt-3 border-t border-gray-100">
+                                                <p className="text-[10px] font-bold uppercase tracking-widest text-emerald-600">Payment Confirmed</p>
+                                                <p className="text-lg font-bold text-gray-900">
+                                                    ₵{(booking.payment.amount / 100).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                                                </p>
+                                            </div>
+                                        )}
                                     </div>
 
                                     <div className="space-y-2.5">

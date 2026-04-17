@@ -68,6 +68,8 @@ export class PaymentsService {
     });
 
     const platformFee = fee.feeAmount;
+    const processingFee = this.feeCalc.calculateProcessingFee(totalAmount);
+    const totalToCharge = totalAmount + processingFee;
     const ownerEarnings = totalAmount - platformFee;
 
     const reference = `HB_${randomBytes(10).toString("hex")}`;
@@ -76,7 +78,8 @@ export class PaymentsService {
       where: { bookingId: booking.id },
       update: {
         status: PaymentStatus.INITIATED,
-        amount: totalAmount,
+        amount: totalToCharge,
+        processingFee,
         platformFee,
         // @ts-ignore
         feeType: (fee as any).feeType,
@@ -88,7 +91,8 @@ export class PaymentsService {
       },
       create: {
         bookingId: booking.id,
-        amount: totalAmount,
+        amount: totalToCharge,
+        processingFee,
         platformFee,
         // @ts-ignore
         feeType: (fee as any).feeType,
@@ -106,7 +110,7 @@ export class PaymentsService {
 
     const initResponse = await this.paystack.initializeTransaction({
       email: booking.tenant.email,
-      amount: totalAmount,
+      amount: totalToCharge,
       reference,
       callback_url: appUrl ? `${appUrl}/payment/callback` : undefined,
       metadata: { bookingId: booking.id, tenantId: booking.tenantId },

@@ -28,6 +28,19 @@ export class FeeCalculationService {
   }
 
   /**
+   * Calculate the Paystack processing fee to be added to the total
+   * To ensure owner receives X, we charge X / (1 - 0.0195)
+   * @param netAmount The amount the platform/owner should receive
+   * @returns The fee in pesewas
+   */
+  calculateProcessingFee(netAmount: number): number {
+    if (netAmount <= 0) return 0;
+    const paystackRate = 0.0195; // 1.95% for local GH transactions
+    const grossAmount = Math.ceil(netAmount / (1 - paystackRate));
+    return grossAmount - netAmount;
+  }
+
+  /**
    * Calculate the fee to charge based on the hostel's listing fee model
    * @param input Fee calculation input with hostel ID, booking amount, etc
    * @returns Fee amount in pesewas and description
