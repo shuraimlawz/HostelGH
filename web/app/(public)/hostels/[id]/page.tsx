@@ -81,7 +81,7 @@ export default function HostelDetailsPage() {
     if (isLoading) return (
         <div className="container px-6 py-40 flex flex-col items-center justify-center gap-6">
             <Loader2 className="w-12 h-12 text-blue-600 animate-spin" />
-            <p className="text-gray-400 font-bold uppercase tracking-[0.3em] text-[10px] animate-pulse">Syncing Property Matrix...</p>
+            <p className="text-gray-400 font-bold uppercase tracking-[0.3em] text-[10px] animate-pulse">Loading hostel details...</p>
         </div>
     );
 
@@ -390,8 +390,8 @@ export default function HostelDetailsPage() {
                                     <Building2 size={32} />
                                 </div>
                                 <div className="space-y-2">
-                                    <h3 className="font-bold text-2xl uppercase tracking-tighter text-gray-900">Secure Reserve</h3>
-                                    <p className="text-gray-400 text-xs font-bold uppercase tracking-widest leading-relaxed">Authorized platform for automated room allocation and payment.</p>
+                                    <h3 className="font-bold text-2xl uppercase tracking-tighter text-gray-900">Book Now</h3>
+                                    <p className="text-gray-400 text-xs font-bold uppercase tracking-widest leading-relaxed">Book through our trusted platform for automated room allocation.</p>
                                 </div>
 
                                 <div className="space-y-6">
@@ -400,19 +400,19 @@ export default function HostelDetailsPage() {
                                             <div className="w-6 h-6 bg-emerald-50 text-emerald-600 rounded-lg flex items-center justify-center border border-emerald-100">
                                                 <CheckCircle2 size={14} />
                                             </div>
-                                            <p className="text-[10px] font-bold text-gray-900 uppercase tracking-widest">Verified Ownership</p>
+                                            <p className="text-[10px] font-bold text-gray-900 uppercase tracking-widest">Verified Manager</p>
                                         </div>
                                         <div className="flex items-center gap-4">
                                             <div className="w-6 h-6 bg-emerald-50 text-emerald-600 rounded-lg flex items-center justify-center border border-emerald-100">
                                                 <CheckCircle2 size={14} />
                                             </div>
-                                            <p className="text-[10px] font-bold text-gray-900 uppercase tracking-widest">Encrypted Transacting</p>
+                                            <p className="text-[10px] font-bold text-gray-900 uppercase tracking-widest">Secure Payments</p>
                                         </div>
                                         <div className="flex items-center gap-4">
                                             <div className="w-6 h-6 bg-emerald-50 text-emerald-600 rounded-lg flex items-center justify-center border border-emerald-100">
                                                 <CheckCircle2 size={14} />
                                             </div>
-                                            <p className="text-[10px] font-bold text-gray-900 uppercase tracking-widest">Instant Handshake</p>
+                                            <p className="text-[10px] font-bold text-gray-900 uppercase tracking-widest">Fast Confirmation</p>
                                         </div>
                                     </div>
 
@@ -424,7 +424,7 @@ export default function HostelDetailsPage() {
                                             className="w-full h-16 bg-emerald-600 text-white rounded-2xl font-bold uppercase tracking-[0.2em] text-[10px] shadow-xl shadow-emerald-500/10 hover:bg-emerald-700 transition-all flex items-center justify-center gap-3 active:scale-95"
                                         >
                                             <MessageCircle size={20} />
-                                            Signal Manager
+                                            Contact Manager
                                         </a>
                                     )}
                                 </div>
@@ -444,7 +444,7 @@ export default function HostelDetailsPage() {
                                         <p className="font-bold text-gray-900 tracking-tight uppercase leading-none text-sm group-hover/owner:text-blue-600 transition-colors">
                                             {hostel.owner?.firstName} {hostel.owner?.lastName}
                                         </p>
-                                        <p className="text-[9px] text-gray-400 font-bold uppercase tracking-widest">HG Certified Proprietor</p>
+                                        <p className="text-[9px] text-gray-400 font-bold uppercase tracking-widest">Verified Hostel Manager</p>
                                     </div>
                                 </div>
                             </div>
@@ -452,10 +452,10 @@ export default function HostelDetailsPage() {
                             <div className="p-5 bg-gray-900 text-white rounded-2xl border border-white/5 space-y-3 relative overflow-hidden">
                                 <div className="flex items-center gap-2 text-blue-400">
                                     <ShieldAlert size={14} />
-                                    <span className="text-[9px] font-bold uppercase tracking-widest">Security Notice</span>
+                                    <span className="text-[9px] font-bold uppercase tracking-widest">Important Advice</span>
                                 </div>
                                 <p className="text-[9px] text-gray-400 font-bold uppercase tracking-widest leading-relaxed relative z-10">
-                                   Only execute funding via the integrated Paystack terminal. Direct external transfers are not protected by platform protocols.
+                                   Only make payments through our secure gateway. Direct bank transfers are not protected by our security policy.
                                 </p>
                             </div>
                         </div>

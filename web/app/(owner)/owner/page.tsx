@@ -110,7 +110,7 @@ export default function OwnerDashboardPage() {
             <div className="flex h-[60vh] items-center justify-center">
                 <div className="flex flex-col items-center gap-4 text-center">
                     <Loader2 className="animate-spin text-blue-600" size={32} />
-                    <p className="text-sm font-medium text-gray-400">Syncing asset metrics...</p>
+                    <p className="text-sm font-medium text-gray-400">Loading dashboard...</p>
                 </div>
             </div>
         );
@@ -156,18 +156,18 @@ export default function OwnerDashboardPage() {
                 <div className="space-y-2">
                     <div className="flex items-center gap-2">
                         <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                        <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest leading-none">Proprietor Terminal</span>
+                        <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest leading-none">Owner Hub</span>
                     </div>
-                    <h1 className="text-3xl md:text-4xl font-bold text-gray-900 tracking-tight">Portfolio Overview</h1>
-                    <p className="text-gray-500 text-sm max-w-md">Managing {totalHostels} Strategic Assets with {totalRooms} total units.</p>
+                    <h1 className="text-3xl md:text-4xl font-bold text-gray-900 tracking-tight">Owner Dashboard</h1>
+                    <p className="text-gray-500 text-sm max-w-md">Managing {totalHostels} Hostels with {totalRooms} total rooms.</p>
                 </div>
 
                 <div className="flex items-center gap-3">
                     <Link href="/owner/hostels/new" className="h-11 px-6 bg-blue-600 text-white rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-blue-700 transition-all flex items-center gap-2 shadow-lg shadow-blue-100 active:scale-95">
-                        <PlusCircle size={16} /> Deploy Asset
+                        <PlusCircle size={16} /> Add Hostel
                     </Link>
                     <Link href="/owner/payouts" className="h-11 px-6 bg-white border border-gray-100 text-gray-900 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-gray-50 transition-all flex items-center gap-2 shadow-sm">
-                        <Wallet size={16} /> Settlement
+                        <Wallet size={16} /> Payments
                     </Link>
                 </div>
             </div>
@@ -175,36 +175,36 @@ export default function OwnerDashboardPage() {
             {/* Metrics */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 <StatCard 
-                    label="Live Assets" 
+                    label="Total Hostels" 
                     value={totalHostels} 
                     icon={Building2} 
                     color="text-blue-600" 
                     bgColor="bg-blue-50" 
-                    detail={`${totalRooms} Managed Units`} 
+                    detail={`${totalRooms} Total Rooms`} 
                 />
                 <StatCard 
-                    label="Resident Count" 
+                    label="Active Bookings" 
                     value={statsOverview.totalApprovedBookings} 
                     icon={Users} 
                     color="text-emerald-600" 
                     bgColor="bg-emerald-50" 
-                    detail="Verified Occupancy" 
+                    detail="Confirmed stays" 
                 />
                 <StatCard 
-                    label="Action Queue" 
+                    label="Pending Action" 
                     value={statsOverview.totalPendingBookings} 
                     icon={Clock} 
                     color="text-orange-600" 
                     bgColor="bg-orange-50" 
-                    detail="Immediate Protocol Required" 
+                    detail="Review required" 
                 />
                 <StatCard 
-                    label="Equity Ready" 
+                    label="Owner Balance" 
                     value={`₵${walletBalance.toLocaleString()}`} 
                     icon={DollarSign} 
                     color="text-blue-600" 
                     bgColor="bg-blue-50" 
-                    detail="Audited & Liquid" 
+                    detail="Ready for payout" 
                     premium 
                 />
             </div>
@@ -215,9 +215,9 @@ export default function OwnerDashboardPage() {
                     <div className="flex items-center justify-between border-b border-gray-50 pb-4">
                         <div className="flex items-center gap-3">
                             <BarChart3 className="text-blue-600" size={20} />
-                            <h2 className="text-xl font-bold text-gray-900 tracking-tight">Revenue Trajectory</h2>
+                            <h2 className="text-xl font-bold text-gray-900 tracking-tight">Income History</h2>
                         </div>
-                        <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">6-Month Strategic View</span>
+                        <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Last 6 Months</span>
                     </div>
 
                     <div className="h-[300px] w-full">
@@ -267,8 +267,8 @@ export default function OwnerDashboardPage() {
                         <div className="w-12 h-12 bg-white/5 rounded-xl flex items-center justify-center border border-white/10 mb-8 shadow-sm">
                             <LayoutDashboard size={24} className="text-blue-500" />
                         </div>
-                        <h3 className="text-2xl font-bold tracking-tight mb-2 uppercase">Asset Matrix</h3>
-                        <p className="text-xs text-white/40 font-medium leading-relaxed">Scaling your infrastructure with precision control parameters.</p>
+                        <h3 className="text-2xl font-bold tracking-tight mb-2 uppercase">My Hostels</h3>
+                        <p className="text-xs text-white/40 font-medium leading-relaxed">Manage your hostels and view their current status.</p>
                     </div>
 
                     <div className="relative z-10 space-y-6 pt-8">
@@ -283,7 +283,7 @@ export default function OwnerDashboardPage() {
                             </div>
                         </div>
                         <Link href="/owner/hostels" className="w-full h-12 bg-white text-gray-900 rounded-xl font-bold text-[10px] uppercase tracking-widest hover:bg-gray-100 transition-all flex items-center justify-center gap-2">
-                            Full Asset Registry <ArrowRight size={14} />
+                            View All Hostels <ArrowRight size={14} />
                         </Link>
                     </div>
                 </div>
@@ -295,16 +295,16 @@ export default function OwnerDashboardPage() {
                     <div className="flex items-center gap-3">
                         <Activity className="text-blue-600" size={20} />
                         <div className="space-y-0.5">
-                            <h2 className="text-xl font-bold text-gray-900 tracking-tight">Occupation Ledger</h2>
-                            <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Live Infrastructure Deployment Status</p>
+                            <h2 className="text-xl font-bold text-gray-900 tracking-tight">Recent Bookings</h2>
+                            <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Track your latest student bookings</p>
                         </div>
                     </div>
 
                     <div className="flex bg-gray-50 p-1 rounded-xl border border-gray-100 shrink-0">
                         {[
-                            { key: "all", label: "Registry" },
-                            { key: "pending", label: "Queue" },
-                            { key: "active", label: "Live Hub" }
+                            { key: "all", label: "All" },
+                            { key: "pending", label: "Pending" },
+                            { key: "active", label: "Active" }
                         ].map((tab) => (
                             <button
                                 key={tab.key}
@@ -328,19 +328,19 @@ export default function OwnerDashboardPage() {
                                 <Activity size={32} />
                             </div>
                             <div className="space-y-1">
-                                <h3 className="text-lg font-bold text-gray-900 uppercase tracking-tight">Zero Registry Hits</h3>
-                                <p className="text-gray-400 text-sm font-medium">No occupation records detected within the selected parameters.</p>
+                                <h3 className="text-lg font-bold text-gray-900 uppercase tracking-tight">No bookings found</h3>
+                                <p className="text-gray-400 text-sm font-medium">No bookings match your selected filter.</p>
                             </div>
                         </div>
                     ) : (
                         <table className="w-full text-left border-collapse">
                             <thead>
                                 <tr className="bg-gray-50/50">
-                                    <th className="px-8 py-5 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Entity Details</th>
-                                    <th className="px-8 py-5 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Asset Target</th>
-                                    <th className="px-8 py-5 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Temporal Log</th>
-                                    <th className="px-8 py-5 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Moderation</th>
-                                    <th className="px-8 py-5 text-right text-[10px] font-bold text-gray-400 uppercase tracking-widest">Audit</th>
+                                    <th className="px-8 py-5 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Student Info</th>
+                                    <th className="px-8 py-5 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Hostel & Room</th>
+                                    <th className="px-8 py-5 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Date</th>
+                                    <th className="px-8 py-5 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Status</th>
+                                    <th className="px-8 py-5 text-right text-[10px] font-bold text-gray-400 uppercase tracking-widest">View</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-50">
@@ -387,7 +387,7 @@ export default function OwnerDashboardPage() {
                 </div>
                 <div className="p-8 bg-gray-50/30 text-center border-t border-gray-50">
                     <Link href="/owner/bookings" className="text-[10px] font-bold text-gray-400 hover:text-blue-600 uppercase tracking-widest flex items-center justify-center gap-2 group">
-                        Browse Full Asset Ledger <ChevronRight size={14} className="group-hover:translate-x-1 transition-transform" />
+                        View All Bookings <ChevronRight size={14} className="group-hover:translate-x-1 transition-transform" />
                     </Link>
                 </div>
             </div>

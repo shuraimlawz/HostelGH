@@ -50,7 +50,7 @@ function RegisterContent({ onSuccess }: { onSuccess?: () => void }) {
 
             if (accessToken && user) {
                 login(accessToken, user);
-                toast.success("Identity Created", { description: "Welcome to the HostelGH network." });
+                toast.success("Account Created", { description: "Welcome to HostelGH." });
 
                 if (onSuccess) {
                     onSuccess();
@@ -60,20 +60,20 @@ function RegisterContent({ onSuccess }: { onSuccess?: () => void }) {
                     else router.push("/hostels");
                 }
             } else {
-                toast.success("Account created! Check email verification packet.");
+                toast.success("Account created! Please check your email for a verification link.");
                 router.replace("/auth/login?verify=1");
             }
         } catch (error: any) {
             const isNetworkError = !error.response;
             if (isNetworkError) {
-                toast.error("Connectivity Issue", {
-                    description: "Neural link interrupted. Check your internet connection.",
+                toast.error("Connection Error", {
+                    description: "Please check your internet connection and try again.",
                     duration: 5000,
                 });
             } else {
                 const raw = error.response?.data?.message;
                 const message = (!raw || raw === "Internal server error")
-                    ? "Creation protocol failed. Verify your parameters."
+                    ? "Failed to create account. Please check your details."
                     : (Array.isArray(raw) ? raw[0] : raw);
                 setErr(message);
             }
@@ -119,7 +119,7 @@ function RegisterContent({ onSuccess }: { onSuccess?: () => void }) {
                 </div>
 
                 <div className="space-y-2 group">
-                    <label className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] ml-1 group-focus-within:text-blue-600">Credential Email</label>
+                    <label className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] ml-1 group-focus-within:text-blue-600">Email Address</label>
                     <div className="relative">
                         <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-blue-600 transition-colors" size={16} />
                         <input
@@ -127,14 +127,14 @@ function RegisterContent({ onSuccess }: { onSuccess?: () => void }) {
                             className="w-full pl-11 pr-4 h-12 bg-gray-50 border border-gray-100 rounded-2xl outline-none focus:bg-white focus:border-blue-600 transition-all text-xs font-bold uppercase tracking-tight placeholder:text-gray-300"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
-                            placeholder="USER@HOSTELGH.COM"
+                            placeholder="USER@EMAIL.COM"
                             required
                         />
                     </div>
                 </div>
 
                 <div className="space-y-2 group">
-                    <label className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] ml-1 group-focus-within:text-blue-600">Security Key</label>
+                    <label className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] ml-1 group-focus-within:text-blue-600">Password</label>
                     <div className="relative">
                         <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-blue-600 transition-colors" size={16} />
                         <input
@@ -156,15 +156,15 @@ function RegisterContent({ onSuccess }: { onSuccess?: () => void }) {
                 </div>
 
                 <div className="space-y-2 group">
-                    <label className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] ml-1 group-focus-within:text-blue-600">Identity Tier</label>
+                    <label className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] ml-1 group-focus-within:text-blue-600">Account Type</label>
                     <div className="relative">
                         <select
                             className="w-full px-5 h-12 bg-gray-50 border border-gray-100 rounded-2xl outline-none focus:bg-white focus:border-blue-600 transition-all text-[10px] font-bold uppercase tracking-widest shadow-sm appearance-none cursor-pointer text-gray-900"
                             value={role}
                             onChange={(e) => setRole(e.target.value as any)}
                         >
-                            <option value="TENANT">Scholar Registry (Resident)</option>
-                            <option value="OWNER">Proprietor Hub (Owner)</option>
+                            <option value="TENANT">Student Hub (Resident)</option>
+                            <option value="OWNER">Owner Hub (Property Owner)</option>
                         </select>
                         <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
                             <svg width="10" height="10" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -188,11 +188,11 @@ function RegisterContent({ onSuccess }: { onSuccess?: () => void }) {
                     {loading ? (
                         <>
                             <Loader2 className="animate-spin" size={18} />
-                            Registering...
+                            Creating Account...
                         </>
                     ) : (
                         <>
-                            Initialize Account
+                            Create Account
                             <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
                         </>
                     )}
@@ -219,11 +219,11 @@ function RegisterContent({ onSuccess }: { onSuccess?: () => void }) {
                     <path fill="#FBBC05" d="M3.964 10.706A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.706V4.962H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.038l3.007-2.332z" />
                     <path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.962l3.007 2.332c.708-2.127 2.692-3.711 5.036-3.711z" />
                 </svg>
-                Google Identity Protocol
+                Continue with Google
             </button>
 
             <div className="text-center text-[10px] font-bold text-gray-400 uppercase tracking-widest pt-2">
-                Already Authorized? <Link href="/auth/login" className="text-gray-900 border-b border-gray-200 hover:border-gray-900 transition-all ml-2">Login Terminal</Link>
+                Already have an account? <Link href="/auth/login" className="text-gray-900 border-b border-gray-200 hover:border-gray-900 transition-all ml-2">Login Here</Link>
             </div>
         </div>
     );
@@ -235,7 +235,7 @@ export default function RegisterForm({ onSuccess }: { onSuccess?: () => void }) 
             <div className="flex justify-center items-center py-10">
                 <div className="flex flex-col items-center gap-4">
                     <Loader2 className="animate-spin text-blue-600" size={32} />
-                    <span className="text-[10px] font-bold text-gray-300 uppercase tracking-[0.3em]">Synching Hub...</span>
+                    <span className="text-[10px] font-bold text-gray-300 uppercase tracking-[0.3em]">Loading...</span>
                 </div>
             </div>
         }>

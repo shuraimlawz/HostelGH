@@ -56,7 +56,7 @@ export default function AccountPage() {
         try {
             const { data } = await api.patch("/users/me", formData);
             updateUser(data);
-            toast.success("Identity updated successfully!");
+            toast.success("Profile updated successfully!");
         } catch (error: any) {
             toast.error(error.message || "Failed to update profile");
         } finally {
@@ -69,7 +69,7 @@ export default function AccountPage() {
 
         try {
             await api.delete("/users/me");
-            toast.success("Account purged successfully.");
+            toast.success("Account deleted successfully.");
             localStorage.clear();
             window.location.href = "/";
         } catch (error: any) {
@@ -81,7 +81,7 @@ export default function AccountPage() {
         return (
             <div className="flex flex-col items-center justify-center min-h-[60vh]">
                 <Loader2 className="animate-spin text-blue-600 mb-4" size={32} />
-                <p className="text-sm font-medium text-gray-400">Syncing identity data...</p>
+                <p className="text-sm font-medium text-gray-400">Loading account details...</p>
             </div>
         );
     }
@@ -106,7 +106,7 @@ export default function AccountPage() {
                 <div className="space-y-2">
                     <div className="flex items-center gap-2">
                         <div className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
-                        <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Personal Identification</span>
+                        <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Account Settings</span>
                     </div>
                     <h1 className="text-3xl md:text-4xl font-bold text-gray-900 tracking-tight">Profile Settings</h1>
                     <p className="text-gray-500 text-sm max-w-md">Manage your core credentials and network verification status.</p>
@@ -131,9 +131,9 @@ export default function AccountPage() {
                         <span className="absolute text-[10px] font-bold text-blue-700">{profileCompletion}%</span>
                     </div>
                     <div>
-                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest leading-none mb-1">Identity Strength</p>
+                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest leading-none mb-1">Profile Completion</p>
                         <p className="text-xs font-bold text-gray-900">
-                            {profileCompletion < 100 ? "Optimization Required" : "Fully Optimized"}
+                            {profileCompletion < 100 ? "Action Required" : "Profile Complete"}
                         </p>
                     </div>
                 </div>
@@ -170,17 +170,17 @@ export default function AccountPage() {
                                     onChange={async (e) => {
                                         const file = e.target.files?.[0];
                                         if (!file) return;
-                                        const loadingToast = toast.loading("Syndicating image data...");
+                                        const loadingToast = toast.loading("Uploading photo...");
                                         try {
                                             const fd = new FormData();
                                             fd.append('file', file);
-                                            const res = await api.post("/hostels/upload", fd);
+                                            const res = await api.post("/upload/image", fd);
                                             const imageUrl = res.data.url;
                                             await api.patch("/users/me", { avatarUrl: imageUrl });
                                             updateUser({ ...user!, avatarUrl: imageUrl });
-                                            toast.success("Identity visual updated!", { id: loadingToast });
+                                            toast.success("Profile picture updated!", { id: loadingToast });
                                         } catch (error: any) {
-                                            toast.error(error.message || "Upload failure", { id: loadingToast });
+                                            toast.error(error.message || "Upload failed", { id: loadingToast });
                                         }
                                     }}
                                 />
@@ -208,13 +208,13 @@ export default function AccountPage() {
                                 <KeyRound size={24} className="text-blue-400" />
                             </div>
                             <div className="space-y-1">
-                                <h3 className="text-lg font-bold tracking-tight">Security Protocol</h3>
+                                <h3 className="text-lg font-bold tracking-tight">Security Settings</h3>
                                 <p className="text-xs text-gray-400 font-medium leading-relaxed">
-                                    Update your encryption keys and active session protocols.
+                                    Update your password and manage active sessions.
                                 </p>
                             </div>
-                            <button className="w-full bg-white text-gray-900 h-11 rounded-xl font-bold text-xs hover:bg-blue-600 hover:text-white transition-all">
-                                Update Access Keys
+                            <button className="w-full bg-white text-gray-900 h-11 rounded-xl font-bold text-xs hover:bg-black hover:text-white transition-all">
+                                Update Password
                             </button>
                         </div>
                     </div>
@@ -226,8 +226,8 @@ export default function AccountPage() {
                     <form onSubmit={handleUpdate} className="bg-white rounded-2xl border border-gray-100 p-8 shadow-sm space-y-8">
                         <div className="flex items-center justify-between border-b border-gray-50 pb-6">
                             <div className="space-y-0.5">
-                                <h3 className="text-lg font-bold text-gray-900 tracking-tight">Identity Matrix</h3>
-                                <p className="text-xs text-gray-400 font-medium uppercase tracking-widest">Core personal credentials</p>
+                                <h3 className="text-lg font-bold text-gray-900 tracking-tight">Personal Information</h3>
+                                <p className="text-xs text-gray-400 font-medium uppercase tracking-widest">Your basic details</p>
                             </div>
                             <UserCircle size={20} className="text-blue-600" />
                         </div>

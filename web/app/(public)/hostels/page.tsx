@@ -37,7 +37,7 @@ function HostelsListingContent() {
                 <div className="space-y-2">
                     <div className="flex items-center gap-2">
                         <div className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
-                        <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest leading-none">Market Discover</span>
+                        <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest leading-none">Explore</span>
                     </div>
                     <h1 className="text-3xl md:text-4xl font-bold text-gray-900 tracking-tight">Prime Educational Stays</h1>
                     <p className="text-gray-500 text-sm max-w-md">Discover premium hostels across Ghana vetted for safety and proximity.</p>
@@ -76,14 +76,14 @@ function HostelsListingContent() {
                                         <SearchX size={32} />
                                     </div>
                                     <div className="space-y-1">
-                                        <h3 className="text-xl font-bold text-gray-900 uppercase tracking-tight">Zero Registry Hits</h3>
-                                        <p className="text-gray-400 text-sm font-medium">No assets match your current parameters. Try widening the scope.</p>
+                                        <h3 className="text-xl font-bold text-gray-900 uppercase tracking-tight">No Results Found</h3>
+                                        <p className="text-gray-400 text-sm font-medium">No hostels match your search filters. Try widening the scope.</p>
                                     </div>
                                     <button 
                                         onClick={() => window.location.href = '/hostels'} 
                                         className="mt-4 px-6 py-2 bg-gray-900 text-white rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-black transition-all"
                                     >
-                                        Clear All Protocols
+                                        Reset Filters
                                     </button>
                                 </div>
                             )}
@@ -100,7 +100,7 @@ export default function HostelsListingPage() {
         <Suspense fallback={
             <div className="max-w-[1400px] mx-auto px-4 py-32 flex flex-col items-center justify-center gap-4">
                 <Loader2 className="w-10 h-10 text-blue-600 animate-spin" />
-                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Hydrating marketplace asset log...</p>
+                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Updating list...</p>
             </div>
         }>
             <HostelsListingContent />

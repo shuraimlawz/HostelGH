@@ -25,7 +25,7 @@ export default function Footer() {
                                 <span className="text-2xl font-black tracking-tighter text-white uppercase not-italic">HostelGH</span>
                             </Link>
                             <p className="text-zinc-400 text-sm leading-relaxed font-bold uppercase tracking-widest max-w-sm not-italic">
-                                Decoupling the complexity of student housing. A high-density archival network for verified residences across Ghana.
+                                Simplifying student housing across Ghana. A trusted network of verified hostels and modern student accommodations.
                             </p>
                         </div>
 
@@ -45,10 +45,10 @@ export default function Footer() {
                     {/* Navigation Hubs */}
                     <div className="md:col-span-2 space-y-8">
                         <h4 className="text-[10px] font-black text-white uppercase tracking-[0.3em] flex items-center gap-2 not-italic">
-                            <MapPin size={12} className="text-blue-500" /> Ecosystem
+                            <MapPin size={12} className="text-blue-500" /> Our Locations
                         </h4>
                         <ul className="space-y-4">
-                            {["Greater Accra", "Ashanti Sector", "Central Hub", "Northern Zone"].map((hub) => (
+                            {["Greater Accra", "Ashanti Region", "Central Region", "Northern Region"].map((hub) => (
                                 <li key={hub}>
                                     <Link href={`/hostels?city=${hub}`} className="text-zinc-500 hover:text-white text-[11px] font-bold uppercase tracking-widest transition-colors flex items-center gap-2 group not-italic">
                                         <div className="w-1 h-1 bg-zinc-800 rounded-full group-hover:bg-blue-500 transition-all group-hover:scale-150" />
@@ -61,12 +61,12 @@ export default function Footer() {
 
                     <div className="md:col-span-3 space-y-8">
                         <h4 className="text-[10px] font-black text-white uppercase tracking-[0.3em] flex items-center gap-2 not-italic">
-                            <ShieldCheck size={12} className="text-blue-500" /> Infrastructure
+                            <ShieldCheck size={12} className="text-blue-500" /> Support & Legal
                         </h4>
                         <ul className="space-y-4">
                             {[
                                 { label: "Help Center", href: "/support" },
-                                { label: "Security Protocol", href: "/support/privacy" },
+                                { label: "Security Policy", href: "/support/privacy" },
                                 { label: "Terms of Use", href: "/support/terms" },
                                 { label: "Owner Portal", href: "/auth/register?role=OWNER" }
                             ].map((item) => (
@@ -82,7 +82,7 @@ export default function Footer() {
                     {/* Terminal Section */}
                     <div className="md:col-span-3 space-y-8">
                         <h4 className="text-[10px] font-black text-white uppercase tracking-[0.3em] flex items-center gap-2 not-italic">
-                            <Zap size={12} className="text-blue-500" /> Support Terminal
+                            <Zap size={12} className="text-blue-500" /> Contact Us
                         </h4>
                         <div className="bg-white/5 rounded-2xl p-6 border border-white/5 space-y-6">
                             <div className="space-y-4">
@@ -91,7 +91,7 @@ export default function Footer() {
                                         <Mail size={16} />
                                     </div>
                                     <div>
-                                        <p className="text-[9px] font-black text-zinc-500 uppercase tracking-widest not-italic">Transmission</p>
+                                        <p className="text-[9px] font-black text-zinc-500 uppercase tracking-widest not-italic">Support Email</p>
                                         <p className="text-[11px] font-bold text-zinc-300 not-italic">hello@hostelgh.com</p>
                                     </div>
                                 </div>
@@ -114,10 +114,10 @@ export default function Footer() {
                     <div className="flex flex-col md:flex-row items-center gap-6">
                         <div className="flex items-center gap-2 px-4 py-2 bg-white/5 rounded-full border border-white/5">
                             <div className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
-                            <span className="text-[10px] font-black text-zinc-400 uppercase tracking-widest not-italic">System Status: Optimal</span>
+                            <span className="text-[10px] font-black text-zinc-400 uppercase tracking-widest not-italic">System Status: Online</span>
                         </div>
                         <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-[0.2em] not-italic">
-                            © {currentYear} CORE UNIT RESERVED. HOSTELGH IS A PROPERTY OF MINDED GH.
+                            © {currentYear} ALL RIGHTS RESERVED. HOSTELGH IS A PRODUCT OF MINDED GH.
                         </p>
                     </div>
 

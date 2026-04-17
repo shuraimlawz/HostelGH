@@ -44,14 +44,14 @@ export default function OnboardingPage() {
             <div className="relative z-10 w-full max-w-4xl space-y-16">
                 <div className="text-center space-y-6">
                     <div className="inline-flex items-center gap-3 px-4 py-2 bg-blue-600 text-white rounded-full shadow-xl shadow-blue-500/20 border border-white/10">
-                        <span className="text-[10px] font-bold uppercase tracking-[0.2em]">Profile Initialization</span>
+                        <span className="text-[10px] font-bold uppercase tracking-[0.2em]">Account Setup</span>
                     </div>
                     <div className="space-y-4">
                         <h1 className="text-4xl md:text-6xl font-bold tracking-tighter text-gray-900 uppercase leading-none">
-                            Select Identity Tier
+                            Choose Your Role
                         </h1>
                         <p className="text-xs md:text-sm text-gray-400 max-w-lg mx-auto leading-relaxed font-bold uppercase tracking-widest">
-                            Configure your operational parameters by selecting your primary interaction protocol.
+                            Select how you'd like to use the platform to get started.
                         </p>
                     </div>
                 </div>
@@ -75,9 +75,9 @@ export default function OnboardingPage() {
                         </div>
                         
                         <div className="space-y-3">
-                            <h3 className="text-2xl font-bold text-gray-900 tracking-tight uppercase">Scholar Registry</h3>
+                            <h3 className="text-2xl font-bold text-gray-900 tracking-tight uppercase">Student Hub</h3>
                             <p className="text-[11px] text-gray-400 font-bold uppercase tracking-widest leading-relaxed">
-                                Access the primary archival network to secure premium residences across Ghana.
+                                Join Ghana's top student housing network and book your room easily.
                             </p>
                         </div>
 
@@ -85,7 +85,7 @@ export default function OnboardingPage() {
                             "mt-auto flex items-center gap-3 text-[11px] font-bold uppercase tracking-widest transition-all",
                             role === "TENANT" ? "text-blue-600" : "text-gray-300 group-hover:text-gray-900"
                         )}>
-                            Initialize as Resident <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+                            Join as Student <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
                         </div>
                     </button>
 
@@ -107,9 +107,9 @@ export default function OnboardingPage() {
                         </div>
                         
                         <div className="space-y-3">
-                            <h3 className="text-2xl font-bold text-gray-900 tracking-tight uppercase">Proprietor Hub</h3>
+                            <h3 className="text-2xl font-bold text-gray-900 tracking-tight uppercase">Owner Hub</h3>
                             <p className="text-[11px] text-gray-400 font-bold uppercase tracking-widest leading-relaxed">
-                                Deploy assets, manage archival logs, and automate rental revenue operations.
+                                List your hostels, manage bookings, and handle your payments effortlessly.
                             </p>
                         </div>
 
@@ -117,7 +117,7 @@ export default function OnboardingPage() {
                             "mt-auto flex items-center gap-3 text-[11px] font-bold uppercase tracking-widest transition-all",
                             role === "OWNER" ? "text-blue-600" : "text-gray-300 group-hover:text-gray-900"
                         )}>
-                            Initialize as Proprietor <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+                            Join as Owner <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
                         </div>
                     </button>
                 </div>
@@ -136,11 +136,11 @@ export default function OnboardingPage() {
                         {isLoading ? (
                             <>
                                 <Loader2 className="animate-spin" size={20} />
-                                Synchronizing...
+                                Setting up account...
                             </>
                         ) : (
                             <>
-                                Finalize Identity
+                                Complete Setup
                                 <ShieldCheck size={20} />
                             </>
                         )}
@@ -148,9 +148,7 @@ export default function OnboardingPage() {
                     
                     <div className="flex items-center gap-4 py-5 px-8 bg-gray-50 rounded-2xl border border-gray-100 shadow-sm animate-pulse">
                         <ShieldCheck size={18} className="text-blue-600" /> 
-                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest leading-none">
-                            Identity verification required for full network access
-                        </p>
+                        <span className="text-[10px] font-bold text-gray-900 uppercase tracking-[0.2em]">Account Secured</span>
                     </div>
                 </div>
             </div>

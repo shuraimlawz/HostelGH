@@ -44,14 +44,14 @@ export default function LoginForm({ onSuccess }: { onSuccess?: (user: any) => vo
         } catch (error: any) {
             const isNetworkError = !error.response;
             if (isNetworkError) {
-                toast.error("Connectivity Issue", {
-                    description: "We’re having trouble connecting to our servers.",
+                toast.error("Connection Error", {
+                    description: "Please check your internet connection.",
                     duration: 5000,
                 });
             } else {
                 const raw = error.response?.data?.message;
                 const message = (!raw || raw === "Internal server error")
-                    ? "Invalid credentials. Please verify your access parameters."
+                    ? "Invalid credentials. Please check your email and password."
                     : (Array.isArray(raw) ? raw[0] : raw);
                 setErr(message);
             }
@@ -62,15 +62,15 @@ export default function LoginForm({ onSuccess }: { onSuccess?: (user: any) => vo
 
     async function resendVerification() {
         if (!email) {
-            setErr("Email required for verification re-issue.");
+            setErr("Email required to resend verification.");
             return;
         }
         setResendLoading(true);
         try {
             await api.post("/auth/resend-verification", { email });
-            toast.success("Verification packet transmitted.");
+            toast.success("Verification email sent.");
         } catch (error: any) {
-            toast.error("Failed to re-issue verification.");
+            toast.error("Failed to resend verification.");
         } finally {
             setResendLoading(false);
         }
@@ -87,7 +87,7 @@ export default function LoginForm({ onSuccess }: { onSuccess?: (user: any) => vo
                 <div className="space-y-5">
                     {/* Email Input */}
                     <div className="space-y-2 group">
-                        <label className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] ml-1 group-focus-within:text-blue-600 transition-colors">Credential Email</label>
+                        <label className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] ml-1 group-focus-within:text-blue-600 transition-colors">Email Address</label>
                         <div className="relative">
                             <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-blue-600 transition-colors" size={18} />
                             <input
@@ -95,7 +95,7 @@ export default function LoginForm({ onSuccess }: { onSuccess?: (user: any) => vo
                                 className="w-full pl-12 pr-4 h-14 bg-gray-50 border border-gray-100 rounded-2xl outline-none focus:bg-white focus:border-blue-600 transition-all text-[13px] font-bold text-gray-900 placeholder:text-gray-300"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
-                                placeholder="e.g. USER@HOSTELGH.COM"
+                                placeholder="USER@EMAIL.COM"
                                 required
                                 autoComplete="email"
                             />
@@ -105,9 +105,9 @@ export default function LoginForm({ onSuccess }: { onSuccess?: (user: any) => vo
                     {/* Password Input */}
                     <div className="space-y-2 group">
                         <div className="flex justify-between items-center px-1">
-                            <label className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] group-focus-within:text-blue-600 transition-colors">Access Key</label>
-                            <Link href="/auth/forgot-password" title="Initialize recovery protocol" className="text-[9px] font-bold text-gray-300 uppercase tracking-widest hover:text-blue-600 transition-colors">
-                                Forgot Key?
+                            <label className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] group-focus-within:text-blue-600 transition-colors">Password</label>
+                            <Link href="/auth/forgot-password" title="Reset password" className="text-[11px] font-bold text-blue-600 uppercase tracking-widest hover:text-black transition-colors">
+                                Forgot Password?
                             </Link>
                         </div>
                         <div className="relative">
@@ -143,7 +143,7 @@ export default function LoginForm({ onSuccess }: { onSuccess?: (user: any) => vo
                             />
                             <ShieldCheck className="absolute inset-0 m-auto text-white scale-0 peer-checked:scale-100 transition-transform pointer-events-none" size={12} />
                         </div>
-                        <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest group-hover/check:text-gray-900 transition-colors">Persistent Session</span>
+                        <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest group-hover/check:text-gray-900 transition-colors">Keep me logged in</span>
                     </label>
                 </div>
 
@@ -161,7 +161,7 @@ export default function LoginForm({ onSuccess }: { onSuccess?: (user: any) => vo
                         disabled={resendLoading}
                         className="w-full text-[9px] font-bold uppercase tracking-[0.2em] text-blue-600 hover:text-blue-700 transition-colors py-2"
                     >
-                        {resendLoading ? "Synchronizing..." : "Re-issue Verification Packet"}
+                        {resendLoading ? "Resending..." : "Resend Verification Email"}
                     </button>
                 )}
 
@@ -172,11 +172,11 @@ export default function LoginForm({ onSuccess }: { onSuccess?: (user: any) => vo
                     {loading ? (
                         <>
                             <Loader2 className="animate-spin" size={18} />
-                            Validating...
+                            Logging in...
                         </>
                     ) : (
                         <>
-                            Executive Login
+                            Login
                             <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
                         </>
                     )}
@@ -203,11 +203,11 @@ export default function LoginForm({ onSuccess }: { onSuccess?: (user: any) => vo
                     <path fill="#FBBC05" d="M3.964 10.706A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.706V4.962H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.038l3.007-2.332z" />
                     <path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.962l3.007 2.332c.708-2.127 2.692-3.711 5.036-3.711z" />
                 </svg>
-                Google Identity Protocol
+                Continue with Google
             </button>
 
             <div className="text-center text-[10px] font-bold text-gray-400 uppercase tracking-widest pt-4">
-                Network Breach? <Link href="/auth/register" className="text-gray-900 border-b border-gray-200 hover:border-gray-900 transition-all ml-2">Initialize Account</Link>
+                No account yet? <Link href="/auth/register" className="text-gray-900 border-b border-gray-200 hover:border-gray-900 transition-all ml-2">Register Here</Link>
             </div>
         </div>
     );

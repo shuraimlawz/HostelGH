@@ -110,10 +110,10 @@ export default function HeroSearch() {
                         <div className="relative z-10 flex-1 flex items-center px-6 h-16 rounded-2xl bg-white/5 border border-white/5 group-focus-within:bg-white group-focus-within:border-white transition-all w-full focus-within:shadow-xl">
                             <MapPin className="text-blue-500 mr-4 shrink-0 transition-colors group-focus-within:text-blue-600" size={24} />
                             <div className="flex-1 text-left">
-                                <label className="block text-[9px] font-bold text-gray-400 group-focus-within:text-gray-500 uppercase tracking-widest mb-0.5 transition-colors">Operational Zone</label>
+                                <label className="block text-[9px] font-bold text-gray-400 group-focus-within:text-gray-500 uppercase tracking-widest mb-0.5 transition-colors">Where do you want to live?</label>
                                 <input
                                     type="text"
-                                    placeholder="LEGON, KNUST, UCC..."
+                                    placeholder="Enter school or area..."
                                     className="w-full text-white group-focus-within:text-gray-900 placeholder:text-gray-500 font-bold bg-transparent border-none outline-none text-sm selection:bg-blue-500/30 uppercase tracking-widest"
                                     value={city}
                                     onChange={(e) => setCity(e.target.value)}
@@ -149,7 +149,7 @@ export default function HeroSearch() {
                                 </button>
                             ))
                         ) : (
-                            !isLoadingLocations && <span className="opacity-20 font-bold px-4 lowercase tracking-[0.2em] py-2.5">Syncing hotspots...</span>
+                            !isLoadingLocations && <span className="opacity-20 font-bold px-4 lowercase tracking-[0.2em] py-2.5">Loading areas...</span>
                         )}
                     </div>
                 </div>

@@ -86,7 +86,7 @@ export default function TenantDashboardPage() {
             <div className="flex h-[60vh] items-center justify-center">
                 <div className="flex flex-col items-center gap-4 text-center">
                     <Loader2 className="animate-spin text-blue-600" size={32} />
-                    <p className="text-sm font-medium text-gray-400">Syncing resident data...</p>
+                    <p className="text-sm font-medium text-gray-400">Loading data...</p>
                 </div>
             </div>
         );
@@ -122,13 +122,13 @@ export default function TenantDashboardPage() {
                 <div className="space-y-2">
                     <div className="flex items-center gap-2">
                         <div className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
-                        <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Resident Terminal</span>
+                        <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Student Hub</span>
                     </div>
                     <h1 className="text-3xl md:text-4xl font-bold text-gray-900 tracking-tight">
-                        Dashboard Overlook
+                        Student Dashboard
                     </h1>
                     <p className="text-gray-500 text-sm max-w-md">
-                        Monitoring your stay at <span className="text-gray-900 font-bold">{nextBooking?.hostel.name || "Ghana"}</span> ecosystem.
+                        Monitoring your stay at <span className="text-gray-900 font-bold">{nextBooking?.hostel.name || "Ghana"}</span> community.
                     </p>
                 </div>
 
@@ -154,9 +154,9 @@ export default function TenantDashboardPage() {
                         </div>
                     </div>
                     <div className="relative z-10">
-                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Entity Health</p>
+                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Profile Status</p>
                         <p className="text-sm font-bold text-gray-900 tracking-tight">
-                            {profileCompletion}% Synchronized
+                            {profileCompletion}% Complete
                         </p>
                     </div>
                     <Link href="/account" className="relative z-10 ml-auto w-9 h-9 flex items-center justify-center rounded-xl bg-gray-50 text-gray-400 hover:text-blue-600 border border-gray-100 hover:border-blue-200 transition-all">
@@ -166,30 +166,30 @@ export default function TenantDashboardPage() {
             </div>
 
             {/* Metrics */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 <DashboardStat
-                    label="Operational Stays"
+                    label="My Hostels"
                     value={activeBookings.length}
                     icon={CheckCircle2}
                     color="text-emerald-600"
                     bgColor="bg-emerald-50"
                 />
                 <DashboardStat
-                    label="Pending Actions"
+                    label="Action Needed"
                     value={pendingBookings.length}
                     icon={Clock}
                     color="text-orange-600"
                     bgColor="bg-orange-50"
                 />
                 <DashboardStat
-                    label="Wallet Credit"
+                    label="Wallet Balance"
                     value={`₵${((wallet?.balance || 0) / 100).toLocaleString()}`}
                     icon={Wallet}
                     color="text-blue-600"
                     bgColor="bg-blue-50"
                 />
                 <DashboardStat
-                    label="Life-Volume Spent"
+                    label="Total Payments"
                     value={`₵${totalSpent.toLocaleString()}`}
                     icon={DollarSign}
                     color="text-gray-600"
@@ -201,7 +201,7 @@ export default function TenantDashboardPage() {
                 {/* Active Booking Section */}
                 <div className="xl:col-span-8 space-y-8">
                     <div className="flex items-center justify-between border-b border-gray-100 pb-4">
-                        <h2 className="text-xl font-bold text-gray-900 tracking-tight">Active Deployment</h2>
+                        <h2 className="text-xl font-bold text-gray-900 tracking-tight">Current Booking</h2>
                         <Link href="/bookings" className="text-[10px] font-bold text-blue-600 uppercase tracking-widest hover:underline">
                             View stay history
                         </Link>
@@ -233,20 +233,20 @@ export default function TenantDashboardPage() {
                                             <p className="text-sm font-bold text-gray-900">{new Date(nextBooking.items?.[0]?.startDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}</p>
                                         </div>
                                         <div>
-                                            <p className="text-[9px] text-gray-400 font-bold uppercase tracking-widest mb-1.5">Entity Allocation</p>
+                                            <p className="text-[9px] text-gray-400 font-bold uppercase tracking-widest mb-1.5">Room Detail</p>
                                             <p className="text-sm font-bold text-gray-900">{nextBooking.items?.[0]?.room?.name || "Shared Occupancy"}</p>
                                         </div>
                                         <div className="flex items-end">
                                             <Link href={`/bookings/${nextBooking.id}`} className="h-10 px-6 bg-gray-900 text-white hover:bg-black rounded-xl text-[10px] font-bold uppercase tracking-widest flex items-center gap-2 shadow-lg shadow-gray-200 transition-all">
-                                                Manage stay <ArrowRight size={14} />
+                                                View details <ArrowRight size={14} />
                                             </Link>
                                         </div>
                                     </div>
                                 </div>
                                 <div className="w-full md:w-56 p-8 bg-gray-50 rounded-2xl text-center border border-gray-100 flex flex-col justify-center items-center shadow-inner">
-                                    <p className="text-[9px] text-gray-400 font-bold uppercase tracking-widest mb-2">Total Retention</p>
+                                    <p className="text-[9px] text-gray-400 font-bold uppercase tracking-widest mb-2">Total Cost</p>
                                     <p className="text-3xl font-bold text-gray-900 tracking-tighter">₵{((nextBooking.items?.[0]?.unitPrice * nextBooking.items?.[0]?.quantity || 0) / 100).toLocaleString()}</p>
-                                    <p className="text-[8px] text-gray-400 font-bold uppercase tracking-widest mt-1">Vetted Protocol</p>
+                                    <p className="text-[8px] text-gray-400 font-bold uppercase tracking-widest mt-1">Verified Booking</p>
                                 </div>
                             </div>
                         </div>
@@ -256,8 +256,8 @@ export default function TenantDashboardPage() {
                                 <Building2 size={32} />
                             </div>
                             <div className="space-y-2">
-                                <h3 className="text-xl font-bold text-gray-900 uppercase tracking-tight">Zero Stays Detect</h3>
-                                <p className="text-sm text-gray-400 font-medium">Platform registry indicates no active resident deployments.</p>
+                                <h3 className="text-xl font-bold text-gray-900 uppercase tracking-tight">No bookings yet</h3>
+                                <p className="text-sm text-gray-400 font-medium">You don't have any hostels booked yet.</p>
                             </div>
                             <Link href="/hostels" className="h-12 px-8 bg-blue-600 text-white rounded-xl text-[10px] font-bold uppercase tracking-widest flex items-center gap-2 hover:bg-blue-700 transition-all shadow-xl shadow-blue-100">
                                 Explore Hostels <ArrowUpRight size={14} />
@@ -268,9 +268,9 @@ export default function TenantDashboardPage() {
                     {/* Operational Hub */}
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                         {[
-                            { href: "/account/payments", icon: CreditCard, label: "Payments", sub: "Billing Nodes", color: "text-blue-600", bg: "bg-blue-50" },
-                            { href: "/account", icon: Settings, label: "Settings", sub: "Protocols", color: "text-gray-600", bg: "bg-gray-50" },
-                            { href: "/support", icon: LifeBuoy, label: "Support", sub: "Mediation", color: "text-orange-600", bg: "bg-orange-50" }
+                            { href: "/account/payments", icon: CreditCard, label: "Payments", sub: "History", color: "text-blue-600", bg: "bg-blue-50" },
+                            { href: "/account", icon: Settings, label: "Settings", sub: "My Profile", color: "text-gray-600", bg: "bg-gray-50" },
+                            { href: "/support", icon: LifeBuoy, label: "Support", sub: "Get Help", color: "text-orange-600", bg: "bg-orange-50" }
                         ].map((hub, i) => (
                             <Link key={i} href={hub.href} className="p-6 bg-white border border-gray-100 rounded-2xl hover:border-blue-200 hover:shadow-lg hover:shadow-blue-500/5 transition-all flex flex-col gap-4 group">
                                 <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform shadow-sm border border-gray-100/50", hub.bg, hub.color)}>
@@ -292,7 +292,7 @@ export default function TenantDashboardPage() {
                 <div className="xl:col-span-4 space-y-10">
                     <div className="space-y-6">
                         <div className="flex items-center justify-between border-b border-gray-100 pb-4">
-                            <h2 className="text-lg font-bold text-gray-900 tracking-tight">Activity Log</h2>
+                            <h2 className="text-lg font-bold text-gray-900 tracking-tight">Recent Activity</h2>
                             <Bell size={18} className="text-gray-300" />
                         </div>
                         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-8 space-y-8">
@@ -318,11 +318,11 @@ export default function TenantDashboardPage() {
                             ) : (
                                 <div className="text-center py-16 opacity-30">
                                     <TrendingUp size={40} className="mx-auto text-gray-300 mb-4" />
-                                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">No strategic history</p>
+                                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">No recent activity</p>
                                 </div>
                             )}
                             <Link href="/bookings" className="block w-full text-center py-4 bg-gray-50 hover:bg-gray-100 rounded-xl text-[10px] font-bold uppercase tracking-widest text-gray-500 transition-all border border-gray-100">
-                                Full Registry History
+                                View All Activity
                             </Link>
                         </div>
                     </div>
@@ -334,14 +334,14 @@ export default function TenantDashboardPage() {
                             <div className="w-12 h-12 bg-white/5 rounded-xl flex items-center justify-center border border-white/10 text-blue-400">
                                 <ShieldCheck size={24} />
                             </div>
-                            <div className="space-y-2">
-                                <h3 className="text-lg font-bold tracking-tight">Security Protocol</h3>
+                             <div className="space-y-2">
+                                <h3 className="text-lg font-bold tracking-tight">Security Policy</h3>
                                 <p className="text-xs text-white/40 font-medium leading-relaxed">
-                                    Verified transactions ensure your stay remains autonomous and protected.
+                                    Enjoy a secure stay with our verified booking system.
                                 </p>
                             </div>
                             <Link href="/support/safety" className="h-10 px-6 bg-white text-gray-900 rounded-xl text-[10px] font-bold uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-blue-600 hover:text-white transition-all">
-                                Safety Guide <ArrowUpRight size={14} />
+                                Read Policy <ArrowUpRight size={14} />
                             </Link>
                         </div>
                     </div>

@@ -117,7 +117,7 @@ export default function AdminDashboardPage() {
         onSuccess: (res) => {
             const { token } = res.data;
             localStorage.setItem("accessToken", token);
-            toast.success("Shadow Mode: Switching perspective...");
+            toast.success("Logging in as user...");
             window.location.href = "/tenant"; 
         }
     });
@@ -126,7 +126,7 @@ export default function AdminDashboardPage() {
         <div className="flex h-[60vh] items-center justify-center">
             <div className="flex flex-col items-center gap-4 text-center">
                 <Loader2 className="animate-spin text-blue-600" size={32} />
-                <p className="text-sm font-medium text-gray-400">Syncing command center...</p>
+                <p className="text-sm font-medium text-gray-400">Loading dashboard...</p>
             </div>
         </div>
     );
@@ -145,10 +145,10 @@ export default function AdminDashboardPage() {
                 <div className="space-y-2">
                     <div className="flex items-center gap-2">
                         <div className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
-                        <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Command & Control</span>
+                        <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Administration</span>
                     </div>
-                    <h1 className="text-3xl md:text-4xl font-bold text-gray-900 tracking-tight">Strategic Dashboard</h1>
-                    <p className="text-gray-500 text-sm max-w-md">Live platform oversight and strategic operational monitoring.</p>
+                    <h1 className="text-3xl md:text-4xl font-bold text-gray-900 tracking-tight">Admin Overview</h1>
+                    <p className="text-gray-500 text-sm max-w-md">Monitor platform activity, verify hostels, and manage users.</p>
                 </div>
 
                 <div className="flex items-center gap-3">
@@ -181,7 +181,7 @@ export default function AdminDashboardPage() {
                         <StatCard label="Total Users" value={stats?.totalUsers || 0} icon={Users} trend={stats?.trends?.users} up />
                         <StatCard label="Total Bookings" value={stats?.bookings || 0} icon={CalendarCheck} />
                         <StatCard label="Total Revenue" value={`GH₵ ${(totalRevenue / 100).toLocaleString()}`} icon={DollarSign} />
-                        <StatCard label="Pending Audit" value={pendingApprovals} icon={ListChecks} />
+                        <StatCard label="Pending Action" value={pendingApprovals} icon={ListChecks} />
                         <StatCard label="Active Disputes" value={disputes?.length || 0} icon={LifeBuoy} />
                     </div>
 
@@ -192,15 +192,15 @@ export default function AdminDashboardPage() {
                         <div className="lg:col-span-4">
                             <div className="bg-gray-900 rounded-2xl p-8 min-h-[400px] shadow-xl relative overflow-hidden text-white border border-gray-800">
                                 <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 rounded-full -mr-16 -mt-16 blur-2xl" />
-                                <h2 className="text-xl font-bold tracking-tight mb-8">Operational Links</h2>
+                                <h2 className="text-xl font-bold tracking-tight mb-8">Admin Links</h2>
                                 <div className="space-y-4 relative z-10">
-                                    <QuickActionLink href="/admin/users" label="User Registry" sub="Control platform access" icon={Users} />
-                                    <QuickActionLink href="/admin/hostels" label="Asset Control" sub="Moderate live hostels" icon={Building2} />
+                                    <QuickActionLink href="/admin/users" label="User Management" sub="Control platform access" icon={Users} />
+                                    <QuickActionLink href="/admin/hostels" label="Hostel Management" sub="Moderate live hostels" icon={Building2} />
                                     <QuickActionLink href="/admin/bookings" label="Reservations" sub="Monitor booking activity" icon={CalendarCheck} />
                                     <button className="w-full bg-white/5 hover:bg-white/10 rounded-xl p-5 text-left transition-all border border-white/5 flex items-center justify-between group">
                                         <div>
-                                            <p className="font-bold text-[11px] uppercase tracking-wider mb-1">Drill-Down Mode</p>
-                                            <p className="text-[10px] text-white/40">Enhanced diagnostics</p>
+                                            <p className="font-bold text-[11px] uppercase tracking-wider mb-1">Detailed View</p>
+                                            <p className="text-[10px] text-white/40">Technical settings</p>
                                         </div>
                                         <Zap size={14} className="text-white/20 group-hover:text-blue-400 transition-colors" />
                                     </button>
@@ -213,7 +213,7 @@ export default function AdminDashboardPage() {
                         <div className="lg:col-span-5">
                             <div className="bg-white rounded-2xl border border-gray-100 p-8 space-y-6 shadow-sm">
                                 <h2 className="text-xl font-bold tracking-tight flex items-center gap-3">
-                                    <Bell size={20} className="text-blue-600" /> Maintenance Signals
+                                    <Bell size={20} className="text-blue-600" /> Pending Actions
                                 </h2>
                                 <div className="space-y-4">
                                     <div className="flex items-center justify-between p-4 rounded-xl bg-gray-50 border border-gray-100">
@@ -248,8 +248,8 @@ export default function AdminDashboardPage() {
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <ConfigLink href="/admin/settings" label="Settings Hub" sub="Access & Preferences" icon={Settings} />
                                     <ConfigLink href="/admin/stats" label="Platform Stats" sub="Growth Metrics" icon={TrendingUp} />
-                                    <ConfigLink href="/admin/logs" label="Audit Vault" sub="Trace Protocols" icon={Activity} />
-                                    <ConfigLink href="/admin/users" label="Registry" sub="Entities Control" icon={Users} />
+                                    <ConfigLink href="/admin/logs" label="Activity History" sub="System event logs" icon={Activity} />
+                                    <ConfigLink href="/admin/users" label="Users List" sub="Manage platform users" icon={Users} />
                                 </div>
                             </div>
                         </div>
@@ -263,7 +263,7 @@ export default function AdminDashboardPage() {
                         <div className="bg-white rounded-2xl border border-gray-100 p-8 space-y-6 shadow-sm">
                             <div className="flex items-center justify-between border-b border-gray-50 pb-4">
                                 <h2 className="text-xl font-bold tracking-tight flex items-center gap-3">
-                                    <Building2 size={24} className="text-blue-600" /> Hostel Audit
+                                    <Building2 size={24} className="text-blue-600" /> Hostel Verification
                                 </h2>
                                 <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Queue: {verificationQueue?.hostels?.length || 0}</span>
                             </div>
@@ -303,7 +303,7 @@ export default function AdminDashboardPage() {
                                 ))}
                                 {(!verificationQueue?.hostels || verificationQueue?.hostels?.length === 0) && (
                                     <div className="text-center py-12 border border-dashed border-gray-100 rounded-2xl">
-                                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">All property listings are synchronized</p>
+                                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">All listings are up to date</p>
                                     </div>
                                 )}
                             </div>
@@ -313,7 +313,7 @@ export default function AdminDashboardPage() {
                         <div className="bg-white rounded-2xl border border-gray-100 p-8 space-y-6 shadow-sm">
                             <div className="flex items-center justify-between border-b border-gray-50 pb-4">
                                 <h2 className="text-xl font-bold tracking-tight flex items-center gap-3">
-                                    <UserCircle size={24} className="text-blue-600" /> Identity Audit
+                                    <UserCircle size={24} className="text-blue-600" /> User Verification
                                 </h2>
                                 <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Queue: {verificationQueue?.owners?.length || 0}</span>
                             </div>
@@ -359,7 +359,7 @@ export default function AdminDashboardPage() {
                                 ))}
                                 {(!verificationQueue?.owners || verificationQueue?.owners?.length === 0) && (
                                     <div className="text-center py-12 border border-dashed border-gray-100 rounded-2xl">
-                                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Ownership entities fully verified</p>
+                                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">All owners are verified</p>
                                     </div>
                                 )}
                             </div>
@@ -371,7 +371,7 @@ export default function AdminDashboardPage() {
                 <TabsContent value="disputes" className="space-y-8 animate-in slide-in-from-bottom-4 duration-500">
                     <div className="bg-white rounded-2xl border border-gray-100 p-8 space-y-8 shadow-sm">
                         <h2 className="text-xl font-bold tracking-tight flex items-center gap-3">
-                            <LifeBuoy size={24} className="text-red-500" /> Resolution Matrix
+                            <LifeBuoy size={24} className="text-red-500" /> Dispute Resolution
                         </h2>
                         <div className="space-y-4">
                             {disputes?.map((dispute: any) => (
@@ -465,10 +465,10 @@ function RevenueChart({ data }: any) {
     return (
         <div className="bg-white rounded-2xl border border-gray-100 p-8 shadow-sm space-y-6">
             <div className="flex items-center justify-between border-b border-gray-50 pb-4">
-                <h2 className="text-xl font-bold tracking-tight">Strategic Volume</h2>
+                <h2 className="text-xl font-bold tracking-tight">Revenue Overview</h2>
                 <div className="flex items-center gap-2">
                     <span className="w-2 h-2 rounded-full bg-blue-500" />
-                    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Active Revenue</span>
+                    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Monthly Growth</span>
                 </div>
             </div>
             <div className="h-[300px] w-full">
