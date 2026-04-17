@@ -229,7 +229,7 @@ export default function OwnerAccountPage() {
                                                 const loadingToast = toast.loading("Removing picture...");
                                                 try {
                                                     await api.patch("/users/me", { avatarUrl: null });
-                                                    updateUser({ ...user!, avatarUrl: null });
+                                                    updateUser({ ...user!, avatarUrl: undefined });
                                                     toast.success("Profile picture removed!", { id: loadingToast });
                                                 } catch (error: any) {
                                                     toast.error(error.message || "Failure", { id: loadingToast });
