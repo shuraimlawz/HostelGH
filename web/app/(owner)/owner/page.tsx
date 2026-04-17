@@ -152,7 +152,7 @@ export default function OwnerDashboardPage() {
     return (
         <div className="max-w-[1400px] mx-auto space-y-10 pb-20 pt-4 px-4">
             {/* Header */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-8">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 pb-4">
                 <div className="space-y-2">
                     <div className="flex items-center gap-2">
                         <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
@@ -162,11 +162,11 @@ export default function OwnerDashboardPage() {
                     <p className="text-gray-500 text-sm max-w-md">Managing {totalHostels} Hostels with {totalRooms} total rooms.</p>
                 </div>
 
-                <div className="flex items-center gap-3">
-                    <Link href="/owner/hostels/new" className="h-11 px-6 bg-blue-600 text-white rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-blue-700 transition-all flex items-center gap-2 shadow-lg shadow-blue-100 active:scale-95">
+                <div className="flex flex-wrap items-center gap-3">
+                    <Link href="/owner/hostels/new" className="h-10 px-5 bg-blue-600 text-white rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-blue-700 transition-all flex items-center gap-2 shadow-lg shadow-blue-100 active:scale-95">
                         <PlusCircle size={16} /> Add Hostel
                     </Link>
-                    <Link href="/owner/payouts" className="h-11 px-6 bg-white border border-gray-100 text-gray-900 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-gray-50 transition-all flex items-center gap-2 shadow-sm">
+                    <Link href="/owner/payouts" className="h-10 px-5 bg-white border border-gray-100 text-gray-900 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-gray-50 transition-all flex items-center gap-2 shadow-sm">
                         <Wallet size={16} /> Payments
                     </Link>
                 </div>
@@ -300,24 +300,26 @@ export default function OwnerDashboardPage() {
                         </div>
                     </div>
 
-                    <div className="flex bg-gray-50 p-1 rounded-xl border border-gray-100 shrink-0">
-                        {[
-                            { key: "all", label: "All" },
-                            { key: "pending", label: "Pending" },
-                            { key: "active", label: "Active" }
-                        ].map((tab) => (
-                            <button
-                                key={tab.key}
-                                onClick={() => setSelectedTab(tab.key as any)}
-                                className={cn(
-                                    "px-6 py-2 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-all",
-                                    selectedTab === tab.key
-                                        ? "bg-white text-gray-900 shadow-sm border border-gray-100"
-                                        : "text-gray-400 hover:text-gray-900"
-                                )}>
-                                {tab.label}
-                            </button>
-                        ))}
+                    <div className="overflow-x-auto pb-2 -mx-4 px-4 sm:mx-0 sm:px-0 scrollbar-hide">
+                        <div className="flex bg-gray-50 p-1 rounded-xl border border-gray-100 w-max shrink-0">
+                            {[
+                                { key: "all", label: "All" },
+                                { key: "pending", label: "Pending" },
+                                { key: "active", label: "Active" }
+                            ].map((tab) => (
+                                <button
+                                    key={tab.key}
+                                    onClick={() => setSelectedTab(tab.key as any)}
+                                    className={cn(
+                                        "px-6 py-2 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-all",
+                                        selectedTab === tab.key
+                                            ? "bg-white text-gray-900 shadow-sm border border-gray-100"
+                                            : "text-gray-400 hover:text-gray-900"
+                                    )}>
+                                    {tab.label}
+                                </button>
+                            ))}
+                        </div>
                     </div>
                 </div>
 

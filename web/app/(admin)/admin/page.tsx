@@ -141,7 +141,7 @@ export default function AdminDashboardPage() {
     return (
         <div className="max-w-[1400px] mx-auto space-y-10 pb-20 pt-4 px-4">
             {/* Header */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-8">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 pb-4">
                 <div className="space-y-2">
                     <div className="flex items-center gap-2">
                         <div className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
@@ -151,28 +151,30 @@ export default function AdminDashboardPage() {
                     <p className="text-gray-500 text-sm max-w-md">Monitor platform activity, verify hostels, and manage users.</p>
                 </div>
 
-                <div className="flex items-center gap-3">
-                    <Link href="/admin/settings" className="h-11 px-6 rounded-xl bg-white border border-gray-100 text-[11px] font-bold uppercase tracking-widest hover:bg-gray-50 transition-all flex items-center gap-2 shadow-sm">
+                <div className="flex flex-wrap items-center gap-3">
+                    <Link href="/admin/settings" className="h-10 px-5 rounded-xl bg-white border border-gray-100 text-[10px] font-bold uppercase tracking-widest hover:bg-gray-50 transition-all flex items-center gap-2 shadow-sm">
                         <Settings size={14} /> Configure
                     </Link>
-                    <Link href="/admin/logs" className="h-11 px-6 rounded-xl bg-gray-900 text-white text-[11px] font-bold uppercase tracking-widest hover:bg-black transition-all flex items-center gap-2 shadow-lg shadow-gray-900/10">
+                    <Link href="/admin/logs" className="h-10 px-5 rounded-xl bg-gray-900 text-white text-[10px] font-bold uppercase tracking-widest hover:bg-black transition-all flex items-center gap-2 shadow-lg shadow-gray-900/10">
                         <Activity size={14} /> System Logs
                     </Link>
                 </div>
             </div>
 
             <Tabs defaultValue="overview" className="space-y-10" onValueChange={setActiveTab}>
-                <TabsList className="bg-gray-50 p-1 rounded-xl border border-gray-100 w-fit">
-                    <TabsTrigger value="overview" className="rounded-lg px-6 py-2.5 font-bold uppercase tracking-widest text-[10px]">Overview</TabsTrigger>
-                    <TabsTrigger value="approvals" className="rounded-lg px-6 py-2.5 font-bold uppercase tracking-widest text-[10px]">
-                        Approvals <span className="ml-1.5 px-1.5 py-0.5 bg-blue-100 text-blue-700 rounded-md text-[8px]">{pendingApprovals}</span>
-                    </TabsTrigger>
-                    <TabsTrigger value="financials" className="rounded-lg px-6 py-2.5 font-bold uppercase tracking-widest text-[10px]">Financials</TabsTrigger>
-                    <TabsTrigger value="disputes" className="rounded-lg px-6 py-2.5 font-bold uppercase tracking-widest text-[10px]">
-                        Disputes <span className="ml-1.5 px-1.5 py-0.5 bg-red-100 text-red-700 rounded-md text-[8px]">{disputes?.length || 0}</span>
-                    </TabsTrigger>
-                    <TabsTrigger value="activity" className="rounded-lg px-6 py-2.5 font-bold uppercase tracking-widest text-[10px]">Live Pulse</TabsTrigger>
-                </TabsList>
+                <div className="overflow-x-auto pb-4 -mx-4 px-4 sm:mx-0 sm:px-0 scrollbar-hide">
+                    <TabsList className="bg-gray-50 p-1 rounded-xl border border-gray-100 w-max inline-flex">
+                        <TabsTrigger value="overview" className="rounded-lg px-6 py-2.5 font-bold uppercase tracking-widest text-[10px]">Overview</TabsTrigger>
+                        <TabsTrigger value="approvals" className="rounded-lg px-6 py-2.5 font-bold uppercase tracking-widest text-[10px]">
+                            Approvals <span className="ml-1.5 px-1.5 py-0.5 bg-blue-100 text-blue-700 rounded-md text-[8px]">{pendingApprovals}</span>
+                        </TabsTrigger>
+                        <TabsTrigger value="financials" className="rounded-lg px-6 py-2.5 font-bold uppercase tracking-widest text-[10px]">Financials</TabsTrigger>
+                        <TabsTrigger value="disputes" className="rounded-lg px-6 py-2.5 font-bold uppercase tracking-widest text-[10px]">
+                            Disputes <span className="ml-1.5 px-1.5 py-0.5 bg-red-100 text-red-700 rounded-md text-[8px]">{disputes?.length || 0}</span>
+                        </TabsTrigger>
+                        <TabsTrigger value="activity" className="rounded-lg px-6 py-2.5 font-bold uppercase tracking-widest text-[10px]">Live Pulse</TabsTrigger>
+                    </TabsList>
+                </div>
 
                 {/* --- OVERVIEW --- */}
                 <TabsContent value="overview" className="space-y-10 animate-in fade-in duration-500">

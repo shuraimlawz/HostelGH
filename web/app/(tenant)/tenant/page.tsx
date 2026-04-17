@@ -118,7 +118,7 @@ export default function TenantDashboardPage() {
     return (
         <div className="max-w-[1400px] mx-auto space-y-10 pb-20 pt-4 px-4">
             {/* Header */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-8">
+            <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-8 pb-4">
                 <div className="space-y-2">
                     <div className="flex items-center gap-2">
                         <div className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
@@ -133,33 +133,35 @@ export default function TenantDashboardPage() {
                 </div>
 
                 {/* Identity Hub */}
-                <div className="bg-white border border-gray-100 p-6 rounded-2xl shadow-sm flex items-center gap-6 min-w-[320px] relative overflow-hidden group">
+                <div className="bg-white border border-gray-100 p-6 rounded-2xl shadow-sm flex items-center justify-between gap-6 min-w-full sm:min-w-[320px] xl:w-fit relative overflow-hidden group transition-all">
                     <div className="absolute top-0 right-0 w-32 h-32 bg-blue-50/50 rounded-full -mr-16 -mt-16 group-hover:scale-110 transition-transform" />
-                    <div className="relative w-14 h-14 flex-shrink-0">
-                        <svg className="w-14 h-14 transform -rotate-90">
-                            <circle cx="28" cy="28" r="24" stroke="currentColor" strokeWidth="4" fill="transparent" className="text-gray-50" />
-                            <circle cx="28" cy="28" r="24" stroke="currentColor" strokeWidth="4" fill="transparent" 
-                                strokeDasharray={151} strokeDashoffset={151 - (151 * profileCompletion) / 100}
-                                className="text-blue-600 transition-all duration-1000"
-                            />
-                        </svg>
-                        <div className="absolute inset-0 flex items-center justify-center">
-                            <div className="w-10 h-10 rounded-xl bg-gray-100 overflow-hidden shadow-inner flex items-center justify-center">
-                                {user?.avatarUrl ? (
-                                    <img src={user.avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
-                                ) : (
-                                    <span className="text-xs font-bold text-blue-600">{user?.firstName?.[0] || user?.email[0].toUpperCase()}</span>
-                                )}
+                    <div className="flex items-center gap-6 relative z-10">
+                        <div className="relative w-14 h-14 flex-shrink-0">
+                            <svg className="w-14 h-14 transform -rotate-90">
+                                <circle cx="28" cy="28" r="24" stroke="currentColor" strokeWidth="4" fill="transparent" className="text-gray-50" />
+                                <circle cx="28" cy="28" r="24" stroke="currentColor" strokeWidth="4" fill="transparent" 
+                                    strokeDasharray={151} strokeDashoffset={151 - (151 * profileCompletion) / 100}
+                                    className="text-blue-600 transition-all duration-1000"
+                                />
+                            </svg>
+                            <div className="absolute inset-0 flex items-center justify-center">
+                                <div className="w-10 h-10 rounded-xl bg-gray-100 overflow-hidden shadow-inner flex items-center justify-center">
+                                    {user?.avatarUrl ? (
+                                        <img src={user.avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
+                                    ) : (
+                                        <span className="text-xs font-bold text-blue-600">{user?.firstName?.[0] || user?.email[0].toUpperCase()}</span>
+                                    )}
+                                </div>
                             </div>
                         </div>
+                        <div>
+                            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Profile Health</p>
+                            <p className="text-sm font-bold text-gray-900 tracking-tight">
+                                {profileCompletion}% Pure
+                            </p>
+                        </div>
                     </div>
-                    <div className="relative z-10">
-                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Profile Status</p>
-                        <p className="text-sm font-bold text-gray-900 tracking-tight">
-                            {profileCompletion}% Complete
-                        </p>
-                    </div>
-                    <Link href="/account" className="relative z-10 ml-auto w-9 h-9 flex items-center justify-center rounded-xl bg-gray-50 text-gray-400 hover:text-blue-600 border border-gray-100 hover:border-blue-200 transition-all">
+                    <Link href="/account" className="relative z-10 w-9 h-9 flex items-center justify-center rounded-xl bg-gray-50 text-gray-400 hover:text-blue-600 border border-gray-100 hover:border-blue-200 transition-all">
                         <ArrowUpRight size={18} />
                     </Link>
                 </div>
