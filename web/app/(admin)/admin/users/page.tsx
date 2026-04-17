@@ -8,7 +8,6 @@ import {
     UserPlus,
     Loader2,
     ChevronLeft,
-    ChevronRight,
     Shield,
     UserCog,
     MoreHorizontal,
@@ -18,6 +17,7 @@ import {
     Filter,
     Ban,
     CheckCircle2,
+    ChevronRight,
     ChevronRight as ChevronRightIcon
 } from "lucide-react";
 import { useState, Suspense } from "react";

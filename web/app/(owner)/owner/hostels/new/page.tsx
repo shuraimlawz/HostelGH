@@ -29,7 +29,9 @@ import {
     Image as ImageIcon,
     ShieldAlert,
     ArrowRight,
-    ArrowLeft
+    ArrowLeft,
+    Users,
+    Eye
 } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
