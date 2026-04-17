@@ -65,7 +65,7 @@ export default function AdminSettingsPage() {
             <div className="flex h-[80vh] items-center justify-center bg-white">
                 <div className="flex flex-col items-center gap-4">
                     <Loader2 className="animate-spin text-blue-600" size={40} />
-                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest animate-pulse">Syncing Admin Matrix...</p>
+                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest animate-pulse">Loading Admin Profile...</p>
                 </div>
             </div>
         );
@@ -74,8 +74,8 @@ export default function AdminSettingsPage() {
     if (!user) {
         return (
             <div className="text-center py-40">
-                <h1 className="text-2xl font-bold uppercase tracking-tight text-gray-900 mb-2">Access Unauthorized <span className="text-blue-600">.</span></h1>
-                <p className="text-gray-500 font-bold text-[10px] uppercase tracking-widest">Login required for system terminal.</p>
+                <h1 className="text-2xl font-bold uppercase tracking-tight text-gray-900 mb-2">Access Denied <span className="text-blue-600">.</span></h1>
+                <p className="text-gray-500 font-bold text-[10px] uppercase tracking-widest">Login required for Admin Portal.</p>
             </div>
         );
     }
@@ -87,18 +87,18 @@ export default function AdminSettingsPage() {
                 <div className="space-y-4">
                     <div className="flex items-center gap-3">
                         <span className="px-3 py-1 bg-gray-900 text-white rounded-full text-[9px] font-bold uppercase tracking-widest border border-white/10 shadow-xl">
-                            System Control
+                            Admin Control
                         </span>
                         <div className="flex items-center gap-2">
                             <ShieldCheck size={14} className="text-blue-500" />
-                            <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Terminal Access 01</span>
+                            <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Portal Access 01</span>
                         </div>
                     </div>
                     <h1 className="text-4xl md:text-5xl font-bold text-gray-900 tracking-tighter uppercase leading-tight">
-                        Admin Protocol <span className="text-blue-600 opacity-40">/</span> Control
+                        Admin Settings <span className="text-blue-600 opacity-40">/</span> Control
                     </h1>
                     <p className="text-gray-500 text-xs font-bold uppercase tracking-widest max-w-sm">
-                        Synchronize administrative profile and system preferences.
+                        Manage your administrative profile and preferences.
                     </p>
                 </div>
 
@@ -139,7 +139,7 @@ export default function AdminSettingsPage() {
                                     onChange={async (e) => {
                                         const file = e.target.files?.[0];
                                         if (!file) return;
-                                        const loadingToast = toast.loading("Syndicating image data...");
+                                        const loadingToast = toast.loading("Uploading picture...");
                                         try {
                                             const fd = new FormData();
                                             fd.append('file', file);
@@ -147,7 +147,7 @@ export default function AdminSettingsPage() {
                                             const imageUrl = res.data.url;
                                             await api.patch("/users/me", { avatarUrl: imageUrl });
                                             updateUser({ ...user!, avatarUrl: imageUrl });
-                                            toast.success("Identity visual updated!", { id: loadingToast });
+                                            toast.success("Profile picture updated!", { id: loadingToast });
                                         } catch (error: any) {
                                             toast.error(error.message || "Upload failure", { id: loadingToast });
                                         }
@@ -157,7 +157,7 @@ export default function AdminSettingsPage() {
                             
                             <div className="space-y-1">
                                 <h2 className="text-2xl font-bold text-gray-900 uppercase tracking-tight leading-none">
-                                    {formData.firstName ? `${formData.firstName} ${formData.lastName}` : "Command Leader"}
+                                    {formData.firstName ? `${formData.firstName} ${formData.lastName}` : "Head Admin"}
                                 </h2>
                                 <p className="text-[11px] text-gray-400 font-bold uppercase tracking-widest">{user.email}</p>
                             </div>
@@ -178,9 +178,9 @@ export default function AdminSettingsPage() {
                                 <Zap size={24} className="text-blue-400" />
                             </div>
                             <div className="space-y-2">
-                                <h3 className="text-xl font-bold uppercase tracking-tight leading-none">System Nexus</h3>
+                                <h3 className="text-xl font-bold uppercase tracking-tight leading-none">System Tools</h3>
                                 <p className="text-[10px] text-gray-400 font-bold leading-relaxed uppercase tracking-widest">
-                                    Execute high-level administrative tasks and network audits.
+                                    Manage administrative tasks and system checks.
                                 </p>
                             </div>
                             <button className="w-full bg-white text-gray-900 py-4 rounded-xl font-bold text-[10px] uppercase tracking-widest hover:bg-blue-600 hover:text-white transition-all">
@@ -196,8 +196,8 @@ export default function AdminSettingsPage() {
                     <form onSubmit={handleUpdate} className="bg-white rounded-3xl border border-gray-100 p-10 shadow-sm space-y-10 group">
                         <div className="flex items-center justify-between border-b border-gray-50 pb-8">
                             <div className="space-y-1">
-                                <h3 className="text-xl font-bold text-gray-900 uppercase tracking-tight">Identity Matrix</h3>
-                                <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Core administrative baseline</p>
+                                <h3 className="text-xl font-bold text-gray-900 uppercase tracking-tight">Admin Profile</h3>
+                                <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Your basic details</p>
                             </div>
                             <div className="w-10 h-10 bg-gray-50 rounded-xl flex items-center justify-center text-gray-400 group-hover:rotate-12 transition-transform duration-500">
                                 <User size={20} />
@@ -245,7 +245,7 @@ export default function AdminSettingsPage() {
                                 className="w-full md:w-auto px-12 py-5 bg-blue-600 text-white rounded-xl font-bold text-[11px] uppercase tracking-widest hover:bg-blue-700 transition-all shadow-xl shadow-blue-500/10 flex items-center justify-center gap-4 active:scale-[0.98] group/btn"
                             >
                                 {updating ? <Loader2 className="animate-spin text-white" size={20} /> : <CheckCircle2 size={20} className="group-hover/btn:scale-110 transition-transform" />}
-                                {updating ? "UPDATING MATRIX..." : "AUTHORIZE CHANGES"}
+                                {updating ? "UPDATING..." : "SAVE CHANGES"}
                             </button>
                         </div>
                     </form>
@@ -254,8 +254,8 @@ export default function AdminSettingsPage() {
                     <div className="bg-white rounded-3xl border border-gray-100 p-10 shadow-sm space-y-10">
                         <div className="flex items-center justify-between border-b border-gray-50 pb-8">
                             <div className="space-y-1">
-                                <h3 className="text-xl font-bold text-gray-900 uppercase tracking-tight">Signal Protocol</h3>
-                                <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Network signaling configuration</p>
+                                <h3 className="text-xl font-bold text-gray-900 uppercase tracking-tight">Notification Settings</h3>
+                                <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Manage how you receive updates</p>
                             </div>
                             <Bell size={20} className="text-blue-500" />
                         </div>
@@ -266,8 +266,8 @@ export default function AdminSettingsPage() {
                                     <Mail size={24} className="text-blue-600" />
                                 </div>
                                 <div className="space-y-1">
-                                    <p className="font-bold text-gray-900 uppercase tracking-widest text-[12px]">Email Signaling</p>
-                                    <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">System alerts & critical logs.</p>
+                                    <p className="font-bold text-gray-900 uppercase tracking-widest text-[12px]">Email Notifications</p>
+                                    <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">System alerts & management updates.</p>
                                 </div>
                             </div>
                             <button 
@@ -276,9 +276,9 @@ export default function AdminSettingsPage() {
                                     setFormData({ ...formData, emailNotifications: newValue });
                                     try {
                                         await api.patch("/users/me", { emailNotifications: newValue });
-                                        toast.success("Protocol updated");
+                                        toast.success("Settings updated");
                                     } catch (error: any) {
-                                        toast.error("Signal failure");
+                                        toast.error("Failed to update");
                                         setFormData({ ...formData, emailNotifications: !newValue });
                                     }
                                 }}

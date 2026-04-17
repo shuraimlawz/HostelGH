@@ -109,7 +109,7 @@ export default function AccountPage() {
                         <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Account Settings</span>
                     </div>
                     <h1 className="text-3xl md:text-4xl font-bold text-gray-900 tracking-tight">Profile Settings</h1>
-                    <p className="text-gray-500 text-sm max-w-md">Manage your core credentials and network verification status.</p>
+                    <p className="text-gray-500 text-sm max-w-md">Manage your details and verification status.</p>
                 </div>
 
                 {/* Completion Badge */}
@@ -188,7 +188,7 @@ export default function AccountPage() {
 
                             <div className="space-y-1">
                                 <h2 className="text-xl font-bold text-gray-900 tracking-tight leading-none">
-                                    {formData.firstName ? `${formData.firstName} ${formData.lastName}` : "Auth Resident"}
+                                    {formData.firstName ? `${formData.firstName} ${formData.lastName}` : "Verified Student"}
                                 </h2>
                                 <p className="text-sm text-gray-500 font-medium">{user.email}</p>
                             </div>
@@ -254,7 +254,7 @@ export default function AccountPage() {
                             </div>
 
                             <div className="space-y-2">
-                                <label className="text-xs font-bold text-gray-500 ml-1">Mobile Link</label>
+                                <label className="text-xs font-bold text-gray-500 ml-1">Phone Number</label>
                                 <div className="relative">
                                     <Phone className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
                                     <input
@@ -288,7 +288,7 @@ export default function AccountPage() {
                                 className="w-full md:w-auto px-10 h-12 bg-blue-600 text-white rounded-xl font-bold text-sm shadow-lg shadow-blue-500/10 hover:bg-blue-700 active:scale-95 transition-all flex items-center justify-center gap-2"
                             >
                                 {updating ? <Loader2 className="animate-spin text-white" size={18} /> : <CheckCircle2 size={18} />}
-                                {updating ? "Saving Changes..." : "Authorize Identity Update"}
+                                {updating ? "Saving Changes..." : "Update Profile"}
                             </button>
                         </div>
                     </form>
@@ -297,8 +297,8 @@ export default function AccountPage() {
                     <div className="bg-white rounded-2xl border border-gray-100 p-8 shadow-sm space-y-6">
                         <div className="flex items-center justify-between border-b border-gray-50 pb-6">
                             <div className="space-y-0.5">
-                                <h3 className="text-lg font-bold text-gray-900 tracking-tight">Signal Preferences</h3>
-                                <p className="text-xs text-gray-400 font-medium uppercase tracking-widest">Network communication protocols</p>
+                                <h3 className="text-lg font-bold text-gray-900 tracking-tight">Notifications</h3>
+                                <p className="text-xs text-gray-400 font-medium uppercase tracking-widest">How we contact you</p>
                             </div>
                             <Bell size={20} className="text-blue-600" />
                         </div>
@@ -309,7 +309,7 @@ export default function AccountPage() {
                                     <Mail size={20} className="text-blue-600" />
                                 </div>
                                 <div className="space-y-1">
-                                    <p className="text-sm font-bold text-gray-900">Email Signaling</p>
+                                    <p className="text-sm font-bold text-gray-900">Email Notifications</p>
                                     <p className="text-[11px] text-gray-500 font-medium">Stays, Invoices & Platform updates.</p>
                                 </div>
                             </div>
@@ -334,17 +334,17 @@ export default function AccountPage() {
                             <div className="space-y-2 text-center md:text-left">
                                 <div className="flex items-center justify-center md:justify-start gap-3">
                                     <Trash2 size={24} className="text-rose-600" />
-                                    <h3 className="text-xl font-bold text-rose-900 tracking-tight leading-none uppercase">Termination Protocol</h3>
+                                    <h3 className="text-xl font-bold text-rose-900 tracking-tight leading-none uppercase">Delete Account</h3>
                                 </div>
                                 <p className="text-xs font-medium text-rose-700 leading-relaxed max-w-sm">
-                                    Deleting your identity will purge all stay history, secured payments, and network credentials. This action is irreversible.
+                                    Deleting your account will remove all stay history, payments, and account details. This action cannot be undone.
                                 </p>
                             </div>
                             <button 
                                 onClick={handleDeleteAccount}
                                 className="h-12 px-8 bg-rose-600 text-white rounded-xl font-bold text-xs hover:bg-rose-700 transition-all uppercase tracking-widest shadow-lg shadow-rose-900/10"
                             >
-                                Purge Identity
+                                Delete Account
                             </button>
                         </div>
                     </div>

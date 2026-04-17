@@ -107,10 +107,10 @@ export default function PayoutSettingsPage() {
                 <div className="space-y-2">
                     <div className="flex items-center gap-2">
                         <div className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
-                        <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Revenue Distribution</span>
+                        <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Earnings Distribution</span>
                     </div>
                     <h1 className="text-3xl md:text-4xl font-bold text-gray-900 tracking-tight">Payout Methods</h1>
-                    <p className="text-gray-500 text-sm max-w-md">Manage where your earnings are sent. Automated settlements to Bank or MoMo.</p>
+                    <p className="text-gray-500 text-sm max-w-md">Manage where your earnings are sent (Bank or Mobile Money).</p>
                 </div>
 
                 {!showForm && (
@@ -131,8 +131,8 @@ export default function PayoutSettingsPage() {
                         <div className="bg-white rounded-2xl border border-gray-100 shadow-xl overflow-hidden animate-in fade-in slide-in-from-top-4 duration-500">
                             <div className="p-8 border-b border-gray-50 flex items-center justify-between bg-gray-50/50">
                                 <div className="space-y-1">
-                                    <h2 className="text-lg font-bold text-gray-900 tracking-tight">Configure New Endpoint</h2>
-                                    <p className="text-xs text-gray-400 font-medium">Initialize a secure financial gateway.</p>
+                                    <h2 className="text-lg font-bold text-gray-900 tracking-tight">Add New Payout Account</h2>
+                                    <p className="text-xs text-gray-400 font-medium">Set up a new way to receive your money.</p>
                                 </div>
                                 <button
                                     type="button"
@@ -145,7 +145,7 @@ export default function PayoutSettingsPage() {
 
                             <form onSubmit={handleSubmit((v) => createMutation.mutate(v))} className="p-8 space-y-8">
                                 <div className="space-y-4">
-                                    <label className="text-xs font-bold text-gray-500 ml-1 uppercase tracking-widest">Protocol Type</label>
+                                    <label className="text-xs font-bold text-gray-500 ml-1 uppercase tracking-widest">Account Type</label>
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         {(["MOBILE_MONEY", "BANK"] as const).map((t) => (
                                             <button
@@ -219,8 +219,8 @@ export default function PayoutSettingsPage() {
                                     <label className="flex-1 w-full flex items-center gap-4 cursor-pointer p-4 bg-gray-50 rounded-xl border border-gray-100 hover:bg-gray-100 transition-all">
                                         <input type="checkbox" {...register("isDefault")} className="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
                                         <div className="space-y-0.5">
-                                            <p className="text-xs font-bold text-gray-900">Set as primary gateway</p>
-                                            <p className="text-[10px] text-gray-400 font-medium">This terminal will receive all operational settlements.</p>
+                                            <p className="text-xs font-bold text-gray-900">Set as primary payout account</p>
+                                            <p className="text-[10px] text-gray-400 font-medium">This account will receive all your earnings from bookings.</p>
                                         </div>
                                     </label>
 
@@ -323,9 +323,9 @@ export default function PayoutSettingsPage() {
                                 <ShieldCheck size={28} className="text-blue-500" />
                             </div>
                             <div className="flex-1 space-y-1">
-                                <h4 className="text-lg font-bold tracking-tight">Settlement Protocol</h4>
+                                <h4 className="text-lg font-bold tracking-tight">Payout Rules</h4>
                                 <p className="text-xs text-gray-400 font-medium leading-relaxed max-w-2xl">
-                                    All operational payouts are encrypted. A 10% network commission is deducted before triggering settlements. Revenue is dispatched within 24 hours of operational verification (check-in confirmation).
+                                    All payouts are secure. A 10% service fee is deducted before sending money. Payments are sent within 24 hours of booking verification (check-in confirmation).
                                 </p>
                             </div>
                         </div>

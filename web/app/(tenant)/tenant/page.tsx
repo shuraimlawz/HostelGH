@@ -155,9 +155,9 @@ export default function TenantDashboardPage() {
                             </div>
                         </div>
                         <div>
-                            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Profile Health</p>
+                            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Profile Strength</p>
                             <p className="text-sm font-bold text-gray-900 tracking-tight">
-                                {profileCompletion}% Pure
+                                {profileCompletion}% Complete
                             </p>
                         </div>
                     </div>
@@ -337,7 +337,7 @@ export default function TenantDashboardPage() {
                                 <ShieldCheck size={24} />
                             </div>
                              <div className="space-y-2">
-                                <h3 className="text-lg font-bold tracking-tight">Security Policy</h3>
+                                <h3 className="text-lg font-bold tracking-tight">Safety Policy</h3>
                                 <p className="text-xs text-white/40 font-medium leading-relaxed">
                                     Enjoy a secure stay with our verified booking system.
                                 </p>

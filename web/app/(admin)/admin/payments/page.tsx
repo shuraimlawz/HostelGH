@@ -128,16 +128,16 @@ function AdminPaymentsContent() {
                 <div>
                     <div className="flex items-center gap-3 mb-4">
                         <span className="px-2.5 py-1 bg-emerald-50 text-emerald-600 rounded-full text-[9px] font-bold uppercase tracking-widest border border-emerald-100">
-                            Financial Operations
+                            Financial Management
                         </span>
                         <div className="flex items-center gap-2 text-[10px] font-bold text-gray-400">
-                            <Wallet size={12} className="text-emerald-400" /> Transaction Ledger
+                            <Wallet size={12} className="text-emerald-400" /> Transaction List
                         </div>
                     </div>
                     <h1 className="text-3xl md:text-4xl font-bold text-gray-950 tracking-tight leading-none mb-3">
                         Finance <span className="text-emerald-600 opacity-40">/</span> Revenue
                     </h1>
-                    <p className="text-gray-500 font-bold text-xs uppercase tracking-widest">Manage incoming payments and withdrawal protocols.</p>
+                    <p className="text-gray-500 font-bold text-xs uppercase tracking-widest">Manage incoming payments and withdrawal rules.</p>
                 </div>
             </div>
 
@@ -150,7 +150,7 @@ function AdminPaymentsContent() {
                                 <ArrowUpRight size={28} />
                             </div>
                             <div>
-                                <h2 className="text-2xl font-bold uppercase tracking-tight">Withdrawal Queue</h2>
+                                <h2 className="text-2xl font-bold uppercase tracking-tight">Withdrawal Requests</h2>
                                 <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">
                                     Action Required: {pendingPayouts.length} Active Requests
                                 </p>
@@ -233,7 +233,7 @@ function AdminPaymentsContent() {
                                 value={search}
                                 onChange={(e) => handleSearchChange(e.target.value)}
                                 className="w-full bg-white border border-gray-100 rounded-2xl py-4 pl-16 pr-8 outline-none focus:border-blue-500 transition-all font-bold text-gray-900 placeholder:text-gray-400 shadow-sm text-sm"
-                                placeholder="Audit by reference or email..."
+                                placeholder="Search by reference or email..."
                             />
                         </div>
                         <div className="relative min-w-[200px]">
@@ -258,7 +258,7 @@ function AdminPaymentsContent() {
                         <div className="flex h-[400px] items-center justify-center">
                             <div className="flex flex-col items-center gap-4">
                                 <Loader2 className="animate-spin text-blue-600" size={40} />
-                                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest animate-pulse">Syncing Financial Data...</p>
+                                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest animate-pulse">Loading transactions...</p>
                             </div>
                         </div>
                     ) : (
@@ -267,7 +267,7 @@ function AdminPaymentsContent() {
                                 <thead>
                                     <tr className="bg-gray-50 border-b border-gray-100">
                                         <th className="px-8 py-6 text-[10px] font-bold uppercase tracking-widest text-gray-400">Reference</th>
-                                        <th className="px-8 py-6 text-[10px] font-bold uppercase tracking-widest text-gray-400">Payer Identity</th>
+                                        <th className="px-8 py-6 text-[10px] font-bold uppercase tracking-widest text-gray-400">Paid By</th>
                                         <th className="px-8 py-6 text-[10px] font-bold uppercase tracking-widest text-gray-400">Context</th>
                                         <th className="px-8 py-6 text-[10px] font-bold uppercase tracking-widest text-gray-400">Amount</th>
                                         <th className="px-8 py-6 text-[10px] font-bold uppercase tracking-widest text-gray-400 text-right">Status</th>
@@ -332,8 +332,8 @@ function AdminPaymentsContent() {
                                     <div className="w-20 h-20 bg-gray-50 rounded-2xl flex items-center justify-center mx-auto mb-8 text-gray-200">
                                         <Wallet size={40} />
                                     </div>
-                                    <h3 className="text-2xl font-bold text-gray-950 uppercase tracking-tight mb-2">Null Activity</h3>
-                                    <p className="text-xs text-gray-400 font-bold uppercase tracking-widest">Financial records are empty for this criteria.</p>
+                                    <h3 className="text-2xl font-bold text-gray-950 uppercase tracking-tight mb-2">No results</h3>
+                                    <p className="text-xs text-gray-400 font-bold uppercase tracking-widest">No financial records found for this search.</p>
                                 </div>
                             )}
                         </div>
@@ -373,7 +373,7 @@ export default function AdminPaymentsPage() {
             <div className="flex h-[80vh] items-center justify-center">
                 <div className="flex flex-col items-center gap-4">
                     <Loader2 className="animate-spin text-blue-600" size={40} />
-                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest animate-pulse">Initializing Financial Protocol...</p>
+                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest animate-pulse">Loading...</p>
                 </div>
             </div>
         }>

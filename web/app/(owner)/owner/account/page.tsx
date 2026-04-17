@@ -85,7 +85,7 @@ export default function OwnerAccountPage() {
         try {
             const { data } = await api.patch("/users/me", formData);
             updateUser(data);
-            toast.success("Operational identity secured!");
+            toast.success("Profile updated successfully!");
         } catch (error: any) {
             toast.error(error.message || "Failed to update profile");
         } finally {
@@ -97,12 +97,12 @@ export default function OwnerAccountPage() {
         e.preventDefault();
 
         if (passwordData.newPassword !== passwordData.confirmPassword) {
-            toast.error("Security mismatch: Passwords do not align");
+            toast.error("Passwords do not match");
             return;
         }
 
         if (passwordData.newPassword.length < 6) {
-            toast.error("Entropy error: Password too short");
+            toast.error("Password is too short");
             return;
         }
 
@@ -112,7 +112,7 @@ export default function OwnerAccountPage() {
                 oldPassword: passwordData.oldPassword,
                 newPassword: passwordData.newPassword
             });
-            toast.success("Security keys rotated successfully");
+            toast.success("Password changed successfully");
             setIsPasswordModalOpen(false);
             setPasswordData({ oldPassword: "", newPassword: "", confirmPassword: "" });
         } catch (error: any) {
@@ -123,11 +123,11 @@ export default function OwnerAccountPage() {
     };
 
     const handleDeleteAccount = async () => {
-        if (!confirm("Are you absolutely sure? This will purge all associated hostels, bookings, and financial history permanently.")) return;
+        if (!confirm("Are you absolutely sure? This will remove all your hostels, bookings, and history permanently.")) return;
 
         try {
             await api.delete("/users/me");
-            toast.success("Account purged from network.");
+            toast.success("Account deleted.");
             localStorage.clear();
             window.location.href = "/";
         } catch (error: any) {
@@ -141,7 +141,7 @@ export default function OwnerAccountPage() {
             const { data } = await api.patch("/auth/role", { role: "TENANT" });
             updateUser(data.user);
             localStorage.setItem("accessToken", data.accessToken);
-            toast.success("Protocol switched to Resident.");
+            toast.success("Account changed to Student.");
             window.location.href = "/tenant";
         } catch (error: any) {
             toast.error(error.response?.data?.message || "Failed to switch account type");
@@ -154,7 +154,7 @@ export default function OwnerAccountPage() {
             <div className="flex h-[60vh] items-center justify-center">
                 <div className="flex flex-col items-center gap-4 text-center">
                     <Loader2 className="animate-spin text-blue-600" size={32} />
-                    <p className="text-sm font-medium text-gray-400">Syncing owner matrix...</p>
+                    <p className="text-sm font-medium text-gray-400">Loading profile...</p>
                 </div>
             </div>
         );
@@ -163,8 +163,8 @@ export default function OwnerAccountPage() {
     if (!user) {
         return (
             <div className="text-center py-40">
-                <h1 className="text-2xl font-bold text-gray-900">Access Unauthorized</h1>
-                <p className="text-gray-500 font-medium text-sm mt-2">Login required for management access.</p>
+                <h1 className="text-2xl font-bold text-gray-900">Access Denied</h1>
+                <p className="text-gray-500 font-medium text-sm mt-2">Please login to manage your account.</p>
             </div>
         );
     }
@@ -176,10 +176,10 @@ export default function OwnerAccountPage() {
                 <div className="space-y-2">
                     <div className="flex items-center gap-2">
                         <div className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
-                        <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Management Portal</span>
+                        <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Dashboard Settings</span>
                     </div>
-                    <h1 className="text-3xl md:text-4xl font-bold text-gray-900 tracking-tight">Owner Identity</h1>
-                    <p className="text-gray-500 text-sm max-w-md">Synchronize your management profile and payout protocols.</p>
+                    <h1 className="text-3xl md:text-4xl font-bold text-gray-900 tracking-tight">Profile Settings</h1>
+                    <p className="text-gray-500 text-sm max-w-md">Manage your account info and payout settings.</p>
                 </div>
 
                 <div className="bg-white border border-gray-100 p-4 rounded-2xl flex items-center gap-4 shadow-sm">
@@ -188,7 +188,7 @@ export default function OwnerAccountPage() {
                     </div>
                     <div>
                         <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest leading-none mb-1">Account Status</p>
-                        <p className="text-xs font-bold text-gray-900 uppercase">Active Operator</p>
+                        <p className="text-xs font-bold text-gray-900 uppercase">Verified Owner</p>
                     </div>
                 </div>
             </div>
@@ -221,7 +221,7 @@ export default function OwnerAccountPage() {
                                     onChange={async (e) => {
                                         const file = e.target.files?.[0];
                                         if (!file) return;
-                                        const loadingToast = toast.loading("Syndicating image data...");
+                                        const loadingToast = toast.loading("Uploading picture...");
                                         try {
                                             const fd = new FormData();
                                             fd.append('file', file);
@@ -229,7 +229,7 @@ export default function OwnerAccountPage() {
                                             const imageUrl = res.data.url;
                                             await api.patch("/users/me", { avatarUrl: imageUrl });
                                             updateUser({ ...user!, avatarUrl: imageUrl });
-                                            toast.success("Identity visual updated!", { id: loadingToast });
+                                            toast.success("Profile picture updated!", { id: loadingToast });
                                         } catch (error: any) {
                                             toast.error(error.message || "Upload failure", { id: loadingToast });
                                         }
@@ -245,7 +245,7 @@ export default function OwnerAccountPage() {
                             </div>
 
                             <div className="flex items-center justify-center gap-2 px-4 py-2 bg-blue-50 text-blue-700 rounded-xl text-[10px] font-bold uppercase tracking-widest border border-blue-100">
-                                {user.role} Hub Verified
+                                {user.role} Account Verified
                             </div>
                         </div>
                     </div>
@@ -258,20 +258,19 @@ export default function OwnerAccountPage() {
                                 <div className="w-12 h-12 bg-white/5 rounded-xl flex items-center justify-center border border-white/10">
                                     <KeyRound size={24} className="text-blue-400" />
                                 </div>
-                                <span className="text-[9px] font-bold text-white/30 uppercase tracking-widest">Protocol V1</span>
                             </div>
                             <div className="space-y-1">
-                                <h3 className="text-lg font-bold tracking-tight">Vault Protocol</h3>
+                                <h3 className="text-lg font-bold tracking-tight">Account Security</h3>
                                 <p className="text-xs text-gray-400 font-medium leading-relaxed">
-                                    Your property data and revenue streams are encrypted via enterprise-grade protocols.
+                                    Your property data and revenue are protected by industry-standard encryption.
                                 </p>
                             </div>
                             <div className="pt-4 border-t border-white/5 space-y-3">
                                 <button className="w-full text-left text-[10px] font-bold uppercase tracking-widest text-gray-400 hover:text-white flex items-center justify-between transition-colors group/item">
-                                    Audit Access Log <ChevronRight size={14} className="group-hover/item:translate-x-1 transition-transform" />
+                                    Login History <ChevronRight size={14} className="group-hover/item:translate-x-1 transition-transform" />
                                 </button>
                                 <button className="w-full text-left text-[10px] font-bold uppercase tracking-widest text-gray-400 hover:text-white flex items-center justify-between transition-colors group/item">
-                                    Session Control <ChevronRight size={14} className="group-hover/item:translate-x-1 transition-transform" />
+                                    Active Sessions <ChevronRight size={14} className="group-hover/item:translate-x-1 transition-transform" />
                                 </button>
                             </div>
                         </div>
@@ -284,8 +283,8 @@ export default function OwnerAccountPage() {
                     <form onSubmit={handleUpdate} className="bg-white rounded-2xl border border-gray-100 p-8 shadow-sm space-y-8">
                         <div className="flex items-center justify-between border-b border-gray-50 pb-6">
                             <div className="space-y-0.5">
-                                <h3 className="text-lg font-bold text-gray-900 tracking-tight">Profile Identity</h3>
-                                <p className="text-xs text-gray-400 font-medium uppercase tracking-widest">Operational baseline data</p>
+                                <h3 className="text-lg font-bold text-gray-900 tracking-tight">General Info</h3>
+                                <p className="text-xs text-gray-400 font-medium uppercase tracking-widest">Your basic profile details</p>
                             </div>
                             <UserCircle size={20} className="text-blue-600" />
                         </div>
@@ -312,7 +311,7 @@ export default function OwnerAccountPage() {
                             </div>
 
                             <div className="space-y-2">
-                                <Label className="text-xs font-bold text-gray-500 ml-1">Mobile Matrix Contact</Label>
+                                <Label className="text-xs font-bold text-gray-500 ml-1">Phone Number</Label>
                                 <div className="relative">
                                     <Phone className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
                                     <input
@@ -346,7 +345,7 @@ export default function OwnerAccountPage() {
                                 className="w-full md:w-auto px-10 h-12 bg-blue-600 text-white rounded-xl font-bold text-sm shadow-lg shadow-blue-500/10 hover:bg-blue-700 active:scale-95 transition-all flex items-center justify-center gap-2"
                             >
                                 {updating ? <Loader2 className="animate-spin text-white" size={18} /> : <CheckCircle2 size={18} />}
-                                {updating ? "Saving Update..." : "Authorize Identity Change"}
+                                {updating ? "Updating..." : "Save Changes"}
                             </button>
                         </div>
                     </form>
@@ -360,34 +359,34 @@ export default function OwnerAccountPage() {
                     <div className="bg-white rounded-2xl border border-gray-100 p-8 shadow-sm space-y-8">
                         <div className="flex items-center justify-between border-b border-gray-50 pb-6">
                             <div className="space-y-0.5">
-                                <h3 className="text-lg font-bold text-gray-900 tracking-tight">Security Nexus</h3>
-                                <p className="text-xs text-gray-400 font-medium uppercase tracking-widest">Access control & key rotation</p>
+                                <h3 className="text-lg font-bold text-gray-900 tracking-tight">Security Settings</h3>
+                                <p className="text-xs text-gray-400 font-medium uppercase tracking-widest">Update password and access</p>
                             </div>
                             <Lock size={20} className="text-blue-600" />
                         </div>
 
                         <div className="flex flex-col md:flex-row md:items-center justify-between p-6 bg-gray-50 rounded-2xl border border-gray-100 hover:border-blue-100 transition-all gap-4">
                             <div className="space-y-1 text-center md:text-left">
-                                <p className="text-sm font-bold text-gray-900">Access Key Rotation</p>
-                                <p className="text-[11px] text-gray-500 font-medium">Update password to maintain channel integrity.</p>
+                                <p className="text-sm font-bold text-gray-900">Change Password</p>
+                                <p className="text-[11px] text-gray-500 font-medium">Keep your account secure by updating your password.</p>
                             </div>
 
                             <Dialog open={isPasswordModalOpen} onOpenChange={setIsPasswordModalOpen}>
                                 <DialogTrigger asChild>
                                     <button className="h-10 px-6 bg-white text-gray-900 rounded-lg text-xs font-bold border border-gray-200 hover:border-gray-900 transition-all">
-                                        Rotate Keys
+                                        Update Password
                                     </button>
                                 </DialogTrigger>
                                 <DialogContent className="sm:max-w-md rounded-2xl p-8 border-gray-100">
                                     <DialogHeader>
-                                        <DialogTitle className="text-xl font-bold tracking-tight">Rotate Access Keys</DialogTitle>
+                                        <DialogTitle className="text-xl font-bold tracking-tight">Update Password</DialogTitle>
                                         <DialogDescription className="text-xs text-gray-400 font-medium">
-                                            Confirm authorization by providing current keys.
+                                            Please provide your current and new password.
                                         </DialogDescription>
                                     </DialogHeader>
                                     <form onSubmit={handleChangePassword} className="space-y-6 py-4">
                                         <div className="space-y-2">
-                                            <Label className="text-xs font-bold text-gray-500 ml-1">Current Key</Label>
+                                            <Label className="text-xs font-bold text-gray-500 ml-1">Current Password</Label>
                                             <PasswordField
                                                 value={passwordData.oldPassword}
                                                 onChange={(e) => setPasswordData({ ...passwordData, oldPassword: e.target.value })}
@@ -395,7 +394,7 @@ export default function OwnerAccountPage() {
                                             />
                                         </div>
                                         <div className="space-y-2">
-                                            <Label className="text-xs font-bold text-gray-500 ml-1">New Access Key</Label>
+                                            <Label className="text-xs font-bold text-gray-500 ml-1">New Password</Label>
                                             <PasswordField
                                                 value={passwordData.newPassword}
                                                 onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })}
@@ -403,7 +402,7 @@ export default function OwnerAccountPage() {
                                             />
                                         </div>
                                         <div className="space-y-2">
-                                            <Label className="text-xs font-bold text-gray-500 ml-1">Confirm New Key</Label>
+                                            <Label className="text-xs font-bold text-gray-500 ml-1">Confirm New Password</Label>
                                             <PasswordField
                                                 value={passwordData.confirmPassword}
                                                 onChange={(e) => setPasswordData({ ...passwordData, confirmPassword: e.target.value })}
@@ -411,10 +410,10 @@ export default function OwnerAccountPage() {
                                             />
                                         </div>
                                         <DialogFooter className="gap-2 pt-2">
-                                            <Button type="button" variant="outline" onClick={() => setIsPasswordModalOpen(false)} className="rounded-xl h-11 text-xs font-bold border-gray-200">ABORT</Button>
+                                            <Button type="button" variant="outline" onClick={() => setIsPasswordModalOpen(false)} className="rounded-xl h-11 text-xs font-bold border-gray-200">CANCEL</Button>
                                             <Button type="submit" disabled={isChangingPassword} className="rounded-xl h-11 text-xs font-bold bg-gray-900 text-white hover:bg-black grow">
                                                 {isChangingPassword ? <Loader2 className="animate-spin mr-2" size={14} /> : <CheckCircle2 className="mr-2" size={14} />}
-                                                Authorize Rotation
+                                                Save Password
                                             </Button>
                                         </DialogFooter>
                                     </form>
@@ -427,8 +426,8 @@ export default function OwnerAccountPage() {
                     <div className="bg-white rounded-2xl border border-gray-100 p-8 shadow-sm space-y-6">
                         <div className="flex items-center justify-between border-b border-gray-50 pb-6">
                             <div className="space-y-0.5">
-                                <h3 className="text-lg font-bold text-gray-900 tracking-tight">Signal Matrix</h3>
-                                <p className="text-xs text-gray-400 font-medium uppercase tracking-widest">Network communication protocols</p>
+                                <h3 className="text-lg font-bold text-gray-900 tracking-tight">Notifications</h3>
+                                <p className="text-xs text-gray-400 font-medium uppercase tracking-widest">Manage your communication preferences</p>
                             </div>
                             <Bell size={20} className="text-blue-600" />
                         </div>
@@ -438,8 +437,8 @@ export default function OwnerAccountPage() {
                                     <Mail size={20} className="text-blue-600" />
                                 </div>
                                 <div className="space-y-0.5">
-                                    <p className="text-sm font-bold text-gray-900">Email Signaling</p>
-                                    <p className="text-[11px] text-gray-500 font-medium">Management alerts & Payout logs.</p>
+                                    <p className="text-sm font-bold text-gray-900">Email Notifications</p>
+                                    <p className="text-[11px] text-gray-500 font-medium">Receive updates on bookings and payouts.</p>
                                 </div>
                             </div>
                             <button
@@ -448,9 +447,9 @@ export default function OwnerAccountPage() {
                                     setFormData({ ...formData, emailNotifications: newValue });
                                     try {
                                         await api.patch("/users/me", { emailNotifications: newValue });
-                                        toast.success("Signal protocol updated");
+                                        toast.success("Notification settings updated");
                                     } catch (error: any) {
-                                        toast.error("Signal failure");
+                                        toast.error("Failed to update settings");
                                         setFormData({ ...formData, emailNotifications: !newValue });
                                     }
                                 }}
@@ -475,10 +474,10 @@ export default function OwnerAccountPage() {
                                 <div className="space-y-2 text-center md:text-left">
                                     <div className="flex items-center justify-center md:justify-start gap-3">
                                         <ArrowRightLeft size={24} className="text-amber-600" />
-                                        <h3 className="text-xl font-bold text-amber-900 tracking-tight leading-none uppercase">Role Migration</h3>
+                                        <h3 className="text-xl font-bold text-amber-900 tracking-tight leading-none uppercase">Change Account Type</h3>
                                     </div>
                                     <p className="text-xs font-medium text-amber-700 leading-relaxed max-w-sm">
-                                        Permanently switch to a Resident (Tenant) account. This will purge all business history.
+                                        Switch to a Student account. Note: This will remove your hostel listings.
                                     </p>
                                 </div>
 
@@ -494,10 +493,10 @@ export default function OwnerAccountPage() {
                                                 <div className="w-12 h-12 rounded-xl bg-rose-100 flex items-center justify-center shadow-inner">
                                                     <TriangleAlert size={28} className="text-rose-600" />
                                                 </div>
-                                                <DialogTitle className="text-xl font-bold tracking-tight text-rose-600 uppercase">Irreversible De-registration</DialogTitle>
+                                                <DialogTitle className="text-xl font-bold tracking-tight text-rose-600 uppercase">Warning: Account Change</DialogTitle>
                                             </div>
                                             <DialogDescription className="text-sm text-gray-500 font-medium leading-relaxed pt-2">
-                                                Switching to <span className="text-gray-900 font-bold">RESIDENT</span> status will <span className="text-rose-600 font-bold underline">delete all properties and bookings permanently</span>. This action is terminal.
+                                                Switching to <span className="text-gray-900 font-bold">STUDENT</span> status will <span className="text-rose-600 font-bold underline">delete all properties and bookings permanently</span>. This action cannot be undone.
                                             </DialogDescription>
                                         </DialogHeader>
                                         <DialogFooter className="gap-2 pt-6">
@@ -508,7 +507,7 @@ export default function OwnerAccountPage() {
                                                 className="rounded-xl h-11 text-xs font-bold bg-rose-600 hover:bg-rose-700 text-white grow"
                                             >
                                                 {isSwitchingType ? <Loader2 className="animate-spin mr-2" size={14} /> : null}
-                                                {isSwitchingType ? "PURGING..." : "I CONFIRM, MIGRATE ACCOUNT"}
+                                                {isSwitchingType ? "Deleting..." : "Confirm Account Change"}
                                             </Button>
                                         </DialogFooter>
                                     </DialogContent>
@@ -523,17 +522,17 @@ export default function OwnerAccountPage() {
                             <div className="space-y-2 text-center md:text-left">
                                 <div className="flex items-center justify-center md:justify-start gap-3">
                                     <XCircle size={24} className="text-rose-600" />
-                                    <h3 className="text-xl font-bold text-rose-900 tracking-tight leading-none uppercase">Termination Drill</h3>
+                                    <h3 className="text-xl font-bold text-rose-900 tracking-tight leading-none uppercase">Delete Account</h3>
                                 </div>
                                 <p className="text-xs font-medium text-rose-700 leading-relaxed max-w-sm">
-                                    Full system de-registration. This purge wipes all records from the HostelGH core matrix.
+                                    Permanently remove your account and all associated records from HostelGH.
                                 </p>
                             </div>
                             <button 
                                 onClick={handleDeleteAccount}
                                 className="h-12 px-8 bg-rose-600 text-white rounded-xl font-bold text-xs hover:bg-rose-700 transition-all uppercase tracking-widest shadow-lg shadow-rose-900/10"
                             >
-                                Purge Account
+                                Delete Account
                             </button>
                         </div>
                     </div>
@@ -589,10 +588,10 @@ function SettlementSettings() {
                 ...accountDetail,
                 method
             });
-            toast.success("Payout protocol synchronized!");
+            toast.success("Payout settings saved!");
             refetchSettlement();
         } catch (error: any) {
-            toast.error(error.response?.data?.message || "Protocol link failure");
+            toast.error(error.response?.data?.message || "Failed to save settings");
         } finally {
             setIsSaving(false);
         }
@@ -607,8 +606,8 @@ function SettlementSettings() {
         <div className="bg-white rounded-2xl border border-gray-100 p-8 shadow-sm space-y-8 group/settle">
             <div className="flex items-center justify-between border-b border-gray-50 pb-6">
                 <div className="space-y-0.5">
-                    <h3 className="text-lg font-bold text-gray-900 tracking-tight">Direct Settlement</h3>
-                    <p className="text-xs text-gray-400 font-medium uppercase tracking-widest leading-none">Paystack Payout Nexus</p>
+                    <h3 className="text-lg font-bold text-gray-900 tracking-tight">Payout Settings</h3>
+                    <p className="text-xs text-gray-400 font-medium uppercase tracking-widest leading-none">Automated Direct Payouts</p>
                 </div>
                 <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center border border-blue-100 shadow-sm">
                     <Landmark size={20} />
@@ -657,10 +656,19 @@ function SettlementSettings() {
                                 }}
                                 required
                             >
-                                <option value="">{banksLoading ? "Syncing..." : "Select Gateway"}</option>
-                                {filteredBanks.map((b: any) => (
-                                    <option key={b.code} value={b.code}>{b.name.toUpperCase()}</option>
-                                ))}
+                                <option value="">{banksLoading ? "Loading..." : "Select Provider"}</option>
+                                {filteredBanks.map((b: any) => {
+                                    const formatName = (name: string) => {
+                                        const n = name.toUpperCase();
+                                        if (n.includes("MTN")) return "MTN";
+                                        if (n.includes("AIRTEL") || n.includes("TIGO")) return "AT";
+                                        if (n.includes("VODAFONE") || n.includes("TELECEL")) return "TELECEL";
+                                        return n;
+                                    };
+                                    return (
+                                        <option key={b.code} value={b.code}>{formatName(b.name)}</option>
+                                    );
+                                })}
                             </select>
                             <ChevronRight size={16} className="absolute right-4 top-1/2 -translate-y-1/2 rotate-90 text-gray-300 pointer-events-none" />
                         </div>
@@ -704,11 +712,11 @@ function SettlementSettings() {
                         className="h-12 px-10 bg-gray-900 text-white rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-blue-600 transition-all shadow-lg shadow-black/5 flex items-center justify-center gap-3 active:scale-95 disabled:opacity-50"
                     >
                         {isSaving ? <Loader2 className="animate-spin text-white" size={16} /> : <CheckCircle2 size={16} />}
-                        {isSaving ? "Authorizing..." : currentSettlement ? "Sync Settlement Link" : "Engage Payout Nexus"}
+                        {isSaving ? "Saving..." : currentSettlement ? "Update Payout Link" : "Save Payout Settings"}
                     </button>
                     {currentSettlement && (
                         <div className="flex items-center gap-2 px-4 py-2 bg-emerald-50 text-emerald-700 rounded-xl border border-emerald-100 text-[10px] font-bold uppercase tracking-widest">
-                            <ShieldCheck size={14} /> Active Nexus Link
+                            <ShieldCheck size={14} /> Payout Linked
                         </div>
                     )}
                 </div>

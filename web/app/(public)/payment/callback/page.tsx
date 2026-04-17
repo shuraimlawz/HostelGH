@@ -63,37 +63,37 @@ function PaymentCallbackContent() {
                         <div className="space-y-4">
                             <div className="flex items-center justify-center gap-2">
                                 <span className="px-3 py-1 bg-gray-900 text-white rounded-full text-[9px] font-bold uppercase tracking-widest border border-white/10 shadow-xl">
-                                    Network Registry
+                                    Payment System
                                 </span>
                             </div>
                             <h1 className="text-3xl font-bold text-gray-900 tracking-tighter uppercase leading-tight">
-                                {status === 'loading' && "Verifying Asset Funding"}
-                                {status === 'success' && "Deployment Authorized"}
-                                {status === 'error' && "Funding Breach"}
+                                {status === 'loading' && "Verifying Payment"}
+                                {status === 'success' && "Booking Confirmed"}
+                                {status === 'error' && "Payment Failed"}
                             </h1>
                             <div className="h-1.5 w-16 bg-blue-600 mx-auto rounded-full" />
                         </div>
 
                         <div className="text-[11px] font-bold text-gray-400 uppercase tracking-widest leading-relaxed max-w-md mx-auto">
-                            {status === 'loading' && "Authenticating payment reference with central gateway. Maintaining session connection..."}
-                            {status === 'success' && "Payment verified. Room allocation secured and asset is now active. Confirmation dispatched to registered terminal."}
-                            {status === 'error' && "Could not isolate payment reference. If funds were debited, automated reconciliation will occur within 24 cycles."}
+                            {status === 'loading' && "Checking your payment reference with the provider. Please wait..."}
+                            {status === 'success' && "Payment verified. Your room is secured and booking is now confirmed. We've sent a confirmation to your email."}
+                            {status === 'error' && "Could not find your payment reference. If you were debited, we will fix this within 24 hours."}
                         </div>
 
                         {status === "success" && (
                             <div className="pt-8 flex flex-col gap-4">
                                 <button
-                                    onClick={() => router.push("/tenant/bookings")}
+                                    onClick={() => router.push("/tenant")}
                                     className="w-full h-16 bg-blue-600 text-white rounded-2xl font-bold text-[11px] uppercase tracking-widest shadow-xl shadow-blue-600/20 hover:bg-blue-700 transition-all active:scale-[0.98] flex items-center justify-center gap-3"
                                 >
                                     <Zap size={18} />
-                                    Access Operational Hub
+                                    Go to Dashboard
                                 </button>
                                 <button
                                     onClick={() => router.push("/")}
                                     className="text-[10px] font-bold text-gray-400 uppercase tracking-widest hover:text-gray-900 transition-colors"
                                 >
-                                    Return to Overview
+                                    Return Home
                                 </button>
                             </div>
                         )}
@@ -111,7 +111,7 @@ function PaymentCallbackContent() {
                                     className="flex items-center justify-center gap-2 text-[10px] font-bold text-gray-400 uppercase tracking-widest hover:text-gray-900 transition-colors group"
                                 >
                                     <ChevronLeft size={16} className="group-hover:-translate-x-1 transition-transform" />
-                                    Back to Archive
+                                    Back Home
                                 </Link>
                             </div>
                         )}
@@ -120,7 +120,7 @@ function PaymentCallbackContent() {
 
                 <div className="mt-12 text-center">
                     <p className="text-[9px] font-bold uppercase tracking-widest text-gray-300 flex items-center justify-center gap-3">
-                        <ShieldCheck size={14} className="text-blue-500" /> Secure Protocol • HostelGH Internal Core
+                        <ShieldCheck size={14} className="text-blue-500" /> Secure Payment • HostelGH Verified
                     </p>
                 </div>
             </div>
@@ -133,7 +133,7 @@ export default function PaymentCallbackPage() {
         <Suspense fallback={
             <div className="min-h-screen bg-white flex flex-col items-center justify-center p-6">
                 <Loader2 className="animate-spin text-blue-600 mb-6" size={48} />
-                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest animate-pulse">SYNCHRONIZING EXTERNAL HANDSHAKE...</p>
+                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest animate-pulse">CONNECTING TO PAYMENT PROVIDER...</p>
             </div>
         }>
             <PaymentCallbackContent />

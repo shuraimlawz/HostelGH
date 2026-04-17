@@ -33,7 +33,7 @@ function DeletionRequestsContent() {
         mutationFn: (id: string) => api.delete(`/bookings/${id}/admin-confirm`),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["admin-pending-deletions"] });
-            toast.success("Booking record purged from matrix.");
+            toast.success("Booking record deleted.");
         },
         onError: (err: any) => toast.error(err.message || "Deletion failure"),
     });
@@ -42,7 +42,7 @@ function DeletionRequestsContent() {
         <div className="flex h-[60vh] items-center justify-center bg-white">
             <div className="flex flex-col items-center gap-4">
                 <Loader2 className="animate-spin text-red-600" size={40} />
-                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest animate-pulse">Scanning Deletion Queue...</p>
+                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest animate-pulse">Searching for requests...</p>
             </div>
         </div>
     );
@@ -53,18 +53,18 @@ function DeletionRequestsContent() {
                 <div className="space-y-4">
                     <div className="flex items-center gap-3">
                         <span className="px-3 py-1 bg-red-600/10 text-red-600 rounded-full text-[9px] font-bold uppercase tracking-widest border border-red-200">
-                            Security Audit
+                            Deletion Review
                         </span>
                         <div className="flex items-center gap-2">
                             <ShieldAlert size={14} className="text-red-500" />
-                            <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Protocol Override Required</span>
+                            <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Admin approval required</span>
                         </div>
                     </div>
                     <h1 className="text-4xl md:text-5xl font-bold text-gray-900 tracking-tighter uppercase leading-tight">
-                        Deletion Requests <span className="text-red-600 opacity-40">/</span> Purge
+                        Deletion Requests <span className="text-red-600 opacity-40">/</span> Delete
                     </h1>
                     <p className="text-gray-500 text-xs font-bold uppercase tracking-widest max-w-sm">
-                        Review and authorize the permanent removal of stay records.
+                        Review and approve the permanent removal of stay records.
                     </p>
                 </div>
                 <Link href="/admin" className="h-12 px-6 rounded-xl bg-gray-900 text-white text-[11px] font-bold uppercase tracking-widest hover:bg-black transition-all flex items-center gap-2 shadow-lg">
@@ -78,8 +78,8 @@ function DeletionRequestsContent() {
                         <Check size={40} />
                     </div>
                     <div className="space-y-2">
-                        <h3 className="text-2xl font-bold uppercase tracking-tight text-gray-900">Queue Neutralized</h3>
-                        <p className="text-xs text-gray-400 font-bold uppercase tracking-widest">No pending deletion protocols at the moment.</p>
+                        <h3 className="text-2xl font-bold uppercase tracking-tight text-gray-900">All Clear</h3>
+                        <p className="text-xs text-gray-400 font-bold uppercase tracking-widest">No pending deletion requests at the moment.</p>
                     </div>
                 </div>
             ) : (
@@ -104,9 +104,9 @@ function DeletionRequestsContent() {
                                     </div>
                                 </div>
                                 <div className="p-5 bg-red-50/30 rounded-2xl border border-red-50/50 relative overflow-hidden">
-                                    <div className="text-[9px] font-bold text-red-400 uppercase tracking-widest mb-1">Reason for Purge</div>
+                                    <div className="text-[9px] font-bold text-red-400 uppercase tracking-widest mb-1">Reason for Deletion</div>
                                     <p className="text-xs font-bold text-red-700 leading-relaxed uppercase tracking-tight">
-                                        " {req.deletionReason || "NO RATIONALE PROVIDED"} "
+                                        " {req.deletionReason || "NO REASON PROVIDED"} "
                                     </p>
                                 </div>
                             </div>
@@ -114,7 +114,7 @@ function DeletionRequestsContent() {
                             <div className="flex shrink-0">
                                 <button
                                     onClick={() => {
-                                        if (confirm("Executing this protocol will permanently delete the record. Continue?")) {
+                                        if (confirm("Executing this will permanently delete the record. Continue?")) {
                                             confirmMutation.mutate(req.id);
                                         }
                                     }}
@@ -122,7 +122,7 @@ function DeletionRequestsContent() {
                                     className="h-16 px-10 bg-red-600 text-white rounded-2xl font-bold text-[11px] uppercase tracking-widest hover:bg-red-700 transition-all shadow-xl shadow-red-500/10 flex items-center gap-4 active:scale-95 disabled:opacity-50"
                                 >
                                     {confirmMutation.isPending ? <Loader2 size={20} className="animate-spin" /> : <Trash2 size={20} />}
-                                    PURGE RECORD
+                                    DELETE RECORD
                                 </button>
                             </div>
                         </div>
@@ -139,7 +139,7 @@ export default function DeletionRequestsPage() {
             <div className="flex h-[80vh] items-center justify-center">
                 <div className="flex flex-col items-center gap-4">
                     <Loader2 className="animate-spin text-red-600" size={40} />
-                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest animate-pulse">Initializing Security Protocol...</p>
+                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest animate-pulse">Loading...</p>
                 </div>
             </div>
         }>

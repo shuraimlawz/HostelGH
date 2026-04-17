@@ -68,7 +68,7 @@ export default function AuthLayout({ children, title, subtitle }: AuthLayoutProp
                                 )}
                             >
                                 <div className="inline-block px-4 py-2 rounded-xl border border-white/10 bg-white/5 backdrop-blur-xl shadow-2xl">
-                                    <h2 className="text-[10px] font-bold tracking-[0.3em] text-blue-400 uppercase">Archive Wisdom</h2>
+                                    <h2 className="text-[10px] font-bold tracking-[0.3em] text-blue-400 uppercase">Daily Inspiration</h2>
                                 </div>
                                 <div className="space-y-6">
                                     <p className="text-3xl font-medium tracking-tight opacity-95 leading-relaxed drop-shadow-2xl text-white/90 font-serif lowercase">
@@ -139,7 +139,7 @@ export default function AuthLayout({ children, title, subtitle }: AuthLayoutProp
                     {/* Security Footer */}
                     <div className="flex justify-center lg:justify-start items-center gap-3 text-[9px] font-bold text-gray-300 uppercase tracking-widest leading-none">
                         <div className="w-1.5 h-1.5 bg-blue-600 rounded-full" />
-                        Encrypted Identity Handshake Protocol
+                        Secure login & authentication
                     </div>
                 </div>
             </div>
