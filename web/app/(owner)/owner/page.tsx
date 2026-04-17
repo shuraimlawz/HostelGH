@@ -20,7 +20,8 @@ import {
     Activity,
     PlusCircle,
     ChevronRight,
-    BarChart3
+    BarChart3,
+    Zap
 } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
