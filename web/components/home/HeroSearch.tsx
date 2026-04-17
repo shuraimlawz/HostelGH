@@ -49,7 +49,7 @@ export default function HeroSearch() {
         router.push(`/find${searchCity ? `?city=${encodeURIComponent(searchCity)}` : ""}`);
     };
 
-    const { data: trendingLocations, isLoading: isLoadingTrending } = useQuery({
+    const { data: trendingLocations, isLoading: isLoadingLocations } = useQuery({
         queryKey: ["trending-locations"],
         queryFn: async () => {
             const { data } = await api.get("/hostels/trending-locations");
@@ -149,7 +149,7 @@ export default function HeroSearch() {
                                 </button>
                             ))
                         ) : (
-                            !isLoadingTrending && <span className="opacity-20 font-bold px-4 lowercase tracking-[0.2em] py-2.5">Syncing hotspots...</span>
+                            !isLoadingLocations && <span className="opacity-20 font-bold px-4 lowercase tracking-[0.2em] py-2.5">Syncing hotspots...</span>
                         )}
                     </div>
                 </div>
