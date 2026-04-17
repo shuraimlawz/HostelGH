@@ -149,6 +149,7 @@ export default function PayoutSettingsPage() {
     };
 
     return (
+        <>
         <div className="max-w-[1400px] mx-auto space-y-10 pb-20 pt-4">
             {/* Header Section */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-8">
@@ -557,6 +558,7 @@ export default function PayoutSettingsPage() {
                 </div>
             </DialogContent>
         </Dialog>
+        </>
     );
 }
 
