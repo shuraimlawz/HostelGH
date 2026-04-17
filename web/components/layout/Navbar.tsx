@@ -7,7 +7,6 @@ import LogoAnimation from "./LogoAnimation";
 import { 
     Menu, 
     User as UserIcon, 
-    Globe, 
     LayoutDashboard, 
     Home, 
     Users, 
@@ -18,7 +17,9 @@ import {
     Settings,
     LogOut,
     Building2,
-    Wallet
+    Wallet,
+    Plus,
+    X
 } from "lucide-react";
 import { useAuthModal } from "@/components/auth/AuthModalProvider";
 import { useRouter, usePathname } from "next/navigation";
@@ -29,14 +30,22 @@ export default function Navbar() {
     const { user, logout } = useAuth();
     const { open } = useAuthModal();
     const [isOpen, setIsOpen] = useState(false);
+    const [scrolled, setScrolled] = useState(false);
     const menuRef = useRef<HTMLDivElement>(null);
     const router = useRouter();
     const pathname = usePathname();
 
-    // Define navigation items based on role
+    // Scroll listener for dynamic styling
+    useEffect(() => {
+        const handleScroll = () => {
+            setScrolled(window.scrollY > 20);
+        };
+        window.addEventListener("scroll", handleScroll);
+        return () => window.removeEventListener("scroll", handleScroll);
+    }, []);
+
     const getNavItems = () => {
         if (!user) return [];
-
         if (user.role === "ADMIN") {
             return [
                 { label: "Dashboard", href: "/admin", icon: LayoutDashboard },
@@ -49,19 +58,17 @@ export default function Navbar() {
                 { label: "Settings", href: "/admin/settings", icon: Settings },
             ];
         }
-
         if (user.role === "OWNER") {
             return [
                 { label: "Dashboard", href: "/owner", icon: LayoutDashboard },
                 { label: "My Hostels", href: "/owner/hostels", icon: Home },
                 { label: "My Rooms", href: "/owner/rooms", icon: Building2 },
-                { label: "Reservation List", href: "/owner/bookings", icon: Calendar },
+                { label: "Reservations", href: "/owner/bookings", icon: Calendar },
                 { label: "Payouts", href: "/owner/payouts", icon: Wallet },
                 { label: "Subscription", href: "/owner/subscription", icon: CreditCard },
-                { label: "Profile Settings", href: "/owner/account", icon: UserIcon },
+                { label: "Profile", href: "/owner/account", icon: UserIcon },
             ];
         }
-
         return [
             { label: "Dashboard", href: "/tenant", icon: LayoutDashboard },
             { label: "My Bookings", href: "/tenant/bookings", icon: Calendar },
@@ -73,7 +80,6 @@ export default function Navbar() {
 
     const navItems = getNavItems();
 
-    // Close menu when clicking outside
     useEffect(() => {
         function handleClickOutside(event: MouseEvent) {
             if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
@@ -90,157 +96,187 @@ export default function Navbar() {
         router.push("/");
     };
 
+    const isActive = (path: string) => pathname === path;
+
     return (
-        <header className="sticky top-0 z-50 bg-background/90 backdrop-blur-xl border-b border-border shadow-sm h-16 transition-all duration-300">
-            <div className="container mx-auto px-4 md:px-8 h-full flex items-center justify-between">
-                {/* Logo */}
-                <Link href="/" className="flex items-center gap-1.5 group relative">
+        <header 
+            className={cn(
+                "sticky top-0 z-50 w-full transition-all duration-500 ease-in-out",
+                scrolled 
+                    ? "py-2 bg-white/70 backdrop-blur-2xl border-b border-gray-100/50 shadow-[0_8px_30px_rgb(0,0,0,0.02)]" 
+                    : "py-4 bg-transparent border-b border-transparent"
+            )}
+        >
+            <div className="container mx-auto px-6 md:px-12 flex items-center justify-between">
+                {/* Logo Section */}
+                <Link href="/" className="flex items-center gap-3 group relative transition-transform hover:scale-[1.02] active:scale-95">
                     <LogoAnimation />
-                    <span className="font-black text-lg tracking-tighter text-primary flex overflow-hidden">
-                        HostelGH
-                    </span>
+                    <div className="flex flex-col -space-y-1">
+                        <span className="font-black text-lg md:text-xl tracking-tighter text-gray-900 flex overflow-hidden">
+                            HostelGH
+                        </span>
+                        <div className="h-[2px] w-0 group-hover:w-full bg-blue-600 transition-all duration-300 rounded-full" />
+                    </div>
                 </Link>
 
-                {/* Right Actions */}
-                <div className="flex items-center justify-end gap-2 flex-1">
-                    {/* Navigation Links */}
-                    <div className="hidden lg:flex items-center">
+                {/* Right Navigation & Control Center */}
+                <div className="flex items-center justify-end gap-6 flex-1">
+                    {/* Desktop Main Links */}
+                    <nav className="hidden lg:flex items-center space-x-2 bg-gray-50/50 p-1 rounded-2xl border border-gray-100/50 backdrop-blur-md">
                         <Link
                             href="/hostels"
-                            className="text-xs font-black uppercase tracking-widest px-4 py-2 text-muted-foreground hover:text-foreground transition-all"
+                            className={cn(
+                                "text-[10px] font-bold uppercase tracking-[0.2em] px-6 py-2.5 rounded-xl transition-all duration-300",
+                                isActive("/hostels") 
+                                    ? "bg-white text-blue-600 shadow-sm border border-gray-100" 
+                                    : "text-gray-400 hover:text-gray-900"
+                            )}
                         >
-                            Browse
+                            Explore
                         </Link>
                         <Link
                             href="/support"
-                            className="text-xs font-black uppercase tracking-widest px-4 py-2 text-muted-foreground hover:text-foreground transition-all"
+                            className={cn(
+                                "text-[10px] font-bold uppercase tracking-[0.2em] px-6 py-2.5 rounded-xl transition-all duration-300",
+                                isActive("/support") 
+                                    ? "bg-white text-blue-600 shadow-sm border border-gray-100" 
+                                    : "text-gray-400 hover:text-gray-900"
+                            )}
                         >
                             Support
                         </Link>
-                    </div>
+                    </nav>
 
-                    {!user && (
-                        <Link
-                            href="/auth/register?role=OWNER"
-                            className="hidden md:block text-[10px] font-bold uppercase tracking-[0.15em] px-4 py-2 rounded-lg bg-gray-900 text-white hover:bg-gray-800 transition-all shadow-sm active:scale-[0.98]"
-                        >
-                            List Hostel
-                        </Link>
-                    )}
+                    {/* Secondary Actions */}
+                    <div className="flex items-center gap-3">
+                        {!user && (
+                            <Link
+                                href="/auth/register?role=OWNER"
+                                className="hidden md:flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.15em] px-6 py-3 rounded-2xl bg-gray-900 text-white hover:bg-black hover:shadow-xl hover:shadow-gray-200 transition-all active:scale-95 group"
+                            >
+                                <Plus size={14} className="group-hover:rotate-90 transition-transform duration-300" />
+                                <span>List Hostel</span>
+                            </Link>
+                        )}
 
-                    <Suspense fallback={<div className="w-8 h-8" />}>
-                        <RegionSelector />
-                    </Suspense>
+                        <Suspense fallback={<div className="w-10 h-10 rounded-2xl bg-gray-50 animate-pulse" />}>
+                            <RegionSelector />
+                        </Suspense>
 
-
-                    <div className="relative" ref={menuRef}>
-                        <button
-                            onClick={() => setIsOpen(!isOpen)}
-                            className={cn(
-                                "flex items-center gap-2 border rounded-xl px-2 py-1.5 transition-all ml-1 group",
-                                isOpen ? "border-primary/30 shadow-md bg-accent" : "border-border hover:border-primary/20 bg-background"
-                            )}
-                        >
-                            <Menu size={16} className="text-muted-foreground group-hover:text-foreground transition-colors" />
-                            <div className="bg-gray-100 text-gray-500 rounded-lg p-0.5 overflow-hidden transition-all border border-gray-100">
-                                {user ? (
-                                    <div className="w-7 h-7 bg-primary text-primary-foreground rounded-lg flex items-center justify-center text-[10px] font-bold overflow-hidden shadow-inner">
-                                        {user.avatarUrl ? (
-                                            <img src={user.avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
-                                        ) : (
-                                            user.firstName ? user.firstName[0].toUpperCase() : user.email[0].toUpperCase()
-                                        )}
-                                    </div>
-                                ) : (
-                                    <UserIcon size={18} className="text-gray-400" />
+                        {/* Control Center Pill */}
+                        <div className="relative" ref={menuRef}>
+                            <button
+                                onClick={() => setIsOpen(!isOpen)}
+                                className={cn(
+                                    "flex items-center gap-2 pl-3 pr-2 py-1.5 rounded-[1.5rem] transition-all duration-500 border border-transparent shadow-sm",
+                                    isOpen 
+                                        ? "bg-gray-900 text-white shadow-xl scale-105" 
+                                        : "bg-white hover:bg-gray-50 text-gray-900 border-gray-100"
                                 )}
-                            </div>
-                        </button>
+                            >
+                                {isOpen ? <X size={18} className="animate-in fade-in spin-in-90 duration-300" /> : <Menu size={18} />}
+                                
+                                <div className={cn(
+                                    "w-8 h-8 rounded-full overflow-hidden border-2 transition-all duration-500 flex items-center justify-center text-[10px] font-bold",
+                                    isOpen ? "border-blue-500/50 scale-110" : "border-gray-50 shadow-inner bg-gray-100"
+                                )}>
+                                    {user ? (
+                                        user.avatarUrl ? (
+                                            <img src={user.avatarUrl} alt="Profile" className="w-full h-full object-cover" />
+                                        ) : (
+                                            <span className={cn(isOpen ? "text-white" : "text-gray-400")}>
+                                                {user.firstName ? user.firstName[0].toUpperCase() : user.email[0].toUpperCase()}
+                                            </span>
+                                        )
+                                    ) : (
+                                        <UserIcon size={16} className="text-gray-400" />
+                                    )}
+                                </div>
+                            </button>
 
-                        {isOpen && (
-                            <div className="absolute right-0 top-[calc(100%+0.5rem)] w-64 bg-card text-card-foreground rounded-2xl shadow-2xl border border-black/5 py-3 animate-in fade-in zoom-in-95 duration-200 overflow-hidden z-50">
-                                {/* Navigation items for all users */}
-                                <Link
-                                    href="/hostels"
-                                    className="block px-5 py-2.5 hover:bg-zinc-50 text-sm font-bold text-foreground transition-colors lg:hidden"
-                                    onClick={() => setIsOpen(false)}
-                                >
-                                    Browse Hostels
-                                </Link>
-                                <Link
-                                    href="/support"
-                                    className="block px-5 py-2.5 hover:bg-zinc-50 text-sm font-bold text-foreground transition-colors lg:hidden"
-                                    onClick={() => setIsOpen(false)}
-                                >
-                                    How it works
-                                </Link>
-
-                                {user ? (
-                                    <>
-                                        <div className="border-t border-black/5 my-2 mx-5" />
-                                        <div className="px-5 py-3 border-b border-black/5 mb-1 bg-zinc-50/50">
-                                            <div className="font-bold text-sm truncate text-foreground">{user.email}</div>
-                                            <div className="text-[10px] font-bold text-muted-foreground mt-0.5 uppercase tracking-widest">{user.role.toLowerCase()} Account Type</div>
-                                        </div>
-
-                                        <div className="max-h-[60vh] overflow-y-auto">
-                                            {navItems.map((item) => (
-                                                <Link
-                                                    key={item.href}
-                                                    href={item.href}
-                                                    className={cn(
-                                                        "flex items-center gap-3 px-5 py-2.5 hover:bg-zinc-50 text-sm font-bold transition-colors",
-                                                        pathname === item.href ? "text-[#1877F2] bg-blue-50/50" : "text-foreground"
-                                                    )}
-                                                    onClick={() => setIsOpen(false)}
-                                                >
-                                                    <item.icon size={16} className={cn(pathname === item.href ? "text-[#1877F2]" : "text-muted-foreground")} />
-                                                    {item.label}
-                                                </Link>
-                                            ))}
-                                        </div>
-
-                                        <div className="border-t border-black/5 my-2 mx-5" />
-                                        <button
-                                            onClick={handleLogout}
-                                            className="w-full text-left px-5 py-2.5 hover:bg-red-50 hover:text-red-600 font-bold text-sm transition-colors flex items-center gap-3"
-                                        >
-                                            <LogOut size={16} />
-                                            Log out
-                                        </button>
-                                    </>
-                                ) : (
-                                    <>
-                                        <button
-                                            onClick={() => {
-                                                setIsOpen(false);
-                                                open("login");
-                                            }}
-                                            className="w-full text-left px-5 py-3 hover:bg-zinc-50 text-sm font-bold transition-colors"
-                                        >
-                                            Log in
-                                        </button>
-                                        <button
-                                            onClick={() => {
-                                                setIsOpen(false);
-                                                open("register");
-                                            }}
-                                            className="w-full text-left px-5 py-3 hover:bg-zinc-50 text-sm font-medium transition-colors"
-                                        >
-                                            Sign up
-                                        </button>
-                                        <div className="border-t border-black/5 my-2 mx-5" />
+                            {/* Dropdown Menu */}
+                            {isOpen && (
+                                <div className="absolute right-0 top-[calc(100%+1rem)] w-72 bg-white rounded-3xl shadow-[0_32px_64px_-16px_rgba(0,0,0,0.15)] border border-gray-100 py-3 animate-in fade-in zoom-in-95 slide-in-from-top-4 duration-300 overflow-hidden z-50">
+                                    <div className="lg:hidden px-2 mb-2">
                                         <Link
-                                            href="/auth/register?role=OWNER"
-                                            className="block px-5 py-3 hover:bg-zinc-50 text-sm font-bold transition-colors"
+                                            href="/hostels"
+                                            className="flex items-center gap-3 px-5 py-3 rounded-2xl hover:bg-gray-50 text-xs font-bold text-gray-900 transition-colors"
                                             onClick={() => setIsOpen(false)}
                                         >
-                                            List your hostel
+                                            <Home size={16} className="text-gray-400" />
+                                            Browse Listings
                                         </Link>
-                                    </>
-                                )}
-                            </div>
-                        )}
+                                    </div>
+
+                                    {user ? (
+                                        <>
+                                            <div className="px-5 py-4 bg-gray-50/50 border-y border-gray-100/50 mb-2">
+                                                <div className="font-bold text-sm truncate text-gray-900">{user.email}</div>
+                                                <div className="flex items-center gap-2 mt-1">
+                                                    <div className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
+                                                    <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">{user.role} Hub</span>
+                                                </div>
+                                            </div>
+
+                                            <div className="max-h-[60vh] overflow-y-auto px-2 space-y-1">
+                                                {navItems.map((item) => (
+                                                    <Link
+                                                        key={item.href}
+                                                        href={item.href}
+                                                        className={cn(
+                                                            "flex items-center gap-3 px-4 py-3 rounded-2xl text-xs font-bold transition-all group",
+                                                            isActive(item.href) 
+                                                                ? "bg-blue-50 text-blue-600 shadow-sm" 
+                                                                : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                                                        )}
+                                                        onClick={() => setIsOpen(false)}
+                                                    >
+                                                        <item.icon size={16} className={cn(isActive(item.href) ? "text-blue-600" : "text-gray-400 group-hover:text-gray-600")} />
+                                                        {item.label}
+                                                    </Link>
+                                                ))}
+                                            </div>
+
+                                            <div className="mt-4 px-2">
+                                                <button
+                                                    onClick={handleLogout}
+                                                    className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-xs font-bold text-red-500 hover:bg-red-50 transition-all"
+                                                >
+                                                    <LogOut size={16} />
+                                                    Sign Out
+                                                </button>
+                                            </div>
+                                        </>
+                                    ) : (
+                                        <div className="px-2 space-y-1">
+                                            <button
+                                                onClick={() => { setIsOpen(false); open("login"); }}
+                                                className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-xs font-bold text-gray-900 hover:bg-gray-50 transition-all"
+                                            >
+                                                <UserIcon size={16} className="text-gray-400" />
+                                                Log In
+                                            </button>
+                                            <button
+                                                onClick={() => { setIsOpen(false); open("register"); }}
+                                                className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-xs font-bold text-gray-700 hover:bg-gray-50 transition-all"
+                                            >
+                                                <CreditCard size={16} className="text-gray-400" />
+                                                Join Now
+                                            </button>
+                                            <div className="h-px bg-gray-50 my-2 mx-3" />
+                                            <Link
+                                                href="/auth/register?role=OWNER"
+                                                className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-xs font-bold text-blue-600 hover:bg-blue-50 transition-all"
+                                                onClick={() => setIsOpen(false)}
+                                            >
+                                                <Building2 size={16} />
+                                                List your property
+                                            </Link>
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+                        </div>
                     </div>
                 </div>
             </div>
