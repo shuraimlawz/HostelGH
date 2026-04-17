@@ -24,7 +24,8 @@ import {
     Bell,
     ListChecks,
     Wallet,
-    FileText
+    FileText,
+    ChevronRight,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState, useEffect } from "react";
