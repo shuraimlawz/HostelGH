@@ -390,7 +390,7 @@ function AdminUsersContent() {
                                             </DropdownMenu>
                                         </td>
                                     </tr>
-                                {))}
+                                ))}
                             </tbody>
                         </table>
 
