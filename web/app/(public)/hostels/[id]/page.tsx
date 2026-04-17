@@ -32,7 +32,9 @@ import {
     User,
     Droplets,
     Zap,
-    Flame
+    Flame,
+    Loader2,
+    ShieldAlert
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
