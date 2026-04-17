@@ -4,58 +4,39 @@ import { useState, useEffect } from "react";
 import { Monitor, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-const TIPS = [
-    "💻 Browsing on a PC or laptop gives you the best HostelGH experience — wider view, easier filtering!",
-    "🖥️ For the smoothest hostel search, try HostelGH on your laptop or desktop computer.",
-    "🏠 Finding your perfect hostel is easier on a bigger screen. Switch to PC for the full experience!",
-    "📱 On mobile? You're good — but HostelGH shines brightest on a PC or laptop!",
-];
-
-const SHOW_DELAY = 6000;        // 6s after load, show first tip
-const PERSISTENT_KEY = "hostelgh_tip_dismissed";
+const PERSISTENT_KEY = "hostelgh_tip_dismissed_v2"; // Increment version to force reset if needed
+const SHOW_DELAY = 10000; // Increased to 10s to be less intrusive
 
 export default function BrowsingTip() {
     const [visible, setVisible] = useState(false);
-    const [tip, setTip] = useState(TIPS[0]);
-    const [animating, setAnimating] = useState(false);
-
-    const pickTip = () => TIPS[Math.floor(Math.random() * TIPS.length)];
-
-    const showTip = () => {
-        // Double check local storage before showing
-        if (localStorage.getItem(PERSISTENT_KEY) === "true") return;
-        
-        setTip(pickTip());
-        setAnimating(false);
-        setVisible(true);
-    };
-
-    const dismiss = () => {
-        setAnimating(true);
-        setTimeout(() => {
-            setVisible(false);
-            setAnimating(false);
-        }, 400);
-    };
+    const [isAnimating, setIsAnimating] = useState(false);
 
     useEffect(() => {
-        // Initial check
-        if (localStorage.getItem(PERSISTENT_KEY) === "true") return;
+        // Initial check: if already dismissed, do nothing
+        if (typeof window !== "undefined" && localStorage.getItem(PERSISTENT_KEY) === "true") {
+            return;
+        }
 
-        const initial = setTimeout(showTip, SHOW_DELAY);
-        
-        return () => {
-            clearTimeout(initial);
-        };
+        const timer = setTimeout(() => {
+            // Re-check before showing (in case it was dismissed in another tab during the 10s)
+            if (localStorage.getItem(PERSISTENT_KEY) === "true") return;
+            setVisible(true);
+        }, SHOW_DELAY);
+
+        return () => clearTimeout(timer);
     }, []);
 
     const handleDismiss = () => {
-        dismiss();
+        setIsAnimating(true);
+        setTimeout(() => {
+            setVisible(false);
+            setIsAnimating(false);
+        }, 500);
     };
 
     const handlePermanentDismiss = () => {
         localStorage.setItem(PERSISTENT_KEY, "true");
-        dismiss();
+        handleDismiss();
     };
 
     if (!visible) return null;
@@ -63,37 +44,36 @@ export default function BrowsingTip() {
     return (
         <div
             className={cn(
-                "fixed bottom-6 left-1/2 -translate-x-1/2 z-50 w-[90vw] max-w-sm",
-                "transition-all duration-400",
-                animating ? "opacity-0 translate-y-6 scale-95" : "opacity-100 translate-y-0 scale-100"
+                "fixed bottom-10 left-1/2 -translate-x-1/2 z-[99] w-[92vw] max-w-[400px]",
+                "transition-all duration-700 ease-out",
+                isAnimating ? "opacity-0 translate-y-10 scale-90" : "opacity-100 translate-y-0 scale-100"
             )}
-            style={{ transition: "opacity 0.4s ease, transform 0.4s ease" }}
         >
-            <div className="relative bg-gray-950 text-white rounded-2xl shadow-2xl shadow-black/40 px-5 py-4 flex items-start gap-3 border border-white/10 backdrop-blur-md">
-                {/* Icon */}
-                <div className="shrink-0 mt-0.5 w-9 h-9 bg-blue-500/20 rounded-xl flex items-center justify-center">
-                    <Monitor size={18} className="text-blue-400" />
+            <div className="bg-gray-900/95 backdrop-blur-xl border border-white/10 rounded-2xl shadow-[0_25px_50px_-12px_rgba(0,0,0,0.5)] p-5 flex items-start gap-4">
+                <div className="flex-shrink-0 w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-900/20 border border-blue-500/30">
+                    <Monitor size={18} className="text-white" />
                 </div>
 
-                {/* Content */}
-                <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium leading-snug text-gray-100">{tip}</p>
+                <div className="flex-1 space-y-2">
+                    <div className="flex items-center justify-between">
+                        <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Platform Note</span>
+                        <button 
+                            onClick={handleDismiss}
+                            className="text-gray-500 hover:text-white transition-colors p-1"
+                        >
+                            <X size={14} />
+                        </button>
+                    </div>
+                    <p className="text-xs font-bold text-white tracking-tight leading-relaxed">
+                        HostelGH operates optimally on desktop configurations. Switch to a PC for enhanced auditing and booking tools.
+                    </p>
                     <button
                         onClick={handlePermanentDismiss}
-                        className="mt-2 text-[11px] font-semibold text-gray-500 hover:text-gray-300 transition-colors"
+                        className="text-[9px] font-bold text-blue-400 uppercase tracking-widest hover:text-blue-300 transition-colors pt-1"
                     >
-                        Don't show again
+                        Deactivate this protocol
                     </button>
                 </div>
-
-                {/* Close */}
-                <button
-                    onClick={handleDismiss}
-                    className="shrink-0 w-7 h-7 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors -mt-1 -mr-1"
-                    aria-label="Dismiss"
-                >
-                    <X size={13} />
-                </button>
             </div>
         </div>
     );

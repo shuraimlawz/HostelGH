@@ -40,10 +40,11 @@
     font-size: 14px;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    scroll-behavior: smooth;
   }
 
   body {
-    @apply bg-background text-foreground selection:bg-primary/20;
+    @apply bg-background text-foreground selection:bg-primary/20 font-sans;
     font-feature-settings: "rlig" 1, "calt" 1;
   }
 
@@ -53,7 +54,7 @@
   h4,
   h5,
   h6 {
-    @apply font-heading tracking-tight font-black;
+    @apply font-heading tracking-tight font-bold not-italic;
   }
 }
 

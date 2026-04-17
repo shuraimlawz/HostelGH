@@ -10,7 +10,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuLabel,
 } from "@/components/ui/dropdown-menu";
-import { Globe, MapPin, Check, Search } from "lucide-react";
+import { Globe, MapPin, Check, Search, Server } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const REGIONS = [
@@ -50,7 +50,7 @@ export default function RegionSelector() {
         } else {
             params.set("region", regionName);
         }
-        router.push(`/hostels?${params.toString()}`);
+        router.push(`/find?${params.toString()}`);
     };
 
     if (!mounted) return <div className="hidden md:flex w-10 h-10 mr-1" />;
@@ -58,68 +58,69 @@ export default function RegionSelector() {
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
-                <div className="hidden md:flex items-center justify-center w-10 h-10 rounded-full hover:bg-accent cursor-pointer transition-colors mr-1 group">
+                <div className="hidden md:flex items-center justify-center w-10 h-10 rounded-xl hover:bg-gray-50 cursor-pointer transition-all mr-1 group border border-transparent hover:border-gray-200">
                     <div className="relative">
                         <Globe size={18} className={cn(
                             "transition-all duration-300",
-                            currentRegion ? "text-blue-600 scale-110" : "text-gray-600 group-hover:text-black"
+                            currentRegion ? "text-blue-600 scale-110" : "text-gray-400 group-hover:text-gray-900"
                         )} />
                         {currentRegion && (
-                            <div className="absolute -top-1 -right-1 w-2 h-2 bg-blue-600 rounded-full border-2 border-white animate-pulse" />
+                            <div className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-blue-600 rounded-full border-2 border-white shadow-sm animate-pulse" />
                         )}
                     </div>
                 </div>
             </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-64 bg-card text-card-foreground rounded-2xl shadow-[0_6px_16px_rgba(0,0,0,0.12)] border py-2 mt-2 animate-in fade-in zoom-in-95 duration-200">
-                <DropdownMenuLabel className="px-4 py-3">
-                    <div className="text-xs font-black uppercase tracking-[0.2em] text-muted-foreground flex items-center gap-2">
-                        <MapPin size={12} className="text-primary" />
-                        Select Region
+            <DropdownMenuContent className="w-72 bg-white rounded-3xl shadow-2xl border border-gray-100 py-3 mt-4 animate-in fade-in zoom-in-95 duration-200 lg:mr-4">
+                <DropdownMenuLabel className="px-5 py-4">
+                    <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400 flex items-center gap-3">
+                        <Server size={14} className="text-blue-600" />
+                        Network Node Selection
                     </div>
                 </DropdownMenuLabel>
 
-                <div className="max-h-[350px] overflow-y-auto overflow-x-hidden no-scrollbar py-1">
+                <div className="max-h-[400px] overflow-y-auto no-scrollbar py-1">
                     <DropdownMenuItem
                         onClick={() => handleSelect("All")}
                         className={cn(
-                            "px-4 py-3 cursor-pointer flex items-center justify-between transition-colors",
-                            !currentRegion ? "bg-primary/10 text-primary font-bold" : "hover:bg-accent"
+                            "mx-2 px-4 py-3 cursor-pointer flex items-center justify-between transition-all rounded-2xl mb-1",
+                            !currentRegion ? "bg-blue-50 text-blue-600 font-bold" : "hover:bg-gray-50"
                         )}
                     >
-                        <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center text-[10px] font-black italic">GH</div>
-                            <span className="text-sm">All of Ghana</span>
+                        <div className="flex items-center gap-4">
+                            <div className="w-10 h-10 rounded-xl bg-gray-900 flex items-center justify-center text-[10px] font-bold text-white shadow-lg">GH</div>
+                            <span className="text-[11px] font-bold uppercase tracking-widest">Entire Fleet</span>
                         </div>
-                        {!currentRegion && <Check size={14} className="text-primary" />}
+                        {!currentRegion && <Check size={16} className="text-blue-600" />}
                     </DropdownMenuItem>
 
-                    <DropdownMenuSeparator className="my-1 bg-gray-100" />
+                    <div className="px-5 py-2">
+                        <div className="h-px bg-gray-50 w-full" />
+                    </div>
 
                     {REGIONS.map((r) => (
                         <DropdownMenuItem
                             key={r.name}
                             onClick={() => handleSelect(r.name)}
                             className={cn(
-                                "px-4 py-3 cursor-pointer flex items-center justify-between transition-colors",
-                                currentRegion === r.name ? "bg-primary/10 text-primary font-bold" : "hover:bg-accent"
+                                "mx-2 px-4 py-3 cursor-pointer flex items-center justify-between transition-all rounded-2xl mb-1",
+                                currentRegion === r.name ? "bg-blue-50 text-blue-600 font-bold" : "hover:bg-gray-50"
                             )}
                         >
-                            <div className="flex items-center gap-3">
-                                <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center text-[10px] font-black italic uppercase text-muted-foreground group-hover:text-primary">
+                            <div className="flex items-center gap-4">
+                                <div className="w-10 h-10 rounded-xl bg-gray-50 border border-gray-100 flex items-center justify-center text-[10px] font-bold text-gray-400 uppercase tracking-widest group-hover:text-blue-600 transition-colors">
                                     {r.code}
                                 </div>
-                                <span className="text-sm">{r.name}</span>
+                                <span className="text-[11px] font-bold uppercase tracking-widest leading-none">{r.name}</span>
                             </div>
-                            {currentRegion === r.name && <Check size={14} className="text-primary" />}
+                            {currentRegion === r.name && <Check size={16} className="text-blue-600" />}
                         </DropdownMenuItem>
                     ))}
                 </div>
 
-                <DropdownMenuSeparator className="my-1 bg-gray-100" />
-                <div className="px-4 py-2 opacity-40">
-                    <div className="flex items-center gap-2 text-[8px] font-black uppercase tracking-widest leading-none">
-                        <Search size={10} />
-                        Filter hostels by location
+                <div className="px-5 py-4 border-t border-gray-50 mt-2">
+                    <div className="flex items-center gap-3 text-[9px] font-bold uppercase tracking-widest text-gray-300 leading-none">
+                        <Search size={12} className="text-blue-500" />
+                        Archive Filtering Protocol
                     </div>
                 </div>
             </DropdownMenuContent>

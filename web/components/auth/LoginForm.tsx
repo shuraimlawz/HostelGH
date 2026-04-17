@@ -1,13 +1,13 @@
 "use client";
 
-// Build trigger: Production Cleanup
 import { api } from "@/lib/api";
 import { useState } from "react";
 import { useAuth } from "@/lib/auth-context";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { AlertCircle, Eye, EyeOff } from "lucide-react";
+import { AlertCircle, Eye, EyeOff, Loader2, Mail, Lock, ShieldCheck, ArrowRight } from "lucide-react";
 import Link from "next/link";
+import { cn } from "@/lib/utils";
 
 export default function LoginForm({ onSuccess }: { onSuccess?: (user: any) => void }) {
     const [email, setEmail] = useState("");
@@ -27,7 +27,6 @@ export default function LoginForm({ onSuccess }: { onSuccess?: (user: any) => vo
 
         try {
             const res = await api.post("/auth/login", { email, password });
-            console.log("Login response:", res.data);
             const data = res.data?.data || res.data;
             const { accessToken, user } = data;
 
@@ -37,28 +36,22 @@ export default function LoginForm({ onSuccess }: { onSuccess?: (user: any) => vo
             if (onSuccess) {
                 onSuccess(user);
             } else {
-                // Role-based redirection
-                if (user.role === "OWNER") {
-                    router.push("/owner");
-                } else if (user.role === "ADMIN") {
-                    router.push("/admin");
-                } else if (user.role === "TENANT") {
-                    router.push("/hostels");
-                } else {
-                    router.push("/account");
-                }
+                if (user.role === "OWNER") router.push("/owner");
+                else if (user.role === "ADMIN") router.push("/admin");
+                else if (user.role === "TENANT") router.push("/hostels");
+                else router.push("/account");
             }
         } catch (error: any) {
             const isNetworkError = !error.response;
             if (isNetworkError) {
                 toast.error("Connectivity Issue", {
-                    description: "We’re having trouble connecting to our servers. Please check your internet connection.",
+                    description: "We’re having trouble connecting to our servers.",
                     duration: 5000,
                 });
             } else {
                 const raw = error.response?.data?.message;
                 const message = (!raw || raw === "Internal server error")
-                    ? "Invalid email or password. Please check your credentials and try again."
+                    ? "Invalid credentials. Please verify your access parameters."
                     : (Array.isArray(raw) ? raw[0] : raw);
                 setErr(message);
             }
@@ -69,15 +62,15 @@ export default function LoginForm({ onSuccess }: { onSuccess?: (user: any) => vo
 
     async function resendVerification() {
         if (!email) {
-            setErr("Enter your email to resend verification.");
+            setErr("Email required for verification re-issue.");
             return;
         }
         setResendLoading(true);
         try {
             await api.post("/auth/resend-verification", { email });
-            toast.success("Verification email sent.");
+            toast.success("Verification packet transmitted.");
         } catch (error: any) {
-            toast.error("Failed to resend verification email.");
+            toast.error("Failed to re-issue verification.");
         } finally {
             setResendLoading(false);
         }
@@ -85,122 +78,136 @@ export default function LoginForm({ onSuccess }: { onSuccess?: (user: any) => vo
 
     const handleGoogleLogin = () => {
         const url = `${api.defaults.baseURL}/auth/google`;
-        console.log("Redirecting to Google Auth:", url);
         window.location.href = url;
     };
 
     return (
-        <div className="space-y-4">
-            <form onSubmit={submit} className="space-y-3">
-                <div className="space-y-1 group">
-                    <label className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] px-0.5 group-focus-within:text-foreground transition-colors">Email</label>
-                    <input
-                        type="email"
-                        className="w-full px-3 py-2.5 bg-background border border-border rounded-sm outline-none focus:border-primary transition-all text-xs font-bold uppercase tracking-tight placeholder:text-muted-foreground/30 shadow-sm"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        placeholder="your@email.com"
-                        required
-                    />
-                </div>
+        <div className="space-y-8">
+            <form onSubmit={submit} className="space-y-6">
+                <div className="space-y-5">
+                    {/* Email Input */}
+                    <div className="space-y-2 group">
+                        <label className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] ml-1 group-focus-within:text-blue-600 transition-colors">Credential Email</label>
+                        <div className="relative">
+                            <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-blue-600 transition-colors" size={18} />
+                            <input
+                                type="email"
+                                className="w-full pl-12 pr-4 h-14 bg-gray-50 border border-gray-100 rounded-2xl outline-none focus:bg-white focus:border-blue-600 transition-all text-[13px] font-bold text-gray-900 placeholder:text-gray-300"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                placeholder="e.g. USER@HOSTELGH.COM"
+                                required
+                                autoComplete="email"
+                            />
+                        </div>
+                    </div>
 
-                <div className="space-y-1 group">
-                    <label className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] px-0.5 group-focus-within:text-foreground transition-colors">Password</label>
-                    <div className="relative">
-                        <input
-                            type={showPassword ? "text" : "password"}
-                            className="w-full px-3 py-2.5 bg-background border border-border rounded-sm outline-none focus:border-primary transition-all text-xs font-bold tracking-widest placeholder:text-muted-foreground/30 shadow-sm pr-10"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            placeholder="••••••••"
-                            required
-                        />
-                        <button
-                            type="button"
-                            onClick={() => setShowPassword(!showPassword)}
-                            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors outline-none z-10"
-                        >
-                            {showPassword ? <EyeOff size={14} /> : <Eye size={14} />}
-                        </button>
+                    {/* Password Input */}
+                    <div className="space-y-2 group">
+                        <div className="flex justify-between items-center px-1">
+                            <label className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] group-focus-within:text-blue-600 transition-colors">Access Key</label>
+                            <Link href="/auth/forgot-password" title="Initialize recovery protocol" className="text-[9px] font-bold text-gray-300 uppercase tracking-widest hover:text-blue-600 transition-colors">
+                                Forgot Key?
+                            </Link>
+                        </div>
+                        <div className="relative">
+                            <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-blue-600 transition-colors" size={18} />
+                            <input
+                                type={showPassword ? "text" : "password"}
+                                className="w-full pl-12 pr-12 h-14 bg-gray-50 border border-gray-100 rounded-2xl outline-none focus:bg-white focus:border-blue-600 transition-all text-[13px] font-bold tracking-widest text-gray-900 placeholder:text-gray-300"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                placeholder="••••••••"
+                                required
+                                autoComplete="current-password"
+                            />
+                            <button
+                                type="button"
+                                onClick={() => setShowPassword(!showPassword)}
+                                className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-300 hover:text-gray-900 transition-colors outline-none z-10"
+                            >
+                                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                            </button>
+                        </div>
                     </div>
                 </div>
 
-                <div className="flex justify-between items-center px-0.5">
-                    <label className="flex items-center gap-1.5 cursor-pointer group/check">
-                        <input
-                            type="checkbox"
-                            checked={rememberMe}
-                            onChange={(e) => setRememberMe(e.target.checked)}
-                            className="rounded-sm border-border w-3.5 h-3.5 text-primary focus:ring-primary bg-background"
-                        />
-                        <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-tight group-hover/check:text-foreground transition-colors">Remember me</span>
+                <div className="flex items-center px-1">
+                    <label className="flex items-center gap-2.5 cursor-pointer group/check">
+                        <div className="relative flex items-center">
+                            <input
+                                type="checkbox"
+                                checked={rememberMe}
+                                onChange={(e) => setRememberMe(e.target.checked)}
+                                className="peer appearance-none w-5 h-5 rounded-lg border border-gray-200 bg-gray-50 checked:bg-blue-600 checked:border-blue-600 transition-all cursor-pointer"
+                            />
+                            <ShieldCheck className="absolute inset-0 m-auto text-white scale-0 peer-checked:scale-100 transition-transform pointer-events-none" size={12} />
+                        </div>
+                        <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest group-hover/check:text-gray-900 transition-colors">Persistent Session</span>
                     </label>
-                    <Link href="/auth/forgot-password" className="text-[10px] font-black text-muted-foreground uppercase tracking-tight hover:text-primary transition-colors">
-                        Forgot password?
-                    </Link>
                 </div>
 
                 {err && (
-                    <div className="flex items-center gap-2 text-[10px] bg-red-500/10 text-red-600 font-black uppercase tracking-tight px-3 py-2 rounded-sm border border-red-500/20 animate-in fade-in slide-in-from-top-1 duration-200">
-                        <AlertCircle className="w-3 h-3" />
+                    <div className="flex items-center gap-3 text-[10px] bg-red-50 text-red-600 font-bold uppercase tracking-widest px-4 py-3 rounded-2xl border border-red-100 animate-in fade-in slide-in-from-top-1 duration-200">
+                        <AlertCircle className="shrink-0" size={14} />
                         <span>{err}</span>
                     </div>
                 )}
+
                 {err && err.toLowerCase().includes("verify") && (
                     <button
                         type="button"
                         onClick={resendVerification}
                         disabled={resendLoading}
-                        className="w-full text-[9px] font-black uppercase tracking-[0.2em] text-primary hover:text-primary/80 transition-colors"
+                        className="w-full text-[9px] font-bold uppercase tracking-[0.2em] text-blue-600 hover:text-blue-700 transition-colors py-2"
                     >
-                        {resendLoading ? "Resending..." : "Resend verification email"}
+                        {resendLoading ? "Synchronizing..." : "Re-issue Verification Packet"}
                     </button>
                 )}
 
-                <div className="pt-2">
-                    <button
-                        disabled={loading}
-                        className="group relative w-full rounded-sm bg-foreground text-background font-black py-3.5 hover:bg-foreground/90 transition-all active:scale-[0.98] disabled:opacity-60 text-[11px] uppercase tracking-[0.3em] shadow-lg shadow-foreground/5"
-                    >
-                        {loading ? (
-                            <div className="flex items-center justify-center gap-2">
-                                <div className="w-1 h-1 bg-background rounded-full animate-bounce [animation-delay:-0.3s]"></div>
-                                <div className="w-1 h-1 bg-background rounded-full animate-bounce [animation-delay:-0.15s]"></div>
-                                <div className="w-1 h-1 bg-background rounded-full animate-bounce"></div>
-                                <span className="ml-1 tracking-[0.2em]">Checking credentials...</span>
-                            </div>
-                        ) : (
-                            <span className="whitespace-nowrap">Sign In</span>
-                        )}
-                    </button>
-                </div>
+                <button
+                    disabled={loading}
+                    className="group relative w-full h-14 rounded-2xl bg-gray-900 text-white font-bold py-3.5 hover:bg-black transition-all active:scale-[0.98] disabled:opacity-50 text-[11px] uppercase tracking-[0.3em] shadow-2xl shadow-gray-200 flex items-center justify-center gap-3"
+                >
+                    {loading ? (
+                        <>
+                            <Loader2 className="animate-spin" size={18} />
+                            Validating...
+                        </>
+                    ) : (
+                        <>
+                            Executive Login
+                            <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+                        </>
+                    )}
+                </button>
             </form>
 
             <div className="relative py-2">
                 <div className="absolute inset-0 flex items-center">
-                    <div className="w-full border-t border-border"></div>
+                    <div className="w-full border-t border-gray-100"></div>
                 </div>
-                <div className="relative flex justify-center text-[9px] uppercase tracking-[0.4em] font-black">
-                    <span className="bg-card px-3 text-muted-foreground/50">or</span>
+                <div className="relative flex justify-center text-[9px] uppercase tracking-[0.4em] font-bold">
+                    <span className="bg-white px-4 text-gray-300">Alternate</span>
                 </div>
             </div>
 
             <button
                 onClick={handleGoogleLogin}
                 type="button"
-                className="w-full flex items-center justify-center gap-2.5 rounded-sm border border-border bg-background text-foreground font-black py-3 hover:bg-muted hover:border-foreground/20 transition-all active:scale-[0.98] text-[10px] uppercase tracking-widest shadow-sm"
+                className="w-full h-14 flex items-center justify-center gap-3 rounded-2xl border border-gray-100 bg-white text-gray-900 font-bold hover:bg-gray-50 hover:border-gray-200 transition-all active:scale-[0.98] text-[10px] uppercase tracking-widest shadow-sm"
             >
-                <svg viewBox="0 0 18 18" width="14" height="14" xmlns="http://www.w3.org/2000/svg">
+                <svg viewBox="0 0 18 18" width="16" height="16" xmlns="http://www.w3.org/2000/svg">
                     <path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z" />
                     <path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z" />
                     <path fill="#FBBC05" d="M3.964 10.706A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.706V4.962H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.038l3.007-2.332z" />
                     <path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.962l3.007 2.332c.708-2.127 2.692-3.711 5.036-3.711z" />
                 </svg>
-                Continue with Google
+                Google Identity Protocol
             </button>
 
-            <div className="text-center text-[10px] font-bold text-muted-foreground uppercase tracking-widest pt-2">
-                New here? <Link href="/auth/register" className="font-black text-foreground border-b border-foreground/50 hover:border-foreground transition-all ml-1">Create Account</Link>
+            <div className="text-center text-[10px] font-bold text-gray-400 uppercase tracking-widest pt-4">
+                Network Breach? <Link href="/auth/register" className="text-gray-900 border-b border-gray-200 hover:border-gray-900 transition-all ml-2">Initialize Account</Link>
             </div>
         </div>
     );

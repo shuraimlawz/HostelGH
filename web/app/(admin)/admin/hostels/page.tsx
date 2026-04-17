@@ -16,8 +16,9 @@ import {
     ExternalLink,
     MapPin,
     Users as UsersIcon,
-    Bed,
-    Filter
+    Filter,
+    ArrowUpRight,
+    ChevronRight as ChevronRightIcon
 } from "lucide-react";
 import { useState, Suspense } from "react";
 import { cn } from "@/lib/utils";
@@ -76,7 +77,7 @@ function AdminHostelsContent() {
         queryFn: async () => {
             const params = new URLSearchParams();
             params.append("page", page.toString());
-            params.append("limit", "8"); // 8 per page grid
+            params.append("limit", "8"); 
             if (search) params.append("search", search);
             if (statusFilter && statusFilter !== "ALL") params.append("status", statusFilter);
 
@@ -88,10 +89,9 @@ function AdminHostelsContent() {
     const hostels = hostelsData?.data || [];
     const meta = hostelsData?.meta || { total: 0, totalPages: 1 };
 
-    const { data: pendingData, isLoading: pendingLoading } = useQuery({
+    const { data: pendingData } = useQuery({
         queryKey: ["admin-hostels-pending"],
         queryFn: async () => {
-            // Fetch pending specifically for the queue section, limit to 3 recent
             const res = await api.get("/admin/hostels?status=pending&limit=3");
             return res.data;
         }
@@ -99,9 +99,7 @@ function AdminHostelsContent() {
     const pendingHostels = pendingData?.data || [];
 
     const updateHostelMutation = useMutation({
-        mutationFn: async ({ id, data }: { id: string; data: any }) => {
-            return api.patch(`/admin/hostels/${id}`, data);
-        },
+        mutationFn: async ({ id, data }: { id: string; data: any }) => api.patch(`/admin/hostels/${id}`, data),
         onSuccess: () => {
             toast.success("Hostel status updated");
             queryClient.invalidateQueries({ queryKey: ["admin-hostels"] });
@@ -111,9 +109,7 @@ function AdminHostelsContent() {
     });
 
     const verifyHostelMutation = useMutation({
-        mutationFn: async (id: string) => {
-            return api.patch(`/admin/hostels/${id}/verify`);
-        },
+        mutationFn: async (id: string) => api.patch(`/admin/hostels/${id}/verify`),
         onSuccess: () => {
             toast.success("Hostel verified and published");
             queryClient.invalidateQueries({ queryKey: ["admin-hostels"] });
@@ -123,9 +119,7 @@ function AdminHostelsContent() {
     });
 
     const rejectHostelMutation = useMutation({
-        mutationFn: async ({ id, reason }: { id: string; reason?: string }) => {
-            return api.patch(`/admin/hostels/${id}/reject`, { reason });
-        },
+        mutationFn: async ({ id, reason }: { id: string; reason?: string }) => api.patch(`/admin/hostels/${id}/reject`, { reason }),
         onSuccess: () => {
             toast.success("Hostel submission rejected");
             queryClient.invalidateQueries({ queryKey: ["admin-hostels"] });
@@ -135,9 +129,7 @@ function AdminHostelsContent() {
     });
 
     const toggleFeatureMutation = useMutation({
-        mutationFn: async ({ id, featured }: { id: string; featured: boolean }) => {
-            return api.patch(`/admin/hostels/${id}/feature`, { featured });
-        },
+        mutationFn: async ({ id, featured }: { id: string; featured: boolean }) => api.patch(`/admin/hostels/${id}/feature`, { featured }),
         onSuccess: (_, variables) => {
             toast.success(variables.featured ? "Hostel featured" : "Hostel unfeatured");
             queryClient.invalidateQueries({ queryKey: ["admin-hostels"] });
@@ -146,16 +138,7 @@ function AdminHostelsContent() {
     });
 
     const deleteHostelMutation = useMutation({
-        mutationFn: async (id: string) => {
-            // Admin delete endpoint or reuse existing if perm allows
-            // Assuming admin delete endpoint doesn't exist yet, we use generic delete if implemented or prevent it.
-            // Actually admin.controller didn't show delete endpoint.
-            // I will use api.delete(`/hostels/${id}`) assuming ADMIN role overrides owner check in backend guard?
-            // If not, I should implement delete in AdminController.
-            // For now, let's try the standard endpoint, or better, just hide it if risky.
-            // But UI had it. Let's try standard delete.
-            return api.delete(`/hostels/${id}`);
-        },
+        mutationFn: async (id: string) => api.delete(`/hostels/${id}`),
         onSuccess: () => {
             toast.success("Hostel removed from platform");
             queryClient.invalidateQueries({ queryKey: ["admin-hostels"] });
@@ -165,48 +148,40 @@ function AdminHostelsContent() {
     });
 
     return (
-        <div className="max-w-[1600px] mx-auto space-y-12 pb-20">
+        <div className="max-w-[1400px] mx-auto space-y-12 pb-20 pt-4 px-4">
             {/* Header */}
-            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8 pt-4">
-                <div>
-                    <div className="flex items-center gap-3 mb-4">
-                        <span className="px-2.5 py-1 bg-emerald-50 text-emerald-600 rounded-full text-[9px] font-black uppercase tracking-widest border border-emerald-100">
-                            Asset Moderation
-                        </span>
-                        <div className="flex items-center gap-2 text-[10px] font-bold text-gray-400">
-                            <Building2 size={12} className="text-emerald-400" /> Infrastructure Panel
-                        </div>
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-8">
+                <div className="space-y-2">
+                    <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                        <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Asset Moderation</span>
                     </div>
-                    <h1 className="text-4xl font-black text-gray-950 tracking-tight leading-none mb-3">
-                        Asset Control <span className="text-emerald-600">.</span>
-                    </h1>
-                    <p className="text-gray-500 font-medium text-lg">Manage platform inventory, verify new listings, and moderate properties.</p>
+                    <h1 className="text-3xl md:text-4xl font-bold text-gray-900 tracking-tight">Hostel Audit Panel</h1>
+                    <p className="text-gray-500 text-sm max-w-md">Verify property legitimacy, manage featured assets, and monitor platform inventory.</p>
                 </div>
 
-                <div className="flex items-center gap-4">
-                    <div className="bg-white border border-gray-100 rounded-[2rem] px-8 py-4 flex items-center gap-4 shadow-sm">
-                        <div className="w-10 h-10 bg-emerald-50 rounded-xl flex items-center justify-center text-emerald-600">
-                            <Building2 size={20} />
-                        </div>
-                        <div>
-                            <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 leading-none mb-1">Live Assets</p>
-                            <p className="text-2xl font-black text-gray-950 tracking-tighter">{meta.total}</p>
-                        </div>
+                <div className="bg-white border border-gray-100 rounded-xl px-6 py-4 flex items-center gap-4 shadow-sm">
+                    <div className="w-10 h-10 bg-emerald-50 rounded-lg flex items-center justify-center text-emerald-600 border border-emerald-100 shadow-sm">
+                        <Building2 size={20} />
+                    </div>
+                    <div>
+                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest leading-none mb-1">Live Inventory</p>
+                        <p className="text-2xl font-bold text-gray-900 tracking-tight">{meta.total}</p>
                     </div>
                 </div>
             </div>
 
             {/* Pending Verification Section */}
             {pendingHostels.length > 0 && (
-                <div className="bg-orange-50/50 border border-orange-100 rounded-[3rem] p-10 space-y-8 animate-in fade-in slide-in-from-top-4 duration-500">
+                <div className="bg-amber-50 rounded-2xl p-8 border border-amber-100 shadow-sm space-y-8 animate-in fade-in slide-in-from-top-4 duration-500">
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-4">
-                            <div className="w-14 h-14 bg-orange-100 rounded-2xl flex items-center justify-center text-orange-600 shadow-xl shadow-orange-100">
-                                <ShieldCheck size={28} />
+                            <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center text-amber-600 shadow-sm border border-amber-200">
+                                <ShieldCheck size={24} />
                             </div>
                             <div>
-                                <h2 className="text-2xl font-black italic uppercase tracking-tighter">Verification Queue</h2>
-                                <p className="text-[10px] text-orange-600/60 font-black uppercase tracking-widest">
+                                <h2 className="text-xl font-bold text-gray-900">Critical Verification Queue</h2>
+                                <p className="text-[10px] text-amber-600 font-bold uppercase tracking-widest">
                                     Action Required: {pendingData?.meta?.total || pendingHostels.length} First-time listings
                                 </p>
                             </div>
@@ -215,45 +190,44 @@ function AdminHostelsContent() {
 
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {pendingHostels.map((hostel: any) => (
-                            <div key={hostel.id} className="bg-white rounded-[2rem] p-6 border border-orange-100 shadow-sm relative overflow-hidden group">
-                                <div className="absolute top-0 right-0 w-32 h-32 bg-orange-50 rounded-full -mr-16 -mt-16 transition-transform group-hover:scale-110" />
-                                <div className="relative z-10 flex flex-col h-full">
-                                    <div className="flex items-start justify-between mb-4">
+                            <div key={hostel.id} className="bg-white rounded-xl p-5 border border-amber-200 shadow-sm relative overflow-hidden group hover:border-amber-400 transition-colors">
+                                <div className="relative z-10 flex flex-col h-full space-y-4">
+                                    <div className="flex items-start justify-between">
                                         <div className="flex items-center gap-3">
-                                            <div className="w-10 h-10 bg-gray-50 rounded-xl flex items-center justify-center text-gray-900 font-bold text-xs uppercase">
+                                            <div className="w-10 h-10 bg-gray-50 rounded-lg flex items-center justify-center text-gray-400 font-bold text-xs uppercase border border-gray-100">
                                                 {hostel.owner?.firstName?.[0] || 'O'}
                                             </div>
-                                            <div>
-                                                <p className="text-[11px] font-black text-gray-950 truncate max-w-[150px]">{hostel.name}</p>
+                                            <div className="min-w-0">
+                                                <p className="font-bold text-sm text-gray-900 truncate pr-2">{hostel.name}</p>
                                                 <p className="text-[9px] text-gray-400 font-bold uppercase tracking-widest">{hostel.city}</p>
                                             </div>
                                         </div>
-                                        <span className="px-2 py-1 bg-orange-100 text-orange-700 rounded-lg text-[8px] font-black uppercase tracking-widest">Pending</span>
+                                        <span className="px-2 py-1 bg-amber-100 text-amber-700 rounded-lg text-[8px] font-bold uppercase tracking-widest">Pending</span>
                                     </div>
 
-                                    <div className="space-y-2 mb-6 flex-1">
-                                        <div className="flex items-center gap-2 text-[10px] text-gray-500">
-                                            <UsersIcon size={12} className="text-gray-400" />
-                                            <span className="font-medium">Proprietor: <span className="text-gray-950 font-bold">{hostel.owner?.firstName}</span></span>
+                                    <div className="space-y-1.5 flex-1">
+                                        <div className="flex items-center gap-2 text-[10px] text-gray-400">
+                                            <UsersIcon size={12} />
+                                            <span className="font-medium">Owner: <strong className="text-gray-900">{hostel.owner?.firstName}</strong></span>
                                         </div>
-                                        <div className="flex items-center gap-2 text-[10px] text-gray-500">
-                                            <MapPin size={12} className="text-gray-400" />
+                                        <div className="flex items-center gap-2 text-[10px] text-gray-400">
+                                            <MapPin size={12} />
                                             <span className="font-medium truncate">{hostel.addressLine}</span>
                                         </div>
                                     </div>
 
-                                    <div className="grid grid-cols-2 gap-3">
+                                    <div className="grid grid-cols-2 gap-3 pt-2">
                                         <button
                                             onClick={() => verifyHostelMutation.mutate(hostel.id)}
                                             disabled={verifyHostelMutation.isPending}
-                                            className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl py-2.5 font-black text-[9px] uppercase tracking-widest transition-all shadow-lg shadow-emerald-100 disabled:opacity-50"
+                                            className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg py-2 font-bold text-[9px] uppercase tracking-widest transition-all shadow-md shadow-emerald-900/10 disabled:opacity-50"
                                         >
-                                            {verifyHostelMutation.isPending ? "..." : "Approve"}
+                                            {verifyHostelMutation.isPending ? "..." : "Approve Site"}
                                         </button>
                                         <button
                                             onClick={() => rejectHostelMutation.mutate({ id: hostel.id })}
                                             disabled={rejectHostelMutation.isPending}
-                                            className="bg-white border border-red-100 text-red-600 hover:bg-red-50 rounded-xl py-2.5 font-black text-[9px] uppercase tracking-widest transition-all disabled:opacity-50"
+                                            className="bg-white border border-red-100 text-red-600 hover:bg-red-50 rounded-lg py-2 font-bold text-[9px] uppercase tracking-widest transition-all disabled:opacity-50"
                                         >
                                             Reject
                                         </button>
@@ -266,148 +240,156 @@ function AdminHostelsContent() {
             )}
 
             {/* Controls */}
-            {/* Search & Filters */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-                <div className="md:col-span-4 flex gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 px-1">
+                <div className="md:col-span-4 flex flex-col md:flex-row gap-4">
                     <div className="relative flex-1">
-                        <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300" size={18} />
                         <input
                             value={search}
                             onChange={(e) => handleSearchChange(e.target.value)}
-                            className="w-full bg-white border border-gray-100 rounded-[2.5rem] py-5 pl-16 pr-8 outline-none focus:ring-4 focus:ring-emerald-100 transition-all font-bold text-gray-950 placeholder:text-gray-400 shadow-sm"
-                            placeholder="Search by name, city, or proprietor email..."
+                            className="w-full h-12 bg-white border border-gray-100 rounded-xl pl-12 pr-4 outline-none focus:border-blue-500 transition-all font-bold text-gray-900 placeholder:text-gray-300 shadow-sm text-sm"
+                            placeholder="Find assets by name, city, or proprietor..."
                         />
                     </div>
-                    <div className="relative min-w-[180px]">
-                        <Filter className="absolute left-6 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
+                    <div className="relative min-w-[200px]">
+                        <Filter className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300" size={16} />
                         <select
                             value={statusFilter}
                             onChange={(e) => handleStatusChange(e.target.value)}
-                            className="w-full h-full bg-white border border-gray-100 rounded-[2.5rem] pl-14 pr-8 outline-none focus:ring-4 focus:ring-emerald-100 transition-all font-bold text-gray-950 shadow-sm text-sm appearance-none cursor-pointer"
+                            className="w-full h-12 bg-white border border-gray-100 rounded-xl pl-12 pr-10 outline-none focus:border-blue-500 transition-all font-bold text-gray-900 shadow-sm text-sm appearance-none cursor-pointer"
                         >
-                            <option value="ALL">All Status</option>
-                            <option value="published">Published</option>
-                            <option value="unpublished">Unpublished</option>
-                            <option value="pending">Pending</option>
+                            <option value="ALL">All Listing Status</option>
+                            <option value="published">Published Assets</option>
+                            <option value="unpublished">Internal Drafts</option>
+                            <option value="pending">Verification Queue</option>
                         </select>
+                        <ChevronRightIcon className="absolute right-4 top-1/2 -translate-y-1/2 rotate-90 text-gray-300 pointer-events-none" size={14} />
                     </div>
                 </div>
             </div>
 
-            {/* List */}
+            {/* Asset Grid */}
             {isLoading ? (
                 <div className="flex h-[400px] items-center justify-center">
-                    <div className="flex flex-col items-center gap-4">
-                        <Loader2 className="animate-spin text-emerald-600" size={40} />
-                        <p className="text-sm font-black text-gray-400 uppercase tracking-widest animate-pulse">Scanning Asset Registry...</p>
+                    <div className="flex flex-col items-center gap-4 text-center">
+                        <Loader2 className="animate-spin text-blue-600" size={32} />
+                        <p className="text-sm font-medium text-gray-400">Syncing infrastructure log...</p>
                     </div>
                 </div>
             ) : (
-                <>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-10">
+                <div className="space-y-10">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
                         {hostels.map((hostel: any) => (
-                            <div key={hostel.id} className="group flex flex-col gap-3">
-                                {/* Image & overlays */}
-                                <div className="relative aspect-square rounded-xl overflow-hidden bg-gray-100">
+                            <div key={hostel.id} className="group bg-white rounded-2xl border border-gray-100 overflow-hidden hover:shadow-xl hover:shadow-gray-200/50 transition-all flex flex-col">
+                                {/* Image Logic */}
+                                <div className="relative h-56 bg-gray-50 overflow-hidden border-b border-gray-50">
                                     {hostel.images?.[0] ? (
-                                        <img src={hostel.images[0]} alt={hostel.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                                        <img src={hostel.images[0]} alt={hostel.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
                                     ) : (
-                                        <div className="w-full h-full flex flex-col items-center justify-center text-gray-400 gap-2">
+                                        <div className="w-full h-full flex flex-col items-center justify-center text-gray-300 gap-2">
                                             <Building2 size={32} />
-                                            <span className="text-xs font-medium">No Image</span>
+                                            <span className="text-[10px] font-bold uppercase tracking-widest">Image Unavailable</span>
                                         </div>
                                     )}
 
-                                    {/* Status Badge */}
-                                    <div className="absolute top-3 left-3 flex flex-col gap-2">
+                                    {/* Overlay Status */}
+                                    <div className="absolute top-3 left-3 flex flex-wrap gap-2">
                                         <span className={cn(
-                                            "px-2.5 py-1 rounded-md text-xs font-semibold backdrop-blur-md shadow-sm",
+                                            "h-6 px-2.5 flex items-center rounded-lg text-[9px] font-bold uppercase tracking-widest backdrop-blur-md shadow-sm border",
                                             hostel.isPublished
-                                                ? "bg-white/90 text-emerald-700"
-                                                : "bg-black/70 text-white"
+                                                ? "bg-emerald-600/90 text-white border-emerald-500/50"
+                                                : "bg-gray-900/90 text-white border-gray-800"
                                         )}>
                                             {hostel.isPublished ? "Live" : "Draft"}
                                         </span>
                                         {hostel.isFeatured && (
-                                            <span className="bg-white/90 backdrop-blur-md text-blue-700 px-2.5 py-1 rounded-md text-xs font-semibold shadow-sm">
+                                            <span className="h-6 px-2.5 flex items-center bg-blue-600/90 text-white rounded-lg text-[9px] font-bold uppercase tracking-widest backdrop-blur-md shadow-sm border border-blue-500/50">
                                                 Featured
                                             </span>
                                         )}
                                     </div>
 
-                                    {/* Admin Actions */}
+                                    {/* Admin Dropdown */}
                                     <div className="absolute top-3 right-3">
                                         <DropdownMenu>
                                             <DropdownMenuTrigger asChild>
-                                                <button className="p-2 rounded-full bg-white/90 hover:bg-white backdrop-blur-sm transition-all shadow-sm">
-                                                    <MoreVertical size={16} className="text-gray-700" />
+                                                <button className="w-8 h-8 flex items-center justify-center rounded-lg bg-white/90 hover:bg-white backdrop-blur-sm transition-all shadow-sm border border-white/50 text-gray-600">
+                                                    <MoreVertical size={16} />
                                                 </button>
                                             </DropdownMenuTrigger>
-                                            <DropdownMenuContent align="end" className="rounded-xl border-gray-100 p-1 shadow-xl min-w-[180px]">
-                                                <DropdownMenuLabel className="text-[10px] font-bold uppercase tracking-widest text-gray-400 px-3 py-2">
-                                                    Manage Asset
-                                                </DropdownMenuLabel>
+                                            <DropdownMenuContent align="end" className="rounded-xl border-gray-100 p-2 shadow-xl w-52">
+                                                <DropdownMenuLabel className="text-[10px] font-bold uppercase tracking-widest text-gray-400 px-3 py-2">Property Control</DropdownMenuLabel>
                                                 <DropdownMenuItem
                                                     onClick={() => updateHostelMutation.mutate({ id: hostel.id, data: { published: !hostel.isPublished } })}
-                                                    className="rounded-lg font-medium text-xs gap-2 py-2.5 cursor-pointer"
+                                                    className="rounded-lg font-bold text-[10px] gap-3 py-2.5 cursor-pointer uppercase tracking-wide"
                                                 >
                                                     {hostel.isPublished ? <XCircle size={14} className="text-orange-500" /> : <CheckCircle2 size={14} className="text-emerald-500" />}
-                                                    {hostel.isPublished ? "Unpublish" : "Publish"}
+                                                    {hostel.isPublished ? "Unpublish Asset" : "Publish Asset"}
                                                 </DropdownMenuItem>
                                                 <DropdownMenuItem
                                                     onClick={() => toggleFeatureMutation.mutate({ id: hostel.id, featured: !hostel.isFeatured })}
-                                                    className="rounded-lg font-medium text-xs gap-2 py-2.5 cursor-pointer"
+                                                    className="rounded-lg font-bold text-[10px] gap-3 py-2.5 cursor-pointer uppercase tracking-wide"
                                                 >
                                                     <Star size={14} className="text-blue-500" />
-                                                    {hostel.isFeatured ? "Unfeature" : "Feature"}
+                                                    {hostel.isFeatured ? "Revoke Featured" : "Promote Featured"}
                                                 </DropdownMenuItem>
                                                 <DropdownMenuSeparator className="bg-gray-50 my-1" />
                                                 <DropdownMenuItem asChild>
-                                                    <Link href={`/hostels/${hostel.slug || hostel.id}`} target="_blank" className="rounded-lg font-medium text-xs gap-2 py-2.5 flex items-center cursor-pointer">
-                                                        <ExternalLink size={14} className="text-gray-400" />
-                                                        View Details
+                                                    <Link href={`/hostels/${hostel.slug || hostel.id}`} target="_blank" className="rounded-lg font-bold text-[10px] gap-3 py-2.5 flex items-center cursor-pointer uppercase tracking-wide">
+                                                        <ExternalLink size={14} className="text-gray-400" /> View External Listing
                                                     </Link>
                                                 </DropdownMenuItem>
                                                 <DropdownMenuItem
                                                     onClick={() => {
-                                                        if (confirm(`Delete ${hostel.name}?`)) {
+                                                        if (confirm(`Authorize terminal deletion of ${hostel.name}? This action is irreversible.`)) {
                                                             deleteHostelMutation.mutate(hostel.id);
                                                         }
                                                     }}
-                                                    className="rounded-lg font-medium text-xs gap-2 py-2.5 text-red-600 hover:bg-red-50 cursor-pointer"
+                                                    className="rounded-lg font-bold text-[10px] gap-3 py-2.5 text-red-600 hover:bg-red-50 cursor-pointer uppercase tracking-wide"
                                                 >
-                                                    <XCircle size={14} />
-                                                    Delete
+                                                    <XCircle size={14} /> Purge Asset
                                                 </DropdownMenuItem>
                                             </DropdownMenuContent>
                                         </DropdownMenu>
                                     </div>
                                 </div>
 
-                                {/* Content Details */}
-                                <div className="space-y-0.5">
-                                    <div className="flex justify-between items-start">
-                                        <h3 className="font-semibold text-gray-900 truncate pr-2 text-[15px]">
-                                            {hostel.name}
-                                        </h3>
-                                        <div className="flex items-center gap-1 text-sm text-gray-900 font-medium whitespace-nowrap">
-                                            <Star size={12} className="fill-black stroke-black" />
-                                            <span>4.9</span>
+                                {/* Property Info */}
+                                <div className="p-5 flex-1 flex flex-col space-y-4">
+                                    <div className="space-y-1">
+                                        <div className="flex justify-between items-start gap-4">
+                                            <h3 className="font-bold text-gray-900 text-[15px] tracking-tight truncate leading-tight">
+                                                {hostel.name}
+                                            </h3>
+                                            <div className="flex items-center gap-1 shrink-0">
+                                                <Star size={12} className="fill-blue-500 text-blue-500" />
+                                                <span className="text-xs font-bold text-gray-900">4.9</span>
+                                            </div>
+                                        </div>
+                                        <p className="text-[11px] text-gray-400 font-bold uppercase tracking-widest truncate">
+                                            {hostel.city}, {hostel.region}
+                                        </p>
+                                    </div>
+
+                                    <div className="grid grid-cols-2 gap-4 py-3 border-y border-gray-50">
+                                        <div className="space-y-0.5">
+                                            <p className="text-[8px] font-bold uppercase tracking-widest text-gray-400">Inventory</p>
+                                            <p className="text-xs font-bold text-gray-900">{hostel._count?.rooms || 0} Units</p>
+                                        </div>
+                                        <div className="space-y-0.5">
+                                            <p className="text-[8px] font-bold uppercase tracking-widest text-gray-400">Demand</p>
+                                            <p className="text-xs font-bold text-gray-900">{hostel._count?.bookings || 0} Stays</p>
                                         </div>
                                     </div>
 
-                                    <div className="text-[15px] text-gray-500 leading-snug">
-                                        <p className="truncate">{hostel._count?.rooms || 0} Room Types</p>
-                                        <p className="truncate">{hostel.city}, {hostel.region}</p>
-                                    </div>
-
-                                    <div className="flex items-center gap-1 mt-1.5 pt-1">
-                                        <span className="font-semibold text-gray-900 text-[15px]">
-                                            {hostel._count?.bookings || 0}
-                                        </span>
-                                        <span className="text-gray-900 font-normal text-[15px]">
-                                            active bookings
-                                        </span>
+                                    <div className="pt-1 flex items-center justify-between">
+                                        <div className="flex items-center gap-2 text-[10px] font-bold text-gray-400">
+                                            <UsersIcon size={12} />
+                                            <span>{hostel.owner?.firstName}</span>
+                                        </div>
+                                        <Link href={`/admin/hostels/${hostel.id}`} className="text-[10px] font-bold text-blue-600 hover:text-blue-700 uppercase tracking-widest flex items-center gap-1">
+                                            Audit <ArrowUpRight size={12} />
+                                        </Link>
                                     </div>
                                 </div>
                             </div>
@@ -416,38 +398,40 @@ function AdminHostelsContent() {
 
                     {/* No Assets */}
                     {hostels.length === 0 && (
-                        <div className="text-center py-32">
-                            <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                                <Building2 className="text-gray-300" size={32} />
+                        <div className="py-32 text-center space-y-4">
+                            <div className="w-16 h-16 bg-gray-50 rounded-2xl flex items-center justify-center mx-auto text-gray-200 border border-gray-100 shadow-inner">
+                                <Building2 size={32} />
                             </div>
-                            <h3 className="text-lg font-semibold text-gray-900 mb-1">No properties found</h3>
-                            <p className="text-gray-500 text-sm">Inventory is currently empty.</p>
+                            <div className="space-y-1">
+                                <h3 className="text-lg font-bold text-gray-900 uppercase tracking-tight">Zero Asset Hits</h3>
+                                <p className="text-gray-400 text-sm font-medium">No properties found matching your moderation parameters.</p>
+                            </div>
                         </div>
                     )}
 
                     {/* Pagination */}
-                    <div className="flex items-center justify-between pt-10 border-t border-gray-100">
-                        <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">
-                            Page {page} of {meta.totalPages || 1} Strategic Assets ({meta.total || 0} Total)
+                    <div className="px-1 py-8 flex items-center justify-between border-t border-gray-50">
+                        <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400">
+                            Analyzing page {page} of {meta.totalPages || 1} Strategic Assets
                         </p>
-                        <div className="flex gap-3">
+                        <div className="flex gap-2">
                             <button
                                 onClick={() => handlePageChange(Math.max(1, page - 1))}
                                 disabled={page === 1}
-                                className="w-12 h-12 rounded-2xl border border-gray-100 flex items-center justify-center text-gray-400 hover:bg-gray-950 hover:text-white transition-all disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-gray-400"
+                                className="w-10 h-10 rounded-xl border border-gray-100 bg-white flex items-center justify-center text-gray-400 hover:bg-gray-900 hover:text-white transition-all disabled:opacity-30 shadow-sm"
                             >
-                                <ChevronLeft size={20} />
+                                <ChevronLeft size={18} />
                             </button>
                             <button
                                 onClick={() => handlePageChange(Math.min(meta.totalPages, page + 1))}
                                 disabled={page === meta.totalPages || meta.totalPages === 0}
-                                className="w-12 h-12 rounded-2xl border border-gray-100 flex items-center justify-center text-gray-400 hover:bg-gray-950 hover:text-white transition-all disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-gray-400"
+                                className="w-10 h-10 rounded-xl border border-gray-100 bg-white flex items-center justify-center text-gray-400 hover:bg-gray-900 hover:text-white transition-all disabled:opacity-30 shadow-sm"
                             >
-                                <ChevronRight size={20} />
+                                <ChevronRight size={18} />
                             </button>
                         </div>
                     </div>
-                </>
+                </div>
             )}
         </div>
     );
@@ -456,10 +440,10 @@ function AdminHostelsContent() {
 export default function AdminHostelsPage() {
     return (
         <Suspense fallback={
-            <div className="flex h-[80vh] items-center justify-center">
-                <div className="flex flex-col items-center gap-4">
-                    <Loader2 className="animate-spin text-emerald-600" size={40} />
-                    <p className="text-sm font-black text-gray-400 uppercase tracking-widest animate-pulse">Initializing Infrastructure...</p>
+            <div className="flex h-[60vh] items-center justify-center">
+                <div className="flex flex-col items-center gap-4 text-center">
+                    <Loader2 className="animate-spin text-blue-600" size={32} />
+                    <p className="text-sm font-medium text-gray-400">Initializing asset log...</p>
                 </div>
             </div>
         }>

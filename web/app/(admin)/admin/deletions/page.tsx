@@ -11,11 +11,12 @@ import {
     Building2,
     User,
     Loader2,
-    ChevronLeft
+    ChevronLeft,
+    ShieldAlert
 } from "lucide-react";
 import Link from "next/link";
-
 import { Suspense } from "react";
+import { cn } from "@/lib/utils";
 
 function DeletionRequestsContent() {
     const queryClient = useQueryClient();
@@ -32,78 +33,97 @@ function DeletionRequestsContent() {
         mutationFn: (id: string) => api.delete(`/bookings/${id}/admin-confirm`),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["admin-pending-deletions"] });
-            toast.success("Booking deleted successfully.");
+            toast.success("Booking record purged from matrix.");
         },
-        onError: (err: any) => toast.error(err.message || "Failed to delete"),
+        onError: (err: any) => toast.error(err.message || "Deletion failure"),
     });
 
-    const rejectMutation = useMutation({
-        // For rejection, we just clear the flag
-        mutationFn: (id: string) => api.patch(`/bookings/${id}/request-deletion`, { reason: "" }),
-        // Actually, I should add a clear endpoint or use a specific flag. 
-        // For now let's just use request-deletion with a clear reason or add a new one.
-        // Let's implement a clear-request endpoint in the future. 
-        // For now, let's just use confirmMutation or leave it as is.
-    });
-
-    if (isLoading) return <div className="p-20 text-center"><Loader2 className="animate-spin mx-auto" /></div>;
+    if (isLoading) return (
+        <div className="flex h-[60vh] items-center justify-center bg-white">
+            <div className="flex flex-col items-center gap-4">
+                <Loader2 className="animate-spin text-red-600" size={40} />
+                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest animate-pulse">Scanning Deletion Queue...</p>
+            </div>
+        </div>
+    );
 
     return (
-        <div className="space-y-8 max-w-5xl">
-            <div className="flex items-center justify-between">
-                <div>
-                    <h1 className="text-3xl font-bold tracking-tight mb-2">Deletion Requests</h1>
-                    <p className="text-gray-500">Review and approve requests to delete sensitive records.</p>
+        <div className="max-w-[1200px] mx-auto px-4 py-12 space-y-12 pb-20 pt-4">
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
+                <div className="space-y-4">
+                    <div className="flex items-center gap-3">
+                        <span className="px-3 py-1 bg-red-600/10 text-red-600 rounded-full text-[9px] font-bold uppercase tracking-widest border border-red-200">
+                            Security Audit
+                        </span>
+                        <div className="flex items-center gap-2">
+                            <ShieldAlert size={14} className="text-red-500" />
+                            <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Protocol Override Required</span>
+                        </div>
+                    </div>
+                    <h1 className="text-4xl md:text-5xl font-bold text-gray-900 tracking-tighter uppercase leading-tight">
+                        Deletion Requests <span className="text-red-600 opacity-40">/</span> Purge
+                    </h1>
+                    <p className="text-gray-500 text-xs font-bold uppercase tracking-widest max-w-sm">
+                        Review and authorize the permanent removal of stay records.
+                    </p>
                 </div>
-                <Link href="/admin" className="text-sm font-bold text-gray-400 hover:text-black flex items-center gap-1">
-                    <ChevronLeft size={16} /> Dashboard
+                <Link href="/admin" className="h-12 px-6 rounded-xl bg-gray-900 text-white text-[11px] font-bold uppercase tracking-widest hover:bg-black transition-all flex items-center gap-2 shadow-lg">
+                    <ChevronLeft size={16} /> Back to Hub
                 </Link>
             </div>
 
             {requests?.length === 0 ? (
-                <div className="bg-white border rounded-[2.5rem] p-20 text-center">
-                    <Check className="mx-auto text-green-500 mb-4" size={48} />
-                    <h3 className="text-xl font-bold">All caught up!</h3>
-                    <p className="text-gray-500">No pending deletion requests at the moment.</p>
+                <div className="bg-white border border-gray-100 rounded-3xl p-24 text-center space-y-6 shadow-sm">
+                    <div className="w-20 h-20 bg-emerald-50 rounded-2xl flex items-center justify-center mx-auto text-emerald-500 border border-emerald-100 shadow-sm">
+                        <Check size={40} />
+                    </div>
+                    <div className="space-y-2">
+                        <h3 className="text-2xl font-bold uppercase tracking-tight text-gray-900">Queue Neutralized</h3>
+                        <p className="text-xs text-gray-400 font-bold uppercase tracking-widest">No pending deletion protocols at the moment.</p>
+                    </div>
                 </div>
             ) : (
-                <div className="grid grid-cols-1 gap-4">
+                <div className="grid grid-cols-1 gap-6">
                     {requests?.map((req: any) => (
-                        <div key={req.id} className="bg-white rounded-3xl border p-6 flex flex-col md:flex-row items-center gap-6">
-                            <div className="w-12 h-12 bg-red-50 rounded-2xl flex items-center justify-center text-red-600 shrink-0">
-                                <AlertTriangle size={24} />
+                        <div key={req.id} className="bg-white rounded-3xl border border-gray-100 p-8 flex flex-col md:flex-row items-center gap-8 shadow-sm hover:border-red-500/20 transition-all group">
+                            <div className="w-16 h-16 bg-red-50 rounded-2xl flex items-center justify-center text-red-600 shrink-0 border border-red-100 shadow-sm group-hover:scale-110 transition-transform">
+                                <AlertTriangle size={32} />
                             </div>
 
-                            <div className="flex-1 space-y-1">
-                                <div className="flex items-center gap-2">
-                                    <h4 className="font-bold">{req.hostel.name}</h4>
-                                    <span className="text-[10px] bg-gray-100 px-2 py-0.5 rounded-full font-bold uppercase tracking-widest text-gray-500">
-                                        ID: {req.id.slice(-6)}
-                                    </span>
+                            <div className="flex-1 space-y-4">
+                                <div className="space-y-1">
+                                    <div className="flex items-center gap-3">
+                                        <h4 className="font-bold text-xl text-gray-900 uppercase tracking-tight">{req.hostel.name}</h4>
+                                        <span className="text-[9px] bg-gray-50 border border-gray-100 px-3 py-1 rounded-lg font-bold uppercase tracking-[0.2em] text-gray-400">
+                                            RECORD ID: #{req.id.slice(-6).toUpperCase()}
+                                        </span>
+                                    </div>
+                                    <div className="flex flex-wrap gap-4 text-[10px] text-gray-400 font-bold uppercase tracking-widest">
+                                        <span className="flex items-center gap-1.5"><User size={12} className="text-blue-500" /> {req.tenant.firstName} {req.tenant.lastName}</span>
+                                        <span className="flex items-center gap-1.5"><Building2 size={12} className="text-blue-500" /> {req.items[0]?.room.name}</span>
+                                    </div>
                                 </div>
-                                <div className="flex flex-wrap gap-4 text-xs text-gray-500">
-                                    <span className="flex items-center gap-1"><User size={12} /> {req.tenant.firstName} {req.tenant.lastName}</span>
-                                    <span className="flex items-center gap-1"><Building2 size={12} /> {req.items[0]?.room.name}</span>
+                                <div className="p-5 bg-red-50/30 rounded-2xl border border-red-50/50 relative overflow-hidden">
+                                    <div className="text-[9px] font-bold text-red-400 uppercase tracking-widest mb-1">Reason for Purge</div>
+                                    <p className="text-xs font-bold text-red-700 leading-relaxed uppercase tracking-tight">
+                                        " {req.deletionReason || "NO RATIONALE PROVIDED"} "
+                                    </p>
                                 </div>
-                                <p className="text-sm text-red-600 bg-red-50/50 p-3 rounded-xl border border-red-100 mt-2 italic">
-                                    " {req.deletionReason} "
-                                </p>
                             </div>
 
-                            <div className="flex gap-2">
+                            <div className="flex shrink-0">
                                 <button
                                     onClick={() => {
-                                        if (confirm("Permanently delete this record?")) {
+                                        if (confirm("Executing this protocol will permanently delete the record. Continue?")) {
                                             confirmMutation.mutate(req.id);
                                         }
                                     }}
                                     disabled={confirmMutation.isPending}
-                                    className="px-6 py-3 bg-red-600 text-white rounded-xl font-bold hover:bg-red-700 transition-colors flex items-center gap-2"
+                                    className="h-16 px-10 bg-red-600 text-white rounded-2xl font-bold text-[11px] uppercase tracking-widest hover:bg-red-700 transition-all shadow-xl shadow-red-500/10 flex items-center gap-4 active:scale-95 disabled:opacity-50"
                                 >
-                                    {confirmMutation.isPending ? <Loader2 size={16} className="animate-spin" /> : <Trash2 size={16} />}
-                                    Confirm Delete
+                                    {confirmMutation.isPending ? <Loader2 size={20} className="animate-spin" /> : <Trash2 size={20} />}
+                                    PURGE RECORD
                                 </button>
-                                {/* Rejection logic can be added here */}
                             </div>
                         </div>
                     ))}
@@ -115,7 +135,14 @@ function DeletionRequestsContent() {
 
 export default function DeletionRequestsPage() {
     return (
-        <Suspense fallback={<div className="p-20 text-center"><Loader2 className="animate-spin mx-auto text-gray-400" /></div>}>
+        <Suspense fallback={
+            <div className="flex h-[80vh] items-center justify-center">
+                <div className="flex flex-col items-center gap-4">
+                    <Loader2 className="animate-spin text-red-600" size={40} />
+                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest animate-pulse">Initializing Security Protocol...</p>
+                </div>
+            </div>
+        }>
             <DeletionRequestsContent />
         </Suspense>
     );

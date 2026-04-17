@@ -244,7 +244,7 @@ export default function OwnerAccountPage() {
                                 <p className="text-sm text-gray-500 font-medium">{user.email}</p>
                             </div>
 
-                            <div className="flex items-center justify-center gap-2 px-4 py-2 bg-blue-50 text-blue-700 rounded-xl text-[10px] font-bold uppercase tracking-widest border border-blue-100 italic">
+                            <div className="flex items-center justify-center gap-2 px-4 py-2 bg-blue-50 text-blue-700 rounded-xl text-[10px] font-bold uppercase tracking-widest border border-blue-100">
                                 {user.role} Hub Verified
                             </div>
                         </div>
@@ -326,13 +326,13 @@ export default function OwnerAccountPage() {
                             </div>
                             
                             <div className="space-y-2 opacity-60 cursor-not-allowed">
-                                <Label className="text-xs font-bold text-gray-500 ml-1 italic">Email (Locked)</Label>
+                                <Label className="text-xs font-bold text-gray-500 ml-1">Email (Locked)</Label>
                                 <div className="relative">
                                     <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
                                     <input
                                         type="email"
                                         disabled
-                                        className="w-full h-12 pl-12 pr-4 bg-gray-100 border border-gray-100 rounded-xl font-bold text-sm text-gray-500 italic"
+                                        className="w-full h-12 pl-12 pr-4 bg-gray-100 border border-gray-100 rounded-xl font-bold text-sm text-gray-500"
                                         value={user.email}
                                     />
                                 </div>
@@ -475,7 +475,7 @@ export default function OwnerAccountPage() {
                                 <div className="space-y-2 text-center md:text-left">
                                     <div className="flex items-center justify-center md:justify-start gap-3">
                                         <ArrowRightLeft size={24} className="text-amber-600" />
-                                        <h3 className="text-xl font-bold text-amber-900 tracking-tight leading-none uppercase italic">Role Migration</h3>
+                                        <h3 className="text-xl font-bold text-amber-900 tracking-tight leading-none uppercase">Role Migration</h3>
                                     </div>
                                     <p className="text-xs font-medium text-amber-700 leading-relaxed max-w-sm">
                                         Permanently switch to a Resident (Tenant) account. This will purge all business history.
@@ -494,7 +494,7 @@ export default function OwnerAccountPage() {
                                                 <div className="w-12 h-12 rounded-xl bg-rose-100 flex items-center justify-center shadow-inner">
                                                     <TriangleAlert size={28} className="text-rose-600" />
                                                 </div>
-                                                <DialogTitle className="text-xl font-bold tracking-tight text-rose-600 uppercase italic">Irreversible De-registration</DialogTitle>
+                                                <DialogTitle className="text-xl font-bold tracking-tight text-rose-600 uppercase">Irreversible De-registration</DialogTitle>
                                             </div>
                                             <DialogDescription className="text-sm text-gray-500 font-medium leading-relaxed pt-2">
                                                 Switching to <span className="text-gray-900 font-bold">RESIDENT</span> status will <span className="text-rose-600 font-bold underline">delete all properties and bookings permanently</span>. This action is terminal.
@@ -523,7 +523,7 @@ export default function OwnerAccountPage() {
                             <div className="space-y-2 text-center md:text-left">
                                 <div className="flex items-center justify-center md:justify-start gap-3">
                                     <XCircle size={24} className="text-rose-600" />
-                                    <h3 className="text-xl font-bold text-rose-900 tracking-tight leading-none uppercase italic">Termination Drill</h3>
+                                    <h3 className="text-xl font-bold text-rose-900 tracking-tight leading-none uppercase">Termination Drill</h3>
                                 </div>
                                 <p className="text-xs font-medium text-rose-700 leading-relaxed max-w-sm">
                                     Full system de-registration. This purge wipes all records from the HostelGH core matrix.
@@ -645,7 +645,7 @@ function SettlementSettings() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-2">
-                        <Label className="text-xs font-bold text-gray-500 ml-1 italic">Network Provider</Label>
+                        <Label className="text-xs font-bold text-gray-500 ml-1">Network Provider</Label>
                         <div className="relative">
                             <select
                                 disabled={banksLoading}
@@ -667,7 +667,7 @@ function SettlementSettings() {
                     </div>
 
                     <div className="space-y-2">
-                        <Label className="text-xs font-bold text-gray-500 ml-1 italic">
+                        <Label className="text-xs font-bold text-gray-500 ml-1">
                             {method === "MOBILE_MONEY" ? "MoMo Number" : "Account Number"}
                         </Label>
                         <input
@@ -682,7 +682,7 @@ function SettlementSettings() {
                 </div>
 
                 <div className="space-y-2">
-                    <Label className="text-xs font-bold text-gray-500 ml-1 italic">Verified Holder Name</Label>
+                    <Label className="text-xs font-bold text-gray-500 ml-1">Verified Holder Name</Label>
                     <input
                         type="text"
                         className="w-full h-12 px-4 bg-gray-50 border border-gray-100 rounded-xl outline-none focus:bg-white focus:border-blue-500 transition-all font-bold text-sm"

@@ -95,7 +95,7 @@ export default function AccountPage() {
         );
     }
 
-    const profileFields = [formData.firstName, formData.lastName, formData.phone];
+    const profileFields = [formData.firstName, formData.lastName, formData.phone, user.avatarUrl];
     const completedFields = profileFields.filter(Boolean).length;
     const profileCompletion = Math.round((completedFields / profileFields.length) * 100);
 
@@ -156,21 +156,46 @@ export default function AccountPage() {
                                         </div>
                                     )}
                                 </div>
-                                <button className="absolute -bottom-2 -right-2 bg-white border border-gray-100 shadow-sm rounded-xl p-2.5 hover:bg-gray-50 transition-all text-blue-600">
+                                <button 
+                                    onClick={() => document.getElementById('avatar-upload')?.click()}
+                                    className="absolute -bottom-2 -right-2 bg-white border border-gray-100 shadow-sm rounded-xl p-2.5 hover:bg-gray-50 transition-all text-blue-600"
+                                >
                                     <Camera size={18} />
                                 </button>
+                                <input 
+                                    id="avatar-upload" 
+                                    type="file" 
+                                    accept="image/*" 
+                                    className="hidden" 
+                                    onChange={async (e) => {
+                                        const file = e.target.files?.[0];
+                                        if (!file) return;
+                                        const loadingToast = toast.loading("Syndicating image data...");
+                                        try {
+                                            const fd = new FormData();
+                                            fd.append('file', file);
+                                            const res = await api.post("/hostels/upload", fd);
+                                            const imageUrl = res.data.url;
+                                            await api.patch("/users/me", { avatarUrl: imageUrl });
+                                            updateUser({ ...user!, avatarUrl: imageUrl });
+                                            toast.success("Identity visual updated!", { id: loadingToast });
+                                        } catch (error: any) {
+                                            toast.error(error.message || "Upload failure", { id: loadingToast });
+                                        }
+                                    }}
+                                />
                             </div>
 
                             <div className="space-y-1">
-                                <h2 className="text-xl font-bold text-gray-900 tracking-tight">
-                                    {formData.firstName ? `${formData.firstName} ${formData.lastName}` : "Authenticated Resident"}
+                                <h2 className="text-xl font-bold text-gray-900 tracking-tight leading-none">
+                                    {formData.firstName ? `${formData.firstName} ${formData.lastName}` : "Auth Resident"}
                                 </h2>
                                 <p className="text-sm text-gray-500 font-medium">{user.email}</p>
                             </div>
 
                             <div className="flex items-center justify-center gap-2 px-4 py-2 bg-emerald-50 text-emerald-700 rounded-xl text-[10px] font-bold uppercase tracking-widest border border-emerald-100">
                                 <ShieldCheck size={14} />
-                                {user.role} Account Verified
+                                {user.role} ID Verified
                             </div>
                         </div>
                     </div>
@@ -243,13 +268,13 @@ export default function AccountPage() {
                             </div>
 
                             <div className="space-y-2 opacity-60">
-                                <label className="text-xs font-bold text-gray-500 ml-1 italic">Email (Locked)</label>
+                                <label className="text-xs font-bold text-gray-500 ml-1">Email (Locked)</label>
                                 <div className="relative">
                                     <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
                                     <input
                                         type="email"
                                         disabled
-                                        className="w-full h-12 pl-12 pr-4 bg-gray-100 border border-gray-100 rounded-xl font-bold text-sm text-gray-500 italic"
+                                        className="w-full h-12 pl-12 pr-4 bg-gray-100 border border-gray-100 rounded-xl font-bold text-sm text-gray-500"
                                         value={user.email}
                                     />
                                 </div>
@@ -309,7 +334,7 @@ export default function AccountPage() {
                             <div className="space-y-2 text-center md:text-left">
                                 <div className="flex items-center justify-center md:justify-start gap-3">
                                     <Trash2 size={24} className="text-rose-600" />
-                                    <h3 className="text-xl font-bold text-rose-900 tracking-tight leading-none uppercase italic">Termination Protocol</h3>
+                                    <h3 className="text-xl font-bold text-rose-900 tracking-tight leading-none uppercase">Termination Protocol</h3>
                                 </div>
                                 <p className="text-xs font-medium text-rose-700 leading-relaxed max-w-sm">
                                     Deleting your identity will purge all stay history, secured payments, and network credentials. This action is irreversible.

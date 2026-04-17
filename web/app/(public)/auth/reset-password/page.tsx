@@ -57,92 +57,96 @@ function ResetPasswordContent() {
     if (!token) return null;
 
     return (
-        <div className="min-h-screen bg-background flex flex-col items-center justify-center p-6 relative overflow-hidden">
+        <div className="min-h-screen bg-white flex flex-col items-center justify-center p-6 relative overflow-hidden">
             {/* Background Aesthetic */}
-            <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none opacity-20">
-                <div className="absolute -top-24 -left-24 w-96 h-96 bg-primary/20 blur-[120px] rounded-full animate-pulse" />
-                <div className="absolute -bottom-24 -right-24 w-96 h-96 bg-primary/10 blur-[120px] rounded-full animate-pulse delay-1000" />
+            <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none opacity-40">
+                <div className="absolute -top-24 -left-24 w-[600px] h-[600px] bg-blue-600/5 blur-[120px] rounded-full animate-pulse" />
+                <div className="absolute -bottom-24 -right-24 w-[600px] h-[600px] bg-blue-600/5 blur-[120px] rounded-full animate-pulse delay-1000" />
             </div>
 
             <div className="relative z-10 w-full max-w-md">
-                <div className="bg-card border border-border shadow-2xl rounded-sm p-8 md:p-10 animate-in zoom-in-95 duration-500">
+                <div className="bg-white border border-gray-100 shadow-2xl rounded-3xl p-10 md:p-12 animate-in zoom-in-95 duration-700">
 
-                    <div className="mb-8 space-y-2">
-                        <div className="flex items-center gap-2 mb-1">
-                            <span className="px-1.5 py-0.5 bg-foreground text-background rounded-sm text-[8px] font-black uppercase tracking-widest">
-                                security/vault
+                    <div className="mb-10 space-y-4 text-center">
+                        <div className="flex items-center justify-center gap-2">
+                            <span className="px-3 py-1 bg-gray-900 text-white rounded-full text-[9px] font-bold uppercase tracking-widest border border-white/10 shadow-xl">
+                                Security Gateway
                             </span>
                         </div>
-                        <h1 className="text-2xl font-black text-foreground tracking-tight uppercase italic">
-                            Credential Reset <span className="text-primary NOT-italic">.</span>
-                        </h1>
-                        <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest leading-relaxed">
-                            Establishing a new secure baseline for your identity session.
-                        </p>
+                        <div className="space-y-1">
+                            <h1 className="text-3xl font-bold text-gray-900 tracking-tighter uppercase leading-tight">
+                                Credential Reset
+                            </h1>
+                            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest leading-relaxed">
+                                Establishing a new secure baseline for your identity session.
+                            </p>
+                        </div>
+                        <div className="h-1.5 w-12 bg-blue-600 mx-auto rounded-full" />
                     </div>
 
                     {success ? (
-                        <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-500">
-                            <div className="w-16 h-16 bg-emerald-500/10 rounded-sm border border-emerald-500/20 flex items-center justify-center mx-auto mb-4">
-                                <Check className="text-emerald-500" size={32} />
+                        <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                            <div className="w-20 h-20 bg-emerald-50 rounded-2xl border border-emerald-100 flex items-center justify-center mx-auto text-emerald-500 shadow-sm">
+                                <Check size={40} />
                             </div>
                             <div className="text-center space-y-2">
-                                <h3 className="text-sm font-black text-foreground uppercase tracking-widest italic">Registry Synchronized</h3>
-                                <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Your access credentials have been successfully re-encrypted.</p>
+                                <h3 className="text-[11px] font-bold text-gray-900 uppercase tracking-widest">Registry Synchronized</h3>
+                                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest leading-relaxed">Your access credentials have been successfully re-encrypted.</p>
                             </div>
                             <Link
                                 href="/auth/login"
-                                className="flex items-center justify-center gap-2 w-full py-4 bg-foreground text-background rounded-sm text-[10px] font-black uppercase tracking-[0.2em] hover:opacity-90 transition-all shadow-xl shadow-foreground/10 active:scale-[0.98]"
+                                className="flex items-center justify-center gap-3 w-full h-16 bg-blue-600 text-white rounded-2xl text-[11px] font-bold uppercase tracking-widest hover:bg-blue-700 transition-all shadow-xl shadow-blue-500/10 active:scale-95"
                             >
-                                Proceed to Login
+                                <Zap size={18} />
+                                Proceed to Terminal
                             </Link>
                         </div>
                     ) : (
-                        <form className="space-y-6" onSubmit={handleSubmit}>
-                            <div className="space-y-1.5 group">
-                                <label className="text-[9px] font-black text-muted-foreground uppercase tracking-[0.2em] px-0.5 group-focus-within:text-primary transition-colors">
+                        <form className="space-y-8" onSubmit={handleSubmit}>
+                            <div className="space-y-2 group">
+                                <label className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] ml-1 group-focus-within:text-blue-600 transition-colors">
                                     New Passkey
                                 </label>
                                 <div className="relative">
-                                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground/50" size={14} />
+                                    <Lock className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-300" size={16} />
                                     <input
                                         type={showPassword ? "text" : "password"}
                                         required
                                         value={password}
                                         onChange={(e) => setPassword(e.target.value)}
-                                        className="w-full pl-11 pr-12 py-3.5 bg-background border border-border rounded-sm outline-none focus:border-primary transition-all text-xs font-black uppercase tracking-widest placeholder:text-muted-foreground/30"
+                                        className="w-full pl-14 pr-14 h-14 bg-gray-50 border border-gray-100 rounded-2xl outline-none focus:bg-white focus:border-blue-500 transition-all text-sm font-bold text-gray-900 placeholder:text-gray-300"
                                         placeholder="••••••••"
                                     />
                                     <button
                                         type="button"
                                         onClick={() => setShowPassword(!showPassword)}
-                                        className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors outline-none z-10"
+                                        className="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-900 transition-colors outline-none z-10"
                                     >
-                                        {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                                        {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                                     </button>
                                 </div>
                             </div>
 
-                            <div className="space-y-1.5 group">
-                                <label className="text-[9px] font-black text-muted-foreground uppercase tracking-[0.2em] px-0.5 group-focus-within:text-primary transition-colors">
+                            <div className="space-y-2 group">
+                                <label className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] ml-1 group-focus-within:text-blue-600 transition-colors">
                                     Verify Passkey
                                 </label>
                                 <div className="relative">
-                                    <ShieldCheck className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground/50" size={14} />
+                                    <ShieldCheck className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-300" size={16} />
                                     <input
                                         type={showPassword ? "text" : "password"}
                                         required
                                         value={confirmPassword}
                                         onChange={(e) => setConfirmPassword(e.target.value)}
-                                        className="w-full pl-11 pr-12 py-3.5 bg-background border border-border rounded-sm outline-none focus:border-primary transition-all text-xs font-black uppercase tracking-widest placeholder:text-muted-foreground/30"
+                                        className="w-full pl-14 pr-14 h-14 bg-gray-50 border border-gray-100 rounded-2xl outline-none focus:bg-white focus:border-blue-500 transition-all text-sm font-bold text-gray-900 placeholder:text-gray-300"
                                         placeholder="••••••••"
                                     />
                                 </div>
                             </div>
 
                             {error && (
-                                <div className="flex items-center gap-2 text-[9px] bg-red-500/5 text-red-500 font-black uppercase tracking-widest px-4 py-3 rounded-sm border border-red-500/20 animate-in fade-in slide-in-from-top-1">
-                                    <AlertCircle className="w-4 h-4 shrink-0" />
+                                <div className="flex items-center gap-3 text-[10px] bg-red-50 text-red-600 font-bold uppercase tracking-widest px-5 py-4 rounded-2xl border border-red-100 animate-in fade-in slide-in-from-top-2">
+                                    <AlertCircle className="w-5 h-5 shrink-0" />
                                     <span>{error}</span>
                                 </div>
                             )}
@@ -151,17 +155,17 @@ function ResetPasswordContent() {
                                 <button
                                     type="submit"
                                     disabled={loading}
-                                    className="group relative w-full flex justify-center items-center gap-2 py-4 px-4 bg-foreground text-background rounded-sm text-[10px] font-black uppercase tracking-[0.2em] shadow-xl shadow-foreground/10 hover:opacity-90 transition-all active:scale-[0.98] disabled:opacity-70 overflow-hidden"
+                                    className="relative w-full h-16 bg-blue-600 text-white rounded-2xl text-[11px] font-bold uppercase tracking-widest shadow-xl shadow-blue-500/10 hover:bg-blue-700 transition-all active:scale-[0.98] disabled:opacity-70 flex items-center justify-center gap-3"
                                 >
                                     {loading ? (
                                         <>
-                                            <Zap className="animate-pulse" size={14} />
+                                            <Loader2 className="animate-spin" size={18} />
                                             <span>UPDATING REGISTRY...</span>
                                         </>
                                     ) : (
                                         <>
-                                            <Lock size={14} />
-                                            <span>Establish Security Base</span>
+                                            <Lock size={18} />
+                                            <span>Establish Access</span>
                                         </>
                                     )}
                                 </button>
@@ -171,12 +175,12 @@ function ResetPasswordContent() {
                 </div>
 
                 {/* Footer Link */}
-                <div className="mt-8 text-center">
+                <div className="mt-10 text-center">
                     <Link
                         href="/"
-                        className="inline-flex items-center gap-2 text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] hover:text-foreground transition-colors group"
+                        className="inline-flex items-center gap-2 text-[10px] font-bold text-gray-400 uppercase tracking-widest hover:text-gray-900 transition-colors group"
                     >
-                        <ChevronLeft size={14} className="group-hover:-translate-x-1 transition-transform" />
+                        <ChevronLeft size={16} className="group-hover:-translate-x-1 transition-transform" />
                         HUB OVERVIEW
                     </Link>
                 </div>
@@ -188,11 +192,9 @@ function ResetPasswordContent() {
 export default function ResetPasswordPage() {
     return (
         <Suspense fallback={
-            <div className="min-h-screen bg-background flex flex-col items-center justify-center p-6">
-                <div className="w-full max-w-md bg-card border border-border rounded-sm p-10 text-center">
-                    <div className="w-12 h-12 border-2 border-primary border-t-transparent rounded-sm animate-spin mx-auto mb-6" />
-                    <p className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em]">ACCESSING VAULT...</p>
-                </div>
+            <div className="min-h-screen bg-white flex flex-col items-center justify-center p-6">
+                <Loader2 className="animate-spin text-blue-600 mb-6" size={48} />
+                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest animate-pulse">ACCESSING VAULT...</p>
             </div>
         }>
             <ResetPasswordContent />

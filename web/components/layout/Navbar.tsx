@@ -122,7 +122,7 @@ export default function Navbar() {
                     {!user && (
                         <Link
                             href="/auth/register?role=OWNER"
-                            className="hidden md:block text-[10px] font-black uppercase tracking-[0.15em] px-4 py-2 rounded-sm bg-foreground text-background hover:bg-foreground/90 transition-all shadow-sm active:scale-[0.98]"
+                            className="hidden md:block text-[10px] font-bold uppercase tracking-[0.15em] px-4 py-2 rounded-lg bg-gray-900 text-white hover:bg-gray-800 transition-all shadow-sm active:scale-[0.98]"
                         >
                             List Hostel
                         </Link>
@@ -137,14 +137,14 @@ export default function Navbar() {
                         <button
                             onClick={() => setIsOpen(!isOpen)}
                             className={cn(
-                                "flex items-center gap-2 border rounded-md px-2 py-1.5 transition-all ml-1 group",
-                                isOpen ? "border-primary/30 shadow-sm bg-accent" : "border-border hover:border-primary/20 bg-background"
+                                "flex items-center gap-2 border rounded-xl px-2 py-1.5 transition-all ml-1 group",
+                                isOpen ? "border-primary/30 shadow-md bg-accent" : "border-border hover:border-primary/20 bg-background"
                             )}
                         >
                             <Menu size={16} className="text-muted-foreground group-hover:text-foreground transition-colors" />
-                            <div className="bg-muted text-muted-foreground rounded-sm p-0.5 opacity-90 overflow-hidden transition-all">
+                            <div className="bg-gray-100 text-gray-500 rounded-lg p-0.5 overflow-hidden transition-all border border-gray-100">
                                 {user ? (
-                                    <div className="w-7 h-7 bg-primary text-primary-foreground rounded-sm flex items-center justify-center text-[10px] font-black overflow-hidden">
+                                    <div className="w-7 h-7 bg-primary text-primary-foreground rounded-lg flex items-center justify-center text-[10px] font-bold overflow-hidden shadow-inner">
                                         {user.avatarUrl ? (
                                             <img src={user.avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
                                         ) : (
@@ -152,7 +152,7 @@ export default function Navbar() {
                                         )}
                                     </div>
                                 ) : (
-                                    <UserIcon size={18} className="text-muted-foreground/60" />
+                                    <UserIcon size={18} className="text-gray-400" />
                                 )}
                             </div>
                         </button>
@@ -232,10 +232,10 @@ export default function Navbar() {
                                         <div className="border-t border-black/5 my-2 mx-5" />
                                         <Link
                                             href="/auth/register?role=OWNER"
-                                            className="block px-5 py-3 hover:bg-zinc-50 text-sm font-medium transition-colors"
+                                            className="block px-5 py-3 hover:bg-zinc-50 text-sm font-bold transition-colors"
                                             onClick={() => setIsOpen(false)}
                                         >
-                                            Host your home
+                                            List your hostel
                                         </Link>
                                     </>
                                 )}

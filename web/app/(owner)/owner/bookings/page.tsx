@@ -232,7 +232,7 @@ export default function OwnerBookingsPage() {
                                                 <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest flex items-center gap-2">
                                                     <MessageSquare size={12} /> Tenant Signal
                                                 </p>
-                                                <p className="text-xs font-medium text-gray-500 leading-relaxed italic border-l-2 border-blue-500 pl-3 py-1">
+                                                <p className="text-xs font-medium text-gray-500 leading-relaxed border-l-2 border-blue-500 pl-3 py-1">
                                                     "{booking.notes}"
                                                 </p>
                                             </div>

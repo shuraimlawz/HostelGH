@@ -26,7 +26,10 @@ import {
     Droplets,
     Flame,
     Clock,
-    Image as ImageIcon
+    Image as ImageIcon,
+    ShieldAlert,
+    ArrowRight,
+    ArrowLeft
 } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
@@ -172,76 +175,80 @@ export default function NewHostelPage() {
     ];
 
     return (
-        <div className="max-w-4xl mx-auto pb-20 relative">
+        <div className="max-w-4xl mx-auto pb-20 relative px-4">
 
             {/* ─── Publishing Overlay ─── */}
             {(publishStage !== 'idle') && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-                    <div className="absolute inset-0 bg-background/80 backdrop-blur-sm" />
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+                    <div className="absolute inset-0 bg-white/60 backdrop-blur-xl" />
 
-                    <div className="relative z-10 bg-card border border-border rounded-sm shadow-2xl p-8 max-w-sm w-full text-center animate-in zoom-in-95 duration-300">
+                    <div className="relative z-10 bg-white border border-gray-100 rounded-3xl shadow-2xl p-10 max-w-sm w-full text-center animate-in zoom-in-95 duration-700">
 
                         {publishStage === 'done' && publishResult ? (
-                            <>
-                                <div className="w-16 h-16 bg-primary/10 rounded-sm flex items-center justify-center mx-auto mb-6 border border-primary/20">
-                                    <Check className="text-primary" size={32} />
+                            <div className="space-y-8">
+                                <div className="w-20 h-20 bg-blue-600 rounded-2xl flex items-center justify-center mx-auto shadow-xl shadow-blue-500/20 border border-white/20">
+                                    <Check className="text-white" size={40} />
                                 </div>
-                                <h2 className="text-xl font-black text-foreground tracking-tight uppercase italic mb-2">
-                                    {publishResult.requiresVerification ? 'Processing' : 'Asset Live'} <span className="text-primary NOT-italic">.</span>
-                                </h2>
-                                <p className="text-muted-foreground text-[10px] font-bold uppercase tracking-widest leading-relaxed mb-6">
-                                    {publishResult.requiresVerification 
-                                        ? "Your asset has been queued for manual verification. Expected turn-around: 24 hours."
-                                        : "Your asset is now operational and visible to secondary users."
-                                    }
-                                </p>
+                                <div className="space-y-2">
+                                    <h2 className="text-2xl font-bold text-gray-900 tracking-tight uppercase">
+                                        {publishResult.requiresVerification ? 'Processing' : 'Asset Live'}
+                                    </h2>
+                                    <p className="text-gray-400 text-[10px] font-bold uppercase tracking-widest leading-relaxed">
+                                        {publishResult.requiresVerification 
+                                            ? "Your asset has been queued for manual verification. Expected turn-around: 24 cycles."
+                                            : "Your asset is now operational and visible to primary users."
+                                        }
+                                    </p>
+                                </div>
                                 <button
                                     onClick={() => router.push('/owner/hostels')}
-                                    className="w-full bg-foreground text-background py-3 rounded-sm font-black text-[10px] uppercase tracking-[0.2em] hover:opacity-90 transition-all"
+                                    className="w-full h-14 bg-gray-900 text-white rounded-2xl font-bold text-[10px] uppercase tracking-widest hover:bg-black transition-all active:scale-95 shadow-xl"
                                 >
-                                    Return to Hub
+                                    Return to Archive
                                 </button>
-                            </>
+                            </div>
                         ) : (
-                            <>
-                                <div className="relative w-16 h-16 mx-auto mb-8">
-                                    <div className="absolute inset-0 rounded-sm border-2 border-primary/10" />
-                                    <div className="absolute inset-0 rounded-sm border-2 border-primary border-t-transparent animate-spin" />
+                            <div className="space-y-10">
+                                <div className="relative w-20 h-20 mx-auto">
+                                    <div className="absolute inset-0 rounded-2xl border-2 border-blue-600/10" />
+                                    <div className="absolute inset-0 rounded-2xl border-2 border-blue-600 border-t-transparent animate-spin" />
                                     <div className="absolute inset-0 flex items-center justify-center">
-                                        <Building2 className="text-primary" size={20} />
+                                        <Building2 className="text-blue-600 animate-pulse" size={28} />
                                     </div>
                                 </div>
 
-                                <h2 className="text-sm font-black text-foreground tracking-[0.2em] uppercase italic mb-6">Transmitting Session</h2>
+                                <div className="space-y-4">
+                                    <h2 className="text-[11px] font-bold text-gray-400 tracking-[0.3em] uppercase">Transmitting Session</h2>
 
-                                <div className="space-y-2 text-left">
-                                    {stages.map((s, i) => {
-                                        const stageOrder = ['uploading', 'verifying', 'done'];
-                                        const currentIdx = stageOrder.indexOf(publishStage);
-                                        const stageIdx = stageOrder.indexOf(s.key);
-                                        const isDone = stageIdx < currentIdx;
-                                        const isActive = stageIdx === currentIdx;
+                                    <div className="space-y-3 text-left">
+                                        {stages.map((s, i) => {
+                                            const stageOrder = ['uploading', 'verifying', 'done'];
+                                            const currentIdx = stageOrder.indexOf(publishStage);
+                                            const stageIdx = stageOrder.indexOf(s.key);
+                                            const isDone = stageIdx < currentIdx;
+                                            const isActive = stageIdx === currentIdx;
 
-                                        return (
-                                            <div key={s.key} className={cn(
-                                                "flex items-center gap-3 p-2 rounded-sm border transition-all",
-                                                isActive ? "bg-primary/5 border-primary/20" : "bg-muted/30 border-transparent"
-                                            )}>
-                                                <div className={cn(
-                                                    "w-5 h-5 rounded-sm flex items-center justify-center shrink-0 text-[8px] font-black",
-                                                    isDone ? "bg-primary text-white" : isActive ? "bg-primary/20 text-primary" : "bg-border text-muted-foreground"
+                                            return (
+                                                <div key={s.key} className={cn(
+                                                    "flex items-center gap-4 p-4 rounded-2xl border transition-all duration-500",
+                                                    isActive ? "bg-blue-50 border-blue-100 shadow-sm" : "bg-gray-50/50 border-gray-100/50 opacity-60"
                                                 )}>
-                                                    {isDone ? <Check size={10} /> : i + 1}
+                                                    <div className={cn(
+                                                        "w-6 h-6 rounded-lg flex items-center justify-center shrink-0 text-[10px] font-bold border",
+                                                        isDone ? "bg-blue-600 text-white border-blue-500" : isActive ? "bg-white text-blue-600 border-blue-200 shadow-sm" : "bg-white text-gray-300 border-gray-200"
+                                                    )}>
+                                                        {isDone ? <Check size={12} /> : i + 1}
+                                                    </div>
+                                                    <p className={cn(
+                                                        "text-[10px] font-bold uppercase tracking-widest",
+                                                        isActive ? "text-blue-700" : isDone ? "text-gray-900" : "text-gray-300"
+                                                    )}>{s.label}</p>
                                                 </div>
-                                                <p className={cn(
-                                                    "text-[9px] font-black uppercase tracking-widest",
-                                                    isActive ? "text-primary" : isDone ? "text-foreground" : "text-muted-foreground"
-                                                )}>{s.label}</p>
-                                            </div>
-                                        );
-                                    })}
+                                            );
+                                        })}
+                                    </div>
                                 </div>
-                            </>
+                            </div>
                         )}
                     </div>
                 </div>
@@ -250,121 +257,128 @@ export default function NewHostelPage() {
             {/* Back & Header */}
             <Link
                 href="/owner/hostels"
-                className="inline-flex items-center gap-2 text-[10px] font-black text-muted-foreground hover:text-foreground mb-8 transition-colors group uppercase tracking-[0.2em]"
+                className="inline-flex items-center gap-3 text-[11px] font-bold text-gray-400 hover:text-gray-900 mb-10 transition-all group uppercase tracking-widest"
             >
-                <ChevronLeft size={14} className="group-hover:-translate-x-1 transition-transform" />
+                <ChevronLeft size={16} className="group-hover:-translate-x-1 transition-transform" />
                 Hub Overview
             </Link>
 
-            <div className="mb-10">
-                <div className="flex items-center gap-2 mb-2">
-                    <span className="px-2 py-0.5 bg-foreground text-background rounded-sm text-[8px] font-black uppercase tracking-[0.2em]">
-                        Unit Deployment
+            <div className="mb-12 space-y-4">
+                <div className="flex items-center gap-2">
+                    <span className="px-3 py-1 bg-gray-900 text-white rounded-full text-[9px] font-bold uppercase tracking-widest border border-white/10 shadow-xl">
+                        Asset Deployment
                     </span>
                 </div>
-                <h1 className="text-3xl font-black text-foreground tracking-tight uppercase italic mb-2">
-                    Deploy Listing <span className="text-primary NOT-italic">.</span>
-                </h1>
-                <p className="text-muted-foreground font-bold text-[11px] uppercase tracking-widest">Commission a new property asset into the primary fleet.</p>
+                <div className="space-y-2">
+                    <h1 className="text-4xl font-bold text-gray-900 tracking-tighter uppercase leading-tight">
+                        Commission New Listing
+                    </h1>
+                    <p className="text-gray-400 font-bold text-[11px] uppercase tracking-widest max-w-xl">Initialize security protocols and deploy a new property asset into the primary fleet.</p>
+                </div>
+                <div className="h-1.5 w-16 bg-blue-600 rounded-full" />
             </div>
 
             {/* Step Indicator */}
-            <div className="flex items-center gap-2 mb-10 overflow-x-auto no-scrollbar pb-2">
+            <div className="flex items-center gap-3 mb-12 overflow-x-auto no-scrollbar pb-4 -mx-1 px-1">
                 {STEPS.map((step, i) => (
-                    <div key={step.id} className="flex items-center gap-2 shrink-0">
+                    <div key={step.id} className="flex items-center gap-3 shrink-0">
                         <button
                             type="button"
                             onClick={() => setCurrentStep(step.id)}
                             className={cn(
-                                "flex items-center gap-2 px-4 py-2 rounded-sm text-[9px] font-black uppercase tracking-[0.2em] transition-all border",
+                                "flex items-center h-12 gap-3 px-6 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all border",
                                 currentStep === step.id
-                                    ? "bg-foreground text-background border-foreground shadow-lg shadow-foreground/5"
+                                    ? "bg-gray-900 text-white border-gray-900 shadow-xl shadow-gray-200/50"
                                     : currentStep > step.id
-                                        ? "bg-primary/10 text-primary border-primary/20"
-                                        : "bg-background text-muted-foreground border-border hover:border-foreground/20"
+                                        ? "bg-blue-50 text-blue-600 border-blue-100"
+                                        : "bg-white text-gray-400 border-gray-100 hover:border-gray-300"
                             )}
                         >
-                            {currentStep > step.id ? (
-                                <Check size={10} />
-                            ) : (
-                                <step.icon size={10} />
-                            )}
-                            {step.label}
+                            <div className={cn(
+                                "w-6 h-6 rounded-lg flex items-center justify-center shrink-0 border",
+                                currentStep === step.id ? "bg-white/10 border-white/20" : currentStep > step.id ? "bg-white border-blue-200" : "bg-gray-50 border-gray-100"
+                            )}>
+                                {currentStep > step.id ? <Check size={12} /> : <step.icon size={12} />}
+                            </div>
+                            <span className="hidden sm:inline">{step.label}</span>
                         </button>
                         {i < STEPS.length - 1 && (
                             <div className={cn(
-                                "w-4 h-[1px] transition-all",
-                                currentStep > step.id ? "bg-primary/30" : "bg-border"
+                                "w-6 h-0.5 rounded-full transition-all",
+                                currentStep > step.id ? "bg-blue-200" : "bg-gray-100"
                             )} />
                         )}
                     </div>
                 ))}
             </div>
 
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                 {/* Step 1: Basic Info */}
                 {currentStep === 1 && (
-                    <div className="bg-card border border-border p-6 rounded-sm shadow-sm space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
-                        <div className="flex items-center gap-3 pb-4 border-b border-border">
-                            <div className="w-10 h-10 bg-muted rounded-sm flex items-center justify-center text-foreground">
-                                <Info size={18} />
+                    <div className="bg-white border border-gray-100 p-8 md:p-10 rounded-3xl shadow-2xl shadow-gray-100/50 space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
+                        <div className="flex items-center gap-5 pb-6 border-b border-gray-50">
+                            <div className="w-14 h-14 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600 shadow-sm border border-blue-100/50">
+                                <Info size={24} />
                             </div>
-                            <div>
-                                <h2 className="text-sm font-black text-foreground uppercase tracking-widest italic">Asset Identity</h2>
-                                <p className="text-[9px] text-muted-foreground font-bold uppercase tracking-widest">Base identification and purpose</p>
+                            <div className="space-y-1">
+                                <h2 className="text-xl font-bold text-gray-900 uppercase tracking-tight">Identity Registry</h2>
+                                <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Baseline property identification parameters</p>
                             </div>
                         </div>
 
-                        <div className="space-y-4">
-                            <div className="space-y-1.5">
-                                <label className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] px-0.5">Commercial Name</label>
+                        <div className="space-y-8">
+                            <div className="space-y-3">
+                                <label className="text-[11px] font-bold text-gray-400 uppercase tracking-[0.2em] ml-1">Commercial Designation</label>
                                 <div className="relative">
-                                    <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground/50" size={14} />
+                                    <Building2 className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-300" size={18} />
                                     <input
                                         {...form.register("name")}
-                                        className="w-full pl-9 pr-4 py-2.5 bg-background border border-border rounded-sm outline-none focus:border-primary transition-all text-xs font-bold uppercase tracking-tight placeholder:text-muted-foreground/30"
+                                        className="w-full pl-14 pr-6 h-14 bg-gray-50 border border-gray-100 rounded-2xl outline-none focus:bg-white focus:border-blue-500 transition-all text-sm font-bold text-gray-900 placeholder:text-gray-300"
                                         placeholder="e.g. SKYLINE RESIDENCES"
                                     />
                                 </div>
                                 {form.formState.errors.name && (
-                                    <p className="text-[9px] text-red-500 font-black uppercase tracking-widest">{form.formState.errors.name.message}</p>
+                                    <p className="text-[10px] text-red-600 font-bold uppercase tracking-widest ml-1">{form.formState.errors.name.message}</p>
                                 )}
                             </div>
 
-                            <div className="space-y-1.5">
-                                <label className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] px-0.5">Operational Summary</label>
+                            <div className="space-y-3">
+                                <label className="text-[11px] font-bold text-gray-400 uppercase tracking-[0.2em] ml-1">Operational Context</label>
                                 <textarea
                                     {...form.register("description")}
-                                    rows={4}
-                                    className="w-full px-4 py-2.5 bg-background border border-border rounded-sm outline-none focus:border-primary transition-all text-xs font-bold uppercase tracking-tight placeholder:text-muted-foreground/30 resize-none"
-                                    placeholder="Brief technical and aesthetic description of the asset..."
+                                    rows={5}
+                                    className="w-full px-6 py-4 bg-gray-50 border border-gray-100 rounded-2xl outline-none focus:bg-white focus:border-blue-500 transition-all text-sm font-bold text-gray-900 placeholder:text-gray-300 resize-none"
+                                    placeholder="Provide detailed technical and aesthetic summary..."
                                 />
                                 {form.formState.errors.description && (
-                                    <p className="text-[9px] text-red-500 font-black uppercase tracking-widest">{form.formState.errors.description.message}</p>
+                                    <p className="text-[10px] text-red-600 font-bold uppercase tracking-widest ml-1">{form.formState.errors.description.message}</p>
                                 )}
                             </div>
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div className="space-y-1.5">
-                                    <label className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] px-0.5">Gender Vector</label>
-                                    <select
-                                        {...form.register("genderCategory")}
-                                        className="w-full px-4 py-2.5 bg-background border border-border rounded-sm outline-none focus:border-primary transition-all text-xs font-black uppercase tracking-widest appearance-none cursor-pointer"
-                                    >
-                                        <option value="MIXED">Neutral (Mixed Population)</option>
-                                        <option value="MALE">Male Specific</option>
-                                        <option value="FEMALE">Female Specific</option>
-                                    </select>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                <div className="space-y-3">
+                                    <label className="text-[11px] font-bold text-gray-400 uppercase tracking-[0.2em] ml-1">Occupancy Tier</label>
+                                    <div className="relative">
+                                        <Users className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-300" size={18} />
+                                        <select
+                                            {...form.register("genderCategory")}
+                                            className="w-full pl-14 pr-10 h-14 bg-gray-50 border border-gray-100 rounded-2xl outline-none focus:bg-white focus:border-blue-500 transition-all text-[11px] font-bold uppercase tracking-widest text-gray-900 appearance-none cursor-pointer"
+                                        >
+                                            <option value="MIXED">Neutral (Mixed Population)</option>
+                                            <option value="MALE">Male Core Operations</option>
+                                            <option value="FEMALE">Female Core Operations</option>
+                                        </select>
+                                    </div>
                                 </div>
                             </div>
 
-                            <div className="space-y-1.5">
-                                <label className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] px-0.5">Protocol & Compliance</label>
+                            <div className="space-y-3">
+                                <label className="text-[11px] font-bold text-gray-400 uppercase tracking-[0.2em] ml-1">Protocols & Stipulations</label>
                                 <textarea
                                     {...form.register("policiesText")}
-                                    rows={3}
-                                    className="w-full px-4 py-2.5 bg-background border border-border rounded-sm outline-none focus:border-primary transition-all text-xs font-bold uppercase tracking-tight placeholder:text-muted-foreground/30 resize-none"
-                                    placeholder="House rules and contractual stipulations..."
+                                    rows={4}
+                                    className="w-full px-6 py-4 bg-gray-50 border border-gray-100 rounded-2xl outline-none focus:bg-white focus:border-blue-500 transition-all text-sm font-bold text-gray-900 placeholder:text-gray-300 resize-none"
+                                    placeholder="House rules and contractual security stipulations..."
                                 />
                             </div>
                         </div>
@@ -373,63 +387,63 @@ export default function NewHostelPage() {
 
                 {/* Step 2: Location */}
                 {currentStep === 2 && (
-                    <div className="bg-card border border-border p-6 rounded-sm shadow-sm space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
-                        <div className="flex items-center gap-3 pb-4 border-b border-border">
-                            <div className="w-10 h-10 bg-muted rounded-sm flex items-center justify-center text-foreground">
-                                <MapPin size={18} />
+                    <div className="bg-white border border-gray-100 p-8 md:p-10 rounded-3xl shadow-2xl shadow-gray-100/50 space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
+                        <div className="flex items-center gap-5 pb-6 border-b border-gray-50">
+                            <div className="w-14 h-14 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600 shadow-sm border border-blue-100/50">
+                                <MapPin size={24} />
                             </div>
-                            <div>
-                                <h2 className="text-sm font-black text-foreground uppercase tracking-widest italic">Zone Deployment</h2>
-                                <p className="text-[9px] text-muted-foreground font-bold uppercase tracking-widest">Physical coordinates and accessibility</p>
+                            <div className="space-y-1">
+                                <h2 className="text-xl font-bold text-gray-900 uppercase tracking-tight">Zone Deployment</h2>
+                                <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Physical coordinates and accessibility parameters</p>
                             </div>
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div className="space-y-1.5">
-                                <label className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] px-0.5">Municipal Zone</label>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <div className="space-y-3">
+                                <label className="text-[11px] font-bold text-gray-400 uppercase tracking-[0.2em] ml-1">Municipal Sector</label>
                                 <input
                                     {...form.register("city")}
-                                    className="w-full px-4 py-2.5 bg-background border border-border rounded-sm outline-none focus:border-primary transition-all text-xs font-bold uppercase tracking-tight placeholder:text-muted-foreground/30"
+                                    className="w-full px-6 h-14 bg-gray-50 border border-gray-100 rounded-2xl outline-none focus:bg-white focus:border-blue-500 transition-all text-sm font-bold text-gray-900 placeholder:text-gray-300"
                                     placeholder="e.g. ACCRA"
                                 />
                                 {form.formState.errors.city && (
-                                    <p className="text-[9px] text-red-500 font-black uppercase tracking-widest">{form.formState.errors.city.message}</p>
+                                    <p className="text-[10px] text-red-600 font-bold uppercase tracking-widest ml-1">{form.formState.errors.city.message}</p>
                                 )}
                             </div>
 
-                            <div className="space-y-1.5">
-                                <label className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] px-0.5">Street Identification</label>
+                            <div className="space-y-3">
+                                <label className="text-[11px] font-bold text-gray-400 uppercase tracking-[0.2em] ml-1">Street Address</label>
                                 <input
                                     {...form.register("addressLine")}
-                                    className="w-full px-4 py-2.5 bg-background border border-border rounded-sm outline-none focus:border-primary transition-all text-xs font-bold uppercase tracking-tight placeholder:text-muted-foreground/30"
+                                    className="w-full px-6 h-14 bg-gray-50 border border-gray-100 rounded-2xl outline-none focus:bg-white focus:border-blue-500 transition-all text-sm font-bold text-gray-900 placeholder:text-gray-300"
                                     placeholder="PLT 22B, RING ROAD"
                                 />
                                 {form.formState.errors.addressLine && (
-                                    <p className="text-[9px] text-red-500 font-black uppercase tracking-widest">{form.formState.errors.addressLine.message}</p>
+                                    <p className="text-[10px] text-red-600 font-bold uppercase tracking-widest ml-1">{form.formState.errors.addressLine.message}</p>
                                 )}
                             </div>
 
-                            <div className="space-y-1.5">
-                                <label className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] px-0.5 flex items-center gap-2">
-                                    <MessageSquare size={10} /> Comm-Link (WhatsApp)
+                            <div className="space-y-3">
+                                <label className="text-[11px] font-bold text-gray-400 uppercase tracking-[0.2em] ml-1 flex items-center gap-2">
+                                    <MessageSquare size={14} className="text-emerald-500" /> Comm-Link (WhatsApp)
                                 </label>
                                 <input
                                     {...form.register("whatsappNumber")}
-                                    className="w-full px-4 py-2.5 bg-background border border-border rounded-sm outline-none focus:border-primary transition-all text-xs font-bold uppercase tracking-tight placeholder:text-muted-foreground/30"
+                                    className="w-full px-6 h-14 bg-gray-50 border border-gray-100 rounded-2xl outline-none focus:bg-white focus:border-blue-500 transition-all text-sm font-bold text-gray-900 placeholder:text-gray-300"
                                     placeholder="e.g. 0541234567"
                                 />
                                 {form.formState.errors.whatsappNumber && (
-                                    <p className="text-[9px] text-red-500 font-black uppercase tracking-widest">{form.formState.errors.whatsappNumber.message}</p>
+                                    <p className="text-[10px] text-red-600 font-bold uppercase tracking-widest ml-1">{form.formState.errors.whatsappNumber.message}</p>
                                 )}
                             </div>
 
-                            <div className="space-y-1.5">
-                                <label className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] px-0.5 flex items-center gap-2">
-                                    <Clock size={10} /> Campus Proximity
+                            <div className="space-y-3">
+                                <label className="text-[11px] font-bold text-gray-400 uppercase tracking-[0.2em] ml-1 flex items-center gap-2">
+                                    <Clock size={14} className="text-blue-500" /> Campus Proximity
                                 </label>
                                 <input
                                     {...form.register("distanceToCampus")}
-                                    className="w-full px-4 py-2.5 bg-background border border-border rounded-sm outline-none focus:border-primary transition-all text-xs font-bold uppercase tracking-tight placeholder:text-muted-foreground/30"
+                                    className="w-full px-6 h-14 bg-gray-50 border border-gray-100 rounded-2xl outline-none focus:bg-white focus:border-blue-500 transition-all text-sm font-bold text-gray-900 placeholder:text-gray-300"
                                     placeholder="e.g. 5 MINS TRANSIT"
                                 />
                             </div>
@@ -439,24 +453,24 @@ export default function NewHostelPage() {
 
                 {/* Step 3: Features */}
                 {currentStep === 3 && (
-                    <div className="space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
+                    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
                         {/* Utilities */}
-                        <div className="bg-card border border-border p-6 rounded-sm shadow-sm space-y-6">
-                            <div className="flex items-center gap-3 pb-4 border-b border-border">
-                                <div className="w-10 h-10 bg-muted rounded-sm flex items-center justify-center text-foreground">
-                                    <Zap size={18} />
+                        <div className="bg-white border border-gray-100 p-8 md:p-10 rounded-3xl shadow-2xl shadow-gray-100/50 space-y-10">
+                            <div className="flex items-center gap-5 pb-6 border-b border-gray-50">
+                                <div className="w-14 h-14 bg-amber-50 rounded-2xl flex items-center justify-center text-amber-600 shadow-sm border border-amber-100/50">
+                                    <Zap size={24} />
                                 </div>
-                                <div>
-                                    <h2 className="text-sm font-black text-foreground uppercase tracking-widest italic">Core Provisions</h2>
-                                    <p className="text-[9px] text-muted-foreground font-bold uppercase tracking-widest">Included baseline services</p>
+                                <div className="space-y-1">
+                                    <h2 className="text-xl font-bold text-gray-900 uppercase tracking-tight">Core Provisions</h2>
+                                    <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Included baseline utility infrastructure</p>
                                 </div>
                             </div>
 
-                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                                 {[
-                                    { id: "water", label: "H2O Unit", icon: Droplets },
-                                    { id: "light", label: "Energy Pack", icon: Zap },
-                                    { id: "gas", label: "Fuel System", icon: Flame }
+                                    { id: "water", label: "Aqua Unit", icon: Droplets, color: 'text-blue-600', activeBg: 'bg-blue-600' },
+                                    { id: "light", label: "Energy Pack", icon: Zap, color: 'text-amber-600', activeBg: 'bg-amber-600' },
+                                    { id: "gas", label: "Fuel System", icon: Flame, color: 'text-orange-600', activeBg: 'bg-orange-600' }
                                 ].map((util) => {
                                     const isSelected = form.watch("utilitiesIncluded")?.includes(util.id);
                                     return (
@@ -471,14 +485,14 @@ export default function NewHostelPage() {
                                                 form.setValue("utilitiesIncluded", updated);
                                             }}
                                             className={cn(
-                                                "flex items-center gap-3 p-3 rounded-sm border transition-all",
+                                                "flex items-center h-14 gap-4 px-6 rounded-2xl border transition-all active:scale-95 group",
                                                 isSelected
-                                                    ? "bg-foreground text-background border-foreground shadow-lg shadow-foreground/5"
-                                                    : "bg-muted/30 border-transparent text-muted-foreground hover:border-foreground/20 hover:text-foreground"
+                                                    ? cn(util.activeBg, "text-white border-transparent shadow-xl")
+                                                    : "bg-gray-50 border-gray-100 text-gray-400 hover:border-gray-200"
                                             )}
                                         >
-                                            <util.icon size={14} className={isSelected ? "text-background" : "text-primary"} />
-                                            <span className="text-[9px] font-black uppercase tracking-[0.2em]">{util.label}</span>
+                                            <util.icon size={18} className={cn("transition-transform group-hover:scale-110", isSelected ? "text-white" : util.color)} />
+                                            <span className="text-[10px] font-bold uppercase tracking-widest">{util.label}</span>
                                         </button>
                                     );
                                 })}
@@ -486,18 +500,18 @@ export default function NewHostelPage() {
                         </div>
 
                         {/* Amenities */}
-                        <div className="bg-card border border-border p-6 rounded-sm shadow-sm space-y-6">
-                            <div className="flex items-center gap-3 pb-4 border-b border-border">
-                                <div className="w-10 h-10 bg-muted rounded-sm flex items-center justify-center text-foreground">
-                                    <Check size={18} />
+                        <div className="bg-white border border-gray-100 p-8 md:p-10 rounded-3xl shadow-2xl shadow-gray-100/50 space-y-10">
+                            <div className="flex items-center gap-5 pb-6 border-b border-gray-50">
+                                <div className="w-14 h-14 bg-gray-900 rounded-2xl flex items-center justify-center text-white shadow-xl shadow-gray-200">
+                                    <Check size={24} />
                                 </div>
-                                <div>
-                                    <h2 className="text-sm font-black text-foreground uppercase tracking-widest italic">Asset Modules</h2>
-                                    <p className="text-[9px] text-muted-foreground font-bold uppercase tracking-widest">Hardware and software add-ons</p>
+                                <div className="space-y-1">
+                                    <h2 className="text-xl font-bold text-gray-900 uppercase tracking-tight">Asset Modules</h2>
+                                    <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Hardware and infrastructure add-ons</p>
                                 </div>
                             </div>
 
-                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                                 {AMENITIES.map((item) => {
                                     const isSelected = selectedAmenities.includes(item.id);
                                     return (
@@ -506,14 +520,14 @@ export default function NewHostelPage() {
                                             type="button"
                                             onClick={() => toggleAmenity(item.id)}
                                             className={cn(
-                                                "flex flex-col items-center gap-2 p-4 rounded-sm border transition-all active:scale-95 cursor-pointer",
+                                                "flex flex-col items-center justify-center gap-3 h-32 rounded-2xl border transition-all active:scale-95 cursor-pointer group",
                                                 isSelected
-                                                    ? "bg-foreground text-background border-foreground shadow-lg shadow-foreground/5"
-                                                    : "bg-muted/30 border-transparent text-muted-foreground hover:border-foreground/20 hover:text-foreground"
+                                                    ? "bg-gray-900 text-white border-gray-900 shadow-xl"
+                                                    : "bg-gray-50/50 border-gray-100 text-gray-300 hover:border-blue-500/20 hover:text-gray-900"
                                             )}
                                         >
-                                            <item.icon size={16} />
-                                            <span className="text-[8px] font-black uppercase tracking-[0.2em]">{item.label}</span>
+                                            <item.icon size={28} className={cn("transition-all group-hover:scale-110", isSelected ? "text-blue-400" : "text-gray-300")} />
+                                            <span className="text-[9px] font-bold uppercase tracking-widest text-center px-2">{item.label}</span>
                                         </button>
                                     );
                                 })}
@@ -524,36 +538,45 @@ export default function NewHostelPage() {
 
                 {/* Step 4: Photos */}
                 {currentStep === 4 && (
-                    <div className="bg-card border border-border p-6 rounded-sm shadow-sm space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
-                        <div className="flex items-center gap-3 pb-4 border-b border-border">
-                            <div className="w-10 h-10 bg-muted rounded-sm flex items-center justify-center text-foreground">
-                                <ImageIcon size={18} />
+                    <div className="bg-white border border-gray-100 p-8 md:p-10 rounded-3xl shadow-2xl shadow-gray-100/50 space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
+                        <div className="flex items-center gap-5 pb-6 border-b border-gray-50">
+                            <div className="w-14 h-14 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600 shadow-sm border border-blue-100/50">
+                                <ImageIcon size={24} />
                             </div>
-                            <div>
-                                <h2 className="text-sm font-black text-foreground uppercase tracking-widest italic">Visual Verification</h2>
-                                <p className="text-[9px] text-muted-foreground font-bold uppercase tracking-widest">Capture operational reality</p>
+                            <div className="space-y-1">
+                                <h2 className="text-xl font-bold text-gray-900 uppercase tracking-tight">Visual Verification</h2>
+                                <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Capture operational reality and aesthetic value</p>
                             </div>
                         </div>
 
-                        <ImageUpload
-                            value={form.watch("images")}
-                            onChange={(urls) => form.setValue("images", urls)}
-                        />
+                        <div className="bg-gray-50 rounded-2xl p-6 border border-gray-100 shadow-inner">
+                            <ImageUpload
+                                value={form.watch("images")}
+                                onChange={(urls) => form.setValue("images", urls)}
+                            />
+                        </div>
                         {form.formState.errors.images && (
-                            <p className="text-[9px] text-red-500 font-black uppercase tracking-widest italic">{form.formState.errors.images.message}</p>
+                            <p className="text-[10px] text-red-600 font-bold uppercase tracking-widest ml-1">{form.formState.errors.images.message}</p>
                         )}
+
+                        <div className="flex items-start gap-4 p-5 bg-blue-50 rounded-2xl border border-blue-100">
+                            <ShieldAlert size={20} className="text-blue-600 shrink-0 mt-1" />
+                            <p className="text-[9px] font-bold text-blue-700 uppercase tracking-widest leading-relaxed">
+                                Professional grade imagery increases asset verification speed by approximately 40%. Ensure high luminosity and clear architectural focus.
+                            </p>
+                        </div>
                     </div>
                 )}
 
                 {/* Navigation */}
-                <div className={cn("flex items-center justify-between gap-4 pt-4", isPublishing && "pointer-events-none opacity-30")}>
+                <div className={cn("flex items-center justify-between gap-6 pt-6", isPublishing && "pointer-events-none opacity-30")}>
                     {currentStep > 1 ? (
                         <button
                             type="button"
                             onClick={() => setCurrentStep(s => s - 1)}
-                            className="px-6 py-2.5 bg-background border border-border text-foreground rounded-sm font-black text-[10px] uppercase tracking-widest hover:bg-muted transition-all"
+                            className="h-14 px-8 bg-white border border-gray-100 text-gray-400 rounded-2xl font-bold text-[10px] uppercase tracking-widest hover:text-gray-900 hover:border-gray-200 transition-all active:scale-95 flex items-center gap-3"
                         >
-                            ← Reverse
+                            <ArrowLeft size={16} /> Reverse Step
                         </button>
                     ) : (
                         <div />
@@ -574,9 +597,9 @@ export default function NewHostelPage() {
                                     toast.error("PROTOCOL BREACH", { description: "Required sectors require attention." });
                                 }
                             }}
-                            className="px-6 py-2.5 bg-foreground text-background rounded-sm font-black text-[10px] uppercase tracking-widest shadow-xl shadow-foreground/5 hover:opacity-90 transition-all active:scale-[0.98]"
+                            className="h-14 px-10 bg-gray-900 text-white rounded-2xl font-bold text-[10px] uppercase tracking-widest shadow-xl shadow-gray-200 hover:bg-black transition-all active:scale-95 flex items-center gap-3"
                         >
-                            Advance →
+                            Advance Phase <ArrowRight size={16} />
                         </button>
                     ) : (
                         <button
@@ -590,9 +613,9 @@ export default function NewHostelPage() {
                                     toast.error("VALIDATION ERROR");
                                 }
                             }}
-                            className="px-8 py-2.5 bg-primary text-white rounded-sm font-black text-[10px] uppercase tracking-[0.2em] shadow-xl shadow-primary/10 hover:opacity-90 transition-all active:scale-[0.98] flex items-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
+                            className="h-14 px-12 bg-blue-600 text-white rounded-2xl font-bold text-[11px] uppercase tracking-[0.2em] shadow-2xl shadow-blue-500/20 hover:bg-blue-700 transition-all active:scale-95 flex items-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                            <Building2 size={14} />
+                            <Building2 size={18} />
                             Execute Deployment
                         </button>
                     )}

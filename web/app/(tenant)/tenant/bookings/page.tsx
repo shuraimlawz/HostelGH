@@ -50,8 +50,8 @@ function Countdown({ deadline }: { deadline: string }) {
         return () => clearInterval(timer);
     }, [deadline]);
 
-    if (timeLeft === "PROTOCOL EXPIRED") return <span className="text-red-500 font-black italic uppercase tracking-widest text-[10px]">Purged</span>;
-    return <span className="text-orange-500 font-black tabular-nums tracking-tighter truncate">{timeLeft}</span>;
+    if (timeLeft === "PROTOCOL EXPIRED") return <span className="text-red-500 font-bold uppercase tracking-widest text-[10px]">Purged</span>;
+    return <span className="text-orange-500 font-bold tabular-nums tracking-tighter truncate">{timeLeft}</span>;
 }
 
 export default function TenantBookingsPage() {
@@ -94,38 +94,38 @@ export default function TenantBookingsPage() {
     };
 
     return (
-        <div className="max-w-[1200px] mx-auto px-4 py-12 space-y-12">
+        <div className="max-w-[1200px] mx-auto px-4 py-12 space-y-12 pb-20 pt-4">
             {/* Header Section */}
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
                 <div className="space-y-4">
                     <div className="flex items-center gap-3">
-                        <span className="px-3 py-1 bg-black text-white rounded-full text-[9px] font-black uppercase tracking-[0.3em] border border-white/10">
+                        <span className="px-3 py-1 bg-blue-600 text-white rounded-full text-[9px] font-bold uppercase tracking-[0.2em]">
                             Activity Ledger
                         </span>
                         <div className="flex items-center gap-2">
                             <ShieldCheck size={14} className="text-blue-500" />
-                            <span className="text-[9px] font-black text-muted-foreground uppercase tracking-widest italic">Encrypted History</span>
+                            <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Encrypted History</span>
                         </div>
                     </div>
-                    <h1 className="text-5xl font-black text-foreground tracking-tighter uppercase italic leading-none">
-                        Reservations <span className="text-blue-600 NOT-italic opacity-40">.</span>
+                    <h1 className="text-4xl md:text-5xl font-bold text-gray-900 tracking-tighter uppercase leading-tight">
+                        Reservations <span className="text-blue-600 opacity-40">/</span> Linkage
                     </h1>
-                    <p className="text-muted-foreground text-[11px] font-bold uppercase tracking-[0.1em] max-w-sm">
-                        Monitor your stay protocols and active network placements.
+                    <p className="text-gray-500 text-xs font-bold uppercase tracking-widest max-w-sm">
+                        Monitor active stay protocols and placement validation.
                     </p>
                 </div>
 
-                <div className="hidden md:flex bg-white rounded-3xl border border-muted p-6 items-center gap-6 shadow-sm">
+                <div className="hidden md:flex bg-white rounded-2xl border border-gray-100 p-6 items-center gap-8 shadow-sm">
                     <div className="text-right">
-                        <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-1">Active Links</p>
-                        <p className="text-2xl font-black italic tracking-tighter leading-none">
+                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Active Links</p>
+                        <p className="text-3xl font-bold text-gray-900 tracking-tighter leading-none">
                             {Array.isArray(bookings) ? bookings.filter(b => b.status === "CONFIRMED").length : 0}
                         </p>
                     </div>
-                    <div className="w-px h-10 bg-muted" />
+                    <div className="w-px h-10 bg-gray-100" />
                     <div className="text-right">
-                        <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-1">Pending Flow</p>
-                        <p className="text-2xl font-black italic tracking-tighter leading-none">
+                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Pending Flow</p>
+                        <p className="text-3xl font-bold text-gray-900 tracking-tighter leading-none">
                             {Array.isArray(bookings) ? bookings.filter(b => ["APPROVED", "PENDING_APPROVAL"].includes(b.status)).length : 0}
                         </p>
                     </div>
@@ -133,16 +133,16 @@ export default function TenantBookingsPage() {
             </div>
 
             {/* Alert Banner */}
-            <div className="bg-black text-white rounded-[2.5rem] p-8 md:p-10 shadow-2xl relative overflow-hidden group border border-white/5">
-                <div className="absolute top-0 right-0 w-64 h-64 bg-blue-600/20 rounded-full -mr-32 -mt-32 blur-[100px] opacity-40 group-hover:scale-125 transition-transform duration-1000" />
+            <div className="bg-gray-950 text-white rounded-[1.5rem] p-8 md:p-10 shadow-xl relative overflow-hidden group border border-white/5">
+                <div className="absolute top-0 right-0 w-64 h-64 bg-blue-600/10 rounded-full -mr-32 -mt-32 blur-3xl opacity-40 group-hover:scale-125 transition-transform duration-1000" />
                 <div className="relative z-10 flex flex-col md:flex-row items-center gap-8">
-                    <div className="w-16 h-16 bg-white/10 rounded-[1.5rem] flex items-center justify-center border border-white/20 backdrop-blur-md shrink-0 ring-4 ring-white/5">
+                    <div className="w-16 h-16 bg-white/5 rounded-2xl flex items-center justify-center border border-white/10 backdrop-blur-md shrink-0">
                         <Info size={32} className="text-blue-400" />
                     </div>
                     <div className="space-y-2 text-center md:text-left">
-                        <h3 className="text-xl font-black italic uppercase tracking-tight leading-none text-white">24-Hour Settlement Protocol <span className="text-blue-500 NOT-italic">.</span></h3>
-                        <p className="text-[11px] text-white/40 font-bold leading-relaxed uppercase tracking-widest max-w-2xl">
-                            Upon approval, payment must be finalized within the <span className="text-white">24-hour window</span>. Failure to settle will result in automatic slot purging from the matrix.
+                        <h3 className="text-xl font-bold uppercase tracking-tight leading-none text-white">Settlement Window <span className="text-blue-500 opacity-40">.</span></h3>
+                        <p className="text-[11px] text-gray-400 font-bold leading-relaxed uppercase tracking-widest max-w-2xl">
+                            Upon approval, payment must be finalized within the 24-hour window. Failure to settle will result in automatic slot purging from the matrix.
                         </p>
                     </div>
                 </div>
@@ -152,47 +152,47 @@ export default function TenantBookingsPage() {
             <div className="space-y-6">
                 {isLoading ? (
                     <div className="grid grid-cols-1 gap-6">
-                        <Skeleton className="h-40 w-full rounded-[2.5rem]" />
-                        <Skeleton className="h-40 w-full rounded-[2.5rem]" />
+                        <Skeleton className="h-44 w-full rounded-[1.5rem]" />
+                        <Skeleton className="h-44 w-full rounded-[1.5rem]" />
                     </div>
                 ) : Array.isArray(bookings) && bookings.length > 0 ? (
                     <div className="grid grid-cols-1 gap-6">
                         {bookings.map((booking: Booking) => (
-                            <div key={booking.id} className="bg-white rounded-[3rem] border border-muted p-8 md:p-10 shadow-sm group hover:border-black/10 transition-all">
+                            <div key={booking.id} className="bg-white rounded-[1.5rem] border border-gray-100 p-8 shadow-sm group hover:border-blue-500/20 transition-all">
                                 <div className="flex flex-col lg:flex-row lg:items-center gap-10">
                                     {/* Hostel Identity */}
                                     <div className="flex-1 space-y-4">
-                                        <div className="flex items-center gap-3">
+                                        <div className="flex flex-wrap items-center gap-3">
                                             <div className={cn(
-                                                "px-4 py-1.5 rounded-2xl text-[9px] font-black uppercase tracking-[0.2em] border",
+                                                "px-4 py-1.5 rounded-xl text-[9px] font-bold uppercase tracking-widest border",
                                                 getStatusStyles(booking.status)
                                             )}>
                                                 {booking.status.replace("_", " ")}
                                             </div>
-                                            <div className="flex items-center gap-2 text-[9px] font-black text-muted-foreground uppercase tracking-widest">
+                                            <div className="flex items-center gap-2 text-[9px] font-bold text-gray-400 uppercase tracking-widest">
                                                 <Calendar size={12} />
-                                                STAY START: {format(new Date(booking.startDate), "MMM d, yyyy").toUpperCase()}
+                                                COMMENCE: {format(new Date(booking.startDate), "MMM d, yyyy").toUpperCase()}
                                             </div>
                                         </div>
                                         
                                         <div className="space-y-1">
-                                            <h2 className="text-3xl font-black text-foreground italic uppercase tracking-tighter leading-none">
-                                                {booking.hostel.name} <span className="text-blue-600 NOT-italic opacity-40">/</span> {booking.items?.[0]?.room.name || "UNASSIGNED"}
+                                            <h2 className="text-2xl md:text-3xl font-bold text-gray-900 uppercase tracking-tighter leading-none">
+                                                {booking.hostel.name} <span className="text-blue-600 opacity-40">/</span> {booking.items?.[0]?.room.name || "UNASSIGNED"}
                                             </h2>
-                                            <p className="text-[11px] text-muted-foreground font-black uppercase tracking-widest flex items-center gap-2">
-                                                <Building2 size={12} /> HOSTEL ID: #{booking.id.slice(-6).toUpperCase()}
+                                            <p className="text-[11px] text-gray-400 font-bold uppercase tracking-widest flex items-center gap-2">
+                                                <Building2 size={12} /> NODE ID: #{booking.id.slice(-6).toUpperCase()}
                                             </p>
                                         </div>
                                     </div>
 
-                                    <div className="hidden lg:block w-px h-16 bg-muted" />
+                                    <div className="hidden lg:block w-px h-16 bg-gray-50" />
 
                                     {/* Deadline / Countdown */}
-                                    <div className="w-full lg:w-48 space-y-2">
-                                        <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest flex items-center gap-1.5 leading-none mb-1">
-                                            <Clock size={12} /> Settlement Clock
+                                    <div className="w-full lg:w-48 space-y-2 text-center lg:text-left">
+                                        <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest flex items-center justify-center lg:justify-start gap-1.5 leading-none mb-1">
+                                            <Clock size={12} /> Validation Clock
                                         </p>
-                                        <div className="text-xl font-black text-foreground uppercase tracking-tight">
+                                        <div className="text-xl font-bold text-gray-900 uppercase tracking-tight">
                                             {booking.status === 'APPROVED' && booking.paymentDeadline ? (
                                                 <Countdown deadline={booking.paymentDeadline} />
                                             ) : (
@@ -201,15 +201,16 @@ export default function TenantBookingsPage() {
                                         </div>
                                     </div>
 
-                                    {/* Responsive Actions */}
-                                    <div className="flex flex-wrap items-center gap-4">
+                                    {/* Actions */}
+                                    <div className="flex flex-wrap items-center justify-center lg:justify-end gap-3">
                                         {booking.status === 'APPROVED' && (
                                             <button
                                                 disabled={payMutation.isPending}
                                                 onClick={() => payMutation.mutate(booking.id)}
-                                                className="h-16 px-10 bg-black text-white rounded-2xl font-black uppercase text-[11px] tracking-[0.3em] flex items-center gap-4 hover:bg-blue-600 transition-all shadow-xl active:scale-95 disabled:opacity-50 group/pay"
+                                                className="h-14 px-8 bg-blue-600 text-white rounded-xl font-bold uppercase text-[10px] tracking-widest flex items-center gap-3 hover:bg-blue-700 transition-all shadow-lg shadow-blue-500/10 active:scale-95 disabled:opacity-50"
                                             >
-                                                {payMutation.isPending ? <Loader2 className="w-5 h-5 animate-spin" /> : <><CreditCard className="w-5 h-5 group-hover/pay:scale-110 transition-transform" /> AUTHORIZE PAYMENT</>}
+                                                {payMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <CreditCard size={16} />}
+                                                AUTHORIZE SETTLEMENT
                                             </button>
                                         )}
 
@@ -219,13 +220,18 @@ export default function TenantBookingsPage() {
                                                     href={`https://wa.me/233${booking.hostel.whatsappNumber.replace(/^0/, '')}?text=Hi, I'm ${booking.tenant.firstName}, I booked a room at ${booking.hostel.name}.`}
                                                     target="_blank"
                                                     rel="noopener noreferrer"
-                                                    className="w-16 h-16 bg-white border border-muted rounded-2xl flex items-center justify-center text-emerald-500 hover:bg-emerald-500 hover:text-white transition-all shadow-sm hover:shadow-xl"
+                                                    className="w-14 h-14 bg-white border border-gray-100 rounded-xl flex items-center justify-center text-emerald-600 hover:bg-emerald-50 transition-all shadow-sm"
+                                                    title="Operational Support"
                                                 >
-                                                    <MessageCircle size={24} />
+                                                    <MessageCircle size={20} />
                                                 </a>
                                             )}
-                                            <Link href={`/hostels/${booking.hostel.id}`} className="w-16 h-16 bg-white border border-muted rounded-2xl flex items-center justify-center text-blue-600 hover:bg-black hover:text-white transition-all shadow-sm hover:shadow-xl">
-                                                <ChevronRight size={24} />
+                                            <Link 
+                                                href={`/hostels/${booking.hostel.id}`} 
+                                                className="w-14 h-14 bg-white border border-gray-100 rounded-xl flex items-center justify-center text-gray-400 hover:text-blue-600 hover:border-blue-100 transition-all shadow-sm"
+                                                title="View Asset"
+                                            >
+                                                <ChevronRight size={20} />
                                             </Link>
                                         </div>
                                     </div>
@@ -234,16 +240,16 @@ export default function TenantBookingsPage() {
                         ))}
                     </div>
                 ) : (
-                    <div className="bg-white rounded-[3.5rem] border border-dashed border-muted p-20 text-center space-y-6">
-                        <div className="w-20 h-20 bg-muted/30 rounded-full flex items-center justify-center mx-auto text-muted-foreground/30">
+                    <div className="bg-white rounded-[2rem] border border-dashed border-gray-100 p-20 text-center space-y-6">
+                        <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto text-gray-200">
                             <Clock size={40} />
                         </div>
                         <div className="space-y-2">
-                            <h3 className="text-2xl font-black italic uppercase tracking-tighter">Negative History <span className="text-blue-600 NOT-italic">.</span></h3>
-                            <p className="text-[11px] text-muted-foreground font-black uppercase tracking-widest">No active stay protocols detected in the network.</p>
+                            <h3 className="text-2xl font-bold uppercase tracking-tighter">Archive Status Detected</h3>
+                            <p className="text-xs text-gray-400 font-bold uppercase tracking-widest">No active stay protocols detected in the network.</p>
                         </div>
-                        <Link href="/hostels" className="inline-flex items-center gap-4 px-10 py-5 bg-black text-white rounded-2xl font-black text-[11px] uppercase tracking-[0.4em] hover:bg-blue-600 transition-all shadow-xl">
-                            EXPLORE HOSTELS <ArrowRight size={18} />
+                        <Link href="/hostels" className="inline-flex items-center gap-4 px-10 py-5 bg-blue-600 text-white rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-blue-700 transition-all">
+                            EXPLORE ASSETS <ArrowRight size={16} />
                         </Link>
                     </div>
                 )}

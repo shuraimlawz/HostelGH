@@ -64,39 +64,48 @@ export default function HelpCenterPage() {
     const [activeCategory, setActiveCategory] = useState(HELP_CATEGORIES[0].id);
 
     return (
-        <div className="space-y-16">
+        <div className="max-w-[1200px] mx-auto px-4 py-12 space-y-16 pb-20 pt-4">
             {/* Page Header */}
-            <div className="space-y-3">
-                <h1 className="text-3xl font-black text-gray-900 tracking-tight">
-                    Help Center
+            <div className="space-y-4">
+                <div className="flex items-center gap-3">
+                    <span className="px-3 py-1 bg-blue-600 text-white rounded-full text-[9px] font-bold uppercase tracking-widest border border-white/10">
+                        Support Network
+                    </span>
+                    <div className="flex items-center gap-2">
+                        <BookOpen size={14} className="text-blue-500" />
+                        <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Platform Documentation</span>
+                    </div>
+                </div>
+                <h1 className="text-4xl md:text-5xl font-bold text-gray-900 tracking-tighter uppercase leading-tight">
+                    Help Center <span className="text-blue-600 opacity-40">/</span> Archive
                 </h1>
-                <p className="text-gray-500 text-base font-medium max-w-xl">
-                    Detailed guides and answers to help you get the most out of HostelGH.
+                <p className="text-gray-500 text-xs font-bold uppercase tracking-widest max-w-xl">
+                    Detailed guides and tactical answers to help you get the most out of HostelGH.
                 </p>
             </div>
 
             {/* Categories Grid (Desktop) */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {HELP_CATEGORIES.map((cat) => (
                     <button
                         key={cat.id}
                         onClick={() => setActiveCategory(cat.id)}
                         className={cn(
-                            "flex items-center gap-4 p-5 rounded-2xl border-2 transition-all text-left",
+                            "group flex flex-col items-start gap-4 p-8 rounded-2xl border-2 transition-all text-left",
                             activeCategory === cat.id
-                                ? "border-blue-500 bg-blue-50"
-                                : "border-gray-50 bg-white hover:border-gray-200"
+                                ? "border-blue-500 bg-blue-50/30 shadow-lg shadow-blue-500/5"
+                                : "border-gray-100 bg-white hover:border-blue-200"
                         )}
                     >
                         <div className={cn(
-                            "w-10 h-10 rounded-xl flex items-center justify-center",
-                            activeCategory === cat.id ? "bg-blue-600 text-white" : "bg-gray-100 text-gray-500"
+                            "w-12 h-12 rounded-xl flex items-center justify-center transition-all",
+                            activeCategory === cat.id ? "bg-blue-600 text-white" : "bg-gray-50 text-gray-400 group-hover:bg-blue-50 group-hover:text-blue-600"
                         )}>
-                            <cat.icon size={18} />
+                            <cat.icon size={24} />
                         </div>
                         <span className={cn(
-                            "font-black text-[10px] uppercase tracking-widest",
-                            activeCategory === cat.id ? "text-blue-600" : "text-gray-500"
+                            "font-bold text-[11px] uppercase tracking-[0.2em]",
+                            activeCategory === cat.id ? "text-blue-600" : "text-gray-400"
                         )}>
                             {cat.title}
                         </span>
@@ -105,12 +114,12 @@ export default function HelpCenterPage() {
             </div>
 
             {/* Article List Section */}
-            <section className="animate-in fade-in slide-in-from-right-4 duration-500">
-                <div className="bg-white rounded-[2.5rem] border-2 border-gray-50 p-8 md:p-10 shadow-sm">
-                    <div className="flex items-center gap-3 mb-6">
-                        <Clock size={14} className="text-blue-600" />
-                        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">
-                            Frequently Asked Questions
+            <section className="animate-in fade-in slide-in-from-bottom-4 duration-700">
+                <div className="bg-white rounded-3xl border border-gray-100 p-8 md:p-12 shadow-sm">
+                    <div className="flex items-center gap-3 mb-10 pb-6 border-b border-gray-50">
+                        <Clock size={16} className="text-blue-600" />
+                        <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400">
+                            Knowledge Base Activation
                         </span>
                     </div>
 
@@ -119,46 +128,46 @@ export default function HelpCenterPage() {
                     />
 
                     {/* Feedback UI */}
-                    <div className="mt-10 pt-6 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-6">
-                        <span className="text-xs font-bold text-gray-500 italic">Was this information helpful?</span>
-                        <div className="flex gap-3">
-                            <button className="flex items-center gap-2 px-5 py-2 rounded-full border border-gray-100 hover:border-green-500 hover:text-green-600 transition-all font-bold text-[10px] uppercase tracking-widest">
-                                <ThumbsUp size={14} /> Yes
+                    <div className="mt-12 pt-8 border-t border-gray-50 flex flex-col sm:flex-row items-center justify-between gap-6">
+                        <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Signal usefulness of this protocol?</span>
+                        <div className="flex gap-4">
+                            <button className="flex items-center gap-3 px-8 py-3 rounded-xl border border-gray-100 hover:border-blue-500 hover:text-blue-600 transition-all font-bold text-[10px] uppercase tracking-widest shadow-sm active:scale-95">
+                                <ThumbsUp size={16} /> Affirmative
                             </button>
-                            <button className="flex items-center gap-2 px-5 py-2 rounded-full border border-gray-100 hover:border-red-500 hover:text-red-600 transition-all font-bold text-[10px] uppercase tracking-widest">
-                                <ThumbsDown size={14} /> No
+                            <button className="flex items-center gap-3 px-8 py-3 rounded-xl border border-gray-100 hover:border-red-500 hover:text-red-600 transition-all font-bold text-[10px] uppercase tracking-widest shadow-sm active:scale-95">
+                                <ThumbsDown size={16} /> Negative
                             </button>
                         </div>
                     </div>
                 </div>
             </section>
 
-            {/* Contact Support Card - NOT FOOTER */}
-            <div className="grid md:grid-cols-2 gap-6">
-                <div className="p-8 rounded-[2rem] bg-gray-50 border border-gray-100 space-y-4">
-                    <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-blue-600 shadow-sm">
-                        <Mail size={20} />
+            {/* Contact Support Card */}
+            <div className="grid md:grid-cols-2 gap-8">
+                <div className="p-10 rounded-3xl bg-gray-900 border border-white/5 space-y-6 group hover:border-blue-500/20 transition-all shadow-xl">
+                    <div className="w-14 h-14 bg-white/5 border border-white/10 rounded-xl flex items-center justify-center text-blue-500 shadow-xl group-hover:scale-110 transition-transform">
+                        <Mail size={28} />
                     </div>
-                    <div className="space-y-1">
-                        <h3 className="text-lg font-black text-gray-900">Email Support</h3>
-                        <p className="text-xs text-gray-500 font-medium leading-relaxed">
-                            Drop us a message and we'll get back to you within 2-4 hours.
+                    <div className="space-y-2">
+                        <h3 className="text-xl font-bold text-white uppercase tracking-tight">Email Command</h3>
+                        <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest leading-relaxed">
+                            Drop us a signal and our operators will respond within 2-4 cycles.
                         </p>
                     </div>
-                    <p className="text-sm font-black text-blue-600 underline decoration-blue-500/30 decoration-2 underline-offset-4">hello@hostelgh.com</p>
+                    <p className="text-sm font-bold text-blue-400 uppercase tracking-widest">hello@hostelgh.com</p>
                 </div>
 
-                <div className="p-8 rounded-[2rem] bg-gray-50 border border-gray-100 space-y-4">
-                    <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-green-600 shadow-sm">
-                        <MessageCircle size={20} />
+                <div className="p-10 rounded-3xl bg-gray-950 border border-white/5 space-y-6 group hover:border-emerald-500/20 transition-all shadow-xl">
+                    <div className="w-14 h-14 bg-white/5 border border-white/10 rounded-xl flex items-center justify-center text-emerald-500 shadow-xl group-hover:scale-110 transition-transform">
+                        <MessageCircle size={28} />
                     </div>
-                    <div className="space-y-1">
-                        <h3 className="text-lg font-black text-gray-900">WhatsApp Support</h3>
-                        <p className="text-xs text-gray-500 font-medium leading-relaxed">
-                            Fastest for booking and verification help. Active 9 AM - 9 PM.
+                    <div className="space-y-2">
+                        <h3 className="text-xl font-bold text-white uppercase tracking-tight">Direct Linkage</h3>
+                        <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest leading-relaxed">
+                            Operational status: Available 9 AM - 9 PM GMT.
                         </p>
                     </div>
-                    <p className="text-sm font-black text-green-600 underline decoration-green-500/30 decoration-2 underline-offset-4">+233 59 849 4617</p>
+                    <p className="text-sm font-bold text-emerald-400 uppercase tracking-widest">+233 59 849 4617</p>
                 </div>
             </div>
         </div>

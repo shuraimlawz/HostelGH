@@ -20,12 +20,55 @@ import {
     Activity,
     PlusCircle,
     ChevronRight,
-    Monitor
+    BarChart3
 } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
+
+function StatCard({ 
+    label, 
+    value, 
+    icon: Icon, 
+    color, 
+    bgColor, 
+    detail, 
+    premium 
+}: { 
+    label: string, 
+    value: string | number, 
+    icon: LucideIcon, 
+    color: string, 
+    bgColor: string, 
+    detail: string, 
+    premium?: boolean 
+}) {
+    return (
+        <div className={cn(
+            "p-6 rounded-2xl border transition-all duration-300 group overflow-hidden relative",
+            premium 
+               ? "bg-gray-900 text-white border-gray-900 shadow-xl shadow-gray-200" 
+               : "bg-white border-gray-100 shadow-sm hover:shadow-xl hover:shadow-blue-500/5"
+        )}>
+            {premium && <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 rounded-full -mr-16 -mt-16 blur-2xl group-hover:scale-110 transition-transform" />}
+            <div className="flex items-center justify-between mb-6 relative z-10">
+                <div className={cn(
+                    "w-12 h-12 rounded-xl flex items-center justify-center transition-transform group-hover:scale-110 shadow-sm border border-gray-100/10",
+                    premium ? "bg-white/10 text-white" : cn(bgColor, color)
+                )}>
+                    <Icon size={22} />
+                </div>
+                <ArrowUpRight size={14} className={premium ? "text-white/20" : "text-gray-200 group-hover:text-blue-500 transition-colors"} />
+            </div>
+            <div className="relative z-10">
+                <p className={cn("text-[10px] font-bold uppercase tracking-widest mb-1", premium ? "text-gray-400" : "text-gray-400")}>{label}</p>
+                <h3 className="text-2xl font-bold tracking-tight mb-1">{value}</h3>
+                <p className={cn("text-[9px] font-bold uppercase tracking-widest opacity-80", premium ? "text-blue-400" : color)}>{detail}</p>
+            </div>
+        </div>
+    );
+}
 
 export default function OwnerDashboardPage() {
     const [selectedTab, setSelectedTab] = useState<"all" | "pending" | "active" | "completed">("all");
@@ -64,10 +107,10 @@ export default function OwnerDashboardPage() {
 
     if (hostelsLoading || bookingsLoading || analyticsLoading || walletLoading) {
         return (
-            <div className="flex h-[80vh] items-center justify-center">
+            <div className="flex h-[60vh] items-center justify-center">
                 <div className="flex flex-col items-center gap-4 text-center">
                     <Loader2 className="animate-spin text-blue-600" size={32} />
-                    <p className="text-sm font-medium text-gray-400">Synchronizing operational data...</p>
+                    <p className="text-sm font-medium text-gray-400">Syncing asset metrics...</p>
                 </div>
             </div>
         );
@@ -76,7 +119,7 @@ export default function OwnerDashboardPage() {
     const totalHostels = hostels?.length || 0;
     const totalRooms = hostels?.reduce((acc: number, h: any) => acc + (h._count?.rooms || 0), 0) || 0;
 
-    const stats = {
+    const statsOverview = {
         totalHostels,
         totalApprovedBookings: bookings?.filter((b: any) => ["RESERVED", "CHECKED_IN", "COMPLETED"].includes(b.status))?.length || 0,
         totalPendingBookings: bookings?.filter((b: any) => ["PENDING", "PAYMENT_SECURED"].includes(b.status))?.length || 0,
@@ -107,79 +150,81 @@ export default function OwnerDashboardPage() {
     };
 
     return (
-        <div className="max-w-[1400px] mx-auto space-y-10 pb-20 pt-4">
-            {/* Header Section */}
+        <div className="max-w-[1400px] mx-auto space-y-10 pb-20 pt-4 px-4">
+            {/* Header */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-8">
                 <div className="space-y-2">
                     <div className="flex items-center gap-2">
-                        <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                        <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Proprietor Hub</span>
+                        <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                        <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest leading-none">Proprietor Terminal</span>
                     </div>
-                    <h1 className="text-3xl md:text-4xl font-bold text-gray-900 tracking-tight">
-                        Operational Overview
-                    </h1>
-                    <p className="text-gray-500 text-sm max-w-md">
-                        Managing {totalHostels} Assets with {totalRooms} total units.
-                    </p>
+                    <h1 className="text-3xl md:text-4xl font-bold text-gray-900 tracking-tight">Portfolio Overview</h1>
+                    <p className="text-gray-500 text-sm max-w-md">Managing {totalHostels} Strategic Assets with {totalRooms} total units.</p>
                 </div>
 
-                <div className="flex flex-wrap items-center gap-3">
-                    <Link href="/owner/hostels/new" className="px-6 py-3 bg-blue-600 text-white rounded-xl font-bold text-xs hover:bg-blue-700 transition-all flex items-center gap-2 shadow-lg shadow-blue-500/10">
-                        <PlusCircle size={16} />
-                        New Property
+                <div className="flex items-center gap-3">
+                    <Link href="/owner/hostels/new" className="h-11 px-6 bg-blue-600 text-white rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-blue-700 transition-all flex items-center gap-2 shadow-lg shadow-blue-100 active:scale-95">
+                        <PlusCircle size={16} /> Deploy Asset
                     </Link>
-                    <Link href="/owner/payouts" className="px-6 py-3 bg-white border border-gray-200 text-gray-700 rounded-xl font-bold text-xs hover:bg-gray-50 transition-all flex items-center gap-2">
-                        <Wallet size={16} />
-                        Settle Funds
+                    <Link href="/owner/payouts" className="h-11 px-6 bg-white border border-gray-100 text-gray-900 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-gray-50 transition-all flex items-center gap-2 shadow-sm">
+                        <Wallet size={16} /> Settlement
                     </Link>
                 </div>
             </div>
 
-            {/* Metrics Grid */}
+            {/* Metrics */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                {[
-                    { label: "Assets", value: totalHostels, icon: Building2, color: "text-blue-600", bg: "bg-blue-50", detail: `${totalRooms} Units` },
-                    { label: "Active Residents", value: stats.totalApprovedBookings, icon: Users, color: "text-emerald-600", bg: "bg-emerald-50", detail: "Verified Stays" },
-                    { label: "Queue", value: stats.totalPendingBookings, icon: Clock, color: "text-orange-600", bg: "bg-orange-50", detail: "Action required" },
-                    { label: "Withdraw Ready", value: `₵${walletBalance.toLocaleString()}`, icon: DollarSign, color: "text-blue-600", bg: "bg-blue-50", detail: "Available funds", premium: true }
-                ].map((stat, i) => (
-                    <div key={i} className={cn(
-                        "p-6 rounded-2xl border transition-all duration-300 group",
-                        stat.premium 
-                           ? "bg-gray-900 text-white border-gray-900 shadow-xl" 
-                           : "bg-white border-gray-100 shadow-sm hover:shadow-md"
-                    )}>
-                        <div className="flex items-center justify-between mb-4">
-                            <div className={cn(
-                                "w-10 h-10 rounded-xl flex items-center justify-center transition-transform group-hover:scale-110 shadow-sm",
-                                stat.premium ? "bg-white/10 text-white" : cn(stat.bg, stat.color)
-                            )}>
-                                <stat.icon size={20} />
-                            </div>
-                            <ArrowUpRight size={14} className={stat.premium ? "text-white/20" : "text-gray-200"} />
-                        </div>
-                        <p className={cn("text-xs font-semibold mb-1", stat.premium ? "text-gray-400" : "text-gray-500")}>{stat.label}</p>
-                        <h3 className="text-2xl font-bold tracking-tight mb-1">{stat.value}</h3>
-                        <p className={cn("text-[10px] font-bold uppercase tracking-tight", stat.premium ? "text-blue-400" : stat.color)}>{stat.detail}</p>
-                    </div>
-                ))}
+                <StatCard 
+                    label="Live Assets" 
+                    value={totalHostels} 
+                    icon={Building2} 
+                    color="text-blue-600" 
+                    bgColor="bg-blue-50" 
+                    detail={`${totalRooms} Managed Units`} 
+                />
+                <StatCard 
+                    label="Resident Count" 
+                    value={statsOverview.totalApprovedBookings} 
+                    icon={Users} 
+                    color="text-emerald-600" 
+                    bgColor="bg-emerald-50" 
+                    detail="Verified Occupancy" 
+                />
+                <StatCard 
+                    label="Action Queue" 
+                    value={statsOverview.totalPendingBookings} 
+                    icon={Clock} 
+                    color="text-orange-600" 
+                    bgColor="bg-orange-50" 
+                    detail="Immediate Protocol Required" 
+                />
+                <StatCard 
+                    label="Equity Ready" 
+                    value={`₵${walletBalance.toLocaleString()}`} 
+                    icon={DollarSign} 
+                    color="text-blue-600" 
+                    bgColor="bg-blue-50" 
+                    detail="Audited & Liquid" 
+                    premium 
+                />
             </div>
 
-            <div className="grid grid-cols-1 xl:grid-cols-12 gap-8">
-                {/* Revenue Chart */}
+            <div className="grid grid-cols-1 xl:grid-cols-12 gap-10">
+                {/* Financial Trajectory */}
                 <div className="xl:col-span-8 bg-white p-8 rounded-2xl border border-gray-100 shadow-sm flex flex-col space-y-8">
-                    <div className="flex items-center justify-between">
-                        <div className="space-y-1">
-                            <h2 className="text-lg font-bold text-gray-900 tracking-tight">Financial Performance</h2>
-                            <p className="text-xs text-gray-400 font-medium uppercase tracking-tight">6-Month Revenue Trajectory</p>
+                    <div className="flex items-center justify-between border-b border-gray-50 pb-4">
+                        <div className="flex items-center gap-3">
+                            <BarChart3 className="text-blue-600" size={20} />
+                            <h2 className="text-xl font-bold text-gray-900 tracking-tight">Revenue Trajectory</h2>
                         </div>
+                        <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">6-Month Strategic View</span>
                     </div>
 
                     <div className="h-[300px] w-full">
                         <ResponsiveContainer width="100%" height="100%">
                             <AreaChart data={bookingTrendData}>
                                 <defs>
-                                    <linearGradient id="colorRev" x1="0" y1="0" x2="0" y2="1">
+                                    <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
                                         <stop offset="5%" stopColor="#2563eb" stopOpacity={0.1} />
                                         <stop offset="95%" stopColor="#2563eb" stopOpacity={0} />
                                     </linearGradient>
@@ -190,14 +235,17 @@ export default function OwnerDashboardPage() {
                                     axisLine={false} 
                                     tickLine={false} 
                                     tick={{ fill: '#9ca3af', fontSize: 10, fontWeight: 700 }} 
+                                    dy={10}
                                 />
                                 <YAxis 
                                     axisLine={false} 
                                     tickLine={false} 
                                     tick={{ fill: '#9ca3af', fontSize: 10, fontWeight: 700 }} 
+                                    tickFormatter={(val) => `₵${val}`}
+                                    dx={-10}
                                 />
                                 <Tooltip 
-                                    contentStyle={{ borderRadius: '1rem', border: 'none', backgroundColor: '#111827', color: 'white', fontSize: '10px', fontWeight: '700', padding: '0.75rem' }}
+                                    contentStyle={{ borderRadius: '1rem', border: 'none', backgroundColor: '#fff', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)', fontSize: '10px', fontWeight: '700' }}
                                 />
                                 <Area 
                                     type="monotone" 
@@ -205,63 +253,66 @@ export default function OwnerDashboardPage() {
                                     stroke="#2563eb" 
                                     strokeWidth={3} 
                                     fillOpacity={1} 
-                                    fill="url(#colorRev)" 
+                                    fill="url(#colorRevenue)" 
                                 />
                             </AreaChart>
                         </ResponsiveContainer>
                     </div>
                 </div>
 
-                {/* Portfolio Summary */}
-                <div className="xl:col-span-4 bg-gray-900 text-white p-8 rounded-2xl shadow-xl relative overflow-hidden group border border-gray-800 flex flex-col justify-between">
+                {/* Portfolio Control */}
+                <div className="xl:col-span-4 bg-gray-900 text-white p-8 rounded-2xl shadow-xl relative overflow-hidden group border border-gray-800 flex flex-col justify-between shadow-gray-200">
                     <div className="absolute top-0 right-0 w-48 h-48 bg-blue-500/10 rounded-full -mr-24 -mt-24 blur-3xl group-hover:scale-110 transition-transform duration-1000" />
                     <div className="relative z-10">
-                        <div className="w-10 h-10 bg-white/5 rounded-xl flex items-center justify-center border border-white/10 mb-6">
-                            <LayoutDashboard size={20} className="text-blue-500" />
+                        <div className="w-12 h-12 bg-white/5 rounded-xl flex items-center justify-center border border-white/10 mb-8 shadow-sm">
+                            <LayoutDashboard size={24} className="text-blue-500" />
                         </div>
-                        <h3 className="text-2xl font-bold tracking-tight mb-2">Portfolio Stats</h3>
-                        <p className="text-xs text-gray-400 font-medium">Scale your deployment with pro tools.</p>
+                        <h3 className="text-2xl font-bold tracking-tight mb-2 uppercase">Asset Matrix</h3>
+                        <p className="text-xs text-white/40 font-medium leading-relaxed">Scaling your infrastructure with precision control parameters.</p>
                     </div>
 
                     <div className="relative z-10 space-y-6 pt-8">
                         <div className="grid grid-cols-2 gap-4">
-                            <div className="p-4 bg-white/5 rounded-xl border border-white/5">
-                                <p className="text-xl font-bold mb-0.5">{totalHostels}</p>
-                                <p className="text-[10px] font-bold text-blue-400 uppercase tracking-tight">Hostels</p>
+                            <div className="p-4 bg-white/5 rounded-xl border border-white/5 shadow-inner">
+                                <p className="text-2xl font-bold mb-0.5 tracking-tighter">{totalHostels}</p>
+                                <p className="text-[9px] font-bold text-blue-400 uppercase tracking-widest">Assets</p>
                             </div>
-                            <div className="p-4 bg-white/5 rounded-xl border border-white/5">
-                                <p className="text-xl font-bold mb-0.5">{totalRooms}</p>
-                                <p className="text-[10px] font-bold text-blue-400 uppercase tracking-tight">Units</p>
+                            <div className="p-4 bg-white/5 rounded-xl border border-white/5 shadow-inner">
+                                <p className="text-2xl font-bold mb-0.5 tracking-tighter">{totalRooms}</p>
+                                <p className="text-[9px] font-bold text-blue-400 uppercase tracking-widest">Units</p>
                             </div>
                         </div>
-                        <Link href="/owner/hostels" className="w-full bg-white text-gray-900 py-4 rounded-xl font-bold text-xs hover:bg-gray-100 transition-all text-center flex items-center justify-center gap-2">
-                            Manage Assets <ArrowRight size={14} />
+                        <Link href="/owner/hostels" className="w-full h-12 bg-white text-gray-900 rounded-xl font-bold text-[10px] uppercase tracking-widest hover:bg-gray-100 transition-all flex items-center justify-center gap-2">
+                            Full Asset Registry <ArrowRight size={14} />
                         </Link>
                     </div>
                 </div>
             </div>
 
-            {/* Bookings Ledger */}
+            {/* Occupation Ledger */}
             <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden flex flex-col">
                 <div className="p-8 border-b border-gray-50 flex flex-col sm:flex-row sm:items-center justify-between gap-6">
-                    <div className="space-y-1">
-                        <h2 className="text-lg font-bold text-gray-900 tracking-tight">Booking Ledger</h2>
-                        <p className="text-xs text-gray-400 font-medium uppercase tracking-tight">Real-time occupation data</p>
+                    <div className="flex items-center gap-3">
+                        <Activity className="text-blue-600" size={20} />
+                        <div className="space-y-0.5">
+                            <h2 className="text-xl font-bold text-gray-900 tracking-tight">Occupation Ledger</h2>
+                            <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Live Infrastructure Deployment Status</p>
+                        </div>
                     </div>
 
-                    <div className="flex bg-gray-50 p-1 rounded-xl border border-gray-100">
+                    <div className="flex bg-gray-50 p-1 rounded-xl border border-gray-100 shrink-0">
                         {[
-                            { key: "all", label: "Global" },
-                            { key: "pending", label: "Action" },
-                            { key: "active", label: "Live" }
+                            { key: "all", label: "Registry" },
+                            { key: "pending", label: "Queue" },
+                            { key: "active", label: "Live Hub" }
                         ].map((tab) => (
                             <button
                                 key={tab.key}
                                 onClick={() => setSelectedTab(tab.key as any)}
                                 className={cn(
-                                    "px-4 py-1.5 rounded-lg text-xs font-bold transition-all",
+                                    "px-6 py-2 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-all",
                                     selectedTab === tab.key
-                                        ? "bg-white text-gray-900 shadow-sm border border-gray-200"
+                                        ? "bg-white text-gray-900 shadow-sm border border-gray-100"
                                         : "text-gray-400 hover:text-gray-900"
                                 )}>
                                 {tab.label}
@@ -272,53 +323,60 @@ export default function OwnerDashboardPage() {
 
                 <div className="overflow-x-auto">
                     {filteredBookings.length === 0 ? (
-                        <div className="p-20 text-center space-y-4">
-                            <Activity size={32} className="mx-auto text-gray-200" />
-                            <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">No records found</p>
+                        <div className="p-24 text-center space-y-4">
+                            <div className="w-16 h-16 bg-gray-50 rounded-2xl flex items-center justify-center mx-auto text-gray-200 border border-gray-100 shadow-inner">
+                                <Activity size={32} />
+                            </div>
+                            <div className="space-y-1">
+                                <h3 className="text-lg font-bold text-gray-900 uppercase tracking-tight">Zero Registry Hits</h3>
+                                <p className="text-gray-400 text-sm font-medium">No occupation records detected within the selected parameters.</p>
+                            </div>
                         </div>
                     ) : (
-                        <table className="w-full">
+                        <table className="w-full text-left border-collapse">
                             <thead>
                                 <tr className="bg-gray-50/50">
-                                    <th className="px-8 py-4 text-left text-[10px] font-bold text-gray-400 uppercase tracking-widest">Resident</th>
-                                    <th className="px-8 py-4 text-left text-[10px] font-bold text-gray-400 uppercase tracking-widest">Asset</th>
-                                    <th className="px-8 py-4 text-left text-[10px] font-bold text-gray-400 uppercase tracking-widest">Term</th>
-                                    <th className="px-8 py-4 text-left text-[10px] font-bold text-gray-400 uppercase tracking-widest">Status</th>
-                                    <th className="px-8 py-4 text-right text-[10px] font-bold text-gray-400 uppercase tracking-widest">Action</th>
+                                    <th className="px-8 py-5 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Entity Details</th>
+                                    <th className="px-8 py-5 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Asset Target</th>
+                                    <th className="px-8 py-5 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Temporal Log</th>
+                                    <th className="px-8 py-5 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Moderation</th>
+                                    <th className="px-8 py-5 text-right text-[10px] font-bold text-gray-400 uppercase tracking-widest">Audit</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-50">
                                 {filteredBookings.slice(0, 10).map((booking: any) => (
-                                    <tr key={booking.id} className="hover:bg-gray-50/30 transition-colors group/row text-sm">
+                                    <tr key={booking.id} className="hover:bg-gray-50/50 transition-all group/row">
                                         <td className="px-8 py-6">
-                                            <div className="flex items-center gap-3">
-                                                <div className="w-10 h-10 bg-gray-900 text-white rounded-xl flex items-center justify-center font-bold text-xs">
+                                            <div className="flex items-center gap-4">
+                                                <div className="w-10 h-10 bg-gray-900 text-white rounded-xl flex items-center justify-center font-bold text-xs shadow-md shadow-gray-200">
                                                     {booking.user.firstName?.[0] || 'U'}
                                                 </div>
-                                                <div>
-                                                    <p className="font-bold text-gray-900 truncate max-w-[150px]">{booking.user.firstName} {booking.user.lastName}</p>
-                                                    <p className="text-[10px] text-gray-400 font-medium">{booking.user.email}</p>
+                                                <div className="min-w-0">
+                                                    <p className="font-bold text-gray-900 text-sm tracking-tight truncate max-w-[150px]">{booking.user.firstName} {booking.user.lastName}</p>
+                                                    <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest truncate">{booking.user.email}</p>
                                                 </div>
                                             </div>
                                         </td>
                                         <td className="px-8 py-6">
-                                            <p className="font-bold text-gray-900">{booking.hostel.name}</p>
-                                            <p className="text-[10px] text-blue-600 font-bold uppercase">{booking.items?.[0]?.room?.name || "Suite"}</p>
-                                        </td>
-                                        <td className="px-8 py-6 text-gray-500 font-medium">
-                                            {new Date(booking.items?.[0]?.startDate).toLocaleDateString()}
+                                            <p className="font-bold text-gray-900 text-sm tracking-tight">{booking.hostel.name}</p>
+                                            <p className="text-[10px] text-blue-600 font-bold uppercase tracking-widest mt-0.5">{booking.items?.[0]?.room?.name || "Shared Occupancy"}</p>
                                         </td>
                                         <td className="px-8 py-6">
-                                            <span className={cn("px-3 py-1 rounded-md text-[9px] font-bold uppercase border", getStatusStyles(booking.status))}>
+                                            <span className="text-[11px] font-bold text-gray-900 bg-gray-50 px-2 py-1 rounded-md border border-gray-100">
+                                                {new Date(booking.items?.[0]?.startDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
+                                            </span>
+                                        </td>
+                                        <td className="px-8 py-6">
+                                            <span className={cn("px-2.5 py-1.5 rounded-lg text-[9px] font-bold uppercase tracking-widest border", getStatusStyles(booking.status))}>
                                                 {booking.status.replace(/_/g, " ")}
                                             </span>
                                         </td>
                                         <td className="px-8 py-6 text-right">
                                             <Link
                                                 href={`/owner/bookings/${booking.id}`}
-                                                className="inline-flex items-center justify-center w-9 h-9 border border-gray-100 rounded-xl hover:bg-gray-50 text-gray-400 hover:text-gray-900 transition-all"
+                                                className="w-10 h-10 inline-flex items-center justify-center bg-white border border-gray-100 rounded-xl text-gray-400 hover:text-blue-600 hover:border-blue-200 transition-all shadow-sm"
                                             >
-                                                <Eye size={16} />
+                                                <Eye size={18} />
                                             </Link>
                                         </td>
                                     </tr>
@@ -327,9 +385,9 @@ export default function OwnerDashboardPage() {
                         </table>
                     )}
                 </div>
-                <div className="p-8 bg-gray-50/50 text-center border-t border-gray-50">
-                    <Link href="/owner/bookings" className="text-xs font-bold text-gray-400 hover:text-gray-900 flex items-center justify-center gap-2 group">
-                        Browse Full Ledger <ChevronRight size={14} className="group-hover:translate-x-1 transition-transform" />
+                <div className="p-8 bg-gray-50/30 text-center border-t border-gray-50">
+                    <Link href="/owner/bookings" className="text-[10px] font-bold text-gray-400 hover:text-blue-600 uppercase tracking-widest flex items-center justify-center gap-2 group">
+                        Browse Full Asset Ledger <ChevronRight size={14} className="group-hover:translate-x-1 transition-transform" />
                     </Link>
                 </div>
             </div>
