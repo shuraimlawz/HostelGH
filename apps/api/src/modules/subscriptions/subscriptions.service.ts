@@ -23,34 +23,34 @@ const DEFAULT_PLANS: Array<{
   listingLimit?: number | null;
   featuredIncluded?: boolean;
 }> = [
-  {
-    code: "FREE",
-    name: "Free",
-    description: "Free plan with a single listing",
-    monthlyPrice: 0,
-    yearlyPrice: 0,
-    listingLimit: 1,
-    featuredIncluded: false,
-  },
-  {
-    code: "PRO",
-    name: "Pro",
-    description: "Up to 10 listings",
-    monthlyPrice: 9900,
-    yearlyPrice: 9900 * 12,
-    listingLimit: 10,
-    featuredIncluded: false,
-  },
-  {
-    code: "PREMIUM",
-    name: "Premium",
-    description: "Unlimited listings + featured listings",
-    monthlyPrice: 19900,
-    yearlyPrice: 19900 * 12,
-    listingLimit: null,
-    featuredIncluded: true,
-  },
-];
+    {
+      code: "FREE",
+      name: "Free",
+      description: "Free plan with a single listing",
+      monthlyPrice: 0,
+      yearlyPrice: 0,
+      listingLimit: 1,
+      featuredIncluded: false,
+    },
+    {
+      code: "PRO",
+      name: "Pro",
+      description: "Up to 10 listings",
+      monthlyPrice: 9900,
+      yearlyPrice: 9900 * 12,
+      listingLimit: 10,
+      featuredIncluded: false,
+    },
+    {
+      code: "PREMIUM",
+      name: "Premium",
+      description: "Unlimited listings + featured listings",
+      monthlyPrice: 19900,
+      yearlyPrice: 19900 * 12,
+      listingLimit: null,
+      featuredIncluded: true,
+    },
+  ];
 
 @Injectable()
 export class SubscriptionsService {
@@ -222,39 +222,7 @@ export class SubscriptionsService {
     feature: "max_hostels" | "featured_listings" | "max_rooms",
     hostelId?: string,
   ) {
-    const { plan } = await this.getEffectivePlan(ownerId);
-    const isPremium = plan.code === "PREMIUM";
-    const isPro = plan.code === "PRO";
-
-    if (feature === "max_hostels") {
-      const count = await this.prisma.hostel.count({ where: { ownerId } });
-      const limit = plan.listingLimit;
-      if (limit !== null && limit !== undefined && count >= limit) {
-        throw new ForbiddenException(
-          `Your ${plan.code} plan limit for hostels (${limit}) has been reached. Please upgrade.`,
-        );
-      }
-    }
-
-    if (feature === "max_rooms") {
-      if (!hostelId) throw new NotFoundException("Hostel context required for room limits");
-      const count = await this.prisma.room.count({ where: { hostelId } });
-      const limit = isPremium || isPro ? 100 : 3;
-      if (count >= limit) {
-        throw new ForbiddenException(
-          `Your ${plan.code} plan limit for rooms per property (${limit}) has been reached. Please upgrade.`,
-        );
-      }
-    }
-
-    if (feature === "featured_listings") {
-      if (!plan.featuredIncluded) {
-        throw new ForbiddenException(
-          "Featured listings are only available on the PREMIUM plan or via paid featuring.",
-        );
-      }
-    }
-
+    // Launch Mode Bypass: No limits during early launch phase
     return true;
   }
 

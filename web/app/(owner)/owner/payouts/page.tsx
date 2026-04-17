@@ -43,6 +43,25 @@ type PayoutFormValues = z.infer<typeof payoutSchema>;
 export default function PayoutSettingsPage() {
     const queryClient = useQueryClient();
     const [showForm, setShowForm] = useState(false);
+    const [isWithdrawModalOpen, setIsWithdrawModalOpen] = useState(false);
+    const [withdrawAmount, setWithdrawAmount] = useState("");
+    const [isRequesting, setIsRequesting] = useState(false);
+
+    const { data: wallet, isLoading: walletLoading } = useQuery({
+        queryKey: ["owner-wallet"],
+        queryFn: async () => {
+            const res = await api.get("/wallets/me");
+            return res.data;
+        }
+    });
+
+    const { data: history, isLoading: historyLoading } = useQuery({
+        queryKey: ["payout-history"],
+        queryFn: async () => {
+            const res = await api.get("/payouts/history");
+            return Array.isArray(res.data) ? res.data : [];
+        }
+    });
 
     const { data: methods, isLoading } = useQuery({
         queryKey: ["payout-methods"],
@@ -91,7 +110,7 @@ export default function PayoutSettingsPage() {
 
     const selectedType = watch("type");
 
-    if (isLoading) return (
+    if (isLoading || walletLoading || historyLoading) return (
         <div className="flex h-[60vh] items-center justify-center">
             <div className="flex flex-col items-center gap-4 text-center">
                 <Loader2 className="animate-spin text-blue-600" size={32} />
@@ -99,6 +118,35 @@ export default function PayoutSettingsPage() {
             </div>
         </div>
     );
+
+    const balance = (wallet?.balance || 0) / 100;
+
+    const handleWithdrawal = async () => {
+        const amount = parseFloat(withdrawAmount);
+        if (isNaN(amount) || amount <= 0) {
+            toast.error("Please enter a valid amount");
+            return;
+        }
+
+        if (amount > balance) {
+            toast.error("Insufficient balance");
+            return;
+        }
+
+        setIsRequesting(true);
+        try {
+            await api.post("/payouts/request", { amount: Math.round(amount * 100) });
+            toast.success("Withdrawal request submitted for review");
+            setIsWithdrawModalOpen(false);
+            setWithdrawAmount("");
+            queryClient.invalidateQueries({ queryKey: ["payout-history"] });
+            queryClient.invalidateQueries({ queryKey: ["owner-wallet"] });
+        } catch (error: any) {
+            toast.error(error.message || "Request failed");
+        } finally {
+            setIsRequesting(false);
+        }
+    };
 
     return (
         <div className="max-w-[1400px] mx-auto space-y-10 pb-20 pt-4">
@@ -122,6 +170,54 @@ export default function PayoutSettingsPage() {
                         Add Payout Method
                     </button>
                 )}
+            </div>
+
+            {/* Wallet Section */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="bg-gray-900 rounded-2xl p-8 text-white relative overflow-hidden group border border-gray-800 shadow-xl">
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 rounded-full -mr-16 -mt-16 blur-2xl group-hover:scale-110 transition-transform duration-700" />
+                    <div className="relative z-10 space-y-6">
+                        <div className="flex items-center justify-between">
+                            <div className="w-12 h-12 bg-white/5 rounded-xl flex items-center justify-center border border-white/10">
+                                <Wallet size={24} className="text-blue-400" />
+                            </div>
+                            <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest bg-white/5 px-2 py-1 rounded-md">Wallet Balance</span>
+                        </div>
+                        <div className="space-y-1">
+                            <p className="text-xs font-bold text-blue-400 uppercase tracking-widest">Available for Payout</p>
+                            <h3 className="text-4xl font-bold tracking-tighter">₵{balance.toLocaleString()}</h3>
+                        </div>
+                        <button 
+                            disabled={balance <= 0}
+                            onClick={() => setIsWithdrawModalOpen(true)}
+                            className="w-full h-12 bg-blue-600 text-white rounded-xl font-bold text-xs hover:bg-blue-700 transition-all uppercase tracking-widest shadow-lg shadow-blue-900/10 disabled:opacity-50 disabled:cursor-not-allowed group"
+                        >
+                            Withdraw Funds <ArrowUpRight size={14} className="inline ml-1 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+                        </button>
+                    </div>
+                </div>
+
+                <div className="md:col-span-2 bg-white rounded-2xl border border-gray-100 p-8 shadow-sm flex flex-col justify-between">
+                    <div className="space-y-4">
+                        <div className="flex items-center gap-3">
+                            <ShieldCheck size={20} className="text-emerald-500" />
+                            <h3 className="font-bold text-gray-900 tracking-tight text-lg">Payout Security</h3>
+                        </div>
+                        <p className="text-sm text-gray-500 leading-relaxed font-medium">
+                            To protect your earnings, all withdrawal requests undergo a manual verification process by our finance team. This ensures that payments are sent to the correct settlement accounts and prevents fraudulent activities.
+                        </p>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4 mt-6">
+                        <div className="p-4 bg-gray-50 rounded-xl border border-gray-100">
+                            <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">Standard Processing</p>
+                            <p className="text-xs font-bold text-gray-900">12 - 24 Hours</p>
+                        </div>
+                        <div className="p-4 bg-gray-50 rounded-xl border border-gray-100">
+                            <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">Service Fee</p>
+                            <p className="text-xs font-bold text-gray-900">0% Platform Fee</p>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
@@ -314,6 +410,72 @@ export default function PayoutSettingsPage() {
                     </div>
                 </div>
 
+                {/* Payout History Section */}
+                <div className="lg:col-span-12 space-y-6">
+                    <div className="flex items-center justify-between border-b border-gray-50 pb-4">
+                        <div className="flex items-center gap-3">
+                            <TrendingUp className="text-blue-600" size={20} />
+                            <h2 className="text-xl font-bold text-gray-900 tracking-tight">Withdrawal History</h2>
+                        </div>
+                        <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Recent Activity</span>
+                    </div>
+
+                    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+                        {history.length === 0 ? (
+                            <div className="p-16 text-center space-y-4">
+                                <div className="w-14 h-14 bg-gray-50 rounded-xl flex items-center justify-center mx-auto text-gray-300">
+                                    <Clock size={28} />
+                                </div>
+                                <p className="text-sm font-medium text-gray-500">No withdrawal requests found.</p>
+                            </div>
+                        ) : (
+                            <div className="overflow-x-auto">
+                                <table className="w-full text-left">
+                                    <thead>
+                                        <tr className="bg-gray-50/50">
+                                            <th className="px-8 py-5 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Date</th>
+                                            <th className="px-8 py-5 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Amount</th>
+                                            <th className="px-8 py-5 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Recipient Info</th>
+                                            <th className="px-8 py-5 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-gray-50">
+                                        {history.map((req: any) => (
+                                            <tr key={req.id} className="hover:bg-gray-50/50 transition-all">
+                                                <td className="px-8 py-6">
+                                                    <p className="text-sm font-bold text-gray-900">
+                                                        {new Date(req.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
+                                                    </p>
+                                                    <p className="text-[10px] text-gray-400 font-medium">
+                                                        {new Date(req.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                                    </p>
+                                                </td>
+                                                <td className="px-8 py-6 font-mono font-bold text-gray-900">
+                                                    ₵{(req.amount / 100).toLocaleString()}
+                                                </td>
+                                                <td className="px-8 py-6">
+                                                    <p className="text-xs font-bold text-gray-900">{req.payoutMethodDetails?.provider || "Default Account"}</p>
+                                                    <p className="text-[10px] text-gray-400 font-medium">{req.payoutMethodDetails?.accountNumber || "Direct Settlement"}</p>
+                                                </td>
+                                                <td className="px-8 py-6">
+                                                    <span className={cn(
+                                                        "px-2.5 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-widest border",
+                                                        req.status === "APPROVED" ? "bg-emerald-50 text-emerald-600 border-emerald-100" :
+                                                        req.status === "PENDING" ? "bg-blue-50 text-blue-600 border-blue-100" :
+                                                        "bg-rose-50 text-rose-600 border-rose-100"
+                                                    )}>
+                                                        {req.status}
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        )}
+                    </div>
+                </div>
+
                 {/* Compliance Info */}
                 <div className="lg:col-span-12">
                     <div className="bg-gray-900 p-8 rounded-2xl text-white relative overflow-hidden group shadow-xl border border-gray-800">
@@ -333,5 +495,72 @@ export default function PayoutSettingsPage() {
                 </div>
             </div>
         </div>
+
+        {/* Withdraw Modal */}
+        <Dialog open={isWithdrawModalOpen} onOpenChange={setIsWithdrawModalOpen}>
+            <DialogContent className="sm:max-w-[480px] rounded-3xl p-0 overflow-hidden border-none shadow-2xl">
+                <div className="absolute inset-0 bg-white/80 backdrop-blur-xl z-0" />
+                
+                <div className="relative z-10">
+                    <div className="p-8 pb-4 flex flex-col items-center text-center space-y-4 bg-blue-50/50">
+                        <div className="w-16 h-16 rounded-2xl bg-blue-100 flex items-center justify-center text-blue-600 shadow-lg shadow-blue-100">
+                            <ArrowUpRight size={32} />
+                        </div>
+                        <div className="space-y-2">
+                            <h2 className="text-2xl font-black tracking-tight text-gray-900">WITHDRAW FUNDS</h2>
+                            <p className="text-sm font-medium text-gray-500">Enter the amount you wish to transfer to your primary payout account.</p>
+                        </div>
+                    </div>
+
+                    <div className="p-8 pt-6 space-y-6">
+                        <div className="space-y-2">
+                            <div className="flex items-center justify-between px-1">
+                                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Amount (GHS)</label>
+                                <span className="text-[10px] font-bold text-blue-600 uppercase">Max: ₵{balance.toLocaleString()}</span>
+                            </div>
+                            <div className="relative">
+                                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-xl font-bold text-gray-400">₵</div>
+                                <input 
+                                    type="number"
+                                    value={withdrawAmount}
+                                    onChange={(e) => setWithdrawAmount(e.target.value)}
+                                    placeholder="0.00"
+                                    className="w-full h-16 pl-12 pr-4 bg-gray-50 border border-gray-100 rounded-2xl font-mono text-2xl font-bold focus:bg-white focus:border-blue-500 outline-none transition-all"
+                                />
+                            </div>
+                        </div>
+
+                        <div className="p-4 bg-amber-50 rounded-2xl border border-amber-100 flex gap-4">
+                            <Zap size={20} className="text-amber-600 shrink-0" />
+                            <p className="text-[11px] font-medium text-amber-700 leading-relaxed">
+                                Requests made before 12:00 PM GMT are typically processed on the same day. Minimum withdrawal is ₵10.00.
+                            </p>
+                        </div>
+
+                        <div className="flex flex-col sm:flex-row gap-3 pt-2">
+                            <button
+                                type="button"
+                                onClick={() => setIsWithdrawModalOpen(false)}
+                                className="h-12 flex-1 rounded-2xl border border-gray-100 text-[10px] font-bold uppercase tracking-widest hover:bg-gray-50 transition-all"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={handleWithdrawal}
+                                disabled={isRequesting || !withdrawAmount || parseFloat(withdrawAmount) <= 0}
+                                className="h-12 flex-1 rounded-2xl bg-blue-600 text-white text-[10px] font-bold uppercase tracking-widest shadow-lg shadow-blue-200 hover:bg-blue-700 transition-all disabled:opacity-50"
+                            >
+                                {isRequesting ? <Loader2 className="animate-spin" /> : "Request Transfer"}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </DialogContent>
+        </Dialog>
     );
 }
+
+import {
+    Dialog,
+    DialogContent,
+} from "@/components/ui/dialog";

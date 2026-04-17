@@ -123,7 +123,10 @@ export class HostelsService {
       await this.subscriptions.checkLimit(hostel.ownerId, "featured_listings");
       if (!dto.featuredUntil) {
         const sub = await this.subscriptions.getOwnerSubscription(hostel.ownerId);
-        dto.featuredUntil = sub?.endDate ?? sub?.expiresAt ?? null;
+        // During launch mode, if no sub exists, we default to 1 year of featuring
+        const oneYearFromNow = new Date();
+        oneYearFromNow.setFullYear(oneYearFromNow.getFullYear() + 1);
+        dto.featuredUntil = sub?.endDate ?? sub?.expiresAt ?? oneYearFromNow;
       }
     }
 

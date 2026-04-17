@@ -19,13 +19,15 @@ import {
     CheckCircle2,
     Menu,
     X,
-    CreditCard
+    CreditCard,
+    MessageSquare
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
 
 const adminLinks = [
     { name: "Command Center", href: "/admin", icon: LayoutDashboard },
+    { name: "Support Center", href: "/admin/support", icon: MessageSquare },
     { name: "User Registry", href: "/admin/users", icon: Users },
     { name: "Asset Control", href: "/admin/hostels", icon: Building2 },
     { name: "Reservations", href: "/admin/bookings", icon: CalendarCheck },

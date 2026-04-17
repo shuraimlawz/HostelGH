@@ -41,6 +41,7 @@ import {
     DialogTitle,
     DialogTrigger
 } from "@/components/ui/dialog";
+import { ConfirmModal } from "@/components/common/ConfirmModal";
 
 export default function OwnerAccountPage() {
     const { user, isLoading, updateUser } = useAuth();
@@ -60,6 +61,10 @@ export default function OwnerAccountPage() {
     // Account Type Change State
     const [isAccountTypeModalOpen, setIsAccountTypeModalOpen] = useState(false);
     const [isSwitchingType, setIsSwitchingType] = useState(false);
+
+    // Delete Modal State
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const [isDeleting, setIsDeleting] = useState(false);
 
     useEffect(() => {
         const fetchProfile = async () => {
@@ -123,15 +128,15 @@ export default function OwnerAccountPage() {
     };
 
     const handleDeleteAccount = async () => {
-        if (!confirm("Are you absolutely sure? This will remove all your hostels, bookings, and history permanently.")) return;
-
+        setIsDeleting(true);
         try {
             await api.delete("/users/me");
-            toast.success("Account deleted.");
+            toast.success("Account deleted successfully.");
             localStorage.clear();
             window.location.href = "/";
         } catch (error: any) {
             toast.error(error.message || "Failed to delete account");
+            setIsDeleting(false);
         }
     };
 
@@ -210,13 +215,33 @@ export default function OwnerAccountPage() {
                                         </div>
                                     )}
                                 </div>
-                                <button
-                                    onClick={() => document.getElementById('avatar-upload')?.click()}
-                                    className="absolute -bottom-2 -right-2 bg-white border border-gray-100 shadow-sm rounded-xl p-2.5 hover:bg-gray-50 transition-all text-blue-600"
-                                    title="Change avatar"
-                                >
-                                    <Camera size={18} />
-                                </button>
+                                <div className="absolute -bottom-2 -right-2 flex gap-1">
+                                    <button
+                                        onClick={() => document.getElementById('avatar-upload')?.click()}
+                                        className="bg-white border border-gray-100 shadow-sm rounded-xl p-2.5 hover:bg-gray-50 transition-all text-blue-600"
+                                        title="Change avatar"
+                                    >
+                                        <Camera size={18} />
+                                    </button>
+                                    {user.avatarUrl && (
+                                        <button
+                                            onClick={async () => {
+                                                const loadingToast = toast.loading("Removing picture...");
+                                                try {
+                                                    await api.patch("/users/me", { avatarUrl: null });
+                                                    updateUser({ ...user!, avatarUrl: null });
+                                                    toast.success("Profile picture removed!", { id: loadingToast });
+                                                } catch (error: any) {
+                                                    toast.error(error.message || "Failure", { id: loadingToast });
+                                                }
+                                            }}
+                                            className="bg-white border border-gray-100 shadow-sm rounded-xl p-2.5 hover:bg-rose-50 transition-all text-rose-600"
+                                            title="Remove avatar"
+                                        >
+                                            <XCircle size={18} />
+                                        </button>
+                                    )}
+                                </div>
                                 <input id="avatar-upload" type="file" accept="image/*" className="hidden" 
                                     onChange={async (e) => {
                                         const file = e.target.files?.[0];
@@ -225,7 +250,7 @@ export default function OwnerAccountPage() {
                                         try {
                                             const fd = new FormData();
                                             fd.append('file', file);
-                                            const res = await api.post("/hostels/upload", fd);
+                                            const res = await api.post("/upload/image", fd);
                                             const imageUrl = res.data.url;
                                             await api.patch("/users/me", { avatarUrl: imageUrl });
                                             updateUser({ ...user!, avatarUrl: imageUrl });
@@ -529,7 +554,7 @@ export default function OwnerAccountPage() {
                                 </p>
                             </div>
                             <button 
-                                onClick={handleDeleteAccount}
+                                onClick={() => setIsDeleteModalOpen(true)}
                                 className="h-12 px-8 bg-rose-600 text-white rounded-xl font-bold text-xs hover:bg-rose-700 transition-all uppercase tracking-widest shadow-lg shadow-rose-900/10"
                             >
                                 Delete Account
@@ -538,6 +563,17 @@ export default function OwnerAccountPage() {
                     </div>
                 </div>
             </div>
+
+            <ConfirmModal 
+                isOpen={isDeleteModalOpen}
+                onClose={() => setIsDeleteModalOpen(false)}
+                onConfirm={handleDeleteAccount}
+                title="Delete Account Data"
+                description="Are you absolutely sure? This will remove all your hostels, bookings, and financial history permanently from the platform. This action is irreversible."
+                confirmText="DELETE ACCOUNT"
+                cancelText="CANCEL"
+                isLoading={isDeleting}
+            />
         </div>
     );
 }

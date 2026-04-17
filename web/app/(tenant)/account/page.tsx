@@ -20,6 +20,7 @@ import {
     CheckCircle2
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { ConfirmModal } from "@/components/common/ConfirmModal";
 
 export default function AccountPage() {
     const { user, isLoading, updateUser } = useAuth();
@@ -30,6 +31,9 @@ export default function AccountPage() {
         phone: "",
         emailNotifications: true,
     });
+
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const [isDeleting, setIsDeleting] = useState(false);
 
     useEffect(() => {
         const fetchProfile = async () => {
@@ -65,8 +69,7 @@ export default function AccountPage() {
     };
 
     const handleDeleteAccount = async () => {
-        if (!confirm("Are you absolutely sure you want to delete your account? This action is permanent and all your data will be lost.")) return;
-
+        setIsDeleting(true);
         try {
             await api.delete("/users/me");
             toast.success("Account deleted successfully.");
@@ -74,6 +77,7 @@ export default function AccountPage() {
             window.location.href = "/";
         } catch (error: any) {
             toast.error(error.message || "Failed to delete account");
+            setIsDeleting(false);
         }
     };
 
@@ -156,12 +160,33 @@ export default function AccountPage() {
                                         </div>
                                     )}
                                 </div>
-                                <button 
-                                    onClick={() => document.getElementById('avatar-upload')?.click()}
-                                    className="absolute -bottom-2 -right-2 bg-white border border-gray-100 shadow-sm rounded-xl p-2.5 hover:bg-gray-50 transition-all text-blue-600"
-                                >
-                                    <Camera size={18} />
-                                </button>
+                                <div className="absolute -bottom-2 -right-2 flex gap-1">
+                                    <button 
+                                        onClick={() => document.getElementById('avatar-upload')?.click()}
+                                        className="bg-white border border-gray-100 shadow-sm rounded-xl p-2.5 hover:bg-gray-50 transition-all text-blue-600"
+                                        title="Change avatar"
+                                    >
+                                        <Camera size={18} />
+                                    </button>
+                                    {user.avatarUrl && (
+                                        <button
+                                            onClick={async () => {
+                                                const loadingToast = toast.loading("Removing photo...");
+                                                try {
+                                                    await api.patch("/users/me", { avatarUrl: null });
+                                                    updateUser({ ...user!, avatarUrl: null });
+                                                    toast.success("Profile picture removed!", { id: loadingToast });
+                                                } catch (error: any) {
+                                                    toast.error(error.message || "Failure", { id: loadingToast });
+                                                }
+                                            }}
+                                            className="bg-white border border-gray-100 shadow-sm rounded-xl p-2.5 hover:bg-rose-50 transition-all text-rose-600"
+                                            title="Remove avatar"
+                                        >
+                                            <Trash2 size={18} />
+                                        </button>
+                                    )}
+                                </div>
                                 <input 
                                     id="avatar-upload" 
                                     type="file" 
@@ -341,7 +366,7 @@ export default function AccountPage() {
                                 </p>
                             </div>
                             <button 
-                                onClick={handleDeleteAccount}
+                                onClick={() => setIsDeleteModalOpen(true)}
                                 className="h-12 px-8 bg-rose-600 text-white rounded-xl font-bold text-xs hover:bg-rose-700 transition-all uppercase tracking-widest shadow-lg shadow-rose-900/10"
                             >
                                 Delete Account
@@ -350,6 +375,17 @@ export default function AccountPage() {
                     </div>
                 </div>
             </div>
+
+            <ConfirmModal 
+                isOpen={isDeleteModalOpen}
+                onClose={() => setIsDeleteModalOpen(false)}
+                onConfirm={handleDeleteAccount}
+                title="Delete Student Account"
+                description="Are you absolutely sure you want to delete your account? This action is permanent and all your data, including booking history and saved hostels, will be removed from our systems."
+                confirmText="DELETE ACCOUNT"
+                cancelText="CANCEL"
+                isLoading={isDeleting}
+            />
         </div>
     );
 }

@@ -8,6 +8,7 @@ import Shell from "@/components/layout/Shell";
 import { Toaster } from "sonner";
 import JsonLd from "@/components/JsonLd";
 import BrowsingTip from "@/components/BrowsingTip";
+import SupportWidget from "@/components/support/SupportWidget";
 
 const outfit = Outfit({
   variable: "--font-outfit",
@@ -86,6 +87,7 @@ export default function RootLayout({
               </Shell>
               <Toaster position="top-center" richColors />
               <BrowsingTip />
+              <SupportWidget />
             </AuthModalProvider>
           </QueryProvider>
         </AuthProvider>

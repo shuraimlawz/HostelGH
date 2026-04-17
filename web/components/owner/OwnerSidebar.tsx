@@ -26,7 +26,7 @@ const links = [
     { name: "Bookings", href: "/owner/bookings", icon: CalendarCheck },
     { name: "Add Hostel", href: "/owner/hostels/new", icon: PlusCircle },
     { name: "Payouts", href: "/owner/payouts", icon: CreditCard },
-    { name: "Subscription", href: "/owner/subscription", icon: Zap },
+    // { name: "Subscription", href: "/owner/subscription", icon: Zap },
     { name: "Settings", href: "/owner/account", icon: Settings },
 ];
 
@@ -58,8 +58,16 @@ export default function OwnerSidebar({ isOpen = false, onClose = () => { } }: Ow
                         <Zap size={20} className="fill-current" />
                     </div>
                     <div>
-                        <p className="text-[10px] font-bold text-blue-600 uppercase tracking-widest leading-none mb-1">Network</p>
-                        <h2 className="text-lg font-bold text-gray-900 tracking-tight leading-none">Proprietor<span className="text-blue-600">.</span></h2>
+                        <p className="text-[10px] font-bold text-blue-600 uppercase tracking-widest leading-none mb-1">Proprietor</p>
+                        <h2 className="text-lg font-bold text-gray-900 tracking-tight leading-none uppercase">
+                            {(() => {
+                                if (!user) return "Proprietor";
+                                const prefix = user.gender === "MALE" ? "Mr." : (user.gender === "FEMALE" ? "Mrs." : "");
+                                const name = user.lastName || user.firstName || "Proprietor";
+                                return `${prefix} ${name}`.trim();
+                            })()}
+                            <span className="text-blue-600">.</span>
+                        </h2>
                     </div>
                 </div>
             </div>
@@ -101,21 +109,18 @@ export default function OwnerSidebar({ isOpen = false, onClose = () => { } }: Ow
 
             {/* Bottom Section */}
             <div className="mt-auto space-y-6">
-                {/* Upgrade Card */}
-                <div className="bg-gradient-to-br from-blue-50 to-white rounded-2xl p-5 border border-blue-100 relative overflow-hidden group/pro">
+                {/* Launch Mode Badge */}
+                <div className="bg-gradient-to-br from-emerald-50 to-white rounded-2xl p-5 border border-emerald-100 relative overflow-hidden group/pro">
                     <div className="relative z-10 flex flex-col gap-3">
-                        <div className="w-9 h-9 bg-white rounded-lg flex items-center justify-center border border-blue-100 shadow-sm">
-                            <TrendingUp size={18} className="text-blue-600" />
+                        <div className="w-9 h-9 bg-emerald-100 rounded-lg flex items-center justify-center border border-emerald-200 shadow-sm">
+                            <Zap size={18} className="text-emerald-600 fill-emerald-600" />
                         </div>
                         <div className="space-y-1">
-                            <h3 className="text-xs font-bold text-gray-900">Scale Portfolio</h3>
+                            <h3 className="text-xs font-bold text-gray-900">Beta Launch Partner</h3>
                             <p className="text-[11px] text-gray-500 leading-relaxed">
-                                Unlock high-tier analytics and market exposure.
+                                You have 100% platform access. All listing & feature fees are waived.
                             </p>
                         </div>
-                        <Link href="/owner/subscription" className="inline-flex items-center gap-1.5 text-[11px] font-bold text-blue-600 hover:text-blue-700 transition-colors group/link">
-                            Upgrade Now <ChevronRight size={12} className="group-hover/link:translate-x-0.5 transition-transform" />
-                        </Link>
                     </div>
                 </div>
 
@@ -131,8 +136,15 @@ export default function OwnerSidebar({ isOpen = false, onClose = () => { } }: Ow
                                 )}
                             </div>
                             <div className="min-w-0">
-                                <p className="text-xs font-bold text-gray-900 truncate leading-none mb-1">{user?.firstName || "Proprietor"}</p>
-                                <p className="text-[10px] text-gray-500 truncate font-medium">Verified Partner</p>
+                                <p className="text-xs font-bold text-gray-900 truncate leading-none mb-1">
+                                    {(() => {
+                                        if (!user) return "Proprietor";
+                                        const prefix = user.gender === "MALE" ? "Mr." : (user.gender === "FEMALE" ? "Mrs." : "");
+                                        const name = user.lastName || user.firstName || "Proprietor";
+                                        return `${prefix} ${name}`.trim();
+                                    })()}
+                                </p>
+                                <p className="text-[10px] text-gray-500 truncate font-medium">Verified Property Manager</p>
                             </div>
                         </div>
                         <button

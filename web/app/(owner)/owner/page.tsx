@@ -155,11 +155,16 @@ export default function OwnerDashboardPage() {
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 pb-4">
                 <div className="space-y-2">
                     <div className="flex items-center gap-2">
-                        <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                        <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest leading-none">Owner Hub</span>
+                        <div className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
+                        <span className="text-[10px] font-bold text-blue-600 uppercase tracking-widest leading-none">Open Access Launch</span>
                     </div>
                     <h1 className="text-3xl md:text-4xl font-bold text-gray-900 tracking-tight">Owner Dashboard</h1>
-                    <p className="text-gray-500 text-sm max-w-md">Managing {totalHostels} Hostels with {totalRooms} total rooms.</p>
+                    <div className="flex flex-col md:flex-row md:items-center gap-4">
+                        <p className="text-gray-500 text-sm max-w-md font-medium">Managing {totalHostels} Hostels with {totalRooms} total rooms.</p>
+                        <div className="flex items-center gap-2 px-3 py-1 bg-emerald-50 text-emerald-700 rounded-full border border-emerald-100 text-[10px] font-bold uppercase tracking-widest">
+                            <Zap size={12} className="fill-emerald-600" /> 0% Platform Commission Enabled
+                        </div>
+                    </div>
                 </div>
 
                 <div className="flex flex-wrap items-center gap-3">
@@ -199,12 +204,12 @@ export default function OwnerDashboardPage() {
                     detail="Review required" 
                 />
                 <StatCard 
-                    label="Owner Balance" 
+                    label="Portfolio Revenue" 
                     value={`₵${walletBalance.toLocaleString()}`} 
                     icon={DollarSign} 
-                    color="text-blue-600" 
-                    bgColor="bg-blue-50" 
-                    detail="Ready for payout" 
+                    color="text-emerald-400" 
+                    bgColor="bg-white/5" 
+                    detail="100% Earnings (0% Platform Fee)" 
                     premium 
                 />
             </div>

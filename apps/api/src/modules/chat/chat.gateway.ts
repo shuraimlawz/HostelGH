@@ -33,14 +33,30 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @SubscribeMessage('join_room')
     handleJoinRoom(@MessageBody() conversationId: string, @ConnectedSocket() client: Socket) {
         client.join(conversationId);
+        return { status: 'joined', room: conversationId };
+    }
+
+    @SubscribeMessage('request_support')
+    async handleRequestSupport(
+        @ConnectedSocket() client: Socket,
+        @MessageBody() data: { userId?: string; guestId?: string; guestName?: string }
+    ) {
+        const conversation = await this.chatService.findOrCreateSupportConversation(data.userId || null, data.guestId);
+        client.join(conversation.id);
+        return conversation;
     }
 
     @SubscribeMessage('send_message')
     async handleMessage(
         @ConnectedSocket() client: Socket,
-        @MessageBody() data: { conversationId: string; senderId: string; content: string },
+        @MessageBody() data: { conversationId: string; senderId?: string; content: string; guestName?: string },
     ) {
-        const message = await this.chatService.sendMessage(data.conversationId, data.senderId, data.content);
+        const message = await this.chatService.sendMessage(
+            data.conversationId, 
+            data.senderId || null, 
+            data.content, 
+            data.guestName
+        );
         this.server.to(data.conversationId).emit('new_message', message);
         return message;
     }
