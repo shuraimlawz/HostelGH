@@ -3,7 +3,7 @@
 import { useState, useEffect, Suspense } from "react";
 import { api } from "@/lib/api";
 import { toast } from "sonner";
-import { AlertCircle, Eye, EyeOff, ShieldCheck, Check, ChevronLeft, Zap, Lock } from "lucide-react";
+import { AlertCircle, Eye, EyeOff, ShieldCheck, Check, ChevronLeft, Zap, Lock, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams, useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";

@@ -23,7 +23,7 @@ export default function HeroSearch() {
     const [city, setCity] = useState("");
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
-    const { data: trendingHostels } = useQuery({
+    const { data: trendingHostels, isLoading: isLoadingTrending } = useQuery({
         queryKey: ["featured-hostels"],
         queryFn: async () => {
             const { data } = await api.get("/hostels/public", { params: { sort: "relevance" } });
