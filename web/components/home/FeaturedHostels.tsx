@@ -22,11 +22,11 @@ export default function FeaturedHostels() {
                 <div className="space-y-4">
                     <div className="flex items-center gap-3">
                         <span className="px-3 py-1 bg-blue-600 text-white rounded-full text-[9px] font-bold uppercase tracking-widest border border-white/10 shadow-lg shadow-blue-500/10">
-                            Protocol Selection
+                            Our Best
                         </span>
                         <div className="flex items-center text-amber-600 font-bold text-[9px] gap-2 bg-amber-50 px-3 py-1 rounded-full border border-amber-100 uppercase tracking-widest shadow-sm">
                             <Flame size={12} className="fill-amber-500" />
-                            <span>Trending Tier</span>
+                            <span>Trending</span>
                         </div>
                     </div>
                     <div className="space-y-2">
@@ -40,10 +40,10 @@ export default function FeaturedHostels() {
                 </div>
 
                 <Link
-                    href="/find"
+                    href="/hostels"
                     className="group relative inline-flex h-14 items-center gap-3 bg-gray-900 text-white px-8 rounded-2xl font-bold text-[10px] uppercase tracking-widest hover:bg-black transition-all active:scale-[0.98] shadow-xl"
                 >
-                    <span>Archive Overview</span>
+                    <span>View All Hostels</span>
                     <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
                 </Link>
             </div>
@@ -71,8 +71,8 @@ export default function FeaturedHostels() {
                                 <Building2 className="text-gray-200" size={40} />
                             </div>
                             <div className="space-y-2">
-                                <h4 className="text-xl font-bold text-gray-900 uppercase tracking-tight">Syncing Asset Groups</h4>
-                                <p className="max-w-xs font-bold text-[10px] uppercase tracking-widest text-gray-400">Our operators are currently vetting new residences. Re-check for premium updates shortly.</p>
+                                <h4 className="text-xl font-bold text-gray-900 uppercase tracking-tight">Updating Lists</h4>
+                                <p className="max-w-xs font-bold text-[10px] uppercase tracking-widest text-gray-400">Our team is currently verifying new hostels. Check back soon for new listings.</p>
                             </div>
                         </div>
                     )}

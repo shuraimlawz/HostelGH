@@ -50,7 +50,7 @@ export default function RegionSelector() {
         } else {
             params.set("region", regionName);
         }
-        router.push(`/find?${params.toString()}`);
+        router.push(`/hostels?${params.toString()}`);
     };
 
     if (!mounted) return <div className="hidden md:flex w-10 h-10 mr-1" />;
@@ -74,7 +74,7 @@ export default function RegionSelector() {
                 <DropdownMenuLabel className="px-5 py-4">
                     <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400 flex items-center gap-3">
                         <Server size={14} className="text-blue-600" />
-                        Network Node Selection
+                        Choose Your Region
                     </div>
                 </DropdownMenuLabel>
 
@@ -88,7 +88,7 @@ export default function RegionSelector() {
                     >
                         <div className="flex items-center gap-4">
                             <div className="w-10 h-10 rounded-xl bg-gray-900 flex items-center justify-center text-[10px] font-bold text-white shadow-lg">GH</div>
-                            <span className="text-[11px] font-bold uppercase tracking-widest">Entire Fleet</span>
+                            <span className="text-[11px] font-bold uppercase tracking-widest">All Regions</span>
                         </div>
                         {!currentRegion && <Check size={16} className="text-blue-600" />}
                     </DropdownMenuItem>
@@ -120,7 +120,7 @@ export default function RegionSelector() {
                 <div className="px-5 py-4 border-t border-gray-50 mt-2">
                     <div className="flex items-center gap-3 text-[9px] font-bold uppercase tracking-widest text-gray-300 leading-none">
                         <Search size={12} className="text-blue-500" />
-                        Archive Filtering Protocol
+                        Quick Filter
                     </div>
                 </div>
             </DropdownMenuContent>

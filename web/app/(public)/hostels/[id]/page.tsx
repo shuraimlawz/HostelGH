@@ -91,11 +91,11 @@ export default function HostelDetailsPage() {
                 <ShieldAlert size={40} />
             </div>
             <div className="space-y-2">
-                <h1 className="text-3xl font-bold text-gray-900 uppercase tracking-tight">Access Restricted</h1>
-                <p className="text-gray-500 font-bold text-xs uppercase tracking-widest">The requested asset could not be isolated in the primary registry.</p>
+                <h1 className="text-3xl font-bold text-gray-900 uppercase tracking-tight">Hostel Not Found</h1>
+                <p className="text-gray-500 font-bold text-xs uppercase tracking-widest">We couldn't find this hostel. It might have been removed or moved.</p>
             </div>
-            <Link href="/find" className="inline-flex h-12 px-8 items-center bg-gray-900 text-white rounded-xl font-bold text-[10px] uppercase tracking-widest hover:bg-black transition-all">
-                Back to Find
+            <Link href="/hostels" className="inline-flex h-12 px-8 items-center bg-gray-900 text-white rounded-xl font-bold text-[10px] uppercase tracking-widest hover:bg-black transition-all">
+                Back to Hostels
             </Link>
         </div>
     );
@@ -106,9 +106,9 @@ export default function HostelDetailsPage() {
             <section className="bg-white pt-8 pb-12 border-b border-gray-50">
                 <div className="container px-6">
                     <div className="flex items-center justify-between mb-10">
-                        <Link href="/find" className="flex items-center gap-3 text-[11px] font-bold text-gray-400 uppercase tracking-widest hover:text-gray-900 transition-all group">
+                        <Link href="/hostels" className="flex items-center gap-3 text-[11px] font-bold text-gray-400 uppercase tracking-widest hover:text-gray-900 transition-all group">
                             <ChevronLeft size={16} className="group-hover:-translate-x-1 transition-transform" />
-                            Back to Archive
+                            Back to Hostels
                         </Link>
                         <div className="flex gap-4">
                             <button className="w-12 h-12 flex items-center justify-center bg-white rounded-xl border border-gray-100 hover:border-blue-500 hover:text-blue-600 transition-all shadow-sm"><Share2 size={18} /></button>
@@ -196,31 +196,31 @@ export default function HostelDetailsPage() {
                                 </div>
                                 <div className="text-right flex flex-col items-end shrink-0">
                                     <div className="px-4 py-2 bg-gray-50 rounded-xl border border-gray-100 mb-4">
-                                        <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest leading-none mb-1">Baseline Rent</p>
+                                        <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest leading-none mb-1">Rent Starts From</p>
                                         <div className="flex items-baseline gap-1">
                                             <span className="text-3xl font-bold text-gray-900 tracking-tight">
                                                 ₵{(hostel.minPrice ? hostel.minPrice / 100 : (hostel.rooms?.length ? Math.min(...hostel.rooms.map((r: any) => r.pricePerTerm)) / 100 : 0)).toLocaleString()}
                                             </span>
-                                            <span className="text-[10px] text-gray-400 font-bold uppercase">/ Cycle</span>
+                                            <span className="text-[10px] text-gray-400 font-bold uppercase">/ Term</span>
                                         </div>
                                     </div>
-                                    <p className="text-[9px] text-gray-400 font-bold uppercase tracking-widest">Per Academic Session</p>
+                                    <p className="text-[9px] text-gray-400 font-bold uppercase tracking-widest">Per Academic Year</p>
                                 </div>
                             </div>
 
                             <div className="space-y-12">
                                 <div className="space-y-4">
                                     <h3 className="text-[11px] font-bold text-gray-400 uppercase tracking-[0.3em] flex items-center gap-3">
-                                        <Info size={16} className="text-blue-500" /> Operational Overview
+                                        <Info size={16} className="text-blue-500" /> Hostel Details
                                     </h3>
                                     <p className="text-gray-600 leading-relaxed text-lg font-medium">
-                                        {hostel.description || "Detailed operational description pending for this asset."}
+                                        {hostel.description || "No description provided for this hostel."}
                                     </p>
                                 </div>
 
                                 <div className="pt-10 border-t border-gray-50 space-y-8">
                                     <h3 className="text-[11px] font-bold text-gray-400 uppercase tracking-[0.3em] flex items-center gap-3">
-                                        <Star size={16} className="text-orange-400" /> Amenities & Integrated Utilities
+                                        <Star size={16} className="text-orange-400" /> Amenities
                                     </h3>
                                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                                         {/* Core Utilities */}
@@ -249,7 +249,7 @@ export default function HostelDetailsPage() {
                                             );
                                         })}
                                         {(!hostel.amenities || hostel.amenities.length === 0) && (!hostel.utilitiesIncluded || hostel.utilitiesIncluded.length === 0) && (
-                                            <p className="text-gray-400 text-[10px] font-bold uppercase tracking-widest col-span-4 py-8 bg-gray-50 rounded-2xl border border-dashed border-gray-200 text-center">Amenity registry empty.</p>
+                                            <p className="text-gray-400 text-[10px] font-bold uppercase tracking-widest col-span-4 py-8 bg-gray-50 rounded-2xl border border-dashed border-gray-200 text-center">No amenities listed.</p>
                                         )}
                                     </div>
                                 </div>
@@ -259,7 +259,7 @@ export default function HostelDetailsPage() {
                         {/* Room Types Section */}
                         <div className="space-y-8">
                             <div className="flex items-center gap-4">
-                                <h2 className="text-3xl font-bold tracking-tighter uppercase text-gray-900">Room Configurations</h2>
+                                <h2 className="text-3xl font-bold tracking-tighter uppercase text-gray-900">Room Types</h2>
                                 <div className="h-0.5 grow bg-gray-50 rounded-xl" />
                             </div>
                             {hostel.rooms.length === 0 ? (
@@ -267,7 +267,7 @@ export default function HostelDetailsPage() {
                                     <div className="w-16 h-16 bg-gray-50 rounded-2xl flex items-center justify-center mx-auto text-gray-300">
                                         <Building2 size={32} />
                                     </div>
-                                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">No allocation tiers currently active.</p>
+                                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">No rooms currently available.</p>
                                 </div>
                             ) : (
                                 <div className="grid gap-6">
@@ -292,7 +292,7 @@ export default function HostelDetailsPage() {
                                             <div className="flex-1 space-y-6 text-center md:text-left">
                                                 <div className="space-y-2">
                                                     <h4 className="text-2xl font-bold tracking-tight uppercase text-gray-900">{r.name}</h4>
-                                                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Configuration Logic: {r.roomConfiguration || `${r.capacity} Density`}</p>
+                                                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{r.roomConfiguration || `${r.capacity} People`}</p>
                                                 </div>
                                                 <div className="flex flex-wrap justify-center md:justify-start gap-3">
                                                     <div className="flex items-center gap-2 bg-gray-50 px-4 py-2 rounded-xl border border-gray-100">
@@ -308,7 +308,7 @@ export default function HostelDetailsPage() {
                                                         )}>
                                                             <div className={cn("w-1.5 h-1.5 rounded-full", r.availableSlots <= 3 ? "bg-red-500 animate-pulse" : "bg-emerald-500")} />
                                                             <span className="text-[9px] font-bold uppercase tracking-widest">
-                                                                {r.availableSlots <= 0 ? "Purged" : `${r.availableSlots} Units Left`}
+                                                                {r.availableSlots <= 0 ? "Full" : `${r.availableSlots} Left`}
                                                             </span>
                                                         </div>
                                                     )}
@@ -324,15 +324,15 @@ export default function HostelDetailsPage() {
                                                 <div className="space-y-1">
                                                     <div className="flex items-baseline justify-center md:justify-end gap-1">
                                                         <span className="text-3xl font-bold text-gray-900 tracking-tight">₵{(r.pricePerTerm / 100).toLocaleString()}</span>
-                                                        <span className="text-[10px] text-gray-400 font-bold uppercase">/ Sess.</span>
+                                                        <span className="text-[10px] text-gray-400 font-bold uppercase">/ Term</span>
                                                     </div>
-                                                    <p className="text-[9px] font-bold text-gray-400 uppercase tracking-[0.2em]">Full Academic Cycle</p>
+                                                    <p className="text-[9px] font-bold text-gray-400 uppercase tracking-[0.2em]">Full Academic Year</p>
                                                 </div>
                                                 <button
                                                     onClick={() => onBook(r.id, r)}
                                                     className="w-full h-14 bg-gray-900 text-white rounded-xl font-bold uppercase tracking-[0.2em] text-[10px] shadow-xl hover:bg-black active:scale-95 transition-all"
                                                 >
-                                                    Deploy Booking
+                                                    Book Now
                                                 </button>
                                             </div>
                                         </div>
@@ -346,7 +346,7 @@ export default function HostelDetailsPage() {
                             <div className="flex items-center justify-between mb-10">
                                 <h2 className="text-3xl font-bold tracking-tighter uppercase text-gray-900 flex items-center gap-4">
                                     <Star size={32} className="text-orange-400" />
-                                    Experience Logs
+                                    Student Reviews
                                 </h2>
                             </div>
                             <div className="grid md:grid-cols-2 gap-8">
@@ -375,7 +375,7 @@ export default function HostelDetailsPage() {
                                         <div className="w-12 h-12 bg-white rounded-xl shadow-sm border border-gray-100 flex items-center justify-center mx-auto text-gray-200">
                                             <MessageCircle size={24} />
                                         </div>
-                                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">No archival experience logs recorded.</p>
+                                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">No reviews yet.</p>
                                     </div>
                                 )}
                             </div>
