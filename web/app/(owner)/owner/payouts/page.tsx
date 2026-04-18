@@ -422,7 +422,7 @@ export default function PayoutSettingsPage() {
                     </div>
 
                     <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-                        {history.length === 0 ? (
+                        {!history || history.length === 0 ? (
                             <div className="p-16 text-center space-y-4">
                                 <div className="w-14 h-14 bg-gray-50 rounded-xl flex items-center justify-center mx-auto text-gray-300">
                                     <Clock size={28} />
