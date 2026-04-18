@@ -89,7 +89,7 @@ export class AuthService {
           user,
         };
       } catch (error) {
-        this.logger.error(`Registration failed for ${dto.email}: ${error.message}`, error.stack);
+        this.logger.error(`Registration failed for ${dto.email}: ${(error as any).message}`, (error as any).stack);
         throw error;
       }
     });

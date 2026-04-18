@@ -4,7 +4,7 @@ import { AppModule } from "./app.module";
 import { PrismaService } from "./prisma/prisma.service";
 import * as bodyParser from "body-parser";
 import { ValidationPipe, Logger } from "@nestjs/common";
-import * as cookieParser from "cookie-parser";
+import cookieParser from "cookie-parser";
 import helmet from "helmet";
 import { HttpExceptionFilter } from "./common/filters/http-exception.filter";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";

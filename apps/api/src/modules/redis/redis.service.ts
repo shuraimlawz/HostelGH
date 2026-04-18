@@ -40,14 +40,14 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
     }
 
     this.client.on("error", (err) => {
-      console.error("[Redis] Connection Error:", err.message);
+      console.error("[Redis] Connection Error:", (err as any).message);
     });
 
     try {
       await this.client.connect();
       console.log("[Redis] Connected successfully");
     } catch (err) {
-      console.error("[Redis] connection failed to start:", err.message);
+      console.error("[Redis] connection failed to start:", (err as any).message);
     }
   }
 

@@ -57,7 +57,7 @@ export class PayoutsService {
         });
       }
     } catch (error) {
-      console.error("Subaccount creation failed:", error.message);
+      console.error("Subaccount creation failed:", (error as any).message);
       // We don't throw here to avoid blocking method save, but maybe we should warn the user
     }
   }

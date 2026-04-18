@@ -43,7 +43,7 @@ export class SmsService {
       return true;
     } catch (error) {
       this.logger.error(
-        `Failed to send SMS to ${formattedTo}: ${error.message}`,
+        `Failed to send SMS to ${formattedTo}: ${(error as any).message}`,
       );
       return false;
     }

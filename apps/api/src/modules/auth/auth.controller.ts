@@ -175,10 +175,10 @@ export class AuthController {
       const redirectUrl = `${baseUrl}/auth/callback?accessToken=${result.accessToken}&userId=${result.user.id}&role=${result.user.role}&email=${encodeURIComponent(result.user.email)}&isOnboarded=${result.user.isOnboarded}`;
       return res.redirect(redirectUrl);
     } catch (error) {
-      console.error("[Google OAuth Callback Error]", error.message, error.stack);
+      console.error("[Google OAuth Callback Error]", (error as any).message, (error as any).stack);
       const frontendUrl = this.config.get<string>("app.frontendUrl") || "https://hostelgh.vercel.app";
       const baseUrl = frontendUrl.endsWith('/') ? frontendUrl.slice(0, -1) : frontendUrl;
-      return res.redirect(`${baseUrl}/auth/login?error=OAuthFailed&message=${encodeURIComponent(error.message)}`);
+      return res.redirect(`${baseUrl}/auth/login?error=OAuthFailed&message=${encodeURIComponent((error as any).message)}`);
     }
   }
 

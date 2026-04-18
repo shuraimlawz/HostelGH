@@ -23,7 +23,7 @@ export class HealthController {
       throw new ServiceUnavailableException({
         status: "down",
         database: "disconnected",
-        error: error.message
+        error: (error as any).message
       });
     }
   }

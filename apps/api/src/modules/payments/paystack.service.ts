@@ -42,7 +42,7 @@ export class PaystackService {
       return res.data;
     } catch (error) {
       this.logger.error(
-        `Paystack Init Error: ${error.response?.data?.message || error.message}`,
+        `Paystack Init Error: ${(error as any).response?.data?.message || (error as any).message}`,
       );
       throw new BadRequestException(
         "Failed to initialize Paystack transaction",
@@ -63,7 +63,7 @@ export class PaystackService {
       return res.data;
     } catch (error) {
       this.logger.error(
-        `Paystack Subaccount Error: ${error.response?.data?.message || error.message}`,
+        `Paystack Subaccount Error: ${(error as any).response?.data?.message || (error as any).message}`,
       );
       throw new BadRequestException("Failed to create Paystack subaccount");
     }
@@ -80,7 +80,7 @@ export class PaystackService {
       return res.data;
     } catch (error) {
       this.logger.error(
-        `Paystack Verify Error: ${error.response?.data?.message || error.message}`,
+        `Paystack Verify Error: ${(error as any).response?.data?.message || (error as any).message}`,
       );
       throw new BadRequestException("Failed to verify Paystack transaction");
     }
@@ -93,7 +93,7 @@ export class PaystackService {
       });
       return res.data;
     } catch (error) {
-      this.logger.error(`Paystack Get Banks Error: ${error.message}`);
+      this.logger.error(`Paystack Get Banks Error: ${(error as any).message}`);
       throw new BadRequestException("Failed to fetch banks from Paystack");
     }
   }
@@ -112,7 +112,7 @@ export class PaystackService {
       return res.data;
     } catch (error) {
       this.logger.error(
-        `Paystack Recipient Error: ${error.response?.data?.message || error.message}`,
+        `Paystack Recipient Error: ${(error as any).response?.data?.message || (error as any).message}`,
       );
       throw new BadRequestException("Failed to create transfer recipient");
     }
@@ -132,7 +132,7 @@ export class PaystackService {
       return res.data;
     } catch (error) {
       this.logger.error(
-        `Paystack Transfer Error: ${error.response?.data?.message || error.message}`,
+        `Paystack Transfer Error: ${(error as any).response?.data?.message || (error as any).message}`,
       );
       throw new BadRequestException("Failed to initiate transfer");
     }

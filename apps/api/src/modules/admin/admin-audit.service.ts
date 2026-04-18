@@ -68,8 +68,8 @@ export class AdminAuditLogService {
     } catch (error) {
       // We log the error but do not throw, to prevent breaking the admin flow
       this.logger.error(
-        `Failed to create audit log for admin ${admin.id} on ${entity} ${entityId}`,
-        error.stack,
+        `Failed to create audit log for admin ${admin?.id} on ${entity} ${entityId}`,
+        (error as any).stack,
       );
     }
   }

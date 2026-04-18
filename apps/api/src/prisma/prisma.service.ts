@@ -20,7 +20,7 @@ export class PrismaService
         connectionString = url.toString();
       }
     } catch (e) {
-      console.error("[Prisma] Failed to parse DATABASE_URL, using raw string:", e.message);
+      console.error("[Prisma] Failed to parse DATABASE_URL, using raw string:", (e as any).message);
     }
 
     const pool = new Pool({
@@ -37,7 +37,7 @@ export class PrismaService
       await this.$connect();
       console.log("[Prisma] Database connected successfully");
     } catch (error) {
-      console.error("[Prisma] Database connection failed during boot:", error.message);
+      console.error("[Prisma] Database connection failed during boot:", (error as any).message);
       // We don't throw here to allow the app to boot and show errors via health check/filter
     }
   }

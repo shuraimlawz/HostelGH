@@ -11,6 +11,7 @@ type User = {
     lastName?: string;
     avatarUrl?: string;
     phone?: string;
+    gender?: string;
     isOnboarded?: boolean;
 };
 
