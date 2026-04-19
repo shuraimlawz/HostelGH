@@ -20,39 +20,56 @@ export default function CookiesPage() {
                     </p>
                 </div>
 
-                <div className="max-w-4xl mx-auto space-y-16">
+                <div className="max-w-4xl mx-auto space-y-16 mb-24">
                     <section className="space-y-6">
-                        <h2 className="text-2xl font-black uppercase italic tracking-tight flex items-center gap-3">
-                            <Shield size={24} className="text-blue-500" /> What are cookies?
+                        <h2 className="text-3xl font-black uppercase italic tracking-tight flex items-center gap-3">
+                            <Shield size={28} className="text-blue-500" /> Defining Cookies
                         </h2>
-                        <p className="text-zinc-500 leading-loose">
-                            Cookies are small text files stored on your device that help us provide a seamless experience. They allow us to remember your preferences, keep you logged in, and understand how you interact with our platform.
+                        <p className="text-zinc-500 leading-bold text-lg font-medium">
+                            Cookies are sophisticated digital tokens stored on your device that allow the HostelGH platform to recognize your browser, maintain session integrity, and deliver a personalized search experience.
                         </p>
                     </section>
 
-                    <section className="space-y-6">
-                        <h2 className="text-2xl font-black uppercase italic tracking-tight flex items-center gap-3">
-                            <Eye size={24} className="text-blue-500" /> How we use them
+                    <section className="space-y-8">
+                        <h2 className="text-3xl font-black uppercase italic tracking-tight flex items-center gap-3">
+                            <Eye size={28} className="text-blue-500" /> Specialized Cookie Utility
                         </h2>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                            <div className="p-8 bg-white/[0.02] border border-white/5 rounded-3xl">
-                                <h3 className="text-lg font-bold mb-3 uppercase tracking-wider text-white">Essential Cookies</h3>
-                                <p className="text-zinc-500 text-sm leading-relaxed">Necessary for the website to function, such as authentication and security features.</p>
+                            <div className="p-10 bg-white/[0.02] border border-white/5 rounded-[2.5rem] group hover:bg-white/[0.04] transition-all">
+                                <h3 className="text-xl font-black mb-4 uppercase tracking-tighter text-white italic">Strictly Necessary</h3>
+                                <p className="text-zinc-500 text-sm leading-relaxed mb-6">Critical for core operations including secure authentication, CSRF protection, and booking state persistence. These cannot be disabled.</p>
+                                <div className="px-3 py-1 bg-blue-600/10 border border-blue-500/20 rounded-lg w-fit text-[8px] font-black uppercase tracking-widest text-blue-500">Auto-Enabled</div>
                             </div>
-                            <div className="p-8 bg-white/[0.02] border border-white/5 rounded-3xl">
-                                <h3 className="text-lg font-bold mb-3 uppercase tracking-wider text-white">Performance Cookies</h3>
-                                <p className="text-zinc-500 text-sm leading-relaxed">Help us understand how visitors interact with the site, helping us improve speed and layout.</p>
+                            <div className="p-10 bg-white/[0.02] border border-white/5 rounded-[2.5rem] group hover:bg-white/[0.04] transition-all">
+                                <h3 className="text-xl font-black mb-4 uppercase tracking-tighter text-white italic">Performance Metrics</h3>
+                                <p className="text-zinc-500 text-sm leading-relaxed mb-6">Aggregated, anonymous data that helps us understand site performance, page load speeds, and user navigation patterns.</p>
+                                <div className="px-3 py-1 bg-white/5 border border-white/10 rounded-lg w-fit text-[8px] font-black uppercase tracking-widest text-zinc-500">Opt-out Available</div>
+                            </div>
+                            <div className="p-10 bg-white/[0.02] border border-white/5 rounded-[2.5rem] group hover:bg-white/[0.04] transition-all">
+                                <h3 className="text-xl font-black mb-4 uppercase tracking-tighter text-white italic">User Personalization</h3>
+                                <p className="text-zinc-500 text-sm leading-relaxed mb-6">Remembers your preferred university region, currency, and search filters across different browsing sessions.</p>
+                                <div className="px-3 py-1 bg-white/5 border border-white/10 rounded-lg w-fit text-[8px] font-black uppercase tracking-widest text-zinc-500">Opt-out Available</div>
+                            </div>
+                            <div className="p-10 bg-white/[0.02] border border-white/5 rounded-[2.5rem] group hover:bg-white/[0.04] transition-all border-blue-500/10">
+                                <h3 className="text-xl font-black mb-4 uppercase tracking-tighter text-white italic">Marketing Logic</h3>
+                                <p className="text-zinc-500 text-sm leading-relaxed mb-6">Used to deliver relevant advertising both on and off our platform based on your declared accommodation interests.</p>
+                                <div className="px-3 py-1 bg-white/5 border border-white/10 rounded-lg w-fit text-[8px] font-black uppercase tracking-widest text-zinc-500">Opt-out Available</div>
                             </div>
                         </div>
                     </section>
 
                     <section className="space-y-6">
-                        <h2 className="text-2xl font-black uppercase italic tracking-tight flex items-center gap-3">
-                            <Settings size={24} className="text-blue-500" /> Your Choices
+                        <h2 className="text-3xl font-black uppercase italic tracking-tight flex items-center gap-3">
+                            <Settings size={28} className="text-blue-500" /> Sovereignty Over Your Data
                         </h2>
-                        <p className="text-zinc-500 leading-loose">
-                            You can control and manage cookies through your browser settings. Please note that disabling certain cookies may affect the functionality of our services.
-                        </p>
+                        <div className="p-10 bg-white/[0.02] border border-white/5 rounded-[2.5rem] space-y-4">
+                            <p className="text-zinc-500 leading-loose font-medium">
+                                You retain full digital sovereignty. Beyond our platform&apos;s native settings, you can manage, delete, or block cookies through your primary browser interface (Chrome, Safari, Firefox). 
+                            </p>
+                            <p className="text-zinc-500 leading-loose font-medium">
+                                Note directed toward Students: Disabling cookies entirely will log you out of your active session and prevent you from completing active hostel reservations.
+                            </p>
+                        </div>
                     </section>
                 </div>
 

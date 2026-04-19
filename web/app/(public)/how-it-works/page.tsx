@@ -45,14 +45,70 @@ export default function HowItWorksPage() {
                     <span className="px-4 py-1.5 bg-blue-600/10 text-blue-400 rounded-full text-[10px] font-black uppercase tracking-[0.3em] border border-blue-500/20 mb-8 inline-block animate-pulse">
                         Platform Guide
                     </span>
-                    <h1 className="text-5xl md:text-7xl font-black tracking-tighter mb-8 italic uppercase leading-none">
-                        How It <span className="text-blue-500">Works</span>
+                    <h1 className="text-5xl md:text-8xl font-black tracking-tighter mb-8 italic uppercase leading-none">
+                        How It <span className="text-blue-500 underline decoration-blue-500/20 underline-offset-[12px]">Works</span>
                     </h1>
-                    <p className="text-zinc-400 text-xl font-medium leading-relaxed max-w-2xl mx-auto">
-                        Experience a seamless, secure, and sophisticated way to find student accommodation in Ghana.
+                    <p className="text-zinc-400 text-xl md:text-2xl font-medium leading-relaxed max-w-2xl mx-auto">
+                        A transparent, secure, and sophisticated workflow designed for the modern Ghanaian student ecosystem.
                     </p>
                 </div>
 
+                {/* Dual Journey Selector */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-32">
+                    {/* For Students */}
+                    <div className="bg-white/[0.03] border border-white/10 rounded-[3rem] p-12 hover:bg-white/[0.05] transition-all group overflow-hidden relative">
+                        <div className="absolute top-0 right-0 p-12 opacity-[0.05] group-hover:opacity-[0.1] transition-opacity">
+                            <Search size={120} />
+                        </div>
+                        <h2 className="text-4xl font-black mb-8 italic uppercase tracking-tighter">For <span className="text-blue-500">Students</span></h2>
+                        <ul className="space-y-6">
+                            {[
+                                { title: "Smart Discovery", text: "Filter by university proximity, price, and amenities including WiFi, water supply, and security." },
+                                { title: "Virtual Tours", text: "View high-resolution galleries and verified facility lists before you even visit." },
+                                { title: "Secure Reservation", text: "Book your room with a small commitment fee handled through our secure escrow." },
+                                { title: "Verified Move-in", text: "Receive your digital receipt and check-in instructions instantly." }
+                            ].map((item, i) => (
+                                <li key={i} className="flex gap-4">
+                                    <div className="w-6 h-6 rounded-full bg-blue-600/20 flex items-center justify-center text-blue-500 shrink-0 mt-1">
+                                        <CheckCircle2 size={14} />
+                                    </div>
+                                    <div>
+                                        <p className="font-black uppercase tracking-widest text-[10px] text-white mb-1">{item.title}</p>
+                                        <p className="text-sm text-zinc-500 font-medium leading-relaxed">{item.text}</p>
+                                    </div>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+
+                    {/* For Owners */}
+                    <div className="bg-white/[0.03] border border-white/10 rounded-[3rem] p-12 hover:bg-white/[0.05] transition-all group overflow-hidden relative border-blue-500/20">
+                        <div className="absolute top-0 right-0 p-12 opacity-[0.05] group-hover:opacity-[0.1] transition-opacity">
+                            <Home size={120} />
+                        </div>
+                        <h2 className="text-4xl font-black mb-8 italic uppercase tracking-tighter text-white">For <span className="text-emerald-500 text-blue-500">Owners</span></h2>
+                        <ul className="space-y-6">
+                            {[
+                                { title: "Premium Listing", text: "Showcase your property to thousands of verified students with a few clicks." },
+                                { title: "Tenant Screening", text: "We manage the initial inquiries, ensuring you only deal with serious, verified tenants." },
+                                { title: "Automated Payouts", text: "Funds are settled directly into your mobile money or bank account." },
+                                { title: "Inventory Management", text: "Live tracking of room availability and historical reservation data." }
+                            ].map((item, i) => (
+                                <li key={i} className="flex gap-4">
+                                    <div className="w-6 h-6 rounded-full bg-blue-600/20 flex items-center justify-center text-blue-500 shrink-0 mt-1">
+                                        <CheckCircle2 size={14} />
+                                    </div>
+                                    <div>
+                                        <p className="font-black uppercase tracking-widest text-[10px] text-white mb-1">{item.title}</p>
+                                        <p className="text-sm text-zinc-500 font-medium leading-relaxed">{item.text}</p>
+                                    </div>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                </div>
+
+                {/* Detailed Step Cards */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
                     {steps.map((step, idx) => (
                         <div key={idx} className="group relative">
@@ -63,14 +119,27 @@ export default function HowItWorksPage() {
                                 </div>
                                 <h3 className="text-2xl font-black mb-4 uppercase italic tracking-tight">{step.title}</h3>
                                 <p className="text-zinc-400 text-sm font-medium leading-relaxed mb-8">{step.description}</p>
-                                <div className="mt-auto pt-4">
-                                    <div className="w-10 h-1 bg-white/10 rounded-full overflow-hidden">
-                                        <div className="w-0 group-hover:w-full h-full bg-blue-600 transition-all duration-700" />
-                                    </div>
-                                </div>
                             </div>
                         </div>
                     ))}
+                </div>
+
+                {/* FAQ Style Placeholder Section */}
+                <div className="mt-32 max-w-4xl mx-auto">
+                    <h2 className="text-3xl font-black mb-12 italic uppercase tracking-tighter text-center">Frequently <span className="text-blue-500">Answered</span></h2>
+                    <div className="space-y-4">
+                        {[
+                            { q: "How much does it cost?", a: "Listing is free for owners. Students pay a small platform fee upon successful booking." },
+                            { q: "Is my payment secure?", a: "Yes. All payments are processed via Paystack and held in escrow until verification." },
+                            { q: "What if the hostel is full?", a: "Our live inventory system prevents overbooking, showing you only available rooms." }
+                        ].map((faq, i) => (
+                            <div key={i} className="p-8 bg-white/[0.02] border border-white/5 rounded-3xl">
+                                <p className="text-[10px] font-black uppercase tracking-widest text-blue-500 mb-2">Question {i+1}</p>
+                                <h4 className="text-lg font-bold mb-4 text-white uppercase italic tracking-tight">{faq.q}</h4>
+                                <p className="text-zinc-500 text-sm leading-relaxed">{faq.a}</p>
+                            </div>
+                        ))}
+                    </div>
                 </div>
 
                 <div className="mt-32 p-12 bg-white/[0.02] border border-white/5 rounded-[3rem] text-center max-w-4xl mx-auto backdrop-blur-md">
