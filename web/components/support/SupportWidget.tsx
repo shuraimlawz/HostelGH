@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { MessageCircle, X, Send, User, ShieldCheck } from "lucide-react";
+import { MessageCircle, X, Send, User } from "lucide-react";
+import LogoAnimation from "@/components/layout/LogoAnimation";
 import { io, Socket } from "socket.io-client";
 import { useAuth } from "@/lib/auth-context";
 import { cn } from "@/lib/utils";
@@ -126,8 +127,8 @@ export default function SupportWidget() {
                     {/* Header */}
                     <div className="p-6 bg-blue-600 text-white flex items-center justify-between shadow-lg shadow-blue-500/10">
                         <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center backdrop-blur-md">
-                                <ShieldCheck size={20} />
+                            <div className="p-1">
+                                <LogoAnimation />
                             </div>
                             <div>
                                 <h3 className="font-bold text-sm tracking-tight">HostelGH Support</h3>
