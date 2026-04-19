@@ -115,7 +115,7 @@ export default function Navbar() {
                         <span className="font-black text-lg md:text-xl tracking-tighter text-gray-900 flex overflow-hidden">
                             HostelGH
                         </span>
-                        <div className="h-[2px] w-0 group-hover:w-full bg-blue-600 transition-all duration-300 rounded-full" />
+                        <div className="hidden lg:block h-[2px] w-0 group-hover:w-full bg-blue-600 transition-all duration-300 rounded-full" />
                     </div>
                 </Link>
 

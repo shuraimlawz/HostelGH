@@ -28,6 +28,7 @@ import { EmailModule } from "./modules/email/email.module";
 import { ReviewsModule } from "./modules/reviews/reviews.module";
 
 import { ChatModule } from "./modules/chat/chat.module";
+import { NewsletterModule } from "./modules/newsletter/newsletter.module";
 
 import { AppController } from "./app.controller";
 
@@ -58,6 +59,7 @@ import { AppController } from "./app.controller";
     EmailModule,
     ReviewsModule,
     ChatModule,
+    NewsletterModule,
     ScheduleModule.forRoot(),
     ThrottlerModule.forRoot([
       {

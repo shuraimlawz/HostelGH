@@ -25,7 +25,7 @@ export class ChatService {
         return this.prisma.conversation.findMany({
             where: { isSupport: true },
             include: {
-                participants: { select: { id: true, firstName: true, avatarUrl: true, email: true } },
+                participants: { select: { id: true, firstName: true, avatarUrl: true, email: true, role: true } },
                 messages: {
                     orderBy: { createdAt: 'desc' },
                     take: 1
@@ -92,7 +92,10 @@ export class ChatService {
 
         const existing = await this.prisma.conversation.findFirst({
             where,
-            include: { messages: { take: 10, orderBy: { createdAt: 'desc' } } }
+            include: { 
+                messages: { take: 10, orderBy: { createdAt: 'desc' } },
+                participants: { select: { id: true, firstName: true, avatarUrl: true, role: true } }
+            }
         });
 
         if (existing) return existing;

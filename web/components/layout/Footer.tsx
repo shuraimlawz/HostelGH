@@ -86,13 +86,41 @@ export default function Footer() {
                         </div>
 
                         <div className="w-full lg:max-w-md">
-                            <form className="relative group/form" onSubmit={(e) => e.preventDefault()}>
+                            <form 
+                                className="relative group/form" 
+                                onSubmit={async (e) => {
+                                    e.preventDefault();
+                                    const form = e.currentTarget;
+                                    const email = new FormData(form).get("email") as string;
+                                    const btn = form.querySelector("button");
+                                    if (btn) btn.disabled = true;
+                                    try {
+                                        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "https://hostelgh.onrender.com"}/newsletter/subscribe`, {
+                                            method: "POST",
+                                            headers: { "Content-Type": "application/json" },
+                                            body: JSON.stringify({ email })
+                                        });
+                                        if (res.ok) {
+                                            alert("Successfully joined the circle!");
+                                            form.reset();
+                                        } else {
+                                            alert("Failed to subscribe. Please try again.");
+                                        }
+                                    } catch (err) {
+                                        alert("An error occurred. Please try again.");
+                                    } finally {
+                                        if (btn) btn.disabled = false;
+                                    }
+                                }}
+                            >
                                 <input 
                                     type="email" 
+                                    name="email"
+                                    required
                                     placeholder="Enter your email address" 
                                     className="w-full h-16 md:h-20 bg-white/[0.05] border border-white/10 rounded-2xl px-8 pr-16 text-white placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500/50 transition-all font-medium text-lg"
                                 />
-                                <button className="absolute right-3 top-3 bottom-3 aspect-square bg-blue-600 text-white rounded-xl flex items-center justify-center hover:bg-blue-500 active:scale-95 transition-all shadow-lg shadow-blue-600/20 group/btn">
+                                <button type="submit" className="absolute right-3 top-3 bottom-3 aspect-square bg-blue-600 text-white rounded-xl flex items-center justify-center hover:bg-blue-500 active:scale-95 transition-all shadow-lg shadow-blue-600/20 group/btn disabled:opacity-50">
                                     <Send size={24} className="transition-transform group-hover/btn:-translate-y-1 group-hover/btn:translate-x-1" />
                                 </button>
                             </form>

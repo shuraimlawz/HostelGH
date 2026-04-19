@@ -120,10 +120,10 @@ export default function SupportWidget() {
     };
 
     return (
-        <div className="fixed bottom-8 right-8 z-[100] flex flex-col items-end gap-4 pointer-events-none">
+        <div className="fixed bottom-4 right-4 sm:bottom-8 sm:right-8 z-[999] flex flex-col items-end gap-3 sm:gap-4 pointer-events-none">
             {/* Chat Window */}
             {isOpen && (
-                <div className="w-[350px] sm:w-[380px] h-[500px] sm:h-[550px] bg-white rounded-[2rem] shadow-[0_32px_64px_-16px_rgba(0,0,0,0.15)] border border-gray-100 flex flex-col overflow-hidden animate-in fade-in slide-in-from-bottom-8 duration-500 pointer-events-auto">
+                <div className="w-[calc(100vw-2rem)] sm:w-[380px] h-[500px] sm:h-[600px] max-h-[calc(100vh-120px)] sm:max-h-[700px] bg-white rounded-[2rem] shadow-[0_32px_64px_-16px_rgba(0,0,0,0.15)] border border-gray-100 flex flex-col overflow-hidden animate-in fade-in slide-in-from-bottom-8 duration-500 pointer-events-auto">
                     {/* Header */}
                     <div className="p-6 bg-blue-600 text-white flex items-center justify-between shadow-lg shadow-blue-500/10">
                         <div className="flex items-center gap-3">
