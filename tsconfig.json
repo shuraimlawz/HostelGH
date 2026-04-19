@@ -9,8 +9,6 @@
     "target": "es2017",
     "sourceMap": true,
     "outDir": "./dist",
-    "baseUrl": "./",
-
     "incremental": true,
     "skipLibCheck": true,
     "strictNullChecks": false,
@@ -20,10 +18,10 @@
     "noFallthroughCasesInSwitch": false,
     "paths": {
       "@app/common": [
-        "apps/api/src/common"
+        "./apps/api/src/common"
       ],
       "@app/common/*": [
-        "apps/api/src/common/*"
+        "./apps/api/src/common/*"
       ]
     },
     "types": [

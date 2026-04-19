@@ -1,6 +1,7 @@
 "use client";
 
 import { Building2, Users, BarChart3, ShieldCheck, ArrowUpRight, Zap } from "lucide-react";
+import Link from "next/link";
 
 export default function PartnersPage() {
     const benefits = [
@@ -45,9 +46,9 @@ export default function PartnersPage() {
                             Join Ghana&apos;s most sophisticated student accommodation ecosystem. List once, book forever.
                         </p>
                         <div className="flex flex-col sm:flex-row items-center gap-6">
-                            <button className="h-16 px-10 bg-white text-black rounded-2xl font-black uppercase tracking-widest hover:bg-zinc-200 transition-all flex items-center gap-3 active:scale-95 shadow-2xl">
+                            <Link href="/auth/register?role=OWNER" className="h-16 px-10 bg-white text-black rounded-2xl font-black uppercase tracking-widest hover:bg-zinc-200 transition-all flex items-center gap-3 active:scale-95 shadow-2xl">
                                 Become a Partner <ArrowUpRight size={20} />
-                            </button>
+                            </Link>
                             <div className="flex items-center gap-4 text-emerald-500 font-bold text-xs uppercase tracking-widest">
                                 <div className="w-2.5 h-2.5 bg-emerald-500 rounded-full animate-pulse shadow-[0_0_15px_rgba(16,185,129,0.5)]" />
                                 Onboarding Active
@@ -76,7 +77,7 @@ export default function PartnersPage() {
                             </div>
                             <div className="aspect-[1/1.5] bg-blue-600 rounded-3xl p-8 flex flex-col justify-end group shadow-2xl shadow-blue-600/20">
                                 <div className="font-black text-4xl text-white uppercase tracking-tighter leading-none mb-4 italic">Next Level Living</div>
-                                <button className="w-full py-4 bg-white/20 backdrop-blur-md rounded-xl text-[10px] font-black uppercase tracking-widest text-white hover:bg-white/30 transition-all">Sign Up Now</button>
+                                <Link href="/auth/register?role=OWNER" className="w-full py-4 bg-white/20 backdrop-blur-md rounded-xl text-[10px] font-black uppercase tracking-widest text-white hover:bg-white/30 transition-all text-center">Sign Up Now</Link>
                             </div>
                         </div>
                     </div>

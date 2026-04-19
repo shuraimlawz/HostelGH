@@ -1,6 +1,7 @@
 "use client";
 
 import { Megaphone, Target, BarChart, Rocket, ArrowRight, Zap, CheckCircle2 } from "lucide-react";
+import Link from "next/link";
 
 export default function AdvertisingPage() {
     return (
@@ -133,9 +134,9 @@ export default function AdvertisingPage() {
                     <p className="text-gray-500 text-lg mb-12 max-w-xl mx-auto font-medium">
                         Contact our media sales team today to learn about our customized advertising packages.
                     </p>
-                    <button className="h-16 px-12 bg-blue-600 text-white rounded-2xl font-black uppercase tracking-widest hover:bg-blue-500 transition-all flex items-center gap-3 shadow-xl shadow-blue-600/30 mx-auto active:scale-95">
+                    <Link href="/support/help-center" className="h-16 px-12 bg-blue-600 text-white rounded-2xl font-black uppercase tracking-widest hover:bg-blue-500 transition-all flex items-center gap-3 shadow-xl shadow-blue-600/30 mx-auto active:scale-95">
                         Inquire Now <ArrowRight size={20} />
-                    </button>
+                    </Link>
                 </div>
             </div>
         </main>

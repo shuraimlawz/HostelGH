@@ -1,6 +1,7 @@
 "use client";
 
 import { CheckCircle2, Search, Calendar, CreditCard, Home, ArrowRight } from "lucide-react";
+import Link from "next/link";
 
 export default function HowItWorksPage() {
     const steps = [
@@ -146,12 +147,12 @@ export default function HowItWorksPage() {
                     <h3 className="text-3xl font-black mb-6 italic uppercase tracking-tighter">Ready to find your perfect space?</h3>
                     <p className="text-zinc-500 text-lg mb-10 max-w-xl mx-auto font-medium">Join thousands of students who trust HostelGH for their accommodation needs.</p>
                     <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
-                        <button className="h-16 px-10 bg-blue-600 text-white rounded-2xl font-black uppercase tracking-widest hover:bg-blue-500 transition-all flex items-center gap-3 shadow-[0_10px_40px_rgba(37,99,235,0.3)] active:scale-95">
+                        <Link href="/hostels" className="h-16 px-10 bg-blue-600 text-white rounded-2xl font-black uppercase tracking-widest hover:bg-blue-500 transition-all flex items-center gap-3 shadow-[0_10px_40px_rgba(37,99,235,0.3)] active:scale-95">
                             Start Searching <Search size={20} />
-                        </button>
-                        <button className="h-16 px-10 bg-white/5 text-white rounded-2xl font-black uppercase tracking-widest border border-white/10 hover:bg-white/10 transition-all flex items-center gap-3 active:scale-95">
-                            Learn More <ArrowRight size={20} />
-                        </button>
+                        </Link>
+                        <Link href="/support/help-center" className="h-16 px-10 bg-white/5 text-white rounded-2xl font-black uppercase tracking-widest border border-white/10 hover:bg-white/10 transition-all flex items-center gap-3 active:scale-95">
+                            About Support <ArrowRight size={20} />
+                        </Link>
                     </div>
                 </div>
             </div>
