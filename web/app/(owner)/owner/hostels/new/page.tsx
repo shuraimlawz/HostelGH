@@ -8,46 +8,25 @@ import * as z from "zod";
 import { api } from "@/lib/api";
 import { toast } from "sonner";
 import {
-    Building2,
-    MapPin,
-    Info,
-    Check,
-    ChevronLeft,
-    Loader2,
-    Wifi,
-    Wind,
-    Utensils,
-    Waves,
-    Car,
-    ShieldCheck,
-    Coffee,
-    MessageSquare,
-    Zap,
-    Droplets,
-    Flame,
-    Clock,
-    Image as ImageIcon,
-    ShieldAlert,
-    ArrowRight,
-    ArrowLeft,
-    Users,
-    Eye
+    Wifi, Wind, Utensils, Waves, Car, ShieldCheck, Coffee, Building2,
+    Zap, Droplets, Flame, ChevronLeft, Loader2, CheckCircle2,
 } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import ImageUpload from "@/components/common/ImageUpload";
+import { REGIONAL_UNIVERSITIES } from "@/lib/constants";
 
 const formSchema = z.object({
-    name: z.string().min(3, "Name must be at least 3 characters"),
+    name: z.string().min(3, "Hostel name must be at least 3 characters"),
     description: z.string().min(10, "Description must be at least 10 characters"),
     city: z.string().min(2, "City is required"),
-    addressLine: z.string().min(5, "Address is required"),
-    university: z.string().optional().or(z.literal("")),
-    whatsappNumber: z.string().regex(/^(0|233)[0-9]{9}$/, "Invalid Ghana number (e.g. 0244123456)"),
+    addressLine: z.string().min(5, "Street address is required"),
+    university: z.string().min(2, "Please select the nearest university"),
+    whatsappNumber: z.string().regex(/^(0|233)[0-9]{9}$/, "Enter a valid Ghana number e.g. 0244123456"),
     distanceToCampus: z.string().optional().or(z.literal("")),
     utilitiesIncluded: z.array(z.string()),
     amenities: z.array(z.string()),
-    images: z.array(z.string()),
+    images: z.array(z.string()).min(1, "Please upload at least one photo"),
     policiesText: z.string().optional(),
     genderCategory: z.enum(["MALE", "FEMALE", "MIXED"]).optional(),
 });
@@ -63,74 +42,69 @@ const AMENITIES = [
     { id: "Generator", label: "Generator", icon: Building2 },
 ];
 
-const STEPS = [
-    { id: 1, label: "Identity", icon: Info },
-    { id: 2, label: "Location", icon: MapPin },
-    { id: 3, label: "Specs", icon: Zap },
-    { id: 4, label: "Visuals", icon: ImageIcon },
-];
-
+const STEPS = ["Basic Info", "Location", "Amenities", "Photos"];
 const DRAFT_KEY = "hostel_listing_draft";
+
+const Field = ({ label, required, error, children }: {
+    label: string; required?: boolean; error?: string; children: React.ReactNode;
+}) => (
+    <div className="space-y-1.5">
+        <label className="block text-sm font-medium text-gray-700">
+            {label}{required && <span className="text-red-500 ml-1">*</span>}
+        </label>
+        {children}
+        {error && <p className="text-xs text-red-500">{error}</p>}
+    </div>
+);
+
+const inputCls = (hasError?: boolean) => cn(
+    "w-full px-4 py-2.5 bg-gray-50 border rounded-lg text-sm text-gray-900 outline-none transition-colors placeholder:text-gray-400",
+    hasError ? "border-red-300 focus:border-red-400 bg-red-50" : "border-gray-200 focus:border-blue-500 focus:bg-white"
+);
 
 export default function NewHostelPage() {
     const router = useRouter();
-    const [currentStep, setCurrentStep] = useState(1);
+    const [step, setStep] = useState(1);
     const [selectedAmenities, setSelectedAmenities] = useState<string[]>([]);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [done, setDone] = useState(false);
+    const [requiresVerification, setRequiresVerification] = useState(true);
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
-            name: "",
-            description: "",
-            city: "",
-            addressLine: "",
-            university: "",
-            whatsappNumber: "",
-            distanceToCampus: "",
-            utilitiesIncluded: [],
-            amenities: [],
-            images: [],
-            policiesText: "",
-            genderCategory: "MIXED",
+            name: "", description: "", city: "", addressLine: "",
+            university: "", whatsappNumber: "", distanceToCampus: "",
+            utilitiesIncluded: [], amenities: [], images: [],
+            policiesText: "", genderCategory: "MIXED",
         }
     });
 
-    // ─── Draft Persistence: Load ───
-    useEffect(() => {
-        const savedDraft = localStorage.getItem(DRAFT_KEY);
-        if (savedDraft) {
-            try {
-                const draft = JSON.parse(savedDraft);
-                if (draft.formData) {
-                    Object.keys(draft.formData).forEach((key) => {
-                        form.setValue(key as any, draft.formData[key]);
-                    });
-                    if (draft.formData.amenities) {
-                        setSelectedAmenities(draft.formData.amenities);
-                    }
-                }
-                if (draft.currentStep) {
-                    setCurrentStep(draft.currentStep);
-                }
-                toast.success("Progress Restored");
-            } catch (e) {
-                console.error("Failed to restore draft", e);
-            }
-        }
-    }, [form]);
+    const { formState: { errors } } = form;
 
-    // ─── Draft Persistence: Save ───
+    // Load draft
     useEffect(() => {
-        const subscription = form.watch((value) => {
-            const draft = {
-                formData: value,
-                currentStep: currentStep,
-                updatedAt: new Date().toISOString()
-            };
-            localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
+        const saved = localStorage.getItem(DRAFT_KEY);
+        if (saved) {
+            try {
+                const draft = JSON.parse(saved);
+                if (draft.formData) {
+                    Object.keys(draft.formData).forEach(k => form.setValue(k as any, draft.formData[k]));
+                    if (draft.formData.amenities) setSelectedAmenities(draft.formData.amenities);
+                }
+                if (draft.step) setStep(draft.step);
+                toast.info("Draft restored");
+            } catch { /* ignore */ }
+        }
+    }, []);
+
+    // Save draft
+    useEffect(() => {
+        const sub = form.watch((value) => {
+            localStorage.setItem(DRAFT_KEY, JSON.stringify({ formData: value, step }));
         });
-        return () => subscription.unsubscribe();
-    }, [form.watch, currentStep]);
+        return () => sub.unsubscribe();
+    }, [form.watch, step]);
 
     const toggleAmenity = (id: string) => {
         const updated = selectedAmenities.includes(id)
@@ -140,396 +114,264 @@ export default function NewHostelPage() {
         form.setValue("amenities", updated);
     };
 
-    const [publishStage, setPublishStage] = useState<'idle' | 'uploading' | 'verifying' | 'done' | 'error'>('idle');
-    const [publishResult, setPublishResult] = useState<{ requiresVerification: boolean } | null>(null);
-
-    useEffect(() => {
-        if (publishStage === 'error') {
-            const timer = setTimeout(() => {
-                setPublishStage('idle');
-            }, 500);
-            return () => clearTimeout(timer);
-        }
-    }, [publishStage]);
+    const advance = async () => {
+        const fieldsMap: Record<number, string[]> = {
+            1: ["name", "description", "genderCategory"],
+            2: ["city", "addressLine", "university", "whatsappNumber"],
+            3: [],
+            4: ["images"],
+        };
+        const ok = await form.trigger(fieldsMap[step] as any);
+        if (ok) setStep(s => s + 1);
+    };
 
     const onSubmit = async (values: z.infer<typeof formSchema>) => {
-        setPublishStage('uploading');
+        setIsSubmitting(true);
         try {
-            await new Promise(r => setTimeout(r, 900));
-            setPublishStage('verifying');
             const res = await api.post("/hostels", values);
-            await new Promise(r => setTimeout(r, 700));
             localStorage.removeItem(DRAFT_KEY);
-            setPublishStage('done');
-            setPublishResult({ requiresVerification: res.data?.requiresVerification ?? true });
-        } catch (error: any) {
-            setPublishStage('error');
-            toast.error(error.message);
+            setRequiresVerification(res.data?.requiresVerification ?? true);
+            setDone(true);
+        } catch (e: any) {
+            toast.error(e.message || "Failed to create hostel");
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
-    const isPublishing = publishStage !== 'idle' && publishStage !== 'error';
-
-    const stages = [
-        { key: 'uploading', label: 'TRANSMITTING ASSET DATA...' },
-        { key: 'verifying', label: 'VERIFYING COMPLIANCE...' },
-        { key: 'done', label: 'DEPLOYMENT COMPLETE' },
-    ];
+    // Success screen
+    if (done) {
+        return (
+            <div className="min-h-[60vh] flex items-center justify-center p-6">
+                <div className="max-w-sm w-full text-center space-y-6">
+                    <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto">
+                        <CheckCircle2 size={32} className="text-green-600" />
+                    </div>
+                    <div className="space-y-2">
+                        <h2 className="text-xl font-semibold text-gray-900">
+                            {requiresVerification ? "Submitted for Review" : "Hostel Listed!"}
+                        </h2>
+                        <p className="text-sm text-gray-500 leading-relaxed">
+                            {requiresVerification
+                                ? "Your hostel has been submitted and is under review. It'll be visible once approved (usually within 24 hours)."
+                                : "Your hostel is now live and visible to students."}
+                        </p>
+                    </div>
+                    <button
+                        onClick={() => router.push("/owner/hostels")}
+                        className="w-full py-3 bg-blue-600 text-white rounded-lg font-medium text-sm hover:bg-blue-700 transition-colors"
+                    >
+                        Go to My Hostels
+                    </button>
+                </div>
+            </div>
+        );
+    }
 
     return (
-        <div className="max-w-4xl mx-auto pb-20 relative px-4">
-
-            {/* ─── Publishing Overlay ─── */}
-            {(publishStage !== 'idle') && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-                    <div className="absolute inset-0 bg-white/60 backdrop-blur-xl" />
-
-                    <div className="relative z-10 bg-white border border-gray-100 rounded-3xl shadow-2xl p-10 max-w-sm w-full text-center animate-in zoom-in-95 duration-700">
-
-                        {publishStage === 'done' && publishResult ? (
-                            <div className="space-y-8">
-                                <div className="w-20 h-20 bg-blue-600 rounded-2xl flex items-center justify-center mx-auto shadow-xl shadow-blue-500/20 border border-white/20">
-                                    <Check className="text-white" size={40} />
-                                </div>
-                                <div className="space-y-2">
-                                    <h2 className="text-2xl font-bold text-gray-900 tracking-tight uppercase">
-                                        {publishResult.requiresVerification ? 'Processing' : 'Asset Live'}
-                                    </h2>
-                                    <p className="text-gray-400 text-[10px] font-bold uppercase tracking-widest leading-relaxed">
-                                        {publishResult.requiresVerification 
-                                            ? "Your asset has been queued for manual verification. Expected turn-around: 24 cycles."
-                                            : "Your asset is now operational and visible to primary users."
-                                        }
-                                    </p>
-                                </div>
-                                <button
-                                    onClick={() => router.push('/owner/hostels')}
-                                    className="w-full h-14 bg-gray-900 text-white rounded-2xl font-bold text-[10px] uppercase tracking-widest hover:bg-black transition-all active:scale-95 shadow-xl"
-                                >
-                                    Return to Archive
-                                </button>
-                            </div>
-                        ) : (
-                            <div className="space-y-10">
-                                <div className="relative w-20 h-20 mx-auto">
-                                    <div className="absolute inset-0 rounded-2xl border-2 border-blue-600/10" />
-                                    <div className="absolute inset-0 rounded-2xl border-2 border-blue-600 border-t-transparent animate-spin" />
-                                    <div className="absolute inset-0 flex items-center justify-center">
-                                        <Building2 className="text-blue-600 animate-pulse" size={28} />
-                                    </div>
-                                </div>
-
-                                <div className="space-y-4">
-                                    <h2 className="text-[11px] font-bold text-gray-400 tracking-[0.3em] uppercase">Transmitting Session</h2>
-
-                                    <div className="space-y-3 text-left">
-                                        {stages.map((s, i) => {
-                                            const stageOrder = ['uploading', 'verifying', 'done'];
-                                            const currentIdx = stageOrder.indexOf(publishStage);
-                                            const stageIdx = stageOrder.indexOf(s.key);
-                                            const isDone = stageIdx < currentIdx;
-                                            const isActive = stageIdx === currentIdx;
-
-                                            return (
-                                                <div key={s.key} className={cn(
-                                                    "flex items-center gap-4 p-4 rounded-2xl border transition-all duration-500",
-                                                    isActive ? "bg-blue-50 border-blue-100 shadow-sm" : "bg-gray-50/50 border-gray-100/50 opacity-60"
-                                                )}>
-                                                    <div className={cn(
-                                                        "w-6 h-6 rounded-lg flex items-center justify-center shrink-0 text-[10px] font-bold border",
-                                                        isDone ? "bg-blue-600 text-white border-blue-500" : isActive ? "bg-white text-blue-600 border-blue-200 shadow-sm" : "bg-white text-gray-300 border-gray-200"
-                                                    )}>
-                                                        {isDone ? <Check size={12} /> : i + 1}
-                                                    </div>
-                                                    <p className={cn(
-                                                        "text-[10px] font-bold uppercase tracking-widest",
-                                                        isActive ? "text-blue-700" : isDone ? "text-gray-900" : "text-gray-300"
-                                                    )}>{s.label}</p>
-                                                </div>
-                                            );
-                                        })}
-                                    </div>
-                                </div>
-                            </div>
-                        )}
-                    </div>
-                </div>
-            )}
-
-            {/* Back & Header */}
-            <Link
-                href="/owner/hostels"
-                className="inline-flex items-center gap-3 text-[11px] font-bold text-gray-400 hover:text-gray-900 mb-10 transition-all group uppercase tracking-widest"
-            >
-                <ChevronLeft size={16} className="group-hover:-translate-x-1 transition-transform" />
-                Hub Overview
-            </Link>
-
-            <div className="mb-12 space-y-4">
-                <div className="flex items-center gap-2">
-                    <span className="px-3 py-1 bg-gray-900 text-white rounded-full text-[9px] font-bold uppercase tracking-widest border border-white/10 shadow-xl">
-                        Asset Deployment
-                    </span>
-                </div>
-                <div className="space-y-2">
-                    <h1 className="text-4xl font-bold text-gray-900 tracking-tighter uppercase leading-tight">
-                        Commission New Listing
-                    </h1>
-                    <p className="text-gray-400 font-bold text-[11px] uppercase tracking-widest max-w-xl">Initialize security protocols and deploy a new property asset into the primary fleet.</p>
-                </div>
-                <div className="h-1.5 w-16 bg-blue-600 rounded-full" />
+        <div className="max-w-2xl mx-auto pb-20 px-4">
+            {/* Back link */}
+            <div className="py-6">
+                <Link href="/owner/hostels" className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-900 transition-colors">
+                    <ChevronLeft size={16} />
+                    Back to my hostels
+                </Link>
             </div>
 
-            {/* Step Indicator */}
-            <div className="flex items-center gap-3 mb-12 overflow-x-auto no-scrollbar pb-4 -mx-1 px-1">
-                {STEPS.map((step, i) => (
-                    <div key={step.id} className="flex items-center gap-3 shrink-0">
-                        <button
-                            type="button"
-                            onClick={() => setCurrentStep(step.id)}
-                            className={cn(
-                                "flex items-center h-12 gap-3 px-6 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all border",
-                                currentStep === step.id
-                                    ? "bg-gray-900 text-white border-gray-900 shadow-xl shadow-gray-200/50"
-                                    : currentStep > step.id
-                                        ? "bg-blue-50 text-blue-600 border-blue-100"
-                                        : "bg-white text-gray-400 border-gray-100 hover:border-gray-300"
+            {/* Header */}
+            <div className="mb-8">
+                <h1 className="text-2xl font-semibold text-gray-900">List a hostel</h1>
+                <p className="text-sm text-gray-500 mt-1">Fill in the details below to get your hostel in front of students.</p>
+            </div>
+
+            {/* Step progress */}
+            <div className="flex items-center gap-2 mb-8">
+                {STEPS.map((label, i) => {
+                    const n = i + 1;
+                    const done = step > n;
+                    const active = step === n;
+                    return (
+                        <div key={n} className="flex items-center gap-2 flex-1 last:flex-initial">
+                            <div className="flex items-center gap-2 shrink-0">
+                                <div className={cn(
+                                    "w-7 h-7 rounded-full flex items-center justify-center text-xs font-semibold transition-colors",
+                                    done ? "bg-blue-600 text-white" : active ? "bg-blue-600 text-white" : "bg-gray-100 text-gray-400"
+                                )}>
+                                    {done ? <CheckCircle2 size={14} /> : n}
+                                </div>
+                                <span className={cn("text-sm hidden sm:inline", active ? "text-gray-900 font-medium" : done ? "text-blue-600" : "text-gray-400")}>
+                                    {label}
+                                </span>
+                            </div>
+                            {i < STEPS.length - 1 && (
+                                <div className={cn("flex-1 h-px", step > n ? "bg-blue-200" : "bg-gray-200")} />
                             )}
-                        >
-                            <div className={cn(
-                                "w-6 h-6 rounded-lg flex items-center justify-center shrink-0 border",
-                                currentStep === step.id ? "bg-white/10 border-white/20" : currentStep > step.id ? "bg-white border-blue-200" : "bg-gray-50 border-gray-100"
-                            )}>
-                                {currentStep > step.id ? <Check size={12} /> : <step.icon size={12} />}
-                            </div>
-                            <span className="hidden sm:inline">{step.label}</span>
-                        </button>
-                        {i < STEPS.length - 1 && (
-                            <div className={cn(
-                                "w-6 h-0.5 rounded-full transition-all",
-                                currentStep > step.id ? "bg-blue-200" : "bg-gray-100"
-                            )} />
-                        )}
-                    </div>
-                ))}
+                        </div>
+                    );
+                })}
             </div>
 
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            <form onSubmit={form.handleSubmit(onSubmit)}>
                 {/* Step 1: Basic Info */}
-                {currentStep === 1 && (
-                    <div className="bg-white border border-gray-100 p-8 md:p-10 rounded-3xl shadow-2xl shadow-gray-100/50 space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
-                        <div className="flex items-center gap-5 pb-6 border-b border-gray-50">
-                            <div className="w-14 h-14 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600 shadow-sm border border-blue-100/50">
-                                <Info size={24} />
-                            </div>
-                            <div className="space-y-1">
-                                <h2 className="text-xl font-bold text-gray-900 uppercase tracking-tight">Identity Registry</h2>
-                                <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Baseline property identification parameters</p>
-                            </div>
+                {step === 1 && (
+                    <div className="space-y-5">
+                        <div className="border-b pb-4 mb-6">
+                            <h2 className="font-semibold text-gray-900">Basic Information</h2>
+                            <p className="text-sm text-gray-500 mt-0.5">Tell students what your hostel is about.</p>
                         </div>
 
-                        <div className="space-y-8">
-                            <div className="space-y-3">
-                                <label className="text-[11px] font-bold text-gray-400 uppercase tracking-[0.2em] ml-1">Commercial Designation</label>
-                                <div className="relative">
-                                    <Building2 className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-300" size={18} />
-                                    <input
-                                        {...form.register("name")}
-                                        className="w-full pl-14 pr-6 h-14 bg-gray-50 border border-gray-100 rounded-2xl outline-none focus:bg-white focus:border-blue-500 transition-all text-sm font-bold text-gray-900 placeholder:text-gray-300"
-                                        placeholder="e.g. SKYLINE RESIDENCES"
-                                    />
-                                </div>
-                                {form.formState.errors.name && (
-                                    <p className="text-[10px] text-red-600 font-bold uppercase tracking-widest ml-1">{form.formState.errors.name.message}</p>
-                                )}
-                            </div>
+                        <Field label="Hostel Name" required error={errors.name?.message}>
+                            <input
+                                {...form.register("name")}
+                                className={inputCls(!!errors.name)}
+                                placeholder="e.g. Skyline Residences"
+                            />
+                        </Field>
 
-                            <div className="space-y-3">
-                                <label className="text-[11px] font-bold text-gray-400 uppercase tracking-[0.2em] ml-1">Operational Context</label>
-                                <textarea
-                                    {...form.register("description")}
-                                    rows={5}
-                                    className="w-full px-6 py-4 bg-gray-50 border border-gray-100 rounded-2xl outline-none focus:bg-white focus:border-blue-500 transition-all text-sm font-bold text-gray-900 placeholder:text-gray-300 resize-none"
-                                    placeholder="Provide detailed technical and aesthetic summary..."
-                                />
-                                {form.formState.errors.description && (
-                                    <p className="text-[10px] text-red-600 font-bold uppercase tracking-widest ml-1">{form.formState.errors.description.message}</p>
-                                )}
-                            </div>
+                        <Field label="Description" required error={errors.description?.message}>
+                            <textarea
+                                {...form.register("description")}
+                                rows={4}
+                                className={inputCls(!!errors.description) + " resize-none"}
+                                placeholder="Describe what makes your hostel great — facilities, atmosphere, environment..."
+                            />
+                        </Field>
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                <div className="space-y-3">
-                                    <label className="text-[11px] font-bold text-gray-400 uppercase tracking-[0.2em] ml-1">Occupancy Tier</label>
-                                    <div className="relative">
-                                        <Users className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-300" size={18} />
-                                        <select
-                                            {...form.register("genderCategory")}
-                                            className="w-full pl-14 pr-10 h-14 bg-gray-50 border border-gray-100 rounded-2xl outline-none focus:bg-white focus:border-blue-500 transition-all text-[11px] font-bold uppercase tracking-widest text-gray-900 appearance-none cursor-pointer"
-                                        >
-                                            <option value="MIXED">Neutral (Mixed Population)</option>
-                                            <option value="MALE">Male Core Operations</option>
-                                            <option value="FEMALE">Female Core Operations</option>
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
+                        <Field label="Who can stay here?" required>
+                            <select {...form.register("genderCategory")} className={inputCls()}>
+                                <option value="MIXED">Mixed — both male and female</option>
+                                <option value="MALE">Male students only</option>
+                                <option value="FEMALE">Female students only</option>
+                            </select>
+                        </Field>
 
-                            <div className="space-y-3">
-                                <label className="text-[11px] font-bold text-gray-400 uppercase tracking-[0.2em] ml-1">Protocols & Stipulations</label>
-                                <textarea
-                                    {...form.register("policiesText")}
-                                    rows={4}
-                                    className="w-full px-6 py-4 bg-gray-50 border border-gray-100 rounded-2xl outline-none focus:bg-white focus:border-blue-500 transition-all text-sm font-bold text-gray-900 placeholder:text-gray-300 resize-none"
-                                    placeholder="House rules and contractual security stipulations..."
-                                />
-                            </div>
-                        </div>
+                        <Field label="House Rules & Policies">
+                            <textarea
+                                {...form.register("policiesText")}
+                                rows={3}
+                                className={inputCls() + " resize-none"}
+                                placeholder="e.g. No loud music after 10pm, no pets, guests must sign in..."
+                            />
+                        </Field>
                     </div>
                 )}
 
                 {/* Step 2: Location */}
-                {currentStep === 2 && (
-                    <div className="bg-white border border-gray-100 p-8 md:p-10 rounded-3xl shadow-2xl shadow-gray-100/50 space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
-                        <div className="flex items-center gap-5 pb-6 border-b border-gray-50">
-                            <div className="w-14 h-14 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600 shadow-sm border border-blue-100/50">
-                                <MapPin size={24} />
-                            </div>
-                            <div className="space-y-1">
-                                <h2 className="text-xl font-bold text-gray-900 uppercase tracking-tight">Zone Deployment</h2>
-                                <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Physical coordinates and accessibility parameters</p>
-                            </div>
+                {step === 2 && (
+                    <div className="space-y-5">
+                        <div className="border-b pb-4 mb-6">
+                            <h2 className="font-semibold text-gray-900">Location & Contact</h2>
+                            <p className="text-sm text-gray-500 mt-0.5">Help students find and contact you.</p>
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                            <div className="space-y-3">
-                                <label className="text-[11px] font-bold text-gray-400 uppercase tracking-[0.2em] ml-1">Municipal Sector</label>
+                        <div className="grid grid-cols-2 gap-4">
+                            <Field label="City" required error={errors.city?.message}>
                                 <input
                                     {...form.register("city")}
-                                    className="w-full px-6 h-14 bg-gray-50 border border-gray-100 rounded-2xl outline-none focus:bg-white focus:border-blue-500 transition-all text-sm font-bold text-gray-900 placeholder:text-gray-300"
-                                    placeholder="e.g. ACCRA"
+                                    className={inputCls(!!errors.city)}
+                                    placeholder="e.g. Kumasi"
                                 />
-                                {form.formState.errors.city && (
-                                    <p className="text-[10px] text-red-600 font-bold uppercase tracking-widest ml-1">{form.formState.errors.city.message}</p>
-                                )}
-                            </div>
-
-                            <div className="space-y-3">
-                                <label className="text-[11px] font-bold text-gray-400 uppercase tracking-[0.2em] ml-1">Street Address</label>
+                            </Field>
+                            <Field label="Street Address" required error={errors.addressLine?.message}>
                                 <input
                                     {...form.register("addressLine")}
-                                    className="w-full px-6 h-14 bg-gray-50 border border-gray-100 rounded-2xl outline-none focus:bg-white focus:border-blue-500 transition-all text-sm font-bold text-gray-900 placeholder:text-gray-300"
-                                    placeholder="PLT 22B, RING ROAD"
+                                    className={inputCls(!!errors.addressLine)}
+                                    placeholder="e.g. Plt 22B, Ring Road"
                                 />
-                                {form.formState.errors.addressLine && (
-                                    <p className="text-[10px] text-red-600 font-bold uppercase tracking-widest ml-1">{form.formState.errors.addressLine.message}</p>
-                                )}
-                            </div>
-
-                            <div className="space-y-3">
-                                <label className="text-[11px] font-bold text-gray-400 uppercase tracking-[0.2em] ml-1 flex items-center gap-2">
-                                    <MessageSquare size={14} className="text-emerald-500" /> Comm-Link (WhatsApp)
-                                </label>
-                                <input
-                                    {...form.register("whatsappNumber")}
-                                    className="w-full px-6 h-14 bg-gray-50 border border-gray-100 rounded-2xl outline-none focus:bg-white focus:border-blue-500 transition-all text-sm font-bold text-gray-900 placeholder:text-gray-300"
-                                    placeholder="e.g. 0541234567"
-                                />
-                                {form.formState.errors.whatsappNumber && (
-                                    <p className="text-[10px] text-red-600 font-bold uppercase tracking-widest ml-1">{form.formState.errors.whatsappNumber.message}</p>
-                                )}
-                            </div>
-
-                            <div className="space-y-3">
-                                <label className="text-[11px] font-bold text-gray-400 uppercase tracking-[0.2em] ml-1 flex items-center gap-2">
-                                    <Clock size={14} className="text-blue-500" /> Campus Proximity
-                                </label>
-                                <input
-                                    {...form.register("distanceToCampus")}
-                                    className="w-full px-6 h-14 bg-gray-50 border border-gray-100 rounded-2xl outline-none focus:bg-white focus:border-blue-500 transition-all text-sm font-bold text-gray-900 placeholder:text-gray-300"
-                                    placeholder="e.g. 5 MINS TRANSIT"
-                                />
-                            </div>
+                            </Field>
                         </div>
+
+                        <Field label="Nearest University / Campus" required error={errors.university?.message}>
+                            <select {...form.register("university")} className={inputCls(!!errors.university)}>
+                                <option value="">Select a university</option>
+                                {REGIONAL_UNIVERSITIES.map(group => (
+                                    <optgroup key={group.region} label={group.region}>
+                                        {group.unis.map(u => (
+                                            <option key={u} value={u}>{u}</option>
+                                        ))}
+                                    </optgroup>
+                                ))}
+                            </select>
+                        </Field>
+
+                        <Field label="Distance to Campus">
+                            <input
+                                {...form.register("distanceToCampus")}
+                                className={inputCls()}
+                                placeholder="e.g. 5 minutes walk"
+                            />
+                        </Field>
+
+                        <Field label="WhatsApp Number" required error={errors.whatsappNumber?.message}>
+                            <input
+                                {...form.register("whatsappNumber")}
+                                className={inputCls(!!errors.whatsappNumber)}
+                                placeholder="e.g. 0541234567"
+                            />
+                            <p className="text-xs text-gray-400 mt-1">
+                                This enables the "Book via WhatsApp" button — students can message you directly from your hostel page.
+                            </p>
+                        </Field>
                     </div>
                 )}
 
-                {/* Step 3: Features */}
-                {currentStep === 3 && (
-                    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
-                        {/* Utilities */}
-                        <div className="bg-white border border-gray-100 p-8 md:p-10 rounded-3xl shadow-2xl shadow-gray-100/50 space-y-10">
-                            <div className="flex items-center gap-5 pb-6 border-b border-gray-50">
-                                <div className="w-14 h-14 bg-amber-50 rounded-2xl flex items-center justify-center text-amber-600 shadow-sm border border-amber-100/50">
-                                    <Zap size={24} />
-                                </div>
-                                <div className="space-y-1">
-                                    <h2 className="text-xl font-bold text-gray-900 uppercase tracking-tight">Core Provisions</h2>
-                                    <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Included baseline utility infrastructure</p>
-                                </div>
-                            </div>
+                {/* Step 3: Amenities */}
+                {step === 3 && (
+                    <div className="space-y-6">
+                        <div className="border-b pb-4 mb-2">
+                            <h2 className="font-semibold text-gray-900">Amenities & Utilities</h2>
+                            <p className="text-sm text-gray-500 mt-0.5">Select everything that's available at your hostel.</p>
+                        </div>
 
-                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div>
+                            <p className="text-sm font-medium text-gray-700 mb-3">Utilities included in rent</p>
+                            <div className="flex flex-wrap gap-2">
                                 {[
-                                    { id: "water", label: "Aqua Unit", icon: Droplets, color: 'text-blue-600', activeBg: 'bg-blue-600' },
-                                    { id: "light", label: "Energy Pack", icon: Zap, color: 'text-amber-600', activeBg: 'bg-amber-600' },
-                                    { id: "gas", label: "Fuel System", icon: Flame, color: 'text-orange-600', activeBg: 'bg-orange-600' }
-                                ].map((util) => {
-                                    const isSelected = form.watch("utilitiesIncluded")?.includes(util.id);
+                                    { id: "water", label: "Water", icon: Droplets },
+                                    { id: "light", label: "Electricity", icon: Zap },
+                                    { id: "gas", label: "Gas", icon: Flame },
+                                ].map(util => {
+                                    const isOn = form.watch("utilitiesIncluded")?.includes(util.id);
                                     return (
                                         <button
                                             key={util.id}
                                             type="button"
                                             onClick={() => {
-                                                const current = form.getValues("utilitiesIncluded") || [];
-                                                const updated = isSelected
-                                                    ? current.filter(u => u !== util.id)
-                                                    : [...current, util.id];
-                                                form.setValue("utilitiesIncluded", updated);
+                                                const curr = form.getValues("utilitiesIncluded") || [];
+                                                form.setValue("utilitiesIncluded", isOn
+                                                    ? curr.filter(u => u !== util.id)
+                                                    : [...curr, util.id]);
                                             }}
                                             className={cn(
-                                                "flex items-center h-14 gap-4 px-6 rounded-2xl border transition-all active:scale-95 group",
-                                                isSelected
-                                                    ? cn(util.activeBg, "text-white border-transparent shadow-xl")
-                                                    : "bg-gray-50 border-gray-100 text-gray-400 hover:border-gray-200"
+                                                "flex items-center gap-2 px-4 py-2 rounded-lg border text-sm transition-colors",
+                                                isOn ? "bg-blue-600 text-white border-blue-600" : "bg-white border-gray-200 text-gray-600 hover:border-gray-300"
                                             )}
                                         >
-                                            <util.icon size={18} className={cn("transition-transform group-hover:scale-110", isSelected ? "text-white" : util.color)} />
-                                            <span className="text-[10px] font-bold uppercase tracking-widest">{util.label}</span>
+                                            <util.icon size={14} />
+                                            {util.label}
                                         </button>
                                     );
                                 })}
                             </div>
                         </div>
 
-                        {/* Amenities */}
-                        <div className="bg-white border border-gray-100 p-8 md:p-10 rounded-3xl shadow-2xl shadow-gray-100/50 space-y-10">
-                            <div className="flex items-center gap-5 pb-6 border-b border-gray-50">
-                                <div className="w-14 h-14 bg-gray-900 rounded-2xl flex items-center justify-center text-white shadow-xl shadow-gray-200">
-                                    <Check size={24} />
-                                </div>
-                                <div className="space-y-1">
-                                    <h2 className="text-xl font-bold text-gray-900 uppercase tracking-tight">Asset Modules</h2>
-                                    <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Hardware and infrastructure add-ons</p>
-                                </div>
-                            </div>
-
-                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                                {AMENITIES.map((item) => {
-                                    const isSelected = selectedAmenities.includes(item.id);
+                        <div>
+                            <p className="text-sm font-medium text-gray-700 mb-3">Facilities</p>
+                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                                {AMENITIES.map(item => {
+                                    const isOn = selectedAmenities.includes(item.id);
                                     return (
                                         <button
                                             key={item.id}
                                             type="button"
                                             onClick={() => toggleAmenity(item.id)}
                                             className={cn(
-                                                "flex flex-col items-center justify-center gap-3 h-32 rounded-2xl border transition-all active:scale-95 cursor-pointer group",
-                                                isSelected
-                                                    ? "bg-gray-900 text-white border-gray-900 shadow-xl"
-                                                    : "bg-gray-50/50 border-gray-100 text-gray-300 hover:border-blue-500/20 hover:text-gray-900"
+                                                "flex flex-col items-center gap-2 py-4 rounded-lg border text-sm transition-colors",
+                                                isOn ? "bg-blue-50 border-blue-300 text-blue-700" : "bg-white border-gray-200 text-gray-500 hover:border-gray-300"
                                             )}
                                         >
-                                            <item.icon size={28} className={cn("transition-all group-hover:scale-110", isSelected ? "text-blue-400" : "text-gray-300")} />
-                                            <span className="text-[9px] font-bold uppercase tracking-widest text-center px-2">{item.label}</span>
+                                            <item.icon size={18} />
+                                            <span className="text-xs">{item.label}</span>
                                         </button>
                                     );
                                 })}
@@ -539,86 +381,56 @@ export default function NewHostelPage() {
                 )}
 
                 {/* Step 4: Photos */}
-                {currentStep === 4 && (
-                    <div className="bg-white border border-gray-100 p-8 md:p-10 rounded-3xl shadow-2xl shadow-gray-100/50 space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
-                        <div className="flex items-center gap-5 pb-6 border-b border-gray-50">
-                            <div className="w-14 h-14 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600 shadow-sm border border-blue-100/50">
-                                <ImageIcon size={24} />
-                            </div>
-                            <div className="space-y-1">
-                                <h2 className="text-xl font-bold text-gray-900 uppercase tracking-tight">Visual Verification</h2>
-                                <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Capture operational reality and aesthetic value</p>
-                            </div>
+                {step === 4 && (
+                    <div className="space-y-5">
+                        <div className="border-b pb-4 mb-6">
+                            <h2 className="font-semibold text-gray-900">Photos</h2>
+                            <p className="text-sm text-gray-500 mt-0.5">Good photos significantly increase bookings. Upload at least one.</p>
                         </div>
 
-                        <div className="bg-gray-50 rounded-2xl p-6 border border-gray-100 shadow-inner">
-                            <ImageUpload
-                                value={form.watch("images")}
-                                onChange={(urls) => form.setValue("images", urls)}
-                            />
-                        </div>
-                        {form.formState.errors.images && (
-                            <p className="text-[10px] text-red-600 font-bold uppercase tracking-widest ml-1">{form.formState.errors.images.message}</p>
+                        <ImageUpload
+                            value={form.watch("images")}
+                            onChange={(urls) => form.setValue("images", urls)}
+                        />
+                        {errors.images && (
+                            <p className="text-xs text-red-500">{errors.images.message as string}</p>
                         )}
-
-                        <div className="flex items-start gap-4 p-5 bg-blue-50 rounded-2xl border border-blue-100">
-                            <ShieldAlert size={20} className="text-blue-600 shrink-0 mt-1" />
-                            <p className="text-[9px] font-bold text-blue-700 uppercase tracking-widest leading-relaxed">
-                                Professional grade imagery increases asset verification speed by approximately 40%. Ensure high luminosity and clear architectural focus.
-                            </p>
-                        </div>
                     </div>
                 )}
 
                 {/* Navigation */}
-                <div className={cn("flex items-center justify-between gap-6 pt-6", isPublishing && "pointer-events-none opacity-30")}>
-                    {currentStep > 1 ? (
+                <div className="flex items-center justify-between pt-8 mt-8 border-t">
+                    {step > 1 ? (
                         <button
                             type="button"
-                            onClick={() => setCurrentStep(s => s - 1)}
-                            className="h-14 px-8 bg-white border border-gray-100 text-gray-400 rounded-2xl font-bold text-[10px] uppercase tracking-widest hover:text-gray-900 hover:border-gray-200 transition-all active:scale-95 flex items-center gap-3"
+                            onClick={() => setStep(s => s - 1)}
+                            className="px-5 py-2.5 text-sm font-medium text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
                         >
-                            <ArrowLeft size={16} /> Reverse Step
+                            Back
                         </button>
-                    ) : (
-                        <div />
-                    )}
+                    ) : <div />}
 
-                    {currentStep < STEPS.length ? (
+                    {step < STEPS.length ? (
                         <button
                             type="button"
-                            onClick={async () => {
-                                let fieldsToValidate: any[] = [];
-                                if (currentStep === 1) fieldsToValidate = ["name", "description"];
-                                if (currentStep === 2) fieldsToValidate = ["city", "addressLine", "whatsappNumber"];
-                                
-                                const isValid = await form.trigger(fieldsToValidate);
-                                if (isValid) {
-                                    setCurrentStep(s => s + 1);
-                                } else {
-                                    toast.error("PROTOCOL BREACH", { description: "Required sectors require attention." });
-                                }
-                            }}
-                            className="h-14 px-10 bg-gray-900 text-white rounded-2xl font-bold text-[10px] uppercase tracking-widest shadow-xl shadow-gray-200 hover:bg-black transition-all active:scale-95 flex items-center gap-3"
+                            onClick={advance}
+                            className="px-6 py-2.5 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
                         >
-                            Advance Phase <ArrowRight size={16} />
+                            Continue
                         </button>
                     ) : (
                         <button
                             type="button"
-                            disabled={publishStage !== 'idle'}
+                            disabled={isSubmitting}
                             onClick={async () => {
-                                const isValid = await form.trigger();
-                                if (isValid) {
-                                    form.handleSubmit(onSubmit)();
-                                } else {
-                                    toast.error("VALIDATION ERROR");
-                                }
+                                const ok = await form.trigger();
+                                if (ok) form.handleSubmit(onSubmit)();
+                                else toast.error("Please fill in all required fields");
                             }}
-                            className="h-14 px-12 bg-blue-600 text-white rounded-2xl font-bold text-[11px] uppercase tracking-[0.2em] shadow-2xl shadow-blue-500/20 hover:bg-blue-700 transition-all active:scale-95 flex items-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="flex items-center gap-2 px-6 py-2.5 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
                         >
-                            <Building2 size={18} />
-                            Execute Deployment
+                            {isSubmitting && <Loader2 size={15} className="animate-spin" />}
+                            {isSubmitting ? "Saving..." : "List Hostel"}
                         </button>
                     )}
                 </div>

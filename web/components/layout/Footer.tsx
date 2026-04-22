@@ -1,16 +1,16 @@
 "use client";
 import Link from "next/link";
-import { 
-    Facebook, 
-    Twitter, 
-    Instagram, 
-    Mail, 
-    Phone, 
-    MapPin, 
-    ShieldCheck, 
-    ArrowRight, 
-    Github, 
-    MessageCircle, 
+import {
+    Facebook,
+    Twitter,
+    Instagram,
+    Mail,
+    Phone,
+    MapPin,
+    ShieldCheck,
+    ArrowRight,
+    Github,
+    MessageCircle,
     Send,
     Linkedin,
     Youtube,
@@ -75,7 +75,7 @@ export default function Footer() {
                     <div className="bg-white/[0.03] backdrop-blur-3xl border border-white/10 rounded-[2.5rem] p-8 md:p-16 flex flex-col lg:flex-row items-center justify-between gap-12 shadow-2xl relative overflow-hidden">
                         {/* Decorative Gradient Line */}
                         <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-blue-500/50 to-transparent" />
-                        
+
                         <div className="max-w-xl text-center lg:text-left">
                             <h2 className="text-3xl md:text-5xl font-black text-white tracking-tighter mb-6 italic uppercase leading-none">
                                 Join The <span className="text-blue-500 underline decoration-blue-500/20 underline-offset-8">Circle</span>
@@ -86,8 +86,8 @@ export default function Footer() {
                         </div>
 
                         <div className="w-full lg:max-w-md">
-                            <form 
-                                className="relative group/form" 
+                            <form
+                                className="relative group/form"
                                 onSubmit={async (e) => {
                                     e.preventDefault();
                                     const form = e.currentTarget;
@@ -113,11 +113,11 @@ export default function Footer() {
                                     }
                                 }}
                             >
-                                <input 
-                                    type="email" 
+                                <input
+                                    type="email"
                                     name="email"
                                     required
-                                    placeholder="Enter your email address" 
+                                    placeholder="Enter your email address"
                                     className="w-full h-16 md:h-20 bg-white/[0.05] border border-white/10 rounded-2xl px-8 pr-16 text-white placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500/50 transition-all font-medium text-lg"
                                 />
                                 <button type="submit" className="absolute right-3 top-3 bottom-3 aspect-square bg-blue-600 text-white rounded-xl flex items-center justify-center hover:bg-blue-500 active:scale-95 transition-all shadow-lg shadow-blue-600/20 group/btn disabled:opacity-50">
@@ -151,9 +151,9 @@ export default function Footer() {
 
                         <div className="flex flex-wrap items-center gap-4">
                             {socialLinks.map((social, idx) => (
-                                <a 
+                                <a
                                     key={idx}
-                                    href={social.href} 
+                                    href={social.href}
                                     aria-label={social.label}
                                     className={cn(
                                         "w-12 h-12 flex items-center justify-center bg-white/[0.03] rounded-2xl border border-white/10 text-zinc-500 hover:text-white transition-all duration-500 backdrop-blur-sm group shadow-xl",
@@ -261,7 +261,7 @@ export default function Footer() {
                     <div className="flex flex-col sm:flex-row items-center gap-8 text-center sm:text-left">
                         <div className="flex items-center gap-3 px-6 py-3 bg-white/[0.03] rounded-full border border-white/10 backdrop-blur-md">
                             <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_15px_rgba(16,185,129,0.6)]" />
-                            <span className="text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em]">Network Status: Operational</span>
+                            <span className="text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em]">Network Status: Active\</span>
                         </div>
                         <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-[0.2em] leading-loose">
                             © {currentYear} HostelGH. Precision Built by <span className="text-white">Minded Technologies</span> in <span className="text-blue-500 italic">Accra</span>.
@@ -277,7 +277,7 @@ export default function Footer() {
                             </div>
                         </div>
                         <div className="w-px h-10 bg-white/10 hidden sm:block" />
-                        <button 
+                        <button
                             onClick={scrollToTop}
                             className="w-14 h-14 bg-white/[0.03] border border-white/10 rounded-2xl flex items-center justify-center text-white hover:bg-blue-600 hover:border-blue-500 transition-all active:scale-95 group shadow-xl"
                         >

@@ -291,6 +291,9 @@ export default function EditHostelPage() {
                                 <div className="space-y-1">
                                     <label className="text-[10px] font-bold text-gray-400 uppercase ml-1">WhatsApp Number</label>
                                     <input {...form.register("whatsappNumber")} className="w-full px-5 py-4 bg-gray-50 rounded-2xl border focus:border-black outline-none" placeholder="e.g. 0244000000" />
+                                    <p className="text-[9px] text-gray-400 font-bold uppercase tracking-widest ml-1 leading-relaxed pt-1">
+                                        💬 Enables the &quot;Book via WhatsApp&quot; button — students tap it to send a pre-filled enquiry instantly.
+                                    </p>
                                 </div>
                                 <div className="space-y-1">
                                     <label className="text-[10px] font-bold text-gray-400 uppercase ml-1">Distance to Campus</label>
