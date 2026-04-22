@@ -7,7 +7,6 @@ import { AuthModalProvider } from "@/components/auth/AuthModalProvider";
 import Shell from "@/components/layout/Shell";
 import { Toaster } from "sonner";
 import JsonLd from "@/components/JsonLd";
-import BrowsingTip from "@/components/BrowsingTip";
 import SupportWidget from "@/components/support/SupportWidget";
 
 const outfit = Outfit({
@@ -86,7 +85,6 @@ export default function RootLayout({
                 {children}
               </Shell>
               <Toaster position="top-center" richColors />
-              <BrowsingTip />
               <SupportWidget />
             </AuthModalProvider>
           </QueryProvider>
