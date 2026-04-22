@@ -51,9 +51,15 @@ api.interceptors.response.use(
                 if (typeof window !== "undefined") {
                     localStorage.removeItem("accessToken");
                     sessionStorage.removeItem("accessToken");
+                    localStorage.removeItem("user");
+                    sessionStorage.removeItem("user");
 
-                    // Prevent redirect loops if already on auth page
-                    if (!window.location.pathname.startsWith("/auth")) {
+                    // Only force redirect to login if the user is currently on a protected route
+                    // Public areas like /, /hostels, /schools, etc. should allow guest browsing
+                    const protectedRoutes = ["/account", "/tenant", "/owner", "/admin"];
+                    const isProtectedRoute = protectedRoutes.some(route => window.location.pathname.startsWith(route));
+
+                    if (!window.location.pathname.startsWith("/auth") && isProtectedRoute) {
                         window.location.href = "/auth/login?session_expired=true";
                     }
                 }
