@@ -1,30 +1,19 @@
 "use client";
 import Link from "next/link";
 import {
-    Facebook,
-    Twitter,
-    Instagram,
     Mail,
     Phone,
     MapPin,
     ShieldCheck,
     ArrowRight,
-    Github,
     MessageCircle,
     Send,
-    Linkedin,
-    Youtube,
     ChevronUp
 } from "lucide-react";
 import LogoAnimation from "./LogoAnimation";
 import { cn } from "@/lib/utils";
 
-const socialLinks = [
-    { icon: Twitter, href: "#", color: "hover:bg-sky-500", label: "Twitter" },
-    { icon: Github, href: "#", color: "hover:bg-zinc-800", label: "GitHub" },
-    { icon: Instagram, href: "#", color: "hover:bg-gradient-to-tr from-yellow-400 via-pink-500 to-purple-600", label: "Instagram" },
-    { icon: Linkedin, href: "#", color: "hover:bg-blue-700", label: "LinkedIn" },
-];
+const WHATSAPP_CHANNEL = "https://whatsapp.com/channel/0029Vb7lvGb8kyyFC81FOs1B";
 
 const footerLinks = {
     discover: [
@@ -149,20 +138,20 @@ export default function Footer() {
                             </p>
                         </div>
 
-                        <div className="flex flex-wrap items-center gap-4">
-                            {socialLinks.map((social, idx) => (
-                                <a
-                                    key={idx}
-                                    href={social.href}
-                                    aria-label={social.label}
-                                    className={cn(
-                                        "w-12 h-12 flex items-center justify-center bg-white/[0.03] rounded-2xl border border-white/10 text-zinc-500 hover:text-white transition-all duration-500 backdrop-blur-sm group shadow-xl",
-                                        social.color
-                                    )}
-                                >
-                                    <social.icon size={20} className="transition-transform group-hover:scale-110 group-hover:rotate-12" />
-                                </a>
-                            ))}
+                        <div className="flex items-center gap-4">
+                            <a
+                                href={WHATSAPP_CHANNEL}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                aria-label="Join HostelGH on WhatsApp"
+                                className="flex items-center gap-3 px-5 py-3 bg-[#25D366]/10 hover:bg-[#25D366] border border-[#25D366]/30 hover:border-[#25D366] rounded-2xl text-[#25D366] hover:text-white transition-all duration-500 group shadow-xl"
+                            >
+                                <MessageCircle size={18} className="transition-transform group-hover:scale-110" />
+                                <div className="flex flex-col leading-none">
+                                    <span className="text-[9px] font-black uppercase tracking-[0.2em] opacity-70 group-hover:opacity-100">Join our</span>
+                                    <span className="text-[11px] font-black uppercase tracking-widest">WhatsApp Channel</span>
+                                </div>
+                            </a>
                         </div>
 
                         <div className="pt-8 border-t border-white/5 space-y-4">

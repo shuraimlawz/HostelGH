@@ -31,10 +31,10 @@ export default function FeaturedHostels() {
                     </div>
                     <div className="space-y-2">
                         <h3 className="text-4xl md:text-5xl font-bold tracking-tighter text-gray-900 uppercase leading-tight">
-                            Premier <span className="text-blue-600">Spaces</span>
+                            Trending <span className="text-blue-600">Spaces</span>
                         </h3>
                         <p className="text-gray-400 max-w-lg font-bold text-xs md:text-sm uppercase tracking-widest leading-relaxed">
-                            Ghana's highest-vetted student residences. Safety and comfort guaranteed by central node verification.
+                            Ghana's most-booked student hostels — ranked by student demand.
                         </p>
                     </div>
                 </div>

@@ -134,3 +134,105 @@ export const REGIONAL_UNIVERSITIES = [
 ];
 
 export const ALL_UNIVERSITIES = REGIONAL_UNIVERSITIES.flatMap(r => r.unis).sort();
+
+/** Map of URL slug → school metadata used by /schools/[slug] pages */
+export const SCHOOLS_MAP: Record<string, {
+    name: string;
+    shortName: string;
+    city: string;
+    region: string;
+    color: string; // Tailwind gradient classes
+    description: string;
+    areas?: string[];
+}> = {
+    "knust": {
+        name: "Kwame Nkrumah University of Science and Technology",
+        shortName: "KNUST",
+        city: "Kumasi",
+        region: "Ashanti",
+        color: "from-yellow-600 to-orange-700",
+        description: "Ghana's leading science and technology university located in Kumasi, Ashanti region.",
+        areas: ["Ayeduase", "Kotei", "Maxima", "Bomso", "Kentinkrono"],
+    },
+    "ug": {
+        name: "University of Ghana (Legon)",
+        shortName: "UG Legon",
+        city: "Accra",
+        region: "Greater Accra",
+        color: "from-blue-700 to-indigo-800",
+        description: "Ghana's premier university, located at Legon, Accra. Home to thousands of undergraduate and postgraduate students.",
+        areas: ["Legon", "Madina", "Atomic Junction", "Adenta", "Haatso"],
+    },
+    "ucc": {
+        name: "University of Cape Coast",
+        shortName: "UCC",
+        city: "Cape Coast",
+        region: "Central",
+        color: "from-green-700 to-teal-800",
+        description: "One of Ghana's leading universities situated in the historic Cape Coast.",
+        areas: ["Pedu", "Kwaprow", "Abura", "Oguaa"],
+    },
+    "gctu": {
+        name: "Ghana Communication Technology University",
+        shortName: "GCTU",
+        city: "Accra",
+        region: "Greater Accra",
+        color: "from-purple-700 to-violet-800",
+        description: "A technology-focused university in Tesano, Accra. Formerly Ghana Telecom University College.",
+        areas: ["Tesano", "Achimota", "Abelemkpe", "Dzorwulu"],
+    },
+    "uhas": {
+        name: "University of Health and Allied Sciences",
+        shortName: "UHAS",
+        city: "Ho",
+        region: "Volta",
+        color: "from-pink-700 to-rose-800",
+        description: "Ghana's dedicated health sciences university, located in Ho, Volta Region.",
+        areas: ["Ho", "Sokode", "Kpando"],
+    },
+    "uds": {
+        name: "University for Development Studies",
+        shortName: "UDS",
+        city: "Tamale",
+        region: "Northern",
+        color: "from-cyan-700 to-sky-800",
+        description: "A multi-campus development-focused university with campuses across northern Ghana.",
+        areas: ["Tamale", "Nyankpala", "Wa", "Navrongo"],
+    },
+    "uew": {
+        name: "University of Education, Winneba",
+        shortName: "UEW",
+        city: "Winneba",
+        region: "Central",
+        color: "from-red-700 to-orange-800",
+        description: "Ghana's university dedicated to teacher education, with campuses in Winneba and Kumasi.",
+        areas: ["Winneba", "Kumasi Campus"],
+    },
+    "umat": {
+        name: "University of Mines and Technology",
+        shortName: "UMaT",
+        city: "Tarkwa",
+        region: "Western",
+        color: "from-stone-600 to-zinc-800",
+        description: "Specialist university for mining and technology in Tarkwa, Western Region.",
+        areas: ["Tarkwa", "Bogoso"],
+    },
+    "upsa": {
+        name: "UPSA",
+        shortName: "UPSA",
+        city: "Accra",
+        region: "Greater Accra",
+        color: "from-teal-700 to-cyan-800",
+        description: "University of Professional Studies, Accra — a leading business and professional education institution.",
+        areas: ["Legon", "Adenta", "Madina"],
+    },
+    "gimpa": {
+        name: "GIMPA",
+        shortName: "GIMPA",
+        city: "Accra",
+        region: "Greater Accra",
+        color: "from-slate-700 to-gray-800",
+        description: "Ghana Institute of Management and Public Administration — a leading management school in Greenhill, Accra.",
+        areas: ["Greenhill", "Achimota", "East Legon"],
+    },
+};

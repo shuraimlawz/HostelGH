@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { Search, MapPin, Sparkles, Navigation, Loader2 } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import { Search, MapPin, Sparkles, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
@@ -22,8 +22,10 @@ export default function HeroSearch() {
     const router = useRouter();
     const [city, setCity] = useState("");
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
+    const [scrolled, setScrolled] = useState(false);
+    const heroRef = useRef<HTMLDivElement>(null);
 
-    const { data: trendingHostels, isLoading: isLoadingTrending } = useQuery({
+    const { data: trendingHostels } = useQuery({
         queryKey: ["featured-hostels"],
         queryFn: async () => {
             const { data } = await api.get("/hostels/public", { params: { sort: "relevance" } });
@@ -32,9 +34,8 @@ export default function HeroSearch() {
     });
 
     const activeImages = trendingHostels && trendingHostels.length > 0
-        ? trendingHostels.map((hostel: any) => hostel.images?.[0]).filter(Boolean)
+        ? trendingHostels.map((h: any) => h.images?.[0]).filter(Boolean)
         : FALLBACK_HERO_IMAGES;
-
     const displayImages = activeImages.length > 0 ? activeImages : FALLBACK_HERO_IMAGES;
 
     useEffect(() => {
@@ -43,6 +44,15 @@ export default function HeroSearch() {
         }, 6000);
         return () => clearInterval(interval);
     }, [displayImages.length]);
+
+    // Scroll-collapse listener
+    useEffect(() => {
+        const handleScroll = () => {
+            setScrolled(window.scrollY > 90);
+        };
+        window.addEventListener("scroll", handleScroll, { passive: true });
+        return () => window.removeEventListener("scroll", handleScroll);
+    }, []);
 
     const handleSearch = (overrideCity?: string) => {
         const searchCity = overrideCity !== undefined ? overrideCity : city;
@@ -58,8 +68,16 @@ export default function HeroSearch() {
     });
 
     return (
-        <div className="relative w-full h-[65vh] md:h-[75vh] flex items-center justify-center overflow-hidden rounded-[2.5rem] mx-auto my-6 max-w-[98%] shadow-[0_32px_64px_-16px_rgba(0,0,0,0.2)] border border-white/10">
-            {/* Background Image Carousel with Ken Burns Effect */}
+        <div
+            ref={heroRef}
+            className={cn(
+                "relative w-full flex items-center justify-center overflow-hidden rounded-[2rem] mx-auto my-6 max-w-[98%] shadow-[0_32px_64px_-16px_rgba(0,0,0,0.2)] border border-white/10 transition-all duration-700 ease-in-out",
+                scrolled
+                    ? "h-[42vh] md:h-[38vh]"
+                    : "h-[65vh] md:h-[75vh]"
+            )}
+        >
+            {/* Background Image Carousel */}
             {displayImages.map((img: string, index: number) => (
                 <div
                     key={img}
@@ -70,102 +88,109 @@ export default function HeroSearch() {
                 >
                     <img
                         src={img}
-                        alt={`Hostel Hero ${index + 1}`}
+                        alt={`Hostel ${index + 1}`}
                         className={cn(
                             "w-full h-full object-cover transition-transform duration-[10000ms] ease-linear scale-110",
                             index === currentImageIndex && "scale-100"
                         )}
                     />
-                    {/* Multi-layered Overlay for depth */}
-                    <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/20 to-black/90 px-6" />
+                    <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/20 to-black/90" />
                 </div>
             ))}
 
-            {/* Content Container */}
-            <div className="relative z-20 w-full max-w-5xl px-6 flex flex-col items-center text-center space-y-8">
-                {/* Floating Badge - Minimalist */}
-                <div className="animate-in fade-in slide-in-from-top-6 duration-1000">
+            {/* Content */}
+            <div className="relative z-20 w-full max-w-5xl px-6 flex flex-col items-center text-center space-y-6">
+                {/* Badge — hides when scrolled */}
+                <div className={cn(
+                    "transition-all duration-500",
+                    scrolled ? "opacity-0 -translate-y-4 h-0 overflow-hidden" : "opacity-100 translate-y-0"
+                )}>
                     <div className="inline-flex items-center px-4 py-2 rounded-xl bg-blue-600/20 backdrop-blur-xl border border-blue-500/30 text-white text-[10px] uppercase font-bold tracking-[0.2em] shadow-xl">
                         <Sparkles className="mr-3 h-4 w-4 text-blue-400 animate-pulse" />
                         PREMIUM HOSTEL ACCESS
                     </div>
                 </div>
 
-                {/* Main Heading */}
-                <div className="space-y-4">
-                    <h1 className="text-5xl md:text-8xl font-bold text-white tracking-tighter drop-shadow-2xl animate-in fade-in slide-in-from-bottom-8 duration-1000 fill-mode-both uppercase leading-tight">
+                {/* Heading — shrinks when scrolled */}
+                <div className={cn("space-y-3 transition-all duration-500", scrolled && "space-y-0")}>
+                    <h1 className={cn(
+                        "font-bold text-white tracking-tighter drop-shadow-2xl uppercase leading-tight transition-all duration-500",
+                        scrolled ? "text-3xl md:text-4xl" : "text-5xl md:text-8xl"
+                    )}>
                         Next Chapter <span className="text-blue-500">Starts</span> Here
                     </h1>
-                    {/* Subtitle */}
-                    <p className="text-base md:text-xl text-gray-300 max-w-2xl mx-auto drop-shadow-lg font-bold animate-in fade-in slide-in-from-bottom-10 duration-1000 delay-300 fill-mode-both leading-relaxed uppercase tracking-wide">
+                    {/* Subtitle — fades out when scrolled */}
+                    <p className={cn(
+                        "text-base text-gray-300 max-w-2xl mx-auto drop-shadow-lg font-bold uppercase tracking-wide transition-all duration-500",
+                        scrolled ? "opacity-0 max-h-0 overflow-hidden mt-0" : "opacity-100 max-h-20 md:text-xl"
+                    )}>
                         Vetted residences near Ghana's elite campuses. Safe, modern, and verified.
                     </p>
                 </div>
 
-                {/* Modern Direct Search Box */}
-                <div className="w-full max-w-3xl animate-in fade-in zoom-in-95 duration-1000 delay-500 fill-mode-both">
-                    <div className="bg-white/10 backdrop-blur-2xl p-3 rounded-3xl border border-white/10 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.5)] flex flex-col md:flex-row items-center gap-3 relative group">
-                        
-                        {/* Location Input Group */}
-                        <div className="relative z-10 flex-1 flex items-center px-6 h-16 rounded-2xl bg-white/5 border border-white/5 group-focus-within:bg-white group-focus-within:border-white transition-all w-full focus-within:shadow-xl">
-                            <MapPin className="text-blue-500 mr-4 shrink-0 transition-colors group-focus-within:text-blue-600" size={24} />
+                {/* Search Box — always visible */}
+                <div className="w-full max-w-3xl">
+                    <div className="bg-white/10 backdrop-blur-2xl p-2.5 rounded-2xl border border-white/10 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.5)] flex flex-col md:flex-row items-center gap-2">
+                        <div className="relative z-10 flex-1 flex items-center px-5 h-14 rounded-xl bg-white/5 border border-white/5 focus-within:bg-white focus-within:border-white transition-all w-full focus-within:shadow-xl group">
+                            <MapPin className="text-blue-500 mr-3 shrink-0 transition-colors group-focus-within:text-blue-600" size={20} />
                             <div className="flex-1 text-left">
-                                <label className="block text-[9px] font-bold text-gray-400 group-focus-within:text-gray-500 uppercase tracking-widest mb-0.5 transition-colors">Where do you want to live?</label>
+                                <label className="block text-[9px] font-bold text-gray-400 group-focus-within:text-gray-500 uppercase tracking-widest mb-0.5">Where do you want to live?</label>
                                 <input
                                     type="text"
-                                    placeholder="Enter school or area..."
-                                    className="w-full text-white group-focus-within:text-gray-900 placeholder:text-gray-500 font-bold bg-transparent border-none outline-none text-sm selection:bg-blue-500/30 uppercase tracking-widest"
+                                    placeholder="School, city, or area..."
+                                    className="w-full text-white group-focus-within:text-gray-900 placeholder:text-gray-500 font-bold bg-transparent border-none outline-none text-sm uppercase tracking-widest"
                                     value={city}
                                     onChange={(e) => setCity(e.target.value)}
                                     onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                                 />
                             </div>
                         </div>
-
-                        {/* Search Button */}
                         <button
                             onClick={() => handleSearch()}
-                            className="relative z-10 bg-blue-600 text-white h-16 px-10 rounded-2xl transition-all shadow-xl shadow-blue-600/20 hover:bg-blue-700 flex items-center justify-center gap-3 w-full md:w-auto font-bold text-[11px] uppercase tracking-widest group active:scale-95"
+                            className="bg-blue-600 text-white h-14 px-8 rounded-xl transition-all shadow-xl shadow-blue-600/20 hover:bg-blue-700 flex items-center justify-center gap-2 w-full md:w-auto font-bold text-[11px] uppercase tracking-widest active:scale-95"
                         >
-                            <Search size={20} className="group-hover:scale-110 transition-transform" />
-                            <span>Search Now</span>
+                            <Search size={18} />
+                            <span>Search</span>
                         </button>
                     </div>
 
-                    {/* Quick Links */}
-                    <div className="mt-8 flex flex-wrap justify-center gap-3 text-white/40 text-[10px] font-bold uppercase tracking-widest">
-                        <span className="mt-2.5 opacity-30">Trending:</span>
+                    {/* Trending quick-links — hides when scrolled */}
+                    <div className={cn(
+                        "mt-5 flex flex-wrap justify-center gap-2 text-white/40 text-[10px] font-bold uppercase tracking-widest transition-all duration-500",
+                        scrolled ? "opacity-0 h-0 overflow-hidden mt-0" : "opacity-100"
+                    )}>
+                        <span className="mt-2 opacity-30">Trending:</span>
                         {trendingLocations && trendingLocations.length > 0 ? (
-                            trendingLocations.map((loc) => (
+                            trendingLocations.slice(0, 6).map((loc: string) => (
                                 <button
                                     key={loc}
-                                    onClick={() => {
-                                        setCity(loc);
-                                        handleSearch(loc);
-                                    }}
-                                    className="px-5 py-2.5 rounded-xl border border-white/10 hover:border-blue-500/50 hover:bg-blue-600 hover:text-white transition-all backdrop-blur-md active:scale-90 shadow-sm"
+                                    onClick={() => { setCity(loc); handleSearch(loc); }}
+                                    className="px-4 py-2 rounded-xl border border-white/10 hover:border-blue-500/50 hover:bg-blue-600 hover:text-white transition-all backdrop-blur-md active:scale-90 shadow-sm"
                                 >
                                     {loc}
                                 </button>
                             ))
                         ) : (
-                            !isLoadingLocations && <span className="opacity-20 font-bold px-4 lowercase tracking-[0.2em] py-2.5">Loading areas...</span>
+                            !isLoadingLocations && <span className="opacity-20 py-2 px-4">Loading...</span>
                         )}
                     </div>
                 </div>
             </div>
 
-            {/* Pagination Indicators */}
-            <div className="absolute bottom-10 flex gap-2 z-30">
+            {/* Pagination dots — hide when scrolled */}
+            <div className={cn(
+                "absolute bottom-8 flex gap-2 z-30 transition-all duration-500",
+                scrolled ? "opacity-0 bottom-2" : "opacity-100"
+            )}>
                 {displayImages.map((_, index) => (
                     <button
                         key={index}
                         onClick={() => setCurrentImageIndex(index)}
                         className={cn(
                             "h-1.5 transition-all duration-700 rounded-full",
-                            index === currentImageIndex ? "w-10 bg-blue-600 shadow-lg shadow-blue-500/50" : "w-3 bg-white/20 hover:bg-white/40"
+                            index === currentImageIndex ? "w-8 bg-blue-600 shadow-lg shadow-blue-500/50" : "w-2.5 bg-white/20 hover:bg-white/40"
                         )}
-                        aria-label={`Show unit ${index + 1}`}
+                        aria-label={`Image ${index + 1}`}
                     />
                 ))}
             </div>
