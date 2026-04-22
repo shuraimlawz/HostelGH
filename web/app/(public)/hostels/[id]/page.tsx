@@ -6,6 +6,7 @@ import { api } from "@/lib/api";
 import RoomTypeCard from "@/components/hostels/RoomTypeCard";
 import { useState } from "react";
 import BookingModal from "@/components/bookings/BookingModal";
+import ContentGate from "@/components/auth/ContentGate";
 import { useAuth } from "@/lib/auth-context";
 import { useAuthModal } from "@/components/auth/AuthModalProvider";
 import {
@@ -348,41 +349,46 @@ export default function HostelDetailsPage() {
                                                 </div>
                                             </div>
                                             <div className="md:w-64 text-center md:text-right space-y-6 bg-gray-50/50 p-6 rounded-2xl border border-gray-100/50">
-                                                <div className="space-y-1">
-                                                    <div className="flex items-baseline justify-center md:justify-end gap-1">
-                                                        <span className="text-3xl font-bold text-gray-900 tracking-tight">₵{(r.pricePerTerm / 100).toLocaleString()}</span>
-                                                        <span className="text-[10px] text-gray-400 font-bold uppercase">/ Term</span>
+                                                <ContentGate
+                                                    message="Sign in to see pricing & book this room"
+                                                    className="rounded-xl"
+                                                >
+                                                    <div className="space-y-1">
+                                                        <div className="flex items-baseline justify-center md:justify-end gap-1">
+                                                            <span className="text-3xl font-bold text-gray-900 tracking-tight">₵{(r.pricePerTerm / 100).toLocaleString()}</span>
+                                                            <span className="text-[10px] text-gray-400 font-bold uppercase">/ Term</span>
+                                                        </div>
+                                                        <p className="text-[9px] font-bold text-gray-400 uppercase tracking-[0.2em]">Full Academic Year</p>
                                                     </div>
-                                                    <p className="text-[9px] font-bold text-gray-400 uppercase tracking-[0.2em]">Full Academic Year</p>
-                                                </div>
-                                                <div className="flex flex-col gap-3">
-                                                    <button
-                                                        onClick={() => onBook(r.id, r)}
-                                                        className="w-full h-14 bg-gray-900 text-white rounded-xl font-bold uppercase tracking-[0.2em] text-[10px] shadow-xl hover:bg-black active:scale-95 transition-all"
-                                                    >
-                                                        Book Now
-                                                    </button>
-
-                                                    {hostel.whatsappNumber && (
-                                                        <a
-                                                            href={buildWhatsAppUrl(
-                                                                hostel.whatsappNumber,
-                                                                `Hello! I'm interested in the ${r.name} at ${hostel.name} on HostelGH. Please provide more details about availability and pricing.`
-                                                            )}
-                                                            target="_blank"
-                                                            rel="noopener noreferrer"
-                                                            className="w-full h-12 flex items-center justify-center gap-2 rounded-xl font-bold uppercase tracking-[0.15em] text-[9px] transition-all active:scale-95 group border-2"
-                                                            style={{
-                                                                borderColor: "#25D366",
-                                                                color: "#128C7E",
-                                                                background: "rgba(37,211,102,0.06)",
-                                                            }}
+                                                    <div className="flex flex-col gap-3">
+                                                        <button
+                                                            onClick={() => onBook(r.id, r)}
+                                                            className="w-full h-14 bg-gray-900 text-white rounded-xl font-bold uppercase tracking-[0.2em] text-[10px] shadow-xl hover:bg-black active:scale-95 transition-all"
                                                         >
-                                                            <WhatsAppIcon size={16} className="group-hover:scale-110 transition-transform duration-300" style={{ color: "#25D366" }} />
-                                                            <span>Enquire on WhatsApp</span>
-                                                        </a>
-                                                    )}
-                                                </div>
+                                                            Book Now
+                                                        </button>
+
+                                                        {hostel.whatsappNumber && (
+                                                            <a
+                                                                href={buildWhatsAppUrl(
+                                                                    hostel.whatsappNumber,
+                                                                    `Hello! I'm interested in the ${r.name} at ${hostel.name} on HostelGH. Please provide more details about availability and pricing.`
+                                                                )}
+                                                                target="_blank"
+                                                                rel="noopener noreferrer"
+                                                                className="w-full h-12 flex items-center justify-center gap-2 rounded-xl font-bold uppercase tracking-[0.15em] text-[9px] transition-all active:scale-95 group border-2"
+                                                                style={{
+                                                                    borderColor: "#25D366",
+                                                                    color: "#128C7E",
+                                                                    background: "rgba(37,211,102,0.06)",
+                                                                }}
+                                                            >
+                                                                <WhatsAppIcon size={16} className="group-hover:scale-110 transition-transform duration-300" style={{ color: "#25D366" }} />
+                                                                <span>Enquire on WhatsApp</span>
+                                                            </a>
+                                                        )}
+                                                    </div>
+                                                </ContentGate>
                                             </div>
                                         </div>
                                     ))}
@@ -465,31 +471,33 @@ export default function HostelDetailsPage() {
                                         </div>
                                     </div>
 
-                                    {hostel.whatsappNumber && (
-                                        <a
-                                            href={buildWhatsAppUrl(
-                                                hostel.whatsappNumber,
-                                                `Hello! I'm interested in booking at ${hostel.name} on HostelGH. Please provide more details about availability and pricing.`
-                                            )}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="w-full h-16 flex items-center justify-center gap-3 rounded-2xl font-bold uppercase tracking-[0.15em] text-[10px] shadow-xl transition-all active:scale-95 group"
-                                            style={{
-                                                background: "linear-gradient(135deg, #25D366 0%, #128C7E 100%)",
-                                                boxShadow: "0 8px 24px rgba(37, 211, 102, 0.25)",
-                                                color: "#fff",
-                                            }}
-                                        >
-                                            <WhatsAppIcon size={22} className="group-hover:scale-110 transition-transform duration-300" />
-                                            <span>Book via WhatsApp</span>
-                                        </a>
-                                    )}
+                                    <ContentGate message="Sign in to contact the hostel manager" className="rounded-2xl">
+                                        {hostel.whatsappNumber && (
+                                            <a
+                                                href={buildWhatsAppUrl(
+                                                    hostel.whatsappNumber,
+                                                    `Hello! I'm interested in booking at ${hostel.name} on HostelGH. Please provide more details about availability and pricing.`
+                                                )}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="w-full h-16 flex items-center justify-center gap-3 rounded-2xl font-bold uppercase tracking-[0.15em] text-[10px] shadow-xl transition-all active:scale-95 group"
+                                                style={{
+                                                    background: "linear-gradient(135deg, #25D366 0%, #128C7E 100%)",
+                                                    boxShadow: "0 8px 24px rgba(37, 211, 102, 0.25)",
+                                                    color: "#fff",
+                                                }}
+                                            >
+                                                <WhatsAppIcon size={22} className="group-hover:scale-110 transition-transform duration-300" />
+                                                <span>Book via WhatsApp</span>
+                                            </a>
+                                        )}
 
-                                    {hostel.whatsappNumber && (
-                                        <p className="text-[9px] text-gray-400 font-bold uppercase tracking-widest text-center leading-relaxed">
-                                            Chat directly with the manager for instant confirmation
-                                        </p>
-                                    )}
+                                        {hostel.whatsappNumber && (
+                                            <p className="text-[9px] text-gray-400 font-bold uppercase tracking-widest text-center leading-relaxed">
+                                                Chat directly with the manager for instant confirmation
+                                            </p>
+                                        )}
+                                    </ContentGate>
                                 </div>
                             </div>
 
