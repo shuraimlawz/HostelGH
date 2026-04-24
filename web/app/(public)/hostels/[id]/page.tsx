@@ -107,6 +107,19 @@ export default function HostelDetailsPage() {
         setBookingRoom(room);
     }
 
+    const [isRedirecting, setIsRedirecting] = useState(false);
+
+    const handleWhatsAppClick = (number: string, message: string) => {
+        setIsRedirecting(true);
+        const url = buildWhatsAppUrl(number, message);
+        
+        // Short delay to show the nice "Connecting" UI before the browser handles the redirect
+        setTimeout(() => {
+            window.open(url, '_blank', 'noopener,noreferrer');
+            setIsRedirecting(false);
+        }, 800);
+    };
+
     if (isLoading) return (
         <div className="container px-6 py-40 flex flex-col items-center justify-center gap-6">
             <Loader2 className="w-12 h-12 text-blue-600 animate-spin" />
@@ -394,23 +407,26 @@ export default function HostelDetailsPage() {
                                                         </button>
 
                                                         {hostel.whatsappNumber && (
-                                                            <a
-                                                                href={buildWhatsAppUrl(
+                                                            <button
+                                                                onClick={() => handleWhatsAppClick(
                                                                     hostel.whatsappNumber,
-                                                                    `Hello! I'm interested in the ${r.name} at ${hostel.name} on HostelGH. Please provide more details about availability and pricing.`
+                                                                    `Hello! I'm interested in the ${r.name} at ${hostel.name} on HostelGH. Price: ₵${(r.pricePerTerm/100).toLocaleString()}. Please provide more details.`
                                                                 )}
-                                                                target="_blank"
-                                                                rel="noopener noreferrer"
-                                                                className="w-full h-12 flex items-center justify-center gap-2 rounded-xl font-bold uppercase tracking-[0.15em] text-[9px] transition-all active:scale-95 group border-2"
+                                                                disabled={isRedirecting}
+                                                                className="w-full h-12 flex items-center justify-center gap-2 rounded-xl font-bold uppercase tracking-[0.15em] text-[9px] transition-all active:scale-95 group border-2 disabled:opacity-50"
                                                                 style={{
                                                                     borderColor: "#25D366",
                                                                     color: "#128C7E",
                                                                     background: "rgba(37,211,102,0.06)",
                                                                 }}
                                                             >
-                                                                <WhatsAppIcon size={16} className="group-hover:scale-110 transition-transform duration-300" style={{ color: "#25D366" }} />
-                                                                <span>Enquire on WhatsApp</span>
-                                                            </a>
+                                                                {isRedirecting ? (
+                                                                    <Loader2 size={16} className="animate-spin text-[#25D366]" />
+                                                                ) : (
+                                                                    <WhatsAppIcon size={16} className="group-hover:scale-110 transition-transform duration-300" style={{ color: "#25D366" }} />
+                                                                )}
+                                                                <span>{isRedirecting ? "Connecting..." : "Enquire on WhatsApp"}</span>
+                                                            </button>
                                                         )}
                                                     </div>
                                                 </ContentGate>
@@ -498,23 +514,26 @@ export default function HostelDetailsPage() {
 
                                     <ContentGate message="Sign in to contact the hostel manager" className="rounded-2xl">
                                         {hostel.whatsappNumber && (
-                                            <a
-                                                href={buildWhatsAppUrl(
+                                            <button
+                                                onClick={() => handleWhatsAppClick(
                                                     hostel.whatsappNumber,
                                                     `Hello! I'm interested in booking at ${hostel.name} on HostelGH. Please provide more details about availability and pricing.`
                                                 )}
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                className="w-full h-16 flex items-center justify-center gap-3 rounded-2xl font-bold uppercase tracking-[0.15em] text-[10px] shadow-xl transition-all active:scale-95 group"
+                                                disabled={isRedirecting}
+                                                className="w-full h-16 flex items-center justify-center gap-3 rounded-2xl font-bold uppercase tracking-[0.15em] text-[10px] shadow-xl transition-all active:scale-95 group disabled:opacity-80"
                                                 style={{
-                                                    background: "linear-gradient(135deg, #25D366 0%, #128C7E 100%)",
+                                                    background: isRedirecting ? "gray" : "linear-gradient(135deg, #25D366 0%, #128C7E 100%)",
                                                     boxShadow: "0 8px 24px rgba(37, 211, 102, 0.25)",
                                                     color: "#fff",
                                                 }}
                                             >
-                                                <WhatsAppIcon size={22} className="group-hover:scale-110 transition-transform duration-300" />
-                                                <span>Book via WhatsApp</span>
-                                            </a>
+                                                {isRedirecting ? (
+                                                    <Loader2 size={22} className="animate-spin" />
+                                                ) : (
+                                                    <WhatsAppIcon size={22} className="group-hover:scale-110 transition-transform duration-300" />
+                                                )}
+                                                <span>{isRedirecting ? "Connecting..." : "Book via WhatsApp"}</span>
+                                            </button>
                                         )}
 
                                         {hostel.whatsappNumber && (
