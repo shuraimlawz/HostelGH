@@ -56,14 +56,7 @@ export default function HostelFilters() {
         params.get("amenities")?.split(",").filter(Boolean) ?? []
     );
 
-    useEffect(() => {
-        setCity(params.get("city") ?? "");
-        setUniversity(params.get("university") ?? "");
-        setGender(params.get("gender") ?? "");
-        setRoomConfig(params.get("roomConfig") ?? "");
-        setMinPrice(params.get("minPrice") && !isNaN(parseInt(params.get("minPrice")!)) ? (parseInt(params.get("minPrice")!) / 100).toString() : "");
-        setSelectedAmenities(params.get("amenities")?.split(",").filter(Boolean) ?? []);
-    }, [params]);
+
 
     const handleApply = () => {
         const p = new URLSearchParams();
@@ -179,6 +172,8 @@ export default function HostelFilters() {
                                 <option value="2 in a room">2 in a room</option>
                                 <option value="3 in a room">3 in a room</option>
                                 <option value="4 in a room">4 in a room</option>
+                                <option value="5 in a room">5 in a room</option>
+                                <option value="6 in a room">6 in a room</option>
                             </select>
                         </div>
 
