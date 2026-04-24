@@ -65,8 +65,15 @@ export default function HostelCard({ hostel }: { hostel: any }) {
                                 {hostel.name}
                             </h3>
                             <div className="flex items-center gap-1 shrink-0 px-2 py-0.5 bg-gray-50 rounded-md border border-gray-100">
-                                <Star size={11} className="fill-blue-500 text-blue-500" />
-                                <span className="text-[11px] font-bold text-gray-900">4.9</span>
+                                <Star size={11} className={cn("text-blue-500", hostel.averageRating > 0 && "fill-blue-500")} />
+                                <span className="text-[11px] font-bold text-gray-900">
+                                    {hostel.averageRating?.toFixed(1) || "0.0"}
+                                </span>
+                                {hostel.totalReviews > 0 && (
+                                    <span className="text-[9px] text-gray-400 font-medium ml-0.5">
+                                        ({hostel.totalReviews})
+                                    </span>
+                                )}
                             </div>
                         </div>
                         <div className="flex items-center gap-1.5 text-gray-400 text-[10px] font-bold uppercase tracking-widest truncate">
