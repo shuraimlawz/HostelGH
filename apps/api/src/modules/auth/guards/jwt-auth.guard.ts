@@ -14,16 +14,28 @@ export class JwtAuthGuard extends AuthGuard("jwt") {
       context.getHandler(),
       context.getClass(),
     ]);
+    const handlerName = context.getHandler().name;
+    console.log(`[JwtAuthGuard] Checking route: ${handlerName}, isPublic: ${isPublic}`);
 
     if (isPublic) {
+      console.log(`[JwtAuthGuard] Entering public logic for: ${handlerName}`);
       try {
-        await super.canActivate(context);
+        const result = await super.canActivate(context);
+        console.log(`[JwtAuthGuard] Public super.canActivate result for ${handlerName}: ${result}`);
       } catch (err) {
-        // Ignore errors for public routes, just don't populate req.user
+        console.log(`[JwtAuthGuard] Optional JWT failed for public route ${handlerName}: ${(err as any).message}`);
       }
       return true;
     }
 
-    return super.canActivate(context) as Promise<boolean>;
+    console.log(`[JwtAuthGuard] Entering private logic for: ${handlerName}`);
+    try {
+        const result = await super.canActivate(context);
+        console.log(`[JwtAuthGuard] Private super.canActivate result for ${handlerName}: ${result}`);
+        return result as boolean;
+    } catch (err) {
+        console.log(`[JwtAuthGuard] Private auth failed for ${handlerName}: ${(err as any).message}`);
+        throw err;
+    }
   }
 }

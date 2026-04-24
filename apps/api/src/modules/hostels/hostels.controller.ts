@@ -72,13 +72,6 @@ export class HostelsController {
     return this.hostels.delete({ id: req.user.id, role: req.user.role }, id);
   }
 
-  @Roles(UserRole.OWNER, UserRole.ADMIN)
-  @Get(":id")
-  @ApiOperation({ summary: "Get single hostel details (Owner/Admin only)" })
-  getById(@Req() req: any, @Param("id") id: string) {
-    return this.hostels.getById({ id: req.user.id, role: req.user.role }, id);
-  }
-
   @Roles(UserRole.OWNER)
   @Get("my-hostels")
   @ApiOperation({ summary: "Get all hostels owned by the user" })
@@ -120,16 +113,6 @@ export class HostelsController {
   }
 
   @Public()
-  @Get("public/:id")
-  @ApiOperation({ summary: "Public get hostel details" })
-  getPublicById(@Req() req: any, @Param("id") id: string) {
-    return this.hostels.getPublicById(
-      id,
-      req.user ? { id: req.user.id, role: req.user.role } : undefined,
-    );
-  }
-
-  @Public()
   @Get("city-stats")
   @ApiOperation({ summary: "Get count of hostels per city" })
   getCityStats() {
@@ -141,6 +124,23 @@ export class HostelsController {
   @ApiOperation({ summary: "Get real trending locations based on activity" })
   getTrending() {
     return this.hostels.getTrendingLocations();
+  }
+
+  @Public()
+  @Get("public/:id")
+  @ApiOperation({ summary: "Public get hostel details" })
+  getPublicById(@Req() req: any, @Param("id") id: string) {
+    return this.hostels.getPublicById(
+      id,
+      req.user ? { id: req.user.id, role: req.user.role } : undefined,
+    );
+  }
+
+  @Roles(UserRole.OWNER, UserRole.ADMIN)
+  @Get(":id")
+  @ApiOperation({ summary: "Get single hostel details (Owner/Admin only)" })
+  getById(@Req() req: any, @Param("id") id: string) {
+    return this.hostels.getById({ id: req.user.id, role: req.user.role }, id);
   }
 
   @Roles(UserRole.OWNER)

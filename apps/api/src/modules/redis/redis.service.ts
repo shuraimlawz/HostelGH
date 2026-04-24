@@ -56,19 +56,35 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
   }
 
   async get(key: string): Promise<string | null> {
-    return this.client.get(key);
+    if (!this.client) return null;
+    try {
+      return await this.client.get(key);
+    } catch (err) {
+      console.error(`[Redis] Get error for key ${key}:`, (err as any).message);
+      return null;
+    }
   }
 
   async set(key: string, value: string, ttlSeconds?: number): Promise<void> {
-    if (ttlSeconds) {
-      await this.client.set(key, value, "EX", ttlSeconds);
-    } else {
-      await this.client.set(key, value);
+    if (!this.client) return;
+    try {
+      if (ttlSeconds) {
+        await this.client.set(key, value, "EX", ttlSeconds);
+      } else {
+        await this.client.set(key, value);
+      }
+    } catch (err) {
+      console.error(`[Redis] Set error for key ${key}:`, (err as any).message);
     }
   }
 
   async del(key: string): Promise<void> {
-    await this.client.del(key);
+    if (!this.client) return;
+    try {
+      await this.client.del(key);
+    } catch (err) {
+      console.error(`[Redis] Del error for key ${key}:`, (err as any).message);
+    }
   }
 
   async setJson(key: string, value: any, ttlSeconds?: number): Promise<void> {
