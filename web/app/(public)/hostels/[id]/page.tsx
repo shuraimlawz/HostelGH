@@ -145,30 +145,54 @@ export default function HostelDetailsPage() {
                         </div>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-6 aspect-[21/9] md:aspect-[21/7]">
-                        <div className="md:col-span-2 rounded-[2rem] overflow-hidden bg-gray-50 shadow-xl border border-gray-100 group">
+                    <div className="grid grid-cols-1 md:grid-cols-4 grid-rows-2 gap-4 md:gap-6 aspect-[4/3] md:aspect-[21/8]">
+                        {/* Main Large Image */}
+                        <div className="md:col-span-2 md:row-span-2 rounded-[2.5rem] overflow-hidden bg-gray-50 shadow-2xl border border-gray-100 group relative">
                             {hostel.images?.[0] ? (
                                 <img src={hostel.images[0]} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000" alt={hostel.name} />
                             ) : (
                                 <div className="w-full h-full flex items-center justify-center text-gray-200"><Building2 size={64} /></div>
                             )}
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent pointer-events-none" />
                         </div>
+
+                        {/* Top Middle */}
                         <div className="hidden md:block rounded-[2rem] overflow-hidden bg-gray-50 shadow-xl border border-gray-100 group">
                             {hostel.images?.[1] ? (
                                 <img src={hostel.images[1]} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000" alt={hostel.name} />
                             ) : (
-                                <div className="w-full h-full flex items-center justify-center text-gray-200 bg-gray-50"><Star size={48} /></div>
+                                <div className="w-full h-full flex items-center justify-center text-gray-200 bg-gray-50"><Star size={40} /></div>
                             )}
                         </div>
-                        <div className="hidden md:block rounded-[2rem] overflow-hidden bg-gray-50 relative shadow-xl border border-gray-100 group">
+
+                        {/* Top Right */}
+                        <div className="hidden md:block rounded-[2rem] overflow-hidden bg-gray-50 shadow-xl border border-gray-100 group">
                             {hostel.images?.[2] ? (
                                 <img src={hostel.images[2]} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000" alt={hostel.name} />
                             ) : (
-                                <div className="w-full h-full flex items-center justify-center text-gray-200 bg-gray-50"><Star size={48} /></div>
+                                <div className="w-full h-full flex items-center justify-center text-gray-200 bg-gray-50"><Star size={40} /></div>
                             )}
-                            {hostel.images?.length > 3 && (
-                                <div className="absolute inset-0 bg-gray-900/60 flex items-center justify-center text-white font-bold text-xl backdrop-blur-[4px] uppercase tracking-widest">
-                                    +{hostel.images.length - 3} Units
+                        </div>
+
+                        {/* Bottom Middle */}
+                        <div className="hidden md:block rounded-[2rem] overflow-hidden bg-gray-50 shadow-xl border border-gray-100 group">
+                            {hostel.images?.[3] ? (
+                                <img src={hostel.images[3]} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000" alt={hostel.name} />
+                            ) : (
+                                <div className="w-full h-full flex items-center justify-center text-gray-200 bg-gray-50"><Star size={40} /></div>
+                            )}
+                        </div>
+
+                        {/* Bottom Right with Counter */}
+                        <div className="hidden md:block rounded-[2rem] overflow-hidden bg-gray-50 relative shadow-xl border border-gray-100 group">
+                            {hostel.images?.[4] ? (
+                                <img src={hostel.images[4]} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000" alt={hostel.name} />
+                            ) : (
+                                <div className="w-full h-full flex items-center justify-center text-gray-200 bg-gray-50"><Star size={40} /></div>
+                            )}
+                            {hostel.images?.length > 5 && (
+                                <div className="absolute inset-0 bg-gray-900/60 flex items-center justify-center text-white font-bold text-lg backdrop-blur-[6px] uppercase tracking-widest border-2 border-white/20 rounded-[2rem]">
+                                    +{hostel.images.length - 5} More
                                 </div>
                             )}
                         </div>

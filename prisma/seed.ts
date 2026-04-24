@@ -109,13 +109,13 @@ async function main() {
     ];
 
     const IMAGES = [
-        "https://res.cloudinary.com/dlrigl6rq/image/upload/v1713432000/FuubNuyWIAAzS0c.jpg",
-        "https://res.cloudinary.com/dlrigl6rq/image/upload/v1713432000/SRC_hostel_KNUST-Kumasi.jpg",
-        "https://res.cloudinary.com/dlrigl6rq/image/upload/v1713432000/evandy-scaled-1.jpg",
-        "https://res.cloudinary.com/dlrigl6rq/image/upload/v1713432000/upsahostel.jpg",
-        "https://res.cloudinary.com/dlrigl6rq/image/upload/v1713432000/Hostel_Block_B_GCTU.jpg",
-        "https://res.cloudinary.com/dlrigl6rq/image/upload/v1713432000/hall-seven.jpg",
-        "https://res.cloudinary.com/dlrigl6rq/image/upload/v1713432000/BfTDaFFIUAAYpK9.jpg",
+        "https://images.unsplash.com/photo-1555854877-bab0e564b8d5?auto=format&fit=crop&q=80&w=1200",
+        "https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?auto=format&fit=crop&q=80&w=1200",
+        "https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?auto=format&fit=crop&q=80&w=1200",
+        "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&q=80&w=1200",
+        "https://images.unsplash.com/photo-1540518614846-7eded433c457?auto=format&fit=crop&q=80&w=1200",
+        "https://images.unsplash.com/photo-1560185127-6ed189bf02f4?auto=format&fit=crop&q=80&w=1200",
+        "https://images.unsplash.com/photo-1582719508461-905c673771fd?auto=format&fit=crop&q=80&w=1200",
     ];
 
     const AMENITIES = ["WiFi", "Water 24/7", "CCTV", "Security Post", "Study Room", "Standby Generator", "Laundry", "Kitchenette", "Gym", "Balcony"];
