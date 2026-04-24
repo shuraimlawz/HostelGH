@@ -9,8 +9,7 @@ export class ReviewsService {
         const hostel = await this.prisma.hostel.findUnique({ where: { id: hostelId } });
         if (!hostel) throw new NotFoundException("Hostel not found");
 
-        // @ts-ignore
-        return this.prisma.review.create({
+        const review = await this.prisma.review.create({
             data: {
                 tenantId,
                 hostelId,
@@ -19,6 +18,19 @@ export class ReviewsService {
             },
             include: { tenant: { select: { firstName: true, avatarUrl: true } } },
         });
+
+        // Update average rating on hostel
+        const stats = await this.prisma.review.aggregate({
+            where: { hostelId },
+            _avg: { rating: true },
+        });
+
+        await this.prisma.hostel.update({
+            where: { id: hostelId },
+            data: { rating: stats._avg.rating || 0 },
+        });
+
+        return review;
     }
 
     async getHostelReviews(hostelId: string) {

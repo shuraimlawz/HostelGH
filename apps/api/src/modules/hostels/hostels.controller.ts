@@ -94,6 +94,7 @@ export class HostelsController {
     @Query("roomConfig") roomConfig?: string,
     @Query("limit") limit?: string,
     @Query("page") page?: string,
+    @Query("query") query?: string,
   ) {
     const amenitiesArr =
       typeof amenities === "string" ? amenities.split(",") : amenities;
@@ -109,6 +110,7 @@ export class HostelsController {
       sort,
       gender,
       roomConfig,
+      query,
     });
   }
 

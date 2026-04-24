@@ -102,6 +102,16 @@
     @apply max-w-[1440px] mx-auto;
   }
 
+  button, 
+  [role="button"],
+  select,
+  input[type="submit"],
+  input[type="button"],
+  input[type="checkbox"],
+  input[type="radio"] {
+    cursor: pointer;
+  }
+
   h1, h2, h3, h4, h5, h6 {
     @apply font-heading tracking-tight font-bold not-italic;
   }

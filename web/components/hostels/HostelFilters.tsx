@@ -46,6 +46,7 @@ export default function HostelFilters() {
     const router = useRouter();
     const params = useSearchParams();
 
+    const [query, setQuery] = useState(params.get("query") ?? params.get("city") ?? "");
     const [city, setCity] = useState(params.get("city") ?? "");
     const [university, setUniversity] = useState(params.get("university") ?? "");
     const [minPrice, setMinPrice] = useState(params.get("minPrice") ? (parseInt(params.get("minPrice")!) / 100).toString() : "");
@@ -58,11 +59,15 @@ export default function HostelFilters() {
 
 
 
-    const handleApply = () => {
+    const handleApply = (overrides?: any) => {
         const p = new URLSearchParams();
-        if (city) p.set("city", city);
-        if (university) p.set("university", university);
-        if (gender) p.set("gender", gender);
+        const activeQuery = overrides?.query !== undefined ? overrides.query : query;
+        const activeUni = overrides?.university !== undefined ? overrides.university : university;
+        const activeGender = overrides?.gender !== undefined ? overrides.gender : gender;
+
+        if (activeQuery) p.set("query", activeQuery);
+        if (activeUni) p.set("university", activeUni);
+        if (activeGender) p.set("gender", activeGender);
         if (roomConfig) p.set("roomConfig", roomConfig);
         if (minPrice) p.set("minPrice", (parseFloat(minPrice) * 100).toString());
         if (maxPrice) p.set("maxPrice", (parseFloat(maxPrice) * 100).toString());
@@ -72,6 +77,7 @@ export default function HostelFilters() {
     };
 
     const clearFilters = () => {
+        setQuery("");
         setCity("");
         setUniversity("");
         setGender("");
@@ -92,15 +98,15 @@ export default function HostelFilters() {
         <div className="w-full bg-white border border-gray-100 rounded-2xl p-2 shadow-xl shadow-gray-200/20 mb-10">
             <div className="flex flex-col lg:flex-row items-center gap-2">
                 
-                {/* Search / City */}
+                {/* Smart Global Search */}
                 <div className="flex-1 w-full lg:w-auto relative group">
                     <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-blue-500 transition-colors" size={18} />
                     <input
-                        value={city}
-                        onChange={(e) => setCity(e.target.value)}
+                        value={query}
+                        onChange={(e) => setQuery(e.target.value)}
                         onKeyDown={(e) => e.key === "Enter" && handleApply()}
                         className="w-full h-12 bg-gray-50/50 hover:bg-white border border-transparent hover:border-gray-100 focus:bg-white focus:border-blue-500 rounded-xl pl-11 pr-4 outline-none font-bold text-gray-950 placeholder:text-gray-300 shadow-sm transition-all text-sm"
-                        placeholder="Search city or specific area..."
+                        placeholder="Search hostels, schools, or cities..."
                     />
                 </div>
 
@@ -112,7 +118,11 @@ export default function HostelFilters() {
                         <School className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300" size={16} />
                         <select
                             value={university}
-                            onChange={(e) => { setUniversity(e.target.value); setTimeout(handleApply, 0); }}
+                            onChange={(e) => { 
+                                const val = e.target.value;
+                                setUniversity(val); 
+                                handleApply({ university: val }); 
+                            }}
                             className="w-full h-12 bg-white border border-transparent hover:bg-gray-50 focus:bg-white focus:border-blue-500 rounded-xl pl-11 pr-10 outline-none font-bold text-gray-900 shadow-sm transition-all text-xs appearance-none cursor-pointer"
                         >
                             <option value="">Any University</option>
@@ -134,7 +144,11 @@ export default function HostelFilters() {
                         <Users className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300" size={16} />
                         <select
                             value={gender}
-                            onChange={(e) => { setGender(e.target.value); setTimeout(handleApply, 0); }}
+                            onChange={(e) => { 
+                                const val = e.target.value;
+                                setGender(val); 
+                                handleApply({ gender: val }); 
+                            }}
                             className="w-full h-12 bg-white border border-transparent hover:bg-gray-50 focus:bg-white focus:border-blue-500 rounded-xl pl-11 pr-10 outline-none font-bold text-gray-900 shadow-sm transition-all text-xs appearance-none cursor-pointer"
                         >
                             <option value="">Any Gender</option>
@@ -239,7 +253,7 @@ export default function HostelFilters() {
                 </Popover>
 
                 {/* Reset Shortcut */}
-                {(city || university || gender || minPrice || selectedAmenities.length > 0) && (
+                {(query || city || university || gender || minPrice || selectedAmenities.length > 0) && (
                     <button 
                         onClick={clearFilters}
                         className="h-12 w-12 flex items-center justify-center rounded-xl bg-red-50 text-red-500 hover:bg-red-100 transition-colors shrink-0"

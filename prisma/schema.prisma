@@ -131,6 +131,7 @@ model User {
 
   // relations
   ownedHostels  Hostel[]       @relation("HostelOwner")
+  favorites      Favorite[]
   bookings      Booking[]      @relation("BookingTenant")
   refreshTokens RefreshToken[]
   payoutMethods PayoutMethod[]
@@ -631,3 +632,17 @@ model NewsletterSubscriber {
   @@index([hash])
 }
 
+
+model Favorite {
+  id        String   @id @default(cuid())
+  userId    String
+  hostelId  String
+  createdAt DateTime @default(now())
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  hostel Hostel @relation(fields: [hostelId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, hostelId])
+  @@index([userId])
+  @@index([hostelId])
+}

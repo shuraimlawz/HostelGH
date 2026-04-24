@@ -39,6 +39,8 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 
 // WhatsApp SVG icon (not in lucide-react)
 function WhatsAppIcon({ size = 20, className = "", style }: { size?: number; className?: string; style?: React.CSSProperties }) {
@@ -107,6 +109,47 @@ export default function HostelDetailsPage() {
         setBookingRoom(room);
     }
 
+    const queryClient = useQueryClient();
+
+    // Favorites Logic
+    const { data: favoriteStatus } = useQuery({
+        queryKey: ["favorite-status", hostelId],
+        queryFn: async () => {
+            if (!user) return { favorited: false };
+            const res = await api.get(`/favorites/${hostelId}/status`);
+            return res.data;
+        },
+        enabled: !!hostelId && !!user,
+    });
+
+    const toggleFavorite = useMutation({
+        mutationFn: async () => {
+            if (!user) {
+                const ok = await open("login");
+                if (!ok) throw new Error("Unauthorized");
+            }
+            return api.post(`/favorites/${hostelId}`);
+        },
+        onSuccess: (res) => {
+            queryClient.invalidateQueries({ queryKey: ["favorite-status", hostelId] });
+            toast.success(res.data.favorited ? "Added to favorites" : "Removed from favorites");
+        },
+    });
+
+    const handleShare = () => {
+        const url = window.location.href;
+        if (navigator.share) {
+            navigator.share({
+                title: hostel?.name,
+                text: `Check out this hostel: ${hostel?.name}`,
+                url: url,
+            });
+        } else {
+            navigator.clipboard.writeText(url);
+            toast.success("Link copied to clipboard!");
+        }
+    };
+
     const [isRedirecting, setIsRedirecting] = useState(false);
 
     const handleWhatsAppClick = (number: string, message: string) => {
@@ -153,8 +196,21 @@ export default function HostelDetailsPage() {
                             Back to Hostels
                         </Link>
                         <div className="flex gap-4">
-                            <button className="w-12 h-12 flex items-center justify-center bg-white rounded-xl border border-gray-100 hover:border-blue-500 hover:text-blue-600 transition-all shadow-sm"><Share2 size={18} /></button>
-                            <button className="w-12 h-12 flex items-center justify-center bg-white rounded-xl border border-gray-100 hover:border-red-500 hover:text-red-600 transition-all shadow-sm"><Heart size={18} /></button>
+                            <button 
+                                onClick={handleShare}
+                                className="w-12 h-12 flex items-center justify-center bg-white rounded-xl border border-gray-100 hover:border-blue-500 hover:text-blue-600 transition-all shadow-sm"
+                            >
+                                <Share2 size={18} />
+                            </button>
+                            <button 
+                                onClick={() => toggleFavorite.mutate()}
+                                className={cn(
+                                    "w-12 h-12 flex items-center justify-center bg-white rounded-xl border transition-all shadow-sm",
+                                    favoriteStatus?.favorited ? "border-red-500 text-red-600 bg-red-50" : "border-gray-100 hover:border-red-500 hover:text-red-600"
+                                )}
+                            >
+                                <Heart size={18} className={favoriteStatus?.favorited ? "fill-current" : ""} />
+                            </button>
                         </div>
                     </div>
 
@@ -439,13 +495,26 @@ export default function HostelDetailsPage() {
 
                         {/* Reviews Section */}
                         <div className="pt-16 border-t border-gray-50">
-                            <div className="flex items-center justify-between mb-10">
-                                <h2 className="text-3xl font-bold tracking-tighter uppercase text-gray-900 flex items-center gap-4">
-                                    <Star size={32} className="text-orange-400" />
-                                    Student Reviews
-                                </h2>
+                            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
+                                <div className="space-y-1">
+                                    <h2 className="text-3xl font-bold tracking-tighter uppercase text-gray-900 flex items-center gap-4">
+                                        <Star size={32} className="text-orange-400" />
+                                        Student Reviews
+                                    </h2>
+                                    <p className="text-gray-400 text-[10px] font-bold uppercase tracking-widest pl-12">Total Rating: {hostel.rating?.toFixed(1) || "0.0"} / 5.0</p>
+                                </div>
+                                <button 
+                                    onClick={() => {
+                                        if(!user) open("login");
+                                        else document.getElementById('review-form')?.scrollIntoView({ behavior: 'smooth' });
+                                    }}
+                                    className="h-12 px-8 bg-blue-600 text-white rounded-xl font-bold text-[10px] uppercase tracking-widest hover:bg-blue-700 transition-all shadow-lg shadow-blue-500/20"
+                                >
+                                    Write a Review
+                                </button>
                             </div>
-                            <div className="grid md:grid-cols-2 gap-8">
+
+                            <div className="grid md:grid-cols-2 gap-8 mb-16">
                                 {hostel.reviews?.length > 0 ? (
                                     hostel.reviews.map((r: any) => (
                                         <div key={r.id} className="bg-white rounded-3xl p-8 border border-gray-100 shadow-sm hover:border-blue-500/10 transition-all group">
@@ -471,9 +540,20 @@ export default function HostelDetailsPage() {
                                         <div className="w-12 h-12 bg-white rounded-xl shadow-sm border border-gray-100 flex items-center justify-center mx-auto text-gray-200">
                                             <MessageCircle size={24} />
                                         </div>
-                                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">No reviews yet.</p>
+                                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">No reviews yet. Be the first to share your experience!</p>
                                     </div>
                                 )}
+                            </div>
+
+                            {/* Review Form */}
+                            <div id="review-form" className="bg-gray-50 rounded-[2.5rem] p-8 md:p-12 border border-gray-100">
+                                <div className="max-w-2xl mx-auto space-y-8">
+                                    <div className="text-center space-y-2">
+                                        <h3 className="text-2xl font-bold uppercase tracking-tight text-gray-900">Share Your Experience</h3>
+                                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Your review helps other students find the perfect home.</p>
+                                    </div>
+                                    <ReviewForm hostelId={hostelId} onSubmitted={() => queryClient.invalidateQueries({ queryKey: ["hostel", hostelId] })} />
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -590,5 +670,86 @@ export default function HostelDetailsPage() {
                 room={bookingRoom}
             />
         </div>
+    );
+}
+
+function ReviewForm({ hostelId, onSubmitted }: { hostelId: string, onSubmitted: () => void }) {
+    const [rating, setRating] = useState(0);
+    const [hoveredRating, setHoveredRating] = useState(0);
+    const [comment, setComment] = useState("");
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const { user } = useAuth();
+    const { open } = useAuthModal();
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!user) {
+            open("login");
+            return;
+        }
+        if (rating === 0) {
+            toast.error("Please select a rating");
+            return;
+        }
+
+        setIsSubmitting(true);
+        try {
+            await api.post(`/reviews/${hostelId}`, { rating, comment });
+            toast.success("Review posted successfully!");
+            setRating(0);
+            setComment("");
+            onSubmitted();
+        } catch (err) {
+            toast.error("Failed to post review. Please try again.");
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
+    return (
+        <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="flex flex-col items-center gap-4">
+                <div className="flex gap-2">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                        <button
+                            key={star}
+                            type="button"
+                            onMouseEnter={() => setHoveredRating(star)}
+                            onMouseLeave={() => setHoveredRating(0)}
+                            onClick={() => setRating(star)}
+                            className="transition-transform active:scale-90"
+                        >
+                            <Star
+                                size={40}
+                                className={cn(
+                                    "transition-colors",
+                                    (hoveredRating || rating) >= star ? "text-orange-400 fill-current" : "text-gray-200"
+                                )}
+                            />
+                        </button>
+                    ))}
+                </div>
+                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+                    {rating === 0 ? "Select a rating" : `You gave ${rating} stars`}
+                </p>
+            </div>
+
+            <textarea
+                value={comment}
+                onChange={(e) => setComment(e.target.value)}
+                placeholder="Write your experience here... (What did you like? What could be improved?)"
+                className="w-full h-32 bg-white border border-gray-100 rounded-2xl p-6 outline-none focus:border-blue-500 transition-all font-medium text-gray-700 text-sm shadow-sm"
+                required
+                minLength={10}
+            />
+
+            <button
+                type="submit"
+                disabled={isSubmitting}
+                className="w-full h-14 bg-blue-600 text-white rounded-xl font-bold uppercase tracking-[0.2em] text-[10px] shadow-xl hover:bg-blue-700 disabled:opacity-50 transition-all"
+            >
+                {isSubmitting ? <Loader2 className="animate-spin mx-auto" /> : "Post Review"}
+            </button>
+        </form>
     );
 }

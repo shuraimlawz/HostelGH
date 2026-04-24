@@ -163,6 +163,7 @@ export class HostelsService {
     roomConfig?: string;
     limit?: number;
     page?: number;
+    query?: string;
   }) {
     const cacheKey = `search:${JSON.stringify(params)}`;
     const cached = await this.redis.getJson<any[]>(cacheKey);
@@ -178,7 +179,29 @@ export class HostelsService {
       sort,
       gender,
       roomConfig,
+      query,
     } = params;
+
+    // Smart Aliases Mapping
+    const ALIASES: Record<string, string[]> = {
+      "legon": ["University of Ghana", "UG"],
+      "knust": ["Kwame Nkrumah University", "Tech"],
+      "ucc": ["University of Cape Coast"],
+      "upsa": ["University of Professional Studies"],
+      "tech": ["KNUST"],
+      "central": ["Central University"],
+    };
+
+    let searchQuery = query?.toLowerCase() || "";
+    let universityFilter = university;
+
+    // If the query matches an alias, boost the university filter
+    for (const [alias, realNames] of Object.entries(ALIASES)) {
+      if (searchQuery.includes(alias)) {
+        universityFilter = realNames[0]; // Take the first real name as primary filter
+        break;
+      }
+    }
 
     // Intelligent Suggestion / Relevance Algorithm:
     // 1. Featured hostels first
@@ -200,7 +223,7 @@ export class HostelsService {
     }
 
     // handle optional pagination
-    const take = params.limit ?? 10;
+    const take = params.limit ?? 24; // Increased default limit for "all hostels" feeling
     const skip = params.page && params.limit ? (params.page - 1) * params.limit : undefined;
 
     const results = await this.prisma.hostel.findMany({
@@ -208,9 +231,16 @@ export class HostelsService {
         isPublished: true,
         city: city ? { contains: city, mode: "insensitive" } : undefined,
         region: region ? { equals: region, mode: "insensitive" } : undefined,
-        university: university
-          ? { contains: university, mode: "insensitive" }
+        university: universityFilter
+          ? { contains: universityFilter, mode: "insensitive" }
           : undefined,
+        // Global search query
+        OR: searchQuery ? [
+            { name: { contains: searchQuery, mode: "insensitive" } },
+            { city: { contains: searchQuery, mode: "insensitive" } },
+            { university: { contains: searchQuery, mode: "insensitive" } },
+            { description: { contains: searchQuery, mode: "insensitive" } },
+        ] : undefined,
         amenities:
           amenities && amenities.length > 0
             ? { hasEvery: amenities }
