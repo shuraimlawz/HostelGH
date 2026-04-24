@@ -25,24 +25,34 @@ import { useAuthModal } from "@/components/auth/AuthModalProvider";
 import { useRouter, usePathname } from "next/navigation";
 import RegionSelector from "./RegionSelector";
 import { cn } from "@/lib/utils";
+import StickySearch from "./StickySearch";
 
 export default function Navbar() {
     const { user, logout } = useAuth();
     const { open } = useAuthModal();
     const [isOpen, setIsOpen] = useState(false);
     const [scrolled, setScrolled] = useState(false);
+    const [showStickySearch, setShowStickySearch] = useState(false);
     const menuRef = useRef<HTMLDivElement>(null);
     const router = useRouter();
     const pathname = usePathname();
 
-    // Scroll listener for dynamic styling
+    // Scroll listener for dynamic styling and sticky search
     useEffect(() => {
         const handleScroll = () => {
-            setScrolled(window.scrollY > 20);
+            const scrollPos = window.scrollY;
+            setScrolled(scrollPos > 20);
+            
+            // Show sticky search only on homepage when hero search is out of view
+            if (pathname === "/") {
+                setShowStickySearch(scrollPos > 500);
+            } else {
+                setShowStickySearch(false);
+            }
         };
         window.addEventListener("scroll", handleScroll);
         return () => window.removeEventListener("scroll", handleScroll);
-    }, []);
+    }, [pathname]);
 
     const getNavItems = () => {
         if (!user) return [];
@@ -118,11 +128,17 @@ export default function Navbar() {
                         <div className="hidden lg:block h-[2px] w-0 group-hover:w-full bg-blue-600 transition-all duration-300 rounded-full" />
                     </div>
                 </Link>
+                
+                {/* Sticky Search Pillar — Airbnb Style */}
+                <StickySearch isVisible={showStickySearch} />
 
                 {/* Right Navigation & Control Center */}
                 <div className="flex items-center justify-end gap-6 flex-1">
-                    {/* Desktop Main Links */}
-                    <nav className="hidden lg:flex items-center space-x-2 bg-gray-50/50 p-1 rounded-2xl border border-gray-100/50 backdrop-blur-md">
+                    {/* Desktop Main Links — Hidden when sticky search is active */}
+                    <nav className={cn(
+                        "hidden lg:flex items-center space-x-2 bg-gray-50/50 p-1 rounded-2xl border border-gray-100/50 backdrop-blur-md transition-all duration-500",
+                        showStickySearch ? "opacity-0 -translate-y-2 pointer-events-none" : "opacity-100 translate-y-0"
+                    )}>
                         <Link
                             href="/hostels"
                             className={cn(
