@@ -119,7 +119,10 @@ export default function Navbar() {
         >
             <div className="container mx-auto px-6 md:px-12 flex items-center justify-between">
                 {/* Logo Section */}
-                <Link href="/" className="flex items-center gap-3 group relative transition-transform hover:scale-[1.02] active:scale-95">
+                <Link href="/" className={cn(
+                    "flex items-center gap-3 group relative transition-all duration-500",
+                    showStickySearch ? "opacity-100 md:opacity-100" : "opacity-100"
+                )}>
                     <LogoAnimation />
                     <div className="flex flex-col -space-y-1">
                         <span className="font-black text-lg md:text-xl tracking-tighter text-gray-900 flex overflow-hidden">
@@ -133,11 +136,11 @@ export default function Navbar() {
                 <StickySearch isVisible={showStickySearch} />
 
                 {/* Right Navigation & Control Center */}
-                <div className="flex items-center justify-end gap-6 flex-1">
+                <div className="flex items-center justify-end gap-3 md:gap-6">
                     {/* Desktop Main Links — Hidden when sticky search is active */}
                     <nav className={cn(
                         "hidden lg:flex items-center space-x-2 bg-gray-50/50 p-1 rounded-2xl border border-gray-100/50 backdrop-blur-md transition-all duration-500",
-                        showStickySearch ? "opacity-0 -translate-y-2 pointer-events-none" : "opacity-100 translate-y-0"
+                        showStickySearch ? "opacity-0 -translate-y-4 pointer-events-none absolute scale-95" : "opacity-100 translate-y-0"
                     )}>
                         <Link
                             href="/hostels"
