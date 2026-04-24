@@ -282,6 +282,7 @@ model Hostel {
   bookings   Booking[]
   wallets    Wallet[]
   reviews    Review[]
+  favorites  Favorite[]
   listingFeaturePayments ListingFeaturePayment[]
 
   @@index([ownerId])
