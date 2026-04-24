@@ -223,8 +223,9 @@ export class HostelsService {
     }
 
     // handle optional pagination
-    const take = params.limit ?? 24; // Increased default limit for "all hostels" feeling
-    const skip = params.page && params.limit ? (params.page - 1) * params.limit : undefined;
+    const take = params.limit ?? 12; // Adjusted to a smaller chunk for better infinite scroll experience
+    const page = params.page ?? 1;
+    const skip = (page - 1) * take;
 
     const results = await this.prisma.hostel.findMany({
       where: {
