@@ -270,6 +270,9 @@ model Hostel {
   isVerifiedHostel     Boolean  @default(false)
   virtualTourUrl       String?
 
+  averageRating        Float    @default(0)
+  totalReviews         Int      @default(0)
+  
   createdAt            DateTime @default(now())
   updatedAt            DateTime @updatedAt
 

@@ -19,15 +19,19 @@ export class ReviewsService {
             include: { tenant: { select: { firstName: true, avatarUrl: true } } },
         });
 
-        // Update average rating on hostel
+        // Update average rating and review count on hostel
         const stats = await this.prisma.review.aggregate({
             where: { hostelId },
             _avg: { rating: true },
+            _count: { id: true },
         });
 
         await this.prisma.hostel.update({
             where: { id: hostelId },
-            data: { rating: stats._avg.rating || 0 },
+            data: { 
+                averageRating: stats._avg.rating || 0,
+                totalReviews: stats._count.id || 0
+            },
         });
 
         return review;
