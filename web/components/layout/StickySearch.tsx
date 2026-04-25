@@ -13,8 +13,9 @@ export default function StickySearch({ isVisible }: StickySearchProps) {
     const router = useRouter();
     const [query, setQuery] = useState("");
 
-    const handleSearch = () => {
-        router.push(`/hostels${query ? `?city=${encodeURIComponent(query)}` : ""}`);
+    const handleSearch = (overrideQuery?: string) => {
+        const searchVal = overrideQuery !== undefined ? overrideQuery : query;
+        router.push(`/hostels${searchVal ? `?query=${encodeURIComponent(searchVal)}` : ""}`);
     };
 
     return (

@@ -54,9 +54,9 @@ export default function HeroSearch() {
         return () => window.removeEventListener("scroll", handleScroll);
     }, []);
 
-    const handleSearch = (overrideCity?: string) => {
-        const searchCity = overrideCity !== undefined ? overrideCity : city;
-        router.push(`/hostels${searchCity ? `?city=${encodeURIComponent(searchCity)}` : ""}`);
+    const handleSearch = (overrideQuery?: string) => {
+        const searchVal = overrideQuery !== undefined ? overrideQuery : city;
+        router.push(`/hostels${searchVal ? `?query=${encodeURIComponent(searchVal)}` : ""}`);
     };
 
     const { data: trendingLocations, isLoading: isLoadingLocations } = useQuery({

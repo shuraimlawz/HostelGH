@@ -6,6 +6,7 @@ import {
 import { PrismaService } from "../../prisma/prisma.service";
 import { UserRole, RoomGender, BookingStatus } from "@prisma/client";
 import { RedisService } from "../redis/redis.service";
+import { SearchService } from "../search/search.service";
 import { SubscriptionsService } from "../subscriptions/subscriptions.service";
 import {
   AdminAuditLogService,
@@ -17,11 +18,14 @@ import { Cron, CronExpression } from "@nestjs/schedule";
 
 @Injectable()
 export class HostelsService {
+  private readonly logger = new Logger(HostelsService.name);
+
   constructor(
     private readonly prisma: PrismaService,
     private readonly redis: RedisService,
     private readonly subscriptions: SubscriptionsService,
     private readonly audit: AdminAuditLogService,
+    private readonly search: SearchService,
   ) { }
 
   async create(ownerId: string, dto: CreateHostelDto) {
@@ -165,6 +169,26 @@ export class HostelsService {
     page?: number;
     query?: string;
   }) {
+    const { query } = params;
+
+    // Try Meilisearch first for typos and ranking (Phase 2)
+    const meiliResults = await this.search.search(query || "", {
+      limit: params.limit,
+      offset: params.page && params.limit ? (params.page - 1) * params.limit : 0,
+      filter: this.buildMeiliFilter(params),
+    });
+
+    if (meiliResults) {
+      this.logger.log(`Using Meilisearch for query: ${query}`);
+      // If we have meilisearch results, we return them
+      // Note: Need to fetch full objects from DB or return meili docs
+      const ids = meiliResults.hits.map(h => h.id);
+      return this.prisma.hostel.findMany({
+        where: { id: { in: ids } },
+        include: { rooms: { where: { isActive: true } } },
+      });
+    }
+
     const cacheKey = `search:${JSON.stringify(params)}`;
     const cached = await this.redis.getJson<any[]>(cacheKey);
     if (cached) return cached;
@@ -194,6 +218,62 @@ export class HostelsService {
 
     let searchQuery = query?.toLowerCase() || "";
     let universityFilter = university;
+    let genderFilter = gender;
+    let minPriceFilter = minPrice;
+    let maxPriceFilter = maxPrice;
+    let amenitiesFilter = amenities || [];
+    let roomConfigFilter = roomConfig;
+
+    // Phase 1: Smart Parsing of the natural language query
+    if (searchQuery) {
+        // Price parsing: "under 3000", "below 2000", "cheap"
+        if (searchQuery.includes("cheap") || searchQuery.includes("affordable") || searchQuery.includes("budget")) {
+            maxPriceFilter = Math.min(maxPriceFilter ?? Infinity, 1500 * 100); // 1500 GHS in pesewas
+        }
+        const underMatch = searchQuery.match(/(?:under|below|less than|max)\s*(\d+)/);
+        if (underMatch) {
+            maxPriceFilter = parseInt(underMatch[1], 10) * 100;
+        }
+
+        // Gender parsing: "female", "girls", "male", "boys"
+        if (searchQuery.includes("female") || searchQuery.includes("girls") || searchQuery.includes("ladies") || searchQuery.includes("women")) {
+            genderFilter = "FEMALE";
+        } else if (searchQuery.includes("male") || searchQuery.includes("boys") || searchQuery.includes("guys") || searchQuery.includes("men")) {
+            genderFilter = "MALE";
+        }
+
+        // Amenity parsing
+        if (searchQuery.includes("ac") || searchQuery.includes("air condition") || searchQuery.includes("cooling")) {
+            if (!amenitiesFilter.includes("AC")) amenitiesFilter.push("AC");
+        }
+        if (searchQuery.includes("wifi") || searchQuery.includes("internet") || searchQuery.includes("data") || searchQuery.includes("network")) {
+            if (!amenitiesFilter.includes("WiFi")) amenitiesFilter.push("WiFi");
+        }
+
+        // Room Config parsing: "2 in a room", "single", "2 in 1"
+        if (searchQuery.includes("single") || searchQuery.includes("1 in a room") || searchQuery.includes("1 in 1")) {
+            roomConfigFilter = "1 in a room";
+        } else if (searchQuery.includes("2 in a room") || searchQuery.includes("2 in 1") || searchQuery.includes("two in one")) {
+            roomConfigFilter = "2 in a room";
+        } else if (searchQuery.includes("3 in a room") || searchQuery.includes("3 in 1")) {
+            roomConfigFilter = "3 in a room";
+        } else if (searchQuery.includes("4 in a room") || searchQuery.includes("4 in 1")) {
+            roomConfigFilter = "4 in a room";
+        }
+
+        // Proximity parsing: "near Legon", "close to KNUST"
+        const nearMatch = searchQuery.match(/(?:near|close to|around|at)\s+([a-zA-Z\s]+)/);
+        if (nearMatch) {
+            const schoolPart = nearMatch[1].trim();
+            // Check if this schoolPart matches any alias or university name
+            for (const [alias, realNames] of Object.entries(ALIASES)) {
+                if (schoolPart.includes(alias) || alias.includes(schoolPart)) {
+                    universityFilter = realNames[0];
+                    break;
+                }
+            }
+        }
+    }
 
     // If the query matches an alias, boost the university filter
     for (const [alias, realNames] of Object.entries(ALIASES)) {
@@ -202,6 +282,8 @@ export class HostelsService {
         break;
       }
     }
+    
+    // ... rest of logic uses the updated filters
 
     // Intelligent Suggestion / Relevance Algorithm:
     // 1. Featured hostels first
@@ -235,6 +317,7 @@ export class HostelsService {
         university: universityFilter
           ? { contains: universityFilter, mode: "insensitive" }
           : undefined,
+        gender: genderFilter ? { equals: genderFilter as any } : undefined,
         // Global search query
         OR: searchQuery ? [
             { name: { contains: searchQuery, mode: "insensitive" } },
@@ -243,25 +326,22 @@ export class HostelsService {
             { description: { contains: searchQuery, mode: "insensitive" } },
         ] : undefined,
         amenities:
-          amenities && amenities.length > 0
-            ? { hasEvery: amenities }
+          amenitiesFilter && amenitiesFilter.length > 0
+            ? { hasEvery: amenitiesFilter }
             : undefined,
         bookingStatus: { not: "CLOSED" },
         minPrice:
-          minPrice !== undefined || maxPrice !== undefined
+          minPriceFilter !== undefined || maxPriceFilter !== undefined
             ? {
-              gte: minPrice,
-              lte: maxPrice,
+              gte: minPriceFilter,
+              lte: maxPriceFilter,
             }
             : undefined,
         rooms: {
           some: {
             isActive: true,
             availableSlots: { gt: 0 },
-            gender: gender ? (gender as any) : undefined,
-            roomConfiguration: roomConfig
-              ? { contains: roomConfig, mode: "insensitive" }
-              : undefined,
+            config: roomConfigFilter ? { equals: roomConfigFilter } : undefined,
           },
         },
       },
@@ -515,6 +595,14 @@ export class HostelsService {
     const isAuthorized = actor.role === UserRole.ADMIN || actor.id === ownerId;
     if (!isAuthorized)
       throw new ForbiddenException("Not allowed to modify this hostel");
+  }
+
+  private buildMeiliFilter(params: any) {
+    const filters = ["isPublished = true"];
+    if (params.university) filters.push(`university = "${params.university}"`);
+    if (params.city) filters.push(`city = "${params.city}"`);
+    if (params.gender) filters.push(`gender = "${params.gender}"`);
+    return filters.length > 0 ? filters.join(" AND ") : undefined;
   }
 }
 

@@ -7,7 +7,10 @@
     "start:prod": "cd ../.. && node dist/apps/api/src/main"
   },
   "dependencies": {
+    "@langchain/openai": "^1.4.4",
     "cookie-parser": "^1.4.7",
+    "langchain": "^1.3.4",
+    "meilisearch": "^0.57.0",
     "nestjs-zod": "^5.1.1",
     "nodemailer": "^8.0.1",
     "zod": "^4.3.6"
