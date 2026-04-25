@@ -501,7 +501,9 @@ export default function HostelDetailsPage() {
                                         <Star size={32} className="text-orange-400" />
                                         Student Reviews
                                     </h2>
-                                    <p className="text-gray-400 text-[10px] font-bold uppercase tracking-widest pl-12">Total Rating: {hostel.rating?.toFixed(1) || "0.0"} / 5.0</p>
+                                    <p className="text-gray-400 text-[10px] font-bold uppercase tracking-widest pl-12">
+                                        Total Rating: {hostel.averageRating?.toFixed(1) || "0.0"} / 5.0 ({hostel.totalReviews || 0} reviews)
+                                    </p>
                                 </div>
                                 <button 
                                     onClick={() => {

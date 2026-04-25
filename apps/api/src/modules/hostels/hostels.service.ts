@@ -363,6 +363,11 @@ export class HostelsService {
         rooms: { where: { isActive: true }, orderBy: { createdAt: "asc" } },
         facilities: true,
         owner: { select: { id: true, firstName: true, lastName: true, avatarUrl: true } },
+        reviews: {
+          include: { tenant: { select: { id: true, firstName: true, lastName: true, avatarUrl: true } } },
+          orderBy: { createdAt: "desc" },
+          take: 10,
+        }
       },
     });
 

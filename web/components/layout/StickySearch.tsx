@@ -63,7 +63,7 @@ export default function StickySearch({ isVisible }: StickySearchProps) {
                     </div>
 
                     <button
-                        onClick={handleSearch}
+                        onClick={() => handleSearch()}
                         className="ml-2 flex items-center gap-2 pl-4 pr-3 py-2 bg-blue-600 rounded-full text-white hover:bg-blue-700 transition-all active:scale-95 shadow-lg shadow-blue-500/20 group/btn"
                     >
                         <span className="text-[10px] font-black uppercase tracking-widest">Search</span>
