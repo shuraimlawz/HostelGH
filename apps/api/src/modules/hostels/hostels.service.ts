@@ -1,6 +1,7 @@
 import {
   ForbiddenException,
   Injectable,
+  Logger,
   NotFoundException,
 } from "@nestjs/common";
 import { PrismaService } from "../../prisma/prisma.service";
@@ -341,7 +342,7 @@ export class HostelsService {
           some: {
             isActive: true,
             availableSlots: { gt: 0 },
-            config: roomConfigFilter ? { equals: roomConfigFilter } : undefined,
+            roomConfiguration: roomConfigFilter ? { equals: roomConfigFilter } : undefined,
           },
         },
       },
