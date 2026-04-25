@@ -284,7 +284,6 @@ export class HostelsService {
       }
     }
     
-    // ... rest of logic uses the updated filters
 
     // Intelligent Suggestion / Relevance Algorithm:
     // 1. Featured hostels first
