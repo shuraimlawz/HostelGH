@@ -25,9 +25,7 @@ const footerLinks = {
     ],
     partnership: [
         { label: "List Your Hostel", href: "/auth/register?role=OWNER" },
-        { label: "Partner Program", href: "/partners" },
         { label: "Verification", href: "/support/verification" },
-        { label: "Advertising", href: "/ads" },
     ],
     platform: [
         { label: "How it Works", href: "/how-it-works" },
@@ -39,7 +37,7 @@ const footerLinks = {
         { label: "Privacy Policy", href: "/support/privacy" },
         { label: "Service Terms", href: "/support/terms" },
         { label: "Cookie Policy", href: "/support/cookies" },
-        { label: "Payment Security", href: "/support/security" },
+
     ]
 };
 

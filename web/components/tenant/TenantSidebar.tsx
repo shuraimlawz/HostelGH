@@ -21,7 +21,7 @@ const links = [
     { name: "Dashboard", href: "/tenant", icon: LayoutDashboard },
     { name: "My Profile", href: "/account", icon: User },
     { name: "My Bookings", href: "/bookings", icon: CalendarCheck },
-    { name: "Payments", href: "/account/payments", icon: CreditCard },
+
     { name: "Settings", href: "/account/settings", icon: Settings },
 ];
 

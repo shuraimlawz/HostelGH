@@ -101,9 +101,7 @@ export default function AdminSidebar({ isOpen = false, onClose = () => { } }: Ad
                                 {link.href === "/admin/hostels" && counts?.hostels > 0 && (
                                     <span className="flex h-2 w-2 rounded-full bg-red-500" />
                                 )}
-                                {link.href === "/admin/payments" && counts?.payouts > 0 && (
-                                    <span className="flex h-2 w-2 rounded-full bg-red-500" />
-                                )}
+
                             </div>
                             {isActive && <ChevronRight size={14} className="text-white/60" />}
                         </Link>

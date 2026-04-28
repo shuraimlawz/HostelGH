@@ -74,15 +74,14 @@ export default function Navbar() {
                 { label: "My Hostels", href: "/owner/hostels", icon: Home },
                 { label: "My Rooms", href: "/owner/rooms", icon: Building2 },
                 { label: "Reservations", href: "/owner/bookings", icon: Calendar },
-                { label: "Payouts", href: "/owner/payouts", icon: Wallet },
-                { label: "Subscription", href: "/owner/subscription", icon: CreditCard },
+
                 { label: "Profile", href: "/owner/account", icon: UserIcon },
             ];
         }
         return [
             { label: "Dashboard", href: "/tenant", icon: LayoutDashboard },
             { label: "My Bookings", href: "/tenant/bookings", icon: Calendar },
-            { label: "Payments", href: "/account/payments", icon: CreditCard },
+
             { label: "My Account", href: "/account", icon: UserIcon },
             { label: "Settings", href: "/account/settings", icon: Settings },
         ];
