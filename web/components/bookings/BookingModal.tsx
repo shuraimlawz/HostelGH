@@ -95,16 +95,22 @@ export default function BookingModal({
         setLoading(true);
         setErr(null);
         try {
-            await api.post("/bookings", {
+            const bookingRes = await api.post("/bookings", {
                 hostelId, startDate, endDate,
                 items: [{ roomId, quantity }],
                 levelOfStudy, guardianName, guardianPhone,
                 admissionDocUrl, passportPhotoUrl,
             });
-            setStep("done");
+            
+            // Initiate payment of 5 GHS
+            const paymentRes = await api.post(`/payments/paystack/init/${bookingRes.data.id}`);
+            if (paymentRes.data?.authorizationUrl) {
+                window.location.href = paymentRes.data.authorizationUrl;
+            } else {
+                setStep("done");
+            }
         } catch (e: any) {
-            setErr(e.message || "Booking failed. Please try again.");
-        } finally {
+            setErr(e.response?.data?.message || e.message || "Booking failed. Please try again.");
             setLoading(false);
         }
     };
@@ -387,7 +393,7 @@ export default function BookingModal({
                                         className="mt-0.5 rounded border-gray-300 text-blue-600"
                                     />
                                     <span className="text-xs text-gray-500 leading-relaxed group-hover:text-gray-700 transition-colors">
-                                        I agree to the hostel's terms and booking policies. I understand that payment is due within 24 hours of approval and my slot may be released if unpaid.
+                                        I agree to the terms and policies. I understand that a non-refundable booking fee of ₵5 is required to reveal the manager's contact for direct communication.
                                     </span>
                                 </label>
                             </div>
@@ -400,9 +406,9 @@ export default function BookingModal({
                                     <CheckCircle2 size={28} className="text-green-600" />
                                 </div>
                                 <div className="space-y-1.5">
-                                    <p className="font-semibold text-gray-900">Booking request sent!</p>
+                                    <p className="font-semibold text-gray-900">Payment successful!</p>
                                     <p className="text-sm text-gray-500 max-w-xs mx-auto leading-relaxed">
-                                        The hostel manager will review your request and get back to you within 24 hours. Payment is only due after approval.
+                                        You can now view the manager's contact details and chat with them directly to confirm your move-in dates.
                                     </p>
                                 </div>
                             </div>

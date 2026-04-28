@@ -15,9 +15,11 @@ import {
     Shield,
     Droplets,
     Flame,
-    Loader2
+    Loader2,
+    Image as ImageIcon
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import ImageUpload from "@/components/common/ImageUpload";
 
 const roomSchema = z.object({
     name: z.string().min(2, "Name is required"),
@@ -29,6 +31,7 @@ const roomSchema = z.object({
     gender: z.enum(["MALE", "FEMALE", "MIXED"]),
     hasAC: z.boolean().default(false),
     utilitiesIncluded: z.array(z.string()).default([]),
+    images: z.array(z.string()).min(1, "At least one image is required"),
 });
 
 interface RoomModalProps {
@@ -56,6 +59,7 @@ export default function RoomModal({ hostelId, room, onClose, onSuccess }: RoomMo
             gender: "MIXED",
             hasAC: false,
             utilitiesIncluded: [],
+            images: [],
         }
     });
 
@@ -111,6 +115,17 @@ export default function RoomModal({ hostelId, room, onClose, onSuccess }: RoomMo
                     </div>
 
                     <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
+                        {/* Photos */}
+                        <div className="space-y-4">
+                            <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Room Photos *</label>
+                            <ImageUpload
+                                value={watch("images")}
+                                onChange={(urls) => setValue("images", urls)}
+                                maxImages={5}
+                            />
+                            {errors.images && <p className="text-xs text-red-500 font-bold ml-1">{errors.images.message}</p>}
+                        </div>
+
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             {/* Basic Info */}
                             <div className="space-y-2">

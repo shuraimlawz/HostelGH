@@ -7,6 +7,7 @@ import {
   IsBoolean,
   IsEnum,
   IsArray,
+  ArrayMinSize,
 } from "class-validator";
 import { ApiProperty, PartialType } from "@nestjs/swagger";
 import { RoomGender } from "@prisma/client";

@@ -147,7 +147,7 @@ export default function RoomManagementPage() {
 
                             <div className="space-y-5 mb-8">
                                 <div className="flex items-baseline gap-2">
-                                    <span className="text-3xl font-black text-gray-950 tracking-tighter">₵{room.pricePerTerm.toLocaleString()}</span>
+                                    <span className="text-3xl font-black text-gray-950 tracking-tighter">₵{(room.pricePerTerm / 100).toLocaleString()}</span>
                                     <span className="text-xs font-black text-gray-400 uppercase tracking-widest">/ semester</span>
                                 </div>
 

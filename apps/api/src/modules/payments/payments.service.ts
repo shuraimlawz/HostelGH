@@ -9,7 +9,7 @@ import { BookingsService } from "../bookings/bookings.service";
 
 @Injectable()
 export class PaymentsService {
-  private readonly PLATFORM_FEE = 2000; // 20 GHS in pesewas
+  private readonly PLATFORM_FEE = 500; // 5 GHS in pesewas
 
   constructor(
     private readonly prisma: PrismaService,
