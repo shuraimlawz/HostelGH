@@ -1,13 +1,13 @@
 import { Injectable, OnModuleInit, Logger } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
-import { MeiliSearch } from "meilisearch";
+import { Meilisearch } from "meilisearch";
 import { PrismaService } from "../../prisma/prisma.service";
 import { OpenAIEmbeddings } from "@langchain/openai";
 
 @Injectable()
 export class SearchService implements OnModuleInit {
   private readonly logger = new Logger(SearchService.name);
-  private client: MeiliSearch | null = null;
+  private client: Meilisearch | null = null;
   private embeddings: OpenAIEmbeddings | null = null;
 
   constructor(
@@ -19,7 +19,7 @@ export class SearchService implements OnModuleInit {
     const openAIKey = this.config.get<string>("OPENAI_API_KEY");
 
     if (host && apiKey) {
-      this.client = new MeiliSearch({ host, apiKey });
+      this.client = new Meilisearch({ host, apiKey });
     }
 
     if (openAIKey) {
@@ -61,7 +61,7 @@ export class SearchService implements OnModuleInit {
       });
       this.logger.log("Meilisearch index 'hostels' configured.");
     } catch (error) {
-      this.logger.error("Failed to setup Meilisearch index", error.stack);
+      this.logger.error("Failed to setup Meilisearch index", (error as Error).stack);
     }
   }
 
@@ -80,7 +80,7 @@ export class SearchService implements OnModuleInit {
         description: h.description,
         city: h.city,
         university: h.university,
-        gender: h.gender,
+        gender: h.genderCategory,
         minPrice: h.minPrice,
         rating: h.averageRating,
         amenities: h.amenities,

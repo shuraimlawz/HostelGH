@@ -44,19 +44,7 @@ export class BookingsController {
     return this.bookings.getOwnerBookings(req.user.id);
   }
 
-  @Roles(UserRole.TENANT)
-  @Patch(":id/tenant-check-in")
-  @ApiOperation({ summary: "Tenant confirms they have checked in" })
-  tenantCheckIn(@Req() req: any, @Param("id") id: string) {
-    return this.bookings.setTenantCheckedIn(req.user.id, id);
-  }
 
-  @Roles(UserRole.OWNER, UserRole.ADMIN)
-  @Patch(":id/manager-confirm")
-  @ApiOperation({ summary: "Manager confirms tenant has arrived" })
-  managerConfirm(@Req() req: any, @Param("id") id: string) {
-    return this.bookings.setManagerConfirmed(req.user.id, id);
-  }
 
   @Roles(UserRole.TENANT, UserRole.ADMIN)
   @Patch(":id/cancel")

@@ -98,15 +98,9 @@ export default function OwnerDashboardPage() {
         }
     });
 
-    const { data: wallet, isLoading: walletLoading } = useQuery({
-        queryKey: ["owner-wallet"],
-        queryFn: async () => {
-            const res = await api.get("/wallets/me");
-            return res.data;
-        }
-    });
 
-    if (hostelsLoading || bookingsLoading || analyticsLoading || walletLoading) {
+
+    if (hostelsLoading || bookingsLoading || analyticsLoading) {
         return (
             <div className="flex h-[60vh] items-center justify-center">
                 <div className="flex flex-col items-center gap-4 text-center">
@@ -126,7 +120,7 @@ export default function OwnerDashboardPage() {
         totalPendingBookings: bookings?.filter((b: any) => ["PENDING", "PAYMENT_SECURED"].includes(b.status))?.length || 0,
     };
 
-    const walletBalance = (wallet?.balance || 0) / 100;
+
     const bookingTrendData = analytics?.monthlyTrends || [];
 
     const filteredBookings = bookings?.filter((b: any) => {
@@ -172,9 +166,7 @@ export default function OwnerDashboardPage() {
                     <Link href="/owner/hostels/new" className="h-10 px-5 bg-blue-600 text-white rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-blue-700 transition-all flex items-center gap-2 shadow-lg shadow-blue-100 active:scale-95">
                         <PlusCircle size={16} /> Add Hostel
                     </Link>
-                    <Link href="/owner/payouts" className="h-10 px-5 bg-white border border-gray-100 text-gray-900 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-gray-50 transition-all flex items-center gap-2 shadow-sm">
-                        <Wallet size={16} /> Payments
-                    </Link>
+
                 </div>
             </div>
 
@@ -204,15 +196,7 @@ export default function OwnerDashboardPage() {
                     bgColor="bg-orange-50" 
                     detail="Review required" 
                 />
-                <StatCard 
-                    label="Portfolio Revenue" 
-                    value={`₵${walletBalance.toLocaleString()}`} 
-                    icon={DollarSign} 
-                    color="text-emerald-400" 
-                    bgColor="bg-white/5" 
-                    detail="100% Earnings (0% Platform Fee)" 
-                    premium 
-                />
+
             </div>
 
             <div className="grid grid-cols-1 xl:grid-cols-12 gap-10">

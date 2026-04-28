@@ -1,10 +1,10 @@
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
   previewFeatures = ["driverAdapters"]
 }
 
 datasource db {
-  provider  = "postgresql"
+  provider = "postgresql"
 }
 
 enum UserRole {
@@ -37,11 +37,6 @@ enum PaymentStatus {
   REFUNDED
 }
 
-enum PayoutMethodType {
-  BANK
-  MOBILE_MONEY
-}
-
 enum RoomGender {
   MALE
   FEMALE
@@ -66,29 +61,11 @@ enum HostelBookingStatus {
   FULL // No availability
 }
 
-enum HostelListingFeeModel {
-  STANDARD        // Per-booking fee (default) - charged when tenant books
-  MONTHLY_LISTING // Flat monthly listing fee
-  REVENUE_SHARE   // Percentage of revenue (e.g., 5-10%)
-  PER_ACCEPTANCE  // Fixed fee per accepted booking regardless of amount
-}
-
 enum RoomStatus {
   AVAILABLE
   RESERVED
   OCCUPIED
   ARCHIVED
-}
-
-enum DisputeRaisedBy {
-  USER
-  MANAGER
-}
-
-enum DisputeStatus {
-  OPEN
-  RESOLVED
-  REJECTED
 }
 
 enum SubscriptionStatus {
@@ -106,11 +83,11 @@ model User {
   googleId     String?  @unique
   role         UserRole @default(TENANT)
 
-  firstName String?
+  firstName  String?
   middleName String?
-  lastName  String?
-  avatarUrl String?
-  gender    UserGender?
+  lastName   String?
+  avatarUrl  String?
+  gender     UserGender?
 
   isActive           Boolean @default(true)
   emailVerified      Boolean @default(false)
@@ -121,71 +98,30 @@ model User {
   updatedAt DateTime @updatedAt
 
   // Trust & Safety
-  isVerified      Boolean @default(false)
-  ghanaCardUrl    String?
-  ghanaCardId     String?
-  
+  isVerified   Boolean @default(false)
+  ghanaCardUrl String?
+  ghanaCardId  String?
+
   // Community
-  lookingForRoommate Boolean @default(false)
+  lookingForRoommate    Boolean @default(false)
   roommateMatchingPrefs Json?
 
   // relations
   ownedHostels  Hostel[]       @relation("HostelOwner")
-  favorites      Favorite[]
+  favorites     Favorite[]
   bookings      Booking[]      @relation("BookingTenant")
   refreshTokens RefreshToken[]
-  payoutMethods PayoutMethod[]
-  savedPaymentMethods SavedPaymentMethod[]
-  wallets       Wallet[]
-  payoutRequests PayoutRequest[]
+
   subscriptions  Subscription[]
   adminAuditLogs AdminAuditLog[]
-  processedPayouts PayoutRequest[] @relation("PayoutProcessor")
-  passwordResetTokens PasswordResetToken[]
+
+  passwordResetTokens     PasswordResetToken[]
   emailVerificationTokens EmailVerificationToken[]
-  reviews        Review[]
-  conversations  Conversation[]
-  messages       Message[]
-  listingFeaturePayments ListingFeaturePayment[]
-
-
-  paystackSubaccountCode String? // For automated split payments
-  settlementAccount      SettlementAccount?
+  reviews                 Review[]
+  conversations           Conversation[]
+  messages                Message[]
 
   @@index([role])
-}
-
-model SavedPaymentMethod {
-  id        String   @id @default(cuid())
-  userId    String
-  type      String   // "MOMO" or "CARD"
-  provider  String   // "MTN", "VODAFONE", "AIRTELTIGO" or "VISA", "MASTERCARD"
-  phone     String?  // For MOMO
-  last4     String?  // For CARD
-  isDefault Boolean  @default(false)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([userId])
-}
-
-model PayoutMethod {
-  id            String           @id @default(cuid())
-  ownerId       String
-  type          PayoutMethodType
-  provider      String // e.g. "GCB", "MTN"
-  accountNumber String
-  accountName   String
-  bankCode      String? // Needed for Paystack subaccount creation
-  isDefault     Boolean          @default(false)
-  createdAt     DateTime         @default(now())
-  updatedAt     DateTime         @updatedAt
-
-  owner User @relation(fields: [ownerId], references: [id], onDelete: Cascade)
-
-  @@index([ownerId])
 }
 
 model RefreshToken {
@@ -245,15 +181,9 @@ model Hostel {
   amenities  String[] @default([])
   university String?
 
-  isFeatured Boolean @default(false)
+  isFeatured    Boolean   @default(false)
   featuredUntil DateTime?
-  minPrice   Int?
-
-  // Listing fee model and configuration
-  listingFeeModel        HostelListingFeeModel @default(STANDARD) // Fee model chosen by owner
-  monthlyListingFee      Int?                                     // For MONTHLY_LISTING model (pesewas)
-  revenueSharePercentage Float?                                   // For REVENUE_SHARE model (e.g., 5.0 = 5%)
-  perAcceptanceFee       Int?                                     // For PER_ACCEPTANCE model (pesewas)
+  minPrice      Int?
 
   // Ghana-specific fields
   whatsappNumber    String? // Primary contact method
@@ -263,27 +193,27 @@ model Hostel {
   policiesText      String?
   genderCategory    RoomGender?
 
-  isPublished          Boolean  @default(false)
-  pendingVerification  Boolean  @default(false) // Awaiting admin review before first publish
-  
-  // Trust & Safety
-  isVerifiedHostel     Boolean  @default(false)
-  virtualTourUrl       String?
+  isPublished         Boolean @default(false)
+  isArchived          Boolean @default(false)
+  pendingVerification Boolean @default(false) // Awaiting admin review before first publish
 
-  averageRating        Float    @default(0)
-  totalReviews         Int      @default(0)
-  
-  createdAt            DateTime @default(now())
-  updatedAt            DateTime @updatedAt
+  // Trust & Safety
+  isVerifiedHostel Boolean @default(false)
+  virtualTourUrl   String?
+
+  averageRating Float @default(0)
+  totalReviews  Int   @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   owner      User             @relation("HostelOwner", fields: [ownerId], references: [id], onDelete: Cascade)
   rooms      Room[]
   facilities HostelFacility[]
   bookings   Booking[]
-  wallets    Wallet[]
-  reviews    Review[]
-  favorites  Favorite[]
-  listingFeaturePayments ListingFeaturePayment[]
+
+  reviews   Review[]
+  favorites Favorite[]
 
   @@index([ownerId])
   @@index([city])
@@ -301,39 +231,6 @@ model HostelFacility {
   hostel Hostel @relation(fields: [hostelId], references: [id], onDelete: Cascade)
 
   @@index([hostelId])
-}
-
-model Wallet {
-  id        String   @id @default(cuid())
-  ownerId   String   @unique
-  balance   Int      @default(0) // pesewas (available for withdrawal)
-  pendingBalance Int @default(0) // pesewas (held in escrow)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  owner User @relation(fields: [ownerId], references: [id], onDelete: Cascade)
-  hostelId String?
-  hostel   Hostel? @relation(fields: [hostelId], references: [id])
-}
-
-model PayoutRequest {
-  id          String       @id @default(cuid())
-  ownerId     String
-  amount      Int
-  status      PayoutStatus @default(PENDING)
-  createdAt   DateTime     @default(now())
-  payoutMethodDetails Json?     // Snapshot of default payout method at time of request
-  processedBy         String?
-  processedById       User?    @relation("PayoutProcessor", fields: [processedBy], references: [id])
-
-  owner User @relation(fields: [ownerId], references: [id], onDelete: Cascade)
-}
-
-enum PayoutStatus {
-  PENDING
-  APPROVED
-  REJECTED
-  PAID
 }
 
 model Subscription {
@@ -356,16 +253,16 @@ model Subscription {
 }
 
 model Plan {
-  id               String        @id @default(cuid())
-  code             String        @unique // FREE, PRO, PREMIUM
+  id               String   @id @default(cuid())
+  code             String   @unique // FREE, PRO, PREMIUM
   name             String
   description      String?
-  monthlyPrice     Int?          // pesewas
-  yearlyPrice      Int?          // pesewas
-  listingLimit     Int?          // null = unlimited
-  featuredIncluded Boolean       @default(false)
-  createdAt        DateTime      @default(now())
-  updatedAt        DateTime      @updatedAt
+  monthlyPrice     Int? // pesewas
+  yearlyPrice      Int? // pesewas
+  listingLimit     Int? // null = unlimited
+  featuredIncluded Boolean  @default(false)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
 
   subscriptions Subscription[]
 }
@@ -388,10 +285,10 @@ model Room {
   hasAC             Boolean    @default(false)
   utilitiesIncluded String[]   @default([]) // ["water", "light", "gas"]
 
-  isActive  Boolean  @default(true)
+  isActive  Boolean    @default(true)
   status    RoomStatus @default(AVAILABLE)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
 
   hostel   Hostel        @relation(fields: [hostelId], references: [id], onDelete: Cascade)
   bookings BookingItem[]
@@ -429,12 +326,6 @@ model Booking {
   deletionRequested Boolean @default(false)
   deletionReason    String?
 
-  // Escrow & Check-in
-  userCheckedIn     Boolean @default(false)
-  managerConfirmed  Boolean @default(false)
-  commissionAmount  Int?    // in pesewas
-  payoutAmount      Int?    // in pesewas
-
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -443,8 +334,6 @@ model Booking {
 
   items   BookingItem[]
   payment Payment?
-  installmentPlans InstallmentPlan[]
-  disputes Dispute[]
 
   @@index([hostelId])
   @@index([tenantId])
@@ -474,9 +363,9 @@ model Payment {
   status    PaymentStatus   @default(INITIATED)
 
   amount        Int // in minor unit
-  processingFee Int? @default(0)
-  platformFee   Int @default(0)
-  ownerEarnings Int @default(0)
+  processingFee Int?   @default(0)
+  platformFee   Int    @default(0)
+  ownerEarnings Int    @default(0)
   currency      String @default("GHS")
 
   // Paystack fields
@@ -484,9 +373,9 @@ model Payment {
   authorizationUrl String?
   accessCode       String?
 
-  paidAt     DateTime?
+  paidAt          DateTime?
   offlineProofUrl String?
-  rawWebhook Json? // store last webhook payload (optional)
+  rawWebhook      Json? // store last webhook payload (optional)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -497,43 +386,20 @@ model Payment {
   @@index([provider])
 }
 
-model ListingFeaturePayment {
-  id           String          @id @default(cuid())
-  hostelId     String
-  ownerId      String
-  provider     PaymentProvider @default(PAYSTACK)
-  status       PaymentStatus   @default(INITIATED)
-  amount       Int
-  currency     String          @default("GHS")
-  reference    String          @unique
-  durationDays Int
-  paidAt       DateTime?
-  rawWebhook   Json?
-  createdAt    DateTime        @default(now())
-  updatedAt    DateTime        @updatedAt
-
-  hostel Hostel @relation(fields: [hostelId], references: [id], onDelete: Cascade)
-  owner  User   @relation(fields: [ownerId], references: [id], onDelete: Cascade)
-
-  @@index([hostelId])
-  @@index([ownerId])
-  @@index([status])
-}
-
 model AdminAuditLog {
-  id           String   @id @default(cuid())
-  adminId      String?
-  actionType   String // CREATE, UPDATE, DELETE, APPROVE, REJECT
-  entityType   String // USER, HOSTEL, BOOKING, PAYMENT, etc.
-  entityId     String?
-  details      String? // Human readable summary
-  metadata     Json?   // Store before/after state
-  ipAddress    String?
-  userAgent    String?
+  id         String  @id @default(cuid())
+  adminId    String?
+  actionType String // CREATE, UPDATE, DELETE, APPROVE, REJECT
+  entityType String // USER, HOSTEL, BOOKING, PAYMENT, etc.
+  entityId   String?
+  details    String? // Human readable summary
+  metadata   Json? // Store before/after state
+  ipAddress  String?
+  userAgent  String?
 
-  createdAt    DateTime @default(now())
+  createdAt DateTime @default(now())
 
-  admin        User?     @relation(fields: [adminId], references: [id])
+  admin User? @relation(fields: [adminId], references: [id])
 
   @@index([adminId])
   @@index([entityType])
@@ -555,11 +421,11 @@ model Review {
 }
 
 model Conversation {
-  id           String    @id @default(cuid())
-  isSupport    Boolean   @default(false)
-  guestId      String?   // For guest-to-admin support chats
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
+  id        String   @id @default(cuid())
+  isSupport Boolean  @default(false)
+  guestId   String? // For guest-to-admin support chats
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   participants User[]
   messages     Message[]
@@ -568,8 +434,8 @@ model Conversation {
 model Message {
   id             String   @id @default(cuid())
   conversationId String
-  senderId       String?  // Optional for guests
-  guestName      String?  // Name provided by guest
+  senderId       String? // Optional for guests
+  guestName      String? // Name provided by guest
   content        String
   isRead         Boolean  @default(false)
   createdAt      DateTime @default(now())
@@ -578,51 +444,6 @@ model Message {
   sender       User?        @relation(fields: [senderId], references: [id])
 
   @@index([conversationId])
-}
-
-model InstallmentPlan {
-  id        String   @id @default(cuid())
-  bookingId String
-  amount    Int      // pesewas
-  dueDate   DateTime
-  status    PaymentStatus @default(PENDING)
-  paidAt    DateTime?
-  
-  booking Booking @relation(fields: [bookingId], references: [id])
-
-  @@index([bookingId])
-}
-
-model Dispute {
-  id        String          @id @default(cuid())
-  bookingId String
-  raisedBy  DisputeRaisedBy
-  reason    String
-  details   String?         // description
-  status    DisputeStatus   @default(OPEN)
-  createdAt DateTime        @default(now())
-  updatedAt DateTime        @updatedAt
-
-  booking Booking @relation(fields: [bookingId], references: [id])
-
-  @@index([bookingId])
-}
-
-model SettlementAccount {
-  id            String           @id @default(cuid())
-  ownerId       String           @unique
-  accountNumber String
-  bankCode      String
-  bankName      String
-  accountName   String
-  recipientCode String?          // Paystack recipient code
-  method        PayoutMethodType @default(MOBILE_MONEY)
-  currency      String           @default("GHS")
-  
-  owner User @relation(fields: [ownerId], references: [id])
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
 }
 
 model NewsletterSubscriber {
@@ -635,7 +456,6 @@ model NewsletterSubscriber {
 
   @@index([hash])
 }
-
 
 model Favorite {
   id        String   @id @default(cuid())

@@ -9,15 +9,9 @@ async function main() {
   await prisma.review.deleteMany();
   await prisma.favorite.deleteMany();
   await prisma.booking.deleteMany();
-  await prisma.installmentPlan.deleteMany();
-  await prisma.dispute.deleteMany();
   await prisma.hostelFacility.deleteMany();
-  await prisma.hostelRoom.deleteMany();
+  await prisma.room.deleteMany();
   await prisma.hostel.deleteMany();
-  await prisma.walletTransaction.deleteMany();
-  await prisma.wallet.deleteMany();
-  await prisma.settlementAccount.deleteMany();
-  await prisma.listingFeaturePayment.deleteMany();
   await prisma.newsletterSubscriber.deleteMany();
   await prisma.message.deleteMany();
   await prisma.conversation.deleteMany();

@@ -492,44 +492,6 @@ export class AdminService {
     }
   }
 
-  async updatePayoutStatus(adminId: string, id: string, status: any) {
-    const admin = await this.prisma.user.findUnique({ where: { id: adminId } });
-
-    return await this.prisma.$transaction(async (tx) => {
-      const payout = await tx.payoutRequest.update({
-        where: { id },
-        data: {
-          status: status,
-          processedBy: adminId,
-        },
-        include: { owner: { select: { id: true, email: true } } },
-      });
-
-      // If rejected, refund the money to the wallet
-      if (status === "REJECTED") {
-        await tx.wallet.update({
-          where: { ownerId: payout.owner.id },
-          data: { balance: { increment: payout.amount } },
-        });
-      }
-
-      await this.audit.log(
-        admin,
-        status === "PAID"
-          ? AdminAction.APPROVE
-          : status === "REJECTED"
-            ? AdminAction.REJECT
-            : AdminAction.UPDATE,
-        AdminEntity.PAYOUT,
-        id,
-        `Payout request for ${payout.owner.email} updated to ${status}${status === "REJECTED" ? " (Refunded to wallet)" : ""}`,
-        { status },
-      );
-
-      return payout;
-    });
-  }
-
   async broadcastMessage(adminId: string, dto: BroadcastMessageDto) {
     const admin = await this.prisma.user.findUnique({ where: { id: adminId } });
     // Simulating broadcast - in real app this would send notifications/emails
@@ -546,24 +508,6 @@ export class AdminService {
 
   async getSecurityAlerts() {
     return [];
-  }
-
-  async getPendingPayouts() {
-    return this.prisma.payoutRequest.findMany({
-      where: { status: "PENDING" },
-      include: {
-        owner: {
-          select: {
-            id: true,
-            firstName: true,
-            lastName: true,
-            email: true,
-            payoutMethods: { where: { isDefault: true } },
-          },
-        },
-      },
-      orderBy: { createdAt: "desc" },
-    });
   }
 
   async createInternalUser(dto: any) {
@@ -599,15 +543,11 @@ export class AdminService {
   } // Deprecated in favor of toggleUserSuspension
 
   async getNotificationCounts() {
-    const [pendingHostels, pendingPayouts] = await Promise.all([
-      this.prisma.hostel.count({ where: { pendingVerification: true } }),
-      this.prisma.payoutRequest.count({ where: { status: "PENDING" } }),
-    ]);
-
+    const pendingHostels = await this.prisma.hostel.count({ where: { pendingVerification: true } });
     return {
       hostels: pendingHostels,
-      payouts: pendingPayouts,
-      total: pendingHostels + pendingPayouts,
+      payouts: 0,
+      total: pendingHostels,
     };
   }
 
@@ -618,12 +558,6 @@ export class AdminService {
       alerts.push({
         message: `${counts.hostels} hostels pending verification`,
         type: "info",
-      });
-    }
-    if (counts.payouts > 0) {
-      alerts.push({
-        message: `${counts.payouts} payout requests pending`,
-        type: "warning",
       });
     }
     return alerts;
@@ -650,64 +584,15 @@ export class AdminService {
     return { hostels: pendingHostels, owners: pendingOwners };
   }
 
-  async getDisputes() {
-    // @ts-ignore
-    return this.prisma.dispute.findMany({
-      include: {
-        booking: {
-          include: {
-            tenant: { select: { firstName: true, lastName: true, email: true } },
-            hostel: { select: { name: true } }
-          }
-        }
-      },
-      orderBy: { createdAt: 'desc' }
-    });
-  }
-
-  async updateDisputeStatus(adminId: string, disputeId: string, status: any) {
-    const admin = await this.prisma.user.findUnique({ where: { id: adminId } });
-    // @ts-ignore
-    const dispute = await this.prisma.dispute.update({
-      where: { id: disputeId },
-      data: { status },
-      include: { booking: true }
-    });
-
-    await this.audit.log(
-      admin!,
-      AdminAction.UPDATE,
-      AdminEntity.SYSTEM,
-      disputeId,
-      `Dispute ${disputeId} status updated to ${status}`,
-    );
-
-    this.gateway.broadcastActivity('DISPUTE_UPDATED', { disputeId, status });
-
-    return dispute;
-  }
-
   async getFinancialStats() {
-    const [totalVolume, escrowBalance, pendingPayouts] = await Promise.all([
-      this.prisma.payment.aggregate({
-        _sum: { amount: true },
-        where: { status: 'SUCCESS' }
-      }),
-      this.prisma.wallet.aggregate({
-        // @ts-ignore
-        _sum: { pendingBalance: true }
-      }),
-      this.prisma.payoutRequest.aggregate({
-        _sum: { amount: true },
-        where: { status: 'PENDING' }
-      })
-    ]);
-
+    const totalVolume = await this.prisma.payment.aggregate({
+      _sum: { amount: true },
+      where: { status: 'SUCCESS' }
+    });
     return {
       totalVolume: totalVolume._sum.amount || 0,
-      // @ts-ignore
-      escrowBalance: escrowBalance._sum.pendingBalance || 0,
-      pendingPayouts: pendingPayouts._sum.amount || 0
+      escrowBalance: 0,
+      pendingPayouts: 0
     };
   }
 

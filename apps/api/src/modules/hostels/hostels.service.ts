@@ -68,11 +68,7 @@ export class HostelsService {
         genderCategory: dto.genderCategory,
         isFeatured: dto.isFeatured,
         featuredUntil: featuredUntil,
-        // Listing fee model configuration
-        listingFeeModel: dto.listingFeeModel,
-        monthlyListingFee: dto.monthlyListingFee,
-        revenueSharePercentage: dto.revenueSharePercentage,
-        perAcceptanceFee: dto.perAcceptanceFee,
+
         ownerId,
         isPublished: !isFirstHostel, // auto-publish if already verified
         pendingVerification: isFirstHostel, // flag first-timers for admin review
@@ -170,17 +166,17 @@ export class HostelsService {
     page?: number;
     query?: string;
   }) {
-    const { query } = params;
+    const searchQueryText = params.query;
 
     // Try Meilisearch first for typos and ranking (Phase 2)
-    const meiliResults = await this.search.search(query || "", {
+    const meiliResults = await this.search.search(searchQueryText || "", {
       limit: params.limit,
       offset: params.page && params.limit ? (params.page - 1) * params.limit : 0,
       filter: this.buildMeiliFilter(params),
     });
 
     if (meiliResults) {
-      this.logger.log(`Using Meilisearch for query: ${query}`);
+      this.logger.log(`Using Meilisearch for query: ${searchQueryText}`);
       // If we have meilisearch results, we return them
       // Note: Need to fetch full objects from DB or return meili docs
       const ids = meiliResults.hits.map(h => h.id);
@@ -584,8 +580,7 @@ export class HostelsService {
       this.prisma.booking.count({
         where: {
           hostel: { ownerId },
-          status: BookingStatus.RESERVED,
-          managerConfirmed: false,
+          status: BookingStatus.PENDING,
         },
       }),
     ]);

@@ -47,48 +47,5 @@ export class PaymentsController {
     return this.payments.getPaymentById(id, req.user.userId);
   }
 
-  @Post("offline/submit/:bookingId")
-  @Roles(UserRole.TENANT)
-  submitProof(
-    @Req() req: any,
-    @Param("bookingId") bookingId: string,
-    @Body() dto: SubmitProofDto,
-  ) {
-    return this.payments.submitOfflineProof(
-      req.user.userId,
-      bookingId,
-      dto.proofUrl,
-      dto.notes,
-    );
-  }
 
-  @Post("offline/verify/:paymentId")
-  @Roles(UserRole.OWNER, UserRole.ADMIN)
-  verifyOffline(
-    @Req() req: any,
-    @Param("paymentId") paymentId: string,
-    @Body("status") status: "SUCCESS" | "FAILED",
-  ) {
-    return this.payments.verifyOfflinePayment(
-      req.user.userId,
-      paymentId,
-      status,
-    );
-  }
-
-  @Post("feature/init/:hostelId")
-  @Roles(UserRole.OWNER, UserRole.ADMIN)
-  @HttpCode(HttpStatus.OK)
-  initFeaturePayment(
-    @Req() req: any,
-    @Param("hostelId") hostelId: string,
-    @Body("durationDays") durationDays?: number,
-  ) {
-    const days = durationDays ? Number(durationDays) : undefined;
-    return this.payments.initFeaturedListingPayment(
-      { userId: req.user.userId, role: req.user.role },
-      hostelId,
-      days,
-    );
-  }
 }

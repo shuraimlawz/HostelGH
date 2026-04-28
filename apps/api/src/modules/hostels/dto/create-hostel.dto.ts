@@ -9,7 +9,7 @@ import {
   Min,
 } from "class-validator";
 import { ApiProperty, PartialType } from "@nestjs/swagger";
-import { RoomGender, HostelBookingStatus, HostelListingFeeModel } from "@prisma/client";
+import { RoomGender, HostelBookingStatus } from "@prisma/client";
 
 export class CreateHostelDto {
   @ApiProperty({ example: "Sunny Side Hostel" })
@@ -113,46 +113,7 @@ export class CreateHostelDto {
   @IsEnum(RoomGender)
   genderCategory?: RoomGender;
 
-  // Listing fee model configuration
-  @ApiProperty({
-    example: HostelListingFeeModel.STANDARD,
-    enum: HostelListingFeeModel,
-    description: "Fee model: STANDARD (per-booking), MONTHLY_LISTING (fixed fee), REVENUE_SHARE (%), or PER_ACCEPTANCE (fixed per booking)",
-    required: false,
-  })
-  @IsOptional()
-  @IsEnum(HostelListingFeeModel)
-  listingFeeModel?: HostelListingFeeModel;
 
-  @ApiProperty({
-    example: 5000,
-    description: "Monthly listing fee in pesewas (e.g., 5000 = 50 GHS) - required for MONTHLY_LISTING model",
-    required: false,
-  })
-  @IsOptional()
-  @IsNumber()
-  @Min(0)
-  monthlyListingFee?: number;
-
-  @ApiProperty({
-    example: 7.5,
-    description: "Revenue share percentage (e.g., 7.5 for 7.5%) - required for REVENUE_SHARE model",
-    required: false,
-  })
-  @IsOptional()
-  @IsNumber()
-  @Min(0)
-  revenueSharePercentage?: number;
-
-  @ApiProperty({
-    example: 2000,
-    description: "Fixed fee per accepted booking in pesewas (e.g., 2000 = 20 GHS) - required for PER_ACCEPTANCE model",
-    required: false,
-  })
-  @IsOptional()
-  @IsNumber()
-  @Min(0)
-  perAcceptanceFee?: number;
 }
 
 export class UpdateHostelDto extends PartialType(CreateHostelDto) { }

@@ -25,7 +25,7 @@ const links = [
     { name: "My Hostels", href: "/owner/hostels", icon: Home },
     { name: "Bookings", href: "/owner/bookings", icon: CalendarCheck },
     { name: "Add Hostel", href: "/owner/hostels/new", icon: PlusCircle },
-    { name: "Payouts", href: "/owner/payouts", icon: CreditCard },
+
     // { name: "Subscription", href: "/owner/subscription", icon: Zap },
     { name: "Settings", href: "/owner/account", icon: Settings },
 ];

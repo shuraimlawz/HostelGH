@@ -76,10 +76,7 @@ export class WebhooksController {
         return { received: true };
       }
 
-      if (metadata?.type === "feature_listing" || reference?.startsWith("FT_")) {
-        await this.payments.markFeaturedListingPaidFromWebhook(reference, event, paidAt);
-        return { received: true };
-      }
+
 
       if (reference) {
         await this.payments.markPaidFromWebhook(reference, event, paidAt);

@@ -163,64 +163,12 @@ export class AdminController {
     return this.adminService.getPayments(query);
   }
 
-  // --- PAYOUTS ---
-
-  @Get("payouts")
-  @ApiOperation({ summary: "Get pending payout requests" })
-  getPendingPayouts() {
-    return this.adminService.getPendingPayouts();
-  }
-
-  @Patch("payouts/:id")
-  @ApiOperation({ summary: "Approve/Reject/Pay payout request" })
-  updatePayoutStatus(
-    @Param("id") id: string,
-    @Body("status") status: any,
-    @User() admin,
-  ) {
-    return this.adminService.updatePayoutStatus(admin.id, id, status);
-  }
-
-  @Get("notifications/counts")
-  @ApiOperation({ summary: "Get counts of items needing attention" })
-  getNotificationCounts() {
-    return this.adminService.getNotificationCounts();
-  }
-
-  @Get("alerts")
-  @ApiOperation({ summary: "Get system alerts" })
-  getAlerts() {
-    return this.adminService.getAlerts();
-  }
-
-  @Post("broadcast")
-  @ApiOperation({ summary: "Send a broadcast message to user segments" })
-  broadcastMessage(@Body() dto: BroadcastMessageDto, @User() admin) {
-    return this.adminService.broadcastMessage(admin.id, dto);
-  }
-
   // --- COMMAND CENTER ENDPOINTS ---
 
   @Get("verification-queue")
   @ApiOperation({ summary: "Get items pending verification (KYC & Hostels)" })
   getVerificationQueue() {
     return this.adminService.getVerificationQueue();
-  }
-
-  @Get("disputes")
-  @ApiOperation({ summary: "Get active disputes" })
-  getDisputes() {
-    return this.adminService.getDisputes();
-  }
-
-  @Patch("disputes/:id")
-  @ApiOperation({ summary: "Update dispute status" })
-  updateDisputeStatus(
-    @Param("id") id: string,
-    @Body() dto: AdminActionDto,
-    @User() admin,
-  ) {
-    return this.adminService.updateDisputeStatus(admin.id, id, dto.disputeStatus);
   }
 
   @Get("financials")

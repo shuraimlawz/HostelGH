@@ -8,14 +8,10 @@ import { HostelsModule } from "./modules/hostels/hostels.module";
 import { RoomsModule } from "./modules/rooms/rooms.module";
 import { BookingsModule } from "./modules/bookings/bookings.module";
 import { PaymentsModule } from "./modules/payments/payments.module";
-import { DisputesModule } from "./modules/disputes/disputes.module";
+import { AdminModule } from "./modules/admin/admin.module";
 import { HealthModule } from "./modules/health/health.module";
 import { NotificationsModule } from "./modules/notifications/notifications.module";
-import { PayoutsModule } from "./modules/payouts/payouts.module";
 import { UploadModule } from "./modules/upload/upload.module";
-import { AdminModule } from "./modules/admin/admin.module";
-import { PaymentMethodsModule } from "./modules/payment-methods/payment-methods.module";
-import { WalletsModule } from "./modules/wallets/wallets.module";
 import { RedisModule } from "./modules/redis/redis.module";
 import { SubscriptionsModule } from "./modules/subscriptions/subscriptions.module";
 import { ThrottlerModule, ThrottlerGuard } from "@nestjs/throttler";
@@ -48,14 +44,10 @@ import { AppController } from "./app.controller";
     RoomsModule,
     BookingsModule,
     PaymentsModule,
-    DisputesModule,
     HealthModule,
     NotificationsModule,
-    PayoutsModule,
     UploadModule,
     AdminModule,
-    PaymentMethodsModule,
-    WalletsModule,
     RedisModule,
     SubscriptionsModule,
     EmailModule,

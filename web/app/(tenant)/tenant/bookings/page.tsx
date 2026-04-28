@@ -78,16 +78,12 @@ export default function TenantBookingsPage() {
 
     const getStatusStyles = (status: string) => {
         switch (status) {
-            case "PENDING_APPROVAL": 
+            case "PENDING": 
                 return "bg-yellow-500/10 text-yellow-600 border-yellow-500/20";
-            case "APPROVED": 
-                return "bg-blue-500/10 text-blue-600 border-blue-500/20";
-            case "CONFIRMED": 
+            case "COMPLETED": 
                 return "bg-emerald-500/10 text-emerald-600 border-emerald-500/20";
-            case "REJECTED": 
+            case "CANCELLED": 
                 return "bg-red-500/10 text-red-600 border-red-500/20";
-            case "EXPIRED": 
-                return "bg-gray-500/10 text-gray-500 border-gray-500/20";
             default: 
                 return "bg-muted text-muted-foreground border-border";
         }
@@ -119,14 +115,14 @@ export default function TenantBookingsPage() {
                     <div className="text-right">
                         <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Active Links</p>
                         <p className="text-3xl font-bold text-gray-900 tracking-tighter leading-none">
-                            {Array.isArray(bookings) ? bookings.filter(b => b.status === "CONFIRMED").length : 0}
+                            {Array.isArray(bookings) ? bookings.filter(b => b.status === "COMPLETED").length : 0}
                         </p>
                     </div>
                     <div className="w-px h-10 bg-gray-100" />
                     <div className="text-right">
                         <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Pending Flow</p>
                         <p className="text-3xl font-bold text-gray-900 tracking-tighter leading-none">
-                            {Array.isArray(bookings) ? bookings.filter(b => ["APPROVED", "PENDING_APPROVAL"].includes(b.status)).length : 0}
+                            {Array.isArray(bookings) ? bookings.filter(b => b.status === "PENDING").length : 0}
                         </p>
                     </div>
                 </div>
@@ -140,9 +136,9 @@ export default function TenantBookingsPage() {
                         <Info size={32} className="text-blue-400" />
                     </div>
                     <div className="space-y-2 text-center md:text-left">
-                        <h3 className="text-xl font-bold uppercase tracking-tight leading-none text-white">Settlement Window <span className="text-blue-500 opacity-40">.</span></h3>
+                        <h3 className="text-xl font-bold uppercase tracking-tight leading-none text-white">Contact Reveal <span className="text-blue-500 opacity-40">.</span></h3>
                         <p className="text-[11px] text-gray-400 font-bold leading-relaxed uppercase tracking-widest max-w-2xl">
-                            Upon approval, payment must be finalized within the 24-hour window. Failure to settle will result in automatic slot purging from the matrix.
+                            Pay the platform fee to instantly reveal the hostel manager's contact details and confirm your stay directly with them.
                         </p>
                     </div>
                 </div>
@@ -190,11 +186,11 @@ export default function TenantBookingsPage() {
                                     {/* Deadline / Countdown */}
                                     <div className="w-full lg:w-48 space-y-2 text-center lg:text-left">
                                         <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest flex items-center justify-center lg:justify-start gap-1.5 leading-none mb-1">
-                                            <Clock size={12} /> Validation Clock
+                                            <Clock size={12} /> Expiry
                                         </p>
                                         <div className="text-xl font-bold text-gray-900 uppercase tracking-tight">
-                                            {booking.status === 'APPROVED' && booking.paymentDeadline ? (
-                                                <Countdown deadline={booking.paymentDeadline} />
+                                            {booking.status === 'PENDING' ? (
+                                                <span className="text-orange-500 text-sm">Action Needed</span>
                                             ) : (
                                                 <span className="opacity-20">—</span>
                                             )}
@@ -203,21 +199,21 @@ export default function TenantBookingsPage() {
 
                                     {/* Actions */}
                                     <div className="flex flex-wrap items-center justify-center lg:justify-end gap-3">
-                                        {booking.status === 'APPROVED' && (
+                                        {booking.status === 'PENDING' && (
                                             <button
                                                 disabled={payMutation.isPending}
                                                 onClick={() => payMutation.mutate(booking.id)}
                                                 className="h-14 px-8 bg-blue-600 text-white rounded-xl font-bold uppercase text-[10px] tracking-widest flex items-center gap-3 hover:bg-blue-700 transition-all shadow-lg shadow-blue-500/10 active:scale-95 disabled:opacity-50"
                                             >
                                                 {payMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <CreditCard size={16} />}
-                                                AUTHORIZE SETTLEMENT
+                                                PAY TO REVEAL CONTACT
                                             </button>
                                         )}
 
                                         <div className="flex items-center gap-2">
-                                            {booking.hostel.whatsappNumber && (
+                                            {booking.status === 'COMPLETED' && booking.hostel.whatsappNumber && (
                                                 <a
-                                                    href={`https://wa.me/233${booking.hostel.whatsappNumber.replace(/^0/, '')}?text=Hi, I'm ${booking.tenant.firstName}, I booked a room at ${booking.hostel.name}.`}
+                                                    href={`https://wa.me/233${booking.hostel.whatsappNumber.replace(/^0/, '')}?text=Hi, I'm ${booking.tenant?.firstName || ''}, I booked a room at ${booking.hostel.name}.`}
                                                     target="_blank"
                                                     rel="noopener noreferrer"
                                                     className="w-14 h-14 bg-white border border-gray-100 rounded-xl flex items-center justify-center text-emerald-600 hover:bg-emerald-50 transition-all shadow-sm"
