@@ -28,6 +28,13 @@ enum PaymentProvider {
   OFFLINE
 }
 
+enum PaymentMethod {
+  CARD
+  BANK_TRANSFER
+  USSD
+  MOBILE_MONEY
+}
+
 enum PaymentStatus {
   INITIATED
   PENDING
@@ -360,6 +367,7 @@ model Payment {
   id        String          @id @default(cuid())
   bookingId String          @unique
   provider  PaymentProvider @default(PAYSTACK)
+  method    PaymentMethod   @default(CARD)
   status    PaymentStatus   @default(INITIATED)
 
   amount        Int // in minor unit
@@ -373,6 +381,12 @@ model Payment {
   authorizationUrl String?
   accessCode       String?
 
+  // Bank transfer fields
+  bankName      String?
+  bankCode      String?
+  accountNumber String?
+  accountName   String?
+
   paidAt          DateTime?
   offlineProofUrl String?
   rawWebhook      Json? // store last webhook payload (optional)
@@ -384,6 +398,7 @@ model Payment {
 
   @@index([status])
   @@index([provider])
+  @@index([method])
 }
 
 model AdminAuditLog {

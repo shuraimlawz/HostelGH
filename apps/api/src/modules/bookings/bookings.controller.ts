@@ -86,4 +86,26 @@ export class BookingsController {
   ownerAnalytics(@Req() req: any) {
     return this.bookings.getOwnerAnalytics(req.user.id);
   }
+
+  @Roles(UserRole.OWNER)
+  @Patch(":id/approve")
+  @ApiOperation({ summary: "Approve a booking request (Owner only)" })
+  approve(@Req() req: any, @Param("id") id: string, @Body() body: any) {
+    return this.bookings.approveBooking(
+      { id: req.user.id, role: req.user.role },
+      id,
+      body.slotNumber,
+    );
+  }
+
+  @Roles(UserRole.OWNER)
+  @Patch(":id/reject")
+  @ApiOperation({ summary: "Reject a booking request (Owner only)" })
+  reject(@Req() req: any, @Param("id") id: string, @Body() body: any) {
+    return this.bookings.rejectBooking(
+      { id: req.user.id, role: req.user.role },
+      id,
+      body.reason,
+    );
+  }
 }

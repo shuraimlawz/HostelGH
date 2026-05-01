@@ -10,6 +10,7 @@ import { BookingStatus, UserRole, HostelBookingStatus } from "@prisma/client";
 import { Cron, CronExpression } from "@nestjs/schedule";
 import { CreateBookingDto } from "./dto/create-booking.dto";
 import { NotificationsService } from "../notifications/notifications.service";
+import { AdminAuditLogService, AdminAction, AdminEntity } from "../admin/admin-audit.service";
 
 @Injectable()
 export class BookingsService {
@@ -18,6 +19,7 @@ export class BookingsService {
   constructor(
     private prisma: PrismaService,
     private notifications: NotificationsService,
+    private audit: AdminAuditLogService,
   ) { }
 
   async createBooking(tenantId: string, dto: CreateBookingDto) {
@@ -163,6 +165,105 @@ export class BookingsService {
       },
       orderBy: { createdAt: "desc" },
     });
+  }
+
+  async approveBooking(
+    actor: { id: string; role: UserRole },
+    bookingId: string,
+    slotNumber?: number,
+  ) {
+    const booking = await this.prisma.booking.findUnique({
+      where: { id: bookingId },
+      include: { hostel: true, tenant: true, items: true },
+    });
+
+    if (!booking) throw new NotFoundException("Booking not found");
+
+    // Authorization: only owner of hostel or admin can approve
+    if (booking.hostel.ownerId !== actor.id && actor.role !== UserRole.ADMIN) {
+      throw new ForbiddenException("Not authorized to approve this booking");
+    }
+
+    if (booking.status !== BookingStatus.PENDING) {
+      throw new BadRequestException(`Cannot approve booking with status: ${booking.status}`);
+    }
+
+    const updatedBooking = await this.prisma.booking.update({
+      where: { id: bookingId },
+      data: {
+        status: BookingStatus.PAYMENT_SECURED,
+        slotNumber: slotNumber,
+      },
+      include: { tenant: true, hostel: true, items: { include: { room: true } } },
+    });
+
+    // Log audit trail - fire and forget
+    this.audit.log(
+      null,
+      AdminAction.APPROVE,
+      AdminEntity.BOOKING,
+      bookingId,
+      `Approved booking for ${booking.tenant.firstName} ${booking.tenant.lastName} at ${booking.hostel.name}`,
+      { before: { status: BookingStatus.PENDING }, after: { status: BookingStatus.PAYMENT_SECURED } },
+    ).catch(() => {});
+
+    // Send email notification
+    this.notifications.sendBookingApprovedEmail(booking.tenant.email, {
+      hostelName: booking.hostel.name,
+      startDate: booking.startDate.toDateString(),
+      endDate: booking.endDate.toDateString(),
+    }).catch(() => {});
+
+    return updatedBooking;
+  }
+
+  async rejectBooking(
+    actor: { id: string; role: UserRole },
+    bookingId: string,
+    reason?: string,
+  ) {
+    const booking = await this.prisma.booking.findUnique({
+      where: { id: bookingId },
+      include: { hostel: true, tenant: true, items: true },
+    });
+
+    if (!booking) throw new NotFoundException("Booking not found");
+
+    // Authorization: only owner of hostel or admin can reject
+    if (booking.hostel.ownerId !== actor.id && actor.role !== UserRole.ADMIN) {
+      throw new ForbiddenException("Not authorized to reject this booking");
+    }
+
+    if (booking.status !== BookingStatus.PENDING) {
+      throw new BadRequestException(`Cannot reject booking with status: ${booking.status}`);
+    }
+
+    const updatedBooking = await this.prisma.booking.update({
+      where: { id: bookingId },
+      data: {
+        status: BookingStatus.CANCELLED,
+        notes: reason || "Booking rejected by hostel owner",
+      },
+      include: { tenant: true, hostel: true, items: { include: { room: true } } },
+    });
+
+    // Log audit trail - fire and forget
+    this.audit.log(
+      null,
+      AdminAction.REJECT,
+      AdminEntity.BOOKING,
+      bookingId,
+      `Rejected booking for ${booking.tenant.firstName} ${booking.tenant.lastName} at ${booking.hostel.name}. Reason: ${reason || "No reason provided"}`,
+      { before: { status: BookingStatus.PENDING }, after: { status: BookingStatus.CANCELLED }, reason },
+    ).catch(() => {});
+
+    // Send rejection email
+    this.notifications.sendBookingRejectedEmail(booking.tenant.email, {
+      hostelName: booking.hostel.name,
+      reason: reason || "Hostel owner rejected your booking request",
+    }).catch(() => {});
+
+    return updatedBooking;
   }
 
   async cancelBooking(

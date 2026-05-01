@@ -177,6 +177,22 @@ export class AdminController {
     return this.adminService.getFinancialStats();
   }
 
+  @Get("audit-logs")
+  @ApiOperation({ summary: "Get audit logs with filtering" })
+  getAuditLogs(
+    @Query("entityType") entityType?: string,
+    @Query("actionType") actionType?: string,
+    @Query("page") page: string = "1",
+    @Query("limit") limit: string = "50",
+  ) {
+    return this.adminService.getAuditLogs({
+      entityType,
+      actionType,
+      page: parseInt(page, 10),
+      limit: parseInt(limit, 10),
+    });
+  }
+
   @Post("users/:userId/impersonate")
   @ApiOperation({ summary: "Shadow Mode: Impersonate a user" })
   async impersonate(@Param("userId") userId: string, @User() admin) {

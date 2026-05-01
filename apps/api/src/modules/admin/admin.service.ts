@@ -596,6 +596,47 @@ export class AdminService {
     };
   }
 
+  async getAuditLogs(query: {
+    entityType?: string;
+    actionType?: string;
+    page: number;
+    limit: number;
+  }) {
+    const skip = (query.page - 1) * query.limit;
+    const where: any = {};
+
+    if (query.entityType) {
+      where.entityType = query.entityType;
+    }
+
+    if (query.actionType) {
+      where.actionType = query.actionType;
+    }
+
+    const [logs, total] = await Promise.all([
+      this.prisma.adminAuditLog.findMany({
+        where,
+        include: {
+          admin: { select: { id: true, firstName: true, lastName: true, email: true } },
+        },
+        orderBy: { createdAt: 'desc' },
+        skip,
+        take: query.limit,
+      }),
+      this.prisma.adminAuditLog.count({ where }),
+    ]);
+
+    return {
+      logs,
+      pagination: {
+        total,
+        page: query.page,
+        limit: query.limit,
+        pages: Math.ceil(total / query.limit),
+      },
+    };
+  }
+
   async impersonateUser(adminId: string, targetUserId: string) {
     const admin = await this.prisma.user.findUnique({ where: { id: adminId } });
     if (!admin || admin.role !== UserRole.ADMIN) {
