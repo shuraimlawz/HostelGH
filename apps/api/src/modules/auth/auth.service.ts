@@ -41,16 +41,13 @@ export class AuthService {
   }
 
   async register(dto: RegisterDto) {
-    // 1. Initial Validations & Hashing (Outside DB)
     if (dto.role === UserRole.ADMIN) {
       throw new BadRequestException("Cannot register as an ADMIN via public endpoint");
     }
 
-    // Hash password immediately (CPU intensive)
-    const passwordHash = await bcrypt.hash(dto.password, 10); // 10 rounds for speed
+    const passwordHash = await bcrypt.hash(dto.password, 10);
 
     try {
-      // 2. Sequential Writes (Optimized - No transaction to avoid P2028 timeouts)
       const existingUser = await this.prisma.user.findFirst({
         where: {
           OR: [
@@ -66,7 +63,6 @@ export class AuthService {
         throw new BadRequestException("Phone number already in use");
       }
 
-      // Create User
       const user = await this.prisma.user.create({
         data: {
           email: dto.email,
@@ -85,10 +81,8 @@ export class AuthService {
         },
       });
 
-      // 3. Prepare token and fire email (Non-blocking)
       const rawToken = await this.prepareVerificationToken(user.email);
       
-      // Fire-and-forget email delivery
       this.emailService.sendEmailVerification(user.email, rawToken).catch(err => {
         this.logger.error(`Registration email delivery failed for ${user.email}: ${err.message}`);
       });
@@ -141,7 +135,6 @@ export class AuthService {
       throw new UnauthorizedException("Invalid email or password");
     }
 
-    // Fire success audit (non-blocking)
     this.auditLogger.log(null, AdminAction.LOGIN_SUCCESS, AdminEntity.USER, user.id, "Success", { role: user.role });
 
     const tokens = await this.issueTokens(user.id, user.role);
@@ -220,6 +213,160 @@ export class AuthService {
     };
   }
 
+  async completeOnboarding(userId: string, role: UserRole) {
+    if (role === UserRole.ADMIN) {
+      throw new BadRequestException("Cannot select ADMIN role");
+    }
+
+    const user = await this.prisma.user.update({
+      where: { id: userId },
+      data: {
+        role,
+        isOnboarded: true,
+      },
+    });
+
+    const tokens = await this.issueTokens(user.id, user.role);
+    return {
+      user: { id: user.id, email: user.email, role: user.role, isOnboarded: user.isOnboarded },
+      ...tokens,
+    };
+  }
+
+  async switchRole(userId: string, targetRole: UserRole) {
+    if (targetRole === UserRole.ADMIN) {
+      throw new BadRequestException("Cannot switch to ADMIN role");
+    }
+
+    const user = await this.prisma.user.findUnique({ where: { id: userId } });
+    if (!user) throw new UnauthorizedException("User not found");
+    if (user.role === targetRole) throw new BadRequestException(`Already a ${targetRole}`);
+
+    if (targetRole === UserRole.TENANT) {
+      const hostels = await this.prisma.hostel.findMany({ select: { id: true }, where: { ownerId: userId } });
+      const hostelIds = hostels.map(h => h.id);
+
+      const deleteOperations = [
+        this.prisma.subscription.deleteMany({ where: { userId: userId } })
+      ];
+
+      if (hostelIds.length > 0) {
+        deleteOperations.unshift(
+          this.prisma.booking.deleteMany({ where: { hostelId: { in: hostelIds } } }),
+          this.prisma.room.deleteMany({ where: { hostelId: { in: hostelIds } } }),
+          this.prisma.hostel.deleteMany({ where: { ownerId: userId } })
+        );
+      }
+
+      await this.prisma.$transaction(deleteOperations as any);
+    }
+
+    const updatedUser = await this.prisma.user.update({
+      where: { id: userId },
+      data: { role: targetRole },
+    });
+
+    const tokens = await this.issueTokens(updatedUser.id, updatedUser.role);
+    return {
+      user: { id: updatedUser.id, email: updatedUser.email, role: updatedUser.role, isOnboarded: updatedUser.isOnboarded },
+      ...tokens,
+    };
+  }
+
+  async impersonateUser(adminId: string, targetUserId: string) {
+    const admin = await this.prisma.user.findUnique({ where: { id: adminId } });
+    if (!admin || admin.role !== UserRole.ADMIN) {
+      throw new UnauthorizedException("Only admins can impersonate");
+    }
+
+    const targetUser = await this.prisma.user.findUnique({ where: { id: targetUserId } });
+    if (!targetUser) throw new BadRequestException("Target user not found");
+
+    this.logger.log(`Admin ${admin.email} is impersonating ${targetUser.email}`);
+
+    const tokens = await this.issueTokens(targetUser.id, targetUser.role);
+    return {
+      token: tokens.accessToken,
+      userId: targetUser.id,
+      user: { id: targetUser.id, email: targetUser.email, role: targetUser.role },
+      ...tokens,
+      isImpersonating: true,
+    };
+  }
+
+  async changePassword(userId: string, dto: any) {
+    const user = await this.prisma.user.findUnique({ where: { id: userId } });
+    if (!user || !user.passwordHash) {
+      throw new BadRequestException("User not found or password not set");
+    }
+
+    const valid = await bcrypt.compare(dto.oldPassword, user.passwordHash);
+    if (!valid) {
+      throw new BadRequestException("Current password is incorrect");
+    }
+
+    const newHash = await bcrypt.hash(dto.newPassword, 12);
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: { passwordHash: newHash },
+    });
+
+    return { message: "Password updated successfully" };
+  }
+
+  async forgotPassword(email: string) {
+    const user = await this.prisma.user.findUnique({ where: { email } });
+    if (!user) {
+      return { message: "If an account exists, a reset link was sent." };
+    }
+
+    const rawToken = randomBytes(32).toString("hex");
+    const hashedToken = sha256(rawToken);
+
+    const expiresAt = new Date();
+    expiresAt.setHours(expiresAt.getHours() + 1);
+
+    await this.prisma.passwordResetToken.deleteMany({
+      where: { email },
+    });
+
+    await this.prisma.passwordResetToken.create({
+      data: {
+        email,
+        token: hashedToken,
+        expiresAt,
+      },
+    });
+
+    await this.emailService.sendPasswordResetEmail(email, rawToken);
+
+    return { message: "If an account exists, a reset link was sent." };
+  }
+
+  async resetPassword(token: string, newPassword: string) {
+    const hashedToken = sha256(token);
+
+    const resetRecord = await this.prisma.passwordResetToken.findUnique({
+      where: { token: hashedToken },
+    });
+
+    if (!resetRecord || resetRecord.expiresAt < new Date()) {
+      throw new BadRequestException("Invalid or expired reset token.");
+    }
+
+    const passwordHash = await bcrypt.hash(newPassword, 12);
+    await this.prisma.user.update({
+      where: { email: resetRecord.email },
+      data: { passwordHash },
+    });
+
+    await this.prisma.passwordResetToken.delete({
+      where: { id: resetRecord.id },
+    });
+
+    return { message: "Password has been successfully reset." };
+  }
+
   private async issueTokens(userId: string, role: string | null) {
     if (!role) {
       const user = await this.prisma.user.findUnique({ where: { id: userId }, select: { role: true } });
@@ -252,7 +399,6 @@ export class AuthService {
     const hashedToken = sha256(rawToken);
     const expiresAt = new Date(Date.now() + 1000 * 60 * 60 * 24); // 24 hours
 
-    // Clean up old tokens without blocking
     this.prisma.emailVerificationToken.deleteMany({ where: { email } }).catch(() => {});
     
     await this.prisma.emailVerificationToken.create({

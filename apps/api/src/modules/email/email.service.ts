@@ -30,7 +30,6 @@ export class EmailService implements OnModuleInit {
         html: string;
         from?: string;
         text?: string;
-        idempotencyKey?: string;
     }) {
         if (!this.resend) {
             this.logger.error("Resend client not initialized. Check RESEND_API_KEY mapping in configuration.ts.");
@@ -45,7 +44,6 @@ export class EmailService implements OnModuleInit {
             subject: options.subject,
             html: options.html,
             text: options.text,
-            idempotencyKey: options.idempotencyKey,
         });
 
         if (error) {
@@ -77,7 +75,6 @@ export class EmailService implements OnModuleInit {
             to,
             subject: "Password Reset Request",
             html,
-            idempotencyKey: `pw-reset/${to}-${Date.now()}`,
         });
     }
 
@@ -101,7 +98,6 @@ export class EmailService implements OnModuleInit {
             to,
             subject: "Verify your email",
             html,
-            idempotencyKey: `verify-email/${to}`,
         });
     }
 }
