@@ -21,10 +21,10 @@ export default function StickySearch({ isVisible }: StickySearchProps) {
     return (
         <div 
             className={cn(
-                "absolute top-1/2 left-1/2 -translate-x-1/2 transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] z-50",
+                "absolute top-[58%] left-1/2 -translate-x-1/2 transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] z-50",
                 isVisible 
                     ? "opacity-100 -translate-y-1/2 scale-100 pointer-events-auto" 
-                    : "opacity-0 -translate-y-[150%] scale-90 pointer-events-none"
+                    : "opacity-0 -translate-y-[180%] scale-90 pointer-events-none"
             )}
         >
             <div className="flex items-center bg-white rounded-full border border-gray-200 shadow-[0_12px_40px_rgba(0,0,0,0.08)] hover:shadow-[0_16px_48px_rgba(0,0,0,0.12)] hover:border-gray-300 transition-all duration-300 p-1.5 md:p-2 group">
