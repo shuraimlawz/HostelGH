@@ -10,7 +10,7 @@ export const envSchema = Joi.object({
   GOOGLE_CLIENT_SECRET: Joi.string().optional(),
   GOOGLE_CALLBACK_URL: Joi.string().optional(),
   FRONTEND_URL: Joi.string().default("https://hostelgh.vercel.app"),
-  RESEND_API_KEY: Joi.string().required(),
+  RESEND_API_KEY: Joi.string().optional(),
   EMAIL_FROM: Joi.string().optional(),
   CLOUDINARY_CLOUD_NAME: Joi.string().optional(),
   CLOUDINARY_API_KEY: Joi.string().optional(),
