@@ -7,7 +7,7 @@ import {
 import { PrismaService } from "../../prisma/prisma.service";
 import { UserRole, RoomGender, BookingStatus } from "@prisma/client";
 import { RedisService } from "../redis/redis.service";
-import { SearchService } from "../search/search.service";
+// import { SearchService } from "../search/search.service"; // Temporarily disabled
 import { SubscriptionsService } from "../subscriptions/subscriptions.service";
 import {
   AdminAuditLogService,
@@ -16,6 +16,7 @@ import {
 } from "../admin/admin-audit.service";
 import { CreateHostelDto, UpdateHostelDto } from "./dto/create-hostel.dto";
 import { Cron, CronExpression } from "@nestjs/schedule";
+import { fuzzyMatch, findBestMatch, levenshteinDistance } from "../../utils/fuzzy-match";
 
 @Injectable()
 export class HostelsService {
@@ -26,7 +27,7 @@ export class HostelsService {
     private readonly redis: RedisService,
     private readonly subscriptions: SubscriptionsService,
     private readonly audit: AdminAuditLogService,
-    private readonly search: SearchService,
+    // private readonly search: SearchService, // Temporarily disabled
   ) { }
 
   async create(ownerId: string, dto: CreateHostelDto) {
@@ -152,6 +153,87 @@ export class HostelsService {
     });
   }
 
+  /**
+   * Fetch all unique universities from hostels to enable fuzzy matching
+   */
+  private async getAvailableUniversities(): Promise<string[]> {
+    const cacheKey = "available_universities";
+    const cached = await this.redis.get(cacheKey);
+    if (cached) {
+      try {
+        return JSON.parse(cached);
+      } catch (e) {
+        this.logger.warn("Failed to parse cached universities");
+      }
+    }
+
+    const hostels = await this.prisma.hostel.findMany({
+      where: { isPublished: true, university: { not: null } },
+      select: { university: true },
+      distinct: ["university"],
+    });
+
+    const universities = hostels
+      .map((h) => h.university)
+      .filter((u): u is string => u !== null && u.trim() !== "");
+
+    // Cache for 1 hour
+    await this.redis.set(cacheKey, JSON.stringify(universities), 3600);
+    return universities;
+  }
+
+  /**
+   * Find matching university using fuzzy matching (handles typos)
+   */
+  private async fuzzyMatchUniversity(input: string): Promise<string | null> {
+    if (!input || input.trim() === "") return null;
+
+    const available = await this.getAvailableUniversities();
+    const best = findBestMatch(input, available, 0.65); // 65% similarity threshold
+
+    if (best) {
+      this.logger.debug(
+        `Fuzzy matched "${input}" to "${best.value}" (score: ${best.score.toFixed(2)})`,
+      );
+      return best.value;
+    }
+
+    return null;
+  }
+
+  /**
+   * Fetch all distinct hostel names and city values from DB (for fuzzy query expansion).
+   * Returns a flat list of tokens that the search engine can use to find typo-tolerant matches.
+   */
+  private async getAvailableHostelNames(): Promise<string[]> {
+    const cacheKey = "available_hostel_names";
+    const cached = await this.redis.get(cacheKey);
+    if (cached) {
+      try { return JSON.parse(cached); } catch { /* ignore */ }
+    }
+
+    const [hostels, cities] = await Promise.all([
+      this.prisma.hostel.findMany({
+        where: { isPublished: true },
+        select: { name: true },
+        distinct: ["name"],
+      }),
+      this.prisma.hostel.findMany({
+        where: { isPublished: true },
+        select: { city: true },
+        distinct: ["city"],
+      }),
+    ]);
+
+    const names = [
+      ...hostels.map(h => h.name),
+      ...cities.map(h => h.city),
+    ].filter(Boolean);
+
+    await this.redis.set(cacheKey, JSON.stringify(names), 3600);
+    return names;
+  }
+
   async publicSearch(params: {
     city?: string;
     region?: string;
@@ -159,6 +241,8 @@ export class HostelsService {
     maxPrice?: number;
     amenities?: string[];
     university?: string;
+    /** Comma-separated list of all known name variants for a school (sent by the schools page) */
+    universityAliases?: string[];
     sort?: string;
     gender?: string;
     roomConfig?: string;
@@ -168,23 +252,23 @@ export class HostelsService {
   }) {
     const searchQueryText = params.query;
 
-    // Try Meilisearch first for typos and ranking (Phase 2)
-    const meiliResults = await this.search.search(searchQueryText || "", {
-      limit: params.limit,
-      offset: params.page && params.limit ? (params.page - 1) * params.limit : 0,
-      filter: this.buildMeiliFilter(params),
-    });
+    // Try Meilisearch first for typos and ranking (Phase 2) - Temporarily disabled
+    // const meiliResults = await this.search.search(searchQueryText || "", {
+    //   limit: params.limit,
+    //   offset: params.page && params.limit ? (params.page - 1) * params.limit : 0,
+    //   filter: this.buildMeiliFilter(params),
+    // });
 
-    if (meiliResults) {
-      this.logger.log(`Using Meilisearch for query: ${searchQueryText}`);
-      // If we have meilisearch results, we return them
-      // Note: Need to fetch full objects from DB or return meili docs
-      const ids = meiliResults.hits.map(h => h.id);
-      return this.prisma.hostel.findMany({
-        where: { id: { in: ids } },
-        include: { rooms: { where: { isActive: true } } },
-      });
-    }
+    // if (meiliResults) {
+    //   this.logger.log(`Using Meilisearch for query: ${searchQueryText}`);
+    //   // If we have meilisearch results, we return them
+    //   // Note: Need to fetch full objects from DB or return meili docs
+    //   const ids = meiliResults.hits.map(h => h.id);
+    //   return this.prisma.hostel.findMany({
+    //     where: { id: { in: ids } },
+    //     include: { rooms: { where: { isActive: true } } },
+    //   });
+    // }
 
     const cacheKey = `search:${JSON.stringify(params)}`;
     const cached = await this.redis.getJson<any[]>(cacheKey);
@@ -197,6 +281,7 @@ export class HostelsService {
       maxPrice,
       amenities,
       university,
+      universityAliases,
       sort,
       gender,
       roomConfig,
@@ -215,11 +300,24 @@ export class HostelsService {
 
     let searchQuery = query?.toLowerCase() || "";
     let universityFilter = university;
+    // universityFilters is the full set of name variants to match against (OR logic)
+    let universityFilters: string[] = universityAliases && universityAliases.length > 0
+      ? universityAliases
+      : university ? [university] : [];
     let genderFilter = gender;
     let minPriceFilter = minPrice;
     let maxPriceFilter = maxPrice;
     let amenitiesFilter = amenities || [];
     let roomConfigFilter = roomConfig;
+
+    // Apply fuzzy matching to university filter to handle typos (only when NOT using the full alias list)
+    if (universityFilter && universityFilters.length <= 1) {
+      const fuzzyMatched = await this.fuzzyMatchUniversity(universityFilter);
+      if (fuzzyMatched && fuzzyMatched !== universityFilter) {
+        // Add the fuzzy match as an extra variant
+        universityFilters = [...new Set([...universityFilters, fuzzyMatched])];
+      }
+    }
 
     // Phase 1: Smart Parsing of the natural language query
     if (searchQuery) {
@@ -269,14 +367,50 @@ export class HostelsService {
                     break;
                 }
             }
+            
+            // If no alias matched, try fuzzy matching the school name
+            if (!universityFilter) {
+              const fuzzyMatched = await this.fuzzyMatchUniversity(schoolPart);
+              if (fuzzyMatched) {
+                universityFilter = fuzzyMatched;
+              }
+            }
         }
     }
 
-    // If the query matches an alias, boost the university filter
+    // If the query matches an alias, add to the university filters
     for (const [alias, realNames] of Object.entries(ALIASES)) {
       if (searchQuery.includes(alias)) {
-        universityFilter = realNames[0]; // Take the first real name as primary filter
+        universityFilter = realNames[0];
+        universityFilters = [...new Set([...universityFilters, ...realNames])];
         break;
+      }
+    }
+
+    // -----------------------------------------------------------------------
+    // Fuzzy query expansion: when the user typed something in the search box,
+    // fetch all distinct hostel names + cities from the DB and find fuzzy
+    // neighbours. This handles single-letter typos like "Tesono" → "Tesano".
+    // -----------------------------------------------------------------------
+    let fuzzyExpandedTerms: string[] = [];
+    if (searchQuery && searchQuery.length >= 3) {
+      const allNames = await this.getAvailableHostelNames();
+      const words = searchQuery.split(/\s+/).filter(w => w.length >= 3);
+      for (const word of words) {
+        const matches = allNames.filter(name => {
+          const nameLower = name.toLowerCase();
+          // Exact substring match already handled by Prisma contains — skip
+          if (nameLower.includes(word) || word.includes(nameLower)) return false;
+          // Accept if Levenshtein distance <= 2 for words up to 8 chars, or <= 3 for longer words
+          const maxDist = word.length <= 8 ? 2 : 3;
+          return levenshteinDistance(word, nameLower) <= maxDist;
+        });
+        fuzzyExpandedTerms.push(...matches);
+      }
+      // Deduplicate
+      fuzzyExpandedTerms = [...new Set(fuzzyExpandedTerms)];
+      if (fuzzyExpandedTerms.length > 0) {
+        this.logger.debug(`Fuzzy expanded "${searchQuery}" → [${fuzzyExpandedTerms.slice(0, 5).join(", ")}]`);
       }
     }
     
@@ -305,45 +439,69 @@ export class HostelsService {
     const page = params.page ?? 1;
     const skip = (page - 1) * take;
 
-    const results = await this.prisma.hostel.findMany({
-      where: {
-        isPublished: true,
-        city: city ? { contains: city, mode: "insensitive" } : undefined,
-        region: region ? { equals: region, mode: "insensitive" } : undefined,
-        university: universityFilter
-          ? { contains: universityFilter, mode: "insensitive" }
+    // Build the university OR conditions across all known aliases
+    const universityConditions = universityFilters.length > 0
+      ? universityFilters.map(alias => ({ university: { contains: alias, mode: "insensitive" as const } }))
+      : null;
+
+    // Build the free-text OR conditions including fuzzy-expanded neighbours
+    const textOrConditions: any[] = searchQuery
+      ? [
+          { name: { contains: searchQuery, mode: "insensitive" } },
+          { city: { contains: searchQuery, mode: "insensitive" } },
+          { university: { contains: searchQuery, mode: "insensitive" } },
+          { description: { contains: searchQuery, mode: "insensitive" } },
+          { addressLine: { contains: searchQuery, mode: "insensitive" } },
+          // Add fuzzy-expanded neighbours so typos still find results
+          ...fuzzyExpandedTerms.map(term => ({ name: { contains: term, mode: "insensitive" as const } })),
+          ...fuzzyExpandedTerms.map(term => ({ city: { contains: term, mode: "insensitive" as const } })),
+          ...fuzzyExpandedTerms.map(term => ({ addressLine: { contains: term, mode: "insensitive" as const } })),
+        ]
+      : [];
+
+    // When we have BOTH a university filter AND a text query we combine with AND:
+    // hostel must match one of the university aliases AND match the text query.
+    // When we only have one of them, that one acts alone.
+    const whereConditions: any = {
+      isPublished: true,
+      city: city ? { contains: city, mode: "insensitive" } : undefined,
+      region: region ? { equals: region, mode: "insensitive" } : undefined,
+      gender: genderFilter ? { equals: genderFilter as any } : undefined,
+      amenities:
+        amenitiesFilter && amenitiesFilter.length > 0
+          ? { hasEvery: amenitiesFilter }
           : undefined,
-        gender: genderFilter ? { equals: genderFilter as any } : undefined,
-        // Global search query
-        OR: searchQuery ? [
-            { name: { contains: searchQuery, mode: "insensitive" } },
-            { city: { contains: searchQuery, mode: "insensitive" } },
-            { university: { contains: searchQuery, mode: "insensitive" } },
-            { description: { contains: searchQuery, mode: "insensitive" } },
-        ] : undefined,
-        amenities:
-          amenitiesFilter && amenitiesFilter.length > 0
-            ? { hasEvery: amenitiesFilter }
-            : undefined,
-        bookingStatus: { not: "CLOSED" },
-        minPrice:
-          minPriceFilter !== undefined || maxPriceFilter !== undefined
-            ? {
-              gte: minPriceFilter,
-              lte: maxPriceFilter,
-            }
-            : undefined,
-        rooms: {
-          some: {
-            isActive: true,
-            availableSlots: { gt: 0 },
-            roomConfiguration: roomConfigFilter ? { equals: roomConfigFilter } : undefined,
-          },
+      bookingStatus: { not: "CLOSED" },
+      minPrice:
+        minPriceFilter !== undefined || maxPriceFilter !== undefined
+          ? { gte: minPriceFilter, lte: maxPriceFilter }
+          : undefined,
+      rooms: {
+        some: {
+          isActive: true,
+          availableSlots: { gt: 0 },
+          roomConfiguration: roomConfigFilter ? { equals: roomConfigFilter } : undefined,
         },
       },
+    };
+
+    // Attach OR conditions intelligently
+    if (universityConditions && textOrConditions.length > 0) {
+      // Both: must satisfy university AND text query
+      whereConditions.AND = [
+        { OR: universityConditions },
+        { OR: textOrConditions },
+      ];
+    } else if (universityConditions) {
+      whereConditions.OR = universityConditions;
+    } else if (textOrConditions.length > 0) {
+      whereConditions.OR = textOrConditions;
+    }
+
+    const results = await this.prisma.hostel.findMany({
+      where: whereConditions,
       include: { rooms: { where: { isActive: true } } },
       orderBy: orderBy,
-      // apply paging if provided
       ...(skip !== undefined ? { skip } : {}),
       ...(take !== undefined ? { take } : {}),
     });

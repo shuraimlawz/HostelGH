@@ -26,7 +26,7 @@ import { ReviewsModule } from "./modules/reviews/reviews.module";
 import { ChatModule } from "./modules/chat/chat.module";
 import { NewsletterModule } from "./modules/newsletter/newsletter.module";
 import { FavoritesModule } from "./modules/favorites/favorites.module";
-import { SearchModule } from "./modules/search/search.module";
+// import { SearchModule } from "./modules/search/search.module"; // Temporarily disabled
 
 import { AppController } from "./app.controller";
 
@@ -55,7 +55,7 @@ import { AppController } from "./app.controller";
     ChatModule,
     NewsletterModule,
     FavoritesModule,
-    SearchModule,
+    // SearchModule, // Temporarily disabled due to LangChain ES module issues
     ScheduleModule.forRoot(),
     ThrottlerModule.forRoot([
       {

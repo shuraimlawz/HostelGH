@@ -88,6 +88,7 @@ export class HostelsController {
     @Query("minPrice") minPrice?: string,
     @Query("maxPrice") maxPrice?: string,
     @Query("university") university?: string,
+    @Query("universityAliases") universityAliases?: string,
     @Query("amenities") amenities?: string | string[],
     @Query("sort") sort?: string,
     @Query("gender") gender?: string,
@@ -98,12 +99,17 @@ export class HostelsController {
   ) {
     const amenitiesArr =
       typeof amenities === "string" ? amenities.split(",") : amenities;
+    // universityAliases is a comma-separated list of name variants (sent by the schools page)
+    const aliasesArr = universityAliases
+      ? universityAliases.split("|").map(a => a.trim()).filter(Boolean)
+      : undefined;
     return this.hostels.publicSearch({
       city,
       region,
       minPrice: minPrice ? parseInt(minPrice, 10) : undefined,
       maxPrice: maxPrice ? parseInt(maxPrice, 10) : undefined,
       university,
+      universityAliases: aliasesArr,
       limit: limit ? parseInt(limit, 10) : undefined,
       page: page ? parseInt(page, 10) : undefined,
       amenities: amenitiesArr,

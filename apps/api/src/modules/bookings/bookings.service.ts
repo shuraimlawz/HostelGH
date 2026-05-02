@@ -398,4 +398,95 @@ export class BookingsService {
       console.log(`Auto-cancelled booking ${booking.id} due to payment timeout.`);
     }
   }
+
+  /**
+   * Returns a full receipt for a booking.
+   * Only the booking tenant or an admin can access this.
+   */
+  async getBookingReceipt(userId: string, userRole: UserRole, bookingId: string) {
+    const booking = await this.prisma.booking.findUnique({
+      where: { id: bookingId },
+      include: {
+        hostel: {
+          select: {
+            id: true,
+            name: true,
+            addressLine: true,
+            city: true,
+            region: true,
+            university: true,
+            whatsappNumber: true,
+          },
+        },
+        tenant: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            email: true,
+            phone: true,
+          },
+        },
+        items: {
+          include: {
+            room: {
+              select: {
+                name: true,
+                roomConfiguration: true,
+                gender: true,
+              },
+            },
+          },
+        },
+        payment: true,
+      },
+    });
+
+    if (!booking) throw new NotFoundException("Booking not found");
+
+    // Authorization: only the tenant or admin
+    if (booking.tenantId !== userId && userRole !== UserRole.ADMIN) {
+      throw new ForbiddenException("Not authorized to view this receipt");
+    }
+
+    // Calculate amounts
+    const baseAmount = booking.items.reduce(
+      (sum, item) => sum + item.unitPrice * item.quantity,
+      0,
+    );
+    const totalPaid = booking.payment?.amount ?? baseAmount;
+    const platformFee = booking.payment?.platformFee ?? 0;
+    const processingFee = booking.payment?.processingFee ?? 0;
+
+    return {
+      receiptNumber: booking.payment?.reference ?? `GH-${booking.id.slice(-8).toUpperCase()}`,
+      bookingId: booking.id,
+      status: booking.status,
+      paymentStatus: booking.payment?.status ?? null,
+      paymentMethod: booking.payment?.method ?? null,
+      paymentProvider: booking.payment?.provider ?? null,
+      paidAt: booking.payment?.paidAt ?? null,
+      createdAt: booking.createdAt,
+      startDate: booking.startDate,
+      endDate: booking.endDate,
+      slotNumber: booking.slotNumber,
+      tenant: booking.tenant,
+      hostel: booking.hostel,
+      items: booking.items.map((item) => ({
+        roomName: item.room.name,
+        roomConfiguration: item.room.roomConfiguration,
+        gender: item.room.gender,
+        quantity: item.quantity,
+        unitPrice: item.unitPrice,
+        subtotal: item.unitPrice * item.quantity,
+      })),
+      amounts: {
+        baseAmount,
+        platformFee,
+        processingFee,
+        totalPaid,
+        currency: booking.payment?.currency ?? "GHS",
+      },
+    };
+  }
 }

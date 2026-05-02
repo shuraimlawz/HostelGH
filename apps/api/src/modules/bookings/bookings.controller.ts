@@ -108,4 +108,11 @@ export class BookingsController {
       body.reason,
     );
   }
+
+  @Roles(UserRole.TENANT, UserRole.ADMIN)
+  @Get(":id/receipt")
+  @ApiOperation({ summary: "Get a downloadable receipt for a booking (Tenant only)" })
+  getReceipt(@Req() req: any, @Param("id") id: string) {
+    return this.bookings.getBookingReceipt(req.user.id, req.user.role, id);
+  }
 }

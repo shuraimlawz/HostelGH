@@ -36,6 +36,7 @@ export default function Navbar() {
     const menuRef = useRef<HTMLDivElement>(null);
     const router = useRouter();
     const pathname = usePathname();
+    const WHATSAPP_CHANNEL = "https://whatsapp.com/channel/0029Vb7lvGb8kyyFC81FOs1B";
 
     // Scroll listener for dynamic styling and sticky search
     useEffect(() => {
@@ -167,6 +168,19 @@ export default function Navbar() {
 
                     {/* Secondary Actions */}
                     <div className="flex items-center gap-3">
+                        <a
+                            href={WHATSAPP_CHANNEL}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex h-10 items-center gap-2 rounded-2xl border border-green-500/20 bg-emerald-500/10 px-4 text-xs font-bold uppercase tracking-[0.18em] text-emerald-300 transition hover:bg-emerald-500/15 focus:outline-none focus:ring-2 focus:ring-emerald-400/40"
+                            aria-label="Chat with HostelGH on WhatsApp"
+                        >
+                            <svg viewBox="0 0 24 24" className="h-4 w-4 fill-current" aria-hidden="true">
+                                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.472-.149-.672.15-.198.297-.767.967-.94 1.165-.173.198-.347.223-.644.075-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.447-.52.149-.173.198-.298.298-.497.099-.198.05-.372-.025-.521-.075-.149-.672-1.611-.92-2.207-.242-.579-.487-.5-.672-.51l-.573-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.262.489 1.693.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.414-.074-.124-.272-.198-.57-.347z" />
+                                <path d="M12.004 2.008c-5.523 0-9.995 4.472-9.995 9.995 0 1.76.462 3.496 1.34 5.02l-1.397 4.98 5.107-1.344a9.937 9.937 0 0 0 4.944 1.205h.006c5.523 0 9.995-4.472 9.995-9.995s-4.472-9.995-9.995-9.995zm0 18.195h-.005c-1.585 0-3.136-.415-4.49-1.2l-.322-.193-3.035.8.81-2.88-.209-.32a8.757 8.757 0 0 1-1.31-4.63c0-4.839 3.93-8.77 8.77-8.77 4.84 0 8.77 3.931 8.77 8.77 0 4.84-3.93 8.77-8.77 8.77z" />
+                            </svg>
+                            <span className="hidden sm:inline">WhatsApp</span>
+                        </a>
                         {!user && (
                             <Link
                                 href="/auth/register?role=OWNER"

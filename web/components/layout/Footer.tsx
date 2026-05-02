@@ -1,279 +1,222 @@
 "use client";
 import Link from "next/link";
-import {
-    Mail,
-    Phone,
-    MapPin,
-    ShieldCheck,
-    ArrowRight,
-    MessageCircle,
-    Send,
-    ChevronUp
-} from "lucide-react";
+import { ArrowRight, MessageCircle, Send, GraduationCap, Building2, Shield, Star } from "lucide-react";
 import LogoAnimation from "./LogoAnimation";
-import { cn } from "@/lib/utils";
+import { useState } from "react";
+import { api } from "@/lib/api";
+import { toast } from "sonner";
+
+const QUICK_LINKS = [
+    { label: "All Listings", href: "/hostels" },
+    { label: "How it Works", href: "/how-it-works" },
+    { label: "List Your Hostel", href: "/auth/register?role=OWNER" },
+    { label: "Support Desk", href: "/support" },
+];
+
+const SCHOOLS = [
+    { label: "Near KNUST", href: "/schools/knust" },
+    { label: "Near UG Legon", href: "/schools/ug" },
+    { label: "Near UCC", href: "/schools/ucc" },
+    { label: "Near GCTU", href: "/schools/gctu" },
+    { label: "Near UPSA", href: "/schools/upsa" },
+    { label: "Near GIMPA", href: "/schools/gimpa" },
+];
+
+const LEGAL = [
+    { label: "Privacy Policy", href: "/support/privacy" },
+    { label: "Terms of Service", href: "/support/terms" },
+    { label: "Cookie Policy", href: "/support/cookies" },
+    { label: "Security", href: "/support/security" },
+];
+
+const TRUST_BADGES = [
+    { icon: Shield, label: "Secure Payments" },
+    { icon: GraduationCap, label: "Student-Verified" },
+    { icon: Star, label: "Top-Rated Hostels" },
+    { icon: Building2, label: "Verified Listings" },
+];
 
 const WHATSAPP_CHANNEL = "https://whatsapp.com/channel/0029Vb7lvGb8kyyFC81FOs1B";
 
-const footerLinks = {
-    discover: [
-        { label: "Greater Accra", href: "/hostels?city=Greater%20Accra" },
-        { label: "Ashanti Region", href: "/hostels?city=Ashanti" },
-        { label: "Central Region", href: "/hostels?city=Central" },
-        { label: "Western Region", href: "/hostels?city=Western" },
-        { label: "All Listings", href: "/hostels" },
-    ],
-    partnership: [
-        { label: "List Your Hostel", href: "/auth/register?role=OWNER" },
-        { label: "Verification", href: "/support/verification" },
-    ],
-    platform: [
-        { label: "How it Works", href: "/how-it-works" },
-        { label: "Safety Center", href: "/support/safety" },
-        { label: "Support Desk", href: "/support" },
-        { label: "System Status", href: "/status" },
-    ],
-    legal: [
-        { label: "Privacy Policy", href: "/support/privacy" },
-        { label: "Service Terms", href: "/support/terms" },
-        { label: "Cookie Policy", href: "/support/cookies" },
-
-    ]
-};
-
 export default function Footer() {
     const currentYear = new Date().getFullYear();
+    const [email, setEmail] = useState("");
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
-    const scrollToTop = () => {
-        window.scrollTo({ top: 0, behavior: "smooth" });
+    const handleSubscribe = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!email.trim()) return;
+        setIsSubmitting(true);
+        try {
+            await api.post("/newsletter/subscribe", { email });
+            toast.success("You're subscribed! 🎉");
+            setEmail("");
+        } catch {
+            toast.error("Subscription failed. Please try again.");
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     return (
-        <footer className="relative bg-[#020617] pt-32 pb-12 overflow-hidden border-t border-white/[0.02]">
-            {/* Visual Depth Elements */}
-            <div className="absolute top-0 left-0 w-full h-[500px] bg-gradient-to-b from-blue-600/[0.03] to-transparent pointer-events-none" />
-            <div className="absolute top-[-10%] right-[-5%] w-[600px] h-[600px] bg-indigo-600/[0.08] blur-[150px] rounded-full animate-pulse pointer-events-none" />
-            <div className="absolute bottom-[-10%] left-[-5%] w-[500px] h-[500px] bg-blue-600/[0.05] blur-[120px] rounded-full pointer-events-none" />
+        <footer className="relative overflow-hidden bg-[#020617] text-white border-t border-white/10">
+            {/* Background glows */}
+            <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(59,130,246,0.15),_transparent_35%),radial-gradient(circle_at_bottom_right,_rgba(96,165,250,0.12),_transparent_30%)]" />
 
-            <div className="container mx-auto px-6 relative z-10">
-                {/* Newsletter Section */}
-                <div className="relative mb-32 group">
-                    <div className="absolute inset-0 bg-blue-600/20 blur-[100px] opacity-0 group-hover:opacity-100 transition-opacity duration-1000 -z-10" />
-                    <div className="bg-white/[0.03] backdrop-blur-3xl border border-white/10 rounded-[2.5rem] p-8 md:p-16 flex flex-col lg:flex-row items-center justify-between gap-12 shadow-2xl relative overflow-hidden">
-                        {/* Decorative Gradient Line */}
-                        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-blue-500/50 to-transparent" />
+            <div className="relative container mx-auto px-6 pt-16 pb-10">
 
-                        <div className="max-w-xl text-center lg:text-left">
-                            <h2 className="text-3xl md:text-5xl font-black text-white tracking-tighter mb-6 italic uppercase leading-none">
-                                Join The <span className="text-blue-500 underline decoration-blue-500/20 underline-offset-8">Circle</span>
+                {/* Top: Brand + tagline + CTA */}
+                <div className="grid gap-12 lg:grid-cols-[2fr_1fr] mb-14">
+                    <div className="space-y-6">
+                        <div className="inline-flex items-center gap-3 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-white w-fit">
+                            <LogoAnimation />
+                            <span className="uppercase tracking-[0.25em]">HostelGH</span>
+                        </div>
+                        <div>
+                            <p className="text-xs font-semibold uppercase tracking-[0.35em] text-blue-400/90 mb-3">
+                                Engineered for modern hostel living
+                            </p>
+                            <h2 className="text-3xl sm:text-4xl font-black leading-tight tracking-tight">
+                                Powerful and reliable.
+                                <span className="block text-blue-500">Full hostel automation you can afford.</span>
                             </h2>
-                            <p className="text-zinc-400 text-base md:text-lg font-medium leading-relaxed">
-                                Get exclusive student deals, hostel opening alerts, and curated living tips delivered to your inbox weekly.
+                            <p className="mt-4 text-zinc-400 text-sm leading-7 max-w-lg">
+                                A complete platform for students and hostel owners, designed with trusted workflows, secure payments, and a sleek digital experience that keeps every booking seamless.
                             </p>
                         </div>
 
-                        <div className="w-full lg:max-w-md">
-                            <form
-                                className="relative group/form"
-                                onSubmit={async (e) => {
-                                    e.preventDefault();
-                                    const form = e.currentTarget;
-                                    const email = new FormData(form).get("email") as string;
-                                    const btn = form.querySelector("button");
-                                    if (btn) btn.disabled = true;
-                                    try {
-                                        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "https://hostelgh.onrender.com"}/newsletter/subscribe`, {
-                                            method: "POST",
-                                            headers: { "Content-Type": "application/json" },
-                                            body: JSON.stringify({ email })
-                                        });
-                                        if (res.ok) {
-                                            alert("Successfully joined the circle!");
-                                            form.reset();
-                                        } else {
-                                            alert("Failed to subscribe. Please try again.");
-                                        }
-                                    } catch (err) {
-                                        alert("An error occurred. Please try again.");
-                                    } finally {
-                                        if (btn) btn.disabled = false;
-                                    }
-                                }}
-                            >
-                                <input
-                                    type="email"
-                                    name="email"
-                                    required
-                                    placeholder="Enter your email address"
-                                    className="w-full h-16 md:h-20 bg-white/[0.05] border border-white/10 rounded-2xl px-8 pr-16 text-white placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500/50 transition-all font-medium text-lg"
-                                />
-                                <button type="submit" className="absolute right-3 top-3 bottom-3 aspect-square bg-blue-600 text-white rounded-xl flex items-center justify-center hover:bg-blue-500 active:scale-95 transition-all shadow-lg shadow-blue-600/20 group/btn disabled:opacity-50">
-                                    <Send size={24} className="transition-transform group-hover/btn:-translate-y-1 group-hover/btn:translate-x-1" />
-                                </button>
-                            </form>
-                            <p className="mt-4 text-[10px] text-zinc-500 uppercase tracking-widest text-center lg:text-left font-bold italic">
-                                Zero Spam. Unsubscribe at any time.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-16 mb-24">
-                    {/* Brand Meta Column */}
-                    <div className="lg:col-span-4 space-y-12">
-                        <div className="space-y-8">
-                            <Link href="/" className="flex items-center gap-4 group w-fit">
-                                <div className="p-1 transition-all duration-1000 group-hover:rotate-[360deg] group-hover:scale-110">
-                                    <LogoAnimation />
+                        {/* Trust badges */}
+                        <div className="flex flex-wrap gap-3">
+                            {TRUST_BADGES.map(({ icon: Icon, label }) => (
+                                <div key={label} className="inline-flex items-center gap-2 rounded-full border border-white/8 bg-white/5 px-3 py-1.5 text-xs font-semibold text-zinc-300">
+                                    <Icon size={12} className="text-blue-400" />
+                                    {label}
                                 </div>
-                                <div className="flex flex-col -space-y-1">
-                                    <span className="text-3xl font-black tracking-tighter text-white uppercase italic">Hostel<span className="text-blue-500">GH</span></span>
-                                    <span className="text-[9px] font-black text-blue-500/50 tracking-[0.4em] uppercase">Premium Living</span>
-                                </div>
-                            </Link>
-                            <p className="text-zinc-400 text-sm leading-relaxed font-medium max-w-sm">
-                                Ghana&apos;s most sophisticated student accommodation marketplace. We combine high-end technology with local expertise to secure your perfect home away from home.
-                            </p>
+                            ))}
                         </div>
 
-                        <div className="flex items-center gap-4">
+                        <div className="flex flex-wrap gap-3">
                             <a
                                 href={WHATSAPP_CHANNEL}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                aria-label="Join HostelGH on WhatsApp"
-                                className="flex items-center gap-3 px-5 py-3 bg-[#25D366]/10 hover:bg-[#25D366] border border-[#25D366]/30 hover:border-[#25D366] rounded-2xl text-[#25D366] hover:text-white transition-all duration-500 group shadow-xl"
+                                className="inline-flex h-9 items-center gap-2 rounded-2xl border border-blue-500/20 bg-white/5 px-4 text-sm font-semibold text-blue-100 transition hover:border-blue-400/40 hover:bg-blue-500/10"
                             >
-                                <MessageCircle size={18} className="transition-transform group-hover:scale-110" />
-                                <div className="flex flex-col leading-none">
-                                    <span className="text-[9px] font-black uppercase tracking-[0.2em] opacity-70 group-hover:opacity-100">Join our</span>
-                                    <span className="text-[11px] font-black uppercase tracking-widest">WhatsApp Channel</span>
-                                </div>
+                                <MessageCircle size={15} className="text-blue-400" />
+                                Join WhatsApp Channel
                             </a>
-                        </div>
-
-                        <div className="pt-8 border-t border-white/5 space-y-4">
-                            <div className="flex items-center gap-4 group cursor-pointer">
-                                <div className="w-10 h-10 rounded-xl bg-blue-600/10 flex items-center justify-center text-blue-500 group-hover:bg-blue-600 group-hover:text-white transition-all">
-                                    <Mail size={18} />
-                                </div>
-                                <div>
-                                    <p className="text-[10px] font-black text-zinc-500 uppercase tracking-widest">General Inquiries</p>
-                                    <p className="text-sm font-bold text-zinc-200">hello@hostelgh.com</p>
-                                </div>
-                            </div>
-                            <div className="flex items-center gap-4 group cursor-pointer">
-                                <div className="w-10 h-10 rounded-xl bg-blue-600/10 flex items-center justify-center text-blue-500 group-hover:bg-blue-600 group-hover:text-white transition-all">
-                                    <Phone size={18} />
-                                </div>
-                                <div>
-                                    <p className="text-[10px] font-black text-zinc-500 uppercase tracking-widest">24/7 Hotline</p>
-                                    <p className="text-sm font-bold text-zinc-200">+233 59 849 4617</p>
-                                </div>
-                            </div>
+                            <a
+                                href="/support"
+                                className="inline-flex h-9 items-center gap-2 rounded-2xl bg-blue-500 px-4 text-sm font-semibold text-white transition hover:bg-blue-400"
+                            >
+                                <ArrowRight size={15} />
+                                Get Support
+                            </a>
                         </div>
                     </div>
 
-                    {/* Links Grid */}
-                    <div className="lg:col-span-8 grid grid-cols-2 sm:grid-cols-4 gap-10">
-                        {/* Discover */}
-                        <div className="space-y-10">
-                            <h4 className="text-[11px] font-black text-white uppercase tracking-[0.3em] flex items-center gap-2 italic">
-                                <MapPin size={14} className="text-blue-500" /> Discover
-                            </h4>
-                            <ul className="space-y-5">
-                                {footerLinks.discover.map((link) => (
-                                    <li key={link.label}>
-                                        <Link href={link.href} className="text-zinc-500 hover:text-white text-xs font-bold uppercase tracking-widest transition-all flex items-center gap-3 group">
-                                            <span className="w-1 h-1 rounded-full bg-zinc-800 group-hover:bg-blue-500 group-hover:scale-125 transition-all duration-300" />
-                                            {link.label}
-                                        </Link>
-                                    </li>
-                                ))}
-                            </ul>
+                    {/* Newsletter card */}
+                    <div className="rounded-[2rem] border border-white/10 bg-white/5 p-6 shadow-2xl shadow-blue-900/15 backdrop-blur-2xl self-start">
+                        <div className="flex items-center gap-3 mb-4">
+                            <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-blue-500 text-white shadow-[0_8px_20px_-10px_rgba(59,130,246,0.9)]">
+                                <Send size={16} />
+                            </div>
+                            <div>
+                                <p className="text-xs uppercase tracking-[0.3em] text-blue-300/80">Stay Informed</p>
+                                <p className="font-black text-white text-lg leading-tight">Subscribe to updates</p>
+                            </div>
                         </div>
-
-                        {/* For Owners */}
-                        <div className="space-y-10">
-                            <h4 className="text-[11px] font-black text-white uppercase tracking-[0.3em] flex items-center gap-2 italic">
-                                <ArrowRight size={14} className="text-blue-500" /> For Owners
-                            </h4>
-                            <ul className="space-y-5">
-                                {footerLinks.partnership.map((link) => (
-                                    <li key={link.label}>
-                                        <Link href={link.href} className="text-zinc-500 hover:text-white text-xs font-bold uppercase tracking-widest transition-all hover:translate-x-2 duration-300 flex items-center gap-2">
-                                            {link.label}
-                                        </Link>
-                                    </li>
-                                ))}
-                            </ul>
-                        </div>
-
-                        {/* Platform */}
-                        <div className="space-y-10">
-                            <h4 className="text-[11px] font-black text-white uppercase tracking-[0.3em] flex items-center gap-2 italic">
-                                <Send size={14} className="text-blue-500" /> Platform
-                            </h4>
-                            <ul className="space-y-5">
-                                {footerLinks.platform.map((link) => (
-                                    <li key={link.label}>
-                                        <Link href={link.href} className="text-zinc-500 hover:text-white text-xs font-bold uppercase tracking-widest transition-all hover:translate-x-2 duration-300 flex items-center gap-2">
-                                            {link.label}
-                                        </Link>
-                                    </li>
-                                ))}
-                            </ul>
-                        </div>
-
-                        {/* Legal */}
-                        <div className="space-y-10">
-                            <h4 className="text-[11px] font-black text-white uppercase tracking-[0.3em] flex items-center gap-2 italic">
-                                <ShieldCheck size={14} className="text-blue-500" /> Legal
-                            </h4>
-                            <ul className="space-y-5">
-                                {footerLinks.legal.map((link) => (
-                                    <li key={link.label}>
-                                        <Link href={link.href} className="text-zinc-500 hover:text-white text-xs font-bold uppercase tracking-widest transition-all hover:translate-x-2 duration-300 flex items-center gap-2">
-                                            {link.label}
-                                        </Link>
-                                    </li>
-                                ))}
-                            </ul>
-                        </div>
+                        <p className="text-xs text-zinc-400 mb-4 leading-relaxed">Get new listings, price drops, and student housing tips straight to your inbox.</p>
+                        <form className="space-y-3" onSubmit={handleSubscribe}>
+                            <label className="block text-sm font-semibold text-zinc-300" htmlFor="footer-email">
+                                Your email address
+                            </label>
+                            <div className="relative rounded-2xl border border-white/10 bg-[#0c1321] px-4 py-3 focus-within:border-blue-500/70 transition-colors">
+                                <input
+                                    id="footer-email"
+                                    type="email"
+                                    value={email}
+                                    onChange={e => setEmail(e.target.value)}
+                                    placeholder="e.g. student@ug.edu.gh"
+                                    className="w-full border-none bg-transparent pr-10 text-sm text-white outline-none placeholder:text-zinc-500"
+                                />
+                                <button
+                                    type="submit"
+                                    disabled={isSubmitting}
+                                    className="absolute right-3 top-1/2 -translate-y-1/2 inline-flex h-8 w-8 items-center justify-center rounded-xl bg-blue-500 text-white transition hover:bg-blue-400 disabled:opacity-60"
+                                >
+                                    <ArrowRight size={16} />
+                                </button>
+                            </div>
+                            <p className="text-[11px] leading-5 text-zinc-500">
+                                No spam. Unsubscribe anytime.
+                            </p>
+                        </form>
                     </div>
                 </div>
 
-                {/* Bottom Bar */}
-                <div className="pt-12 border-t border-white/5 flex flex-col lg:flex-row justify-between items-center gap-10">
-                    <div className="flex flex-col sm:flex-row items-center gap-8 text-center sm:text-left">
-                        <div className="flex items-center gap-3 px-6 py-3 bg-white/[0.03] rounded-full border border-white/10 backdrop-blur-md">
-                            <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_15px_rgba(16,185,129,0.6)]" />
-                            <span className="text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em]">Network Status: Active\</span>
-                        </div>
-                        <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-[0.2em] leading-loose">
-                            © {currentYear} HostelGH. Precision Built by <span className="text-white">Minded Technologies</span> in <span className="text-blue-500 italic">Accra</span>.
-                        </p>
+                {/* Middle: Navigation columns */}
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-8 mb-12 border-t border-white/8 pt-12">
+                    <div>
+                        <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-blue-400/70 mb-4">Quick Links</p>
+                        <ul className="space-y-3">
+                            {QUICK_LINKS.map(link => (
+                                <li key={link.label}>
+                                    <Link
+                                        href={link.href}
+                                        className="text-sm text-zinc-400 hover:text-white transition-colors font-medium"
+                                    >
+                                        {link.label}
+                                    </Link>
+                                </li>
+                            ))}
+                        </ul>
                     </div>
+                    <div>
+                        <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-blue-400/70 mb-4">Browse by School</p>
+                        <ul className="space-y-3">
+                            {SCHOOLS.map(link => (
+                                <li key={link.label}>
+                                    <Link
+                                        href={link.href}
+                                        className="text-sm text-zinc-400 hover:text-white transition-colors font-medium"
+                                    >
+                                        {link.label}
+                                    </Link>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                    <div>
+                        <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-blue-400/70 mb-4">Legal</p>
+                        <ul className="space-y-3">
+                            {LEGAL.map(link => (
+                                <li key={link.label}>
+                                    <Link
+                                        href={link.href}
+                                        className="text-sm text-zinc-400 hover:text-white transition-colors font-medium"
+                                    >
+                                        {link.label}
+                                    </Link>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                </div>
 
-                    <div className="flex items-center gap-10">
-                        <div className="flex items-center gap-4">
-                            <ShieldCheck size={16} className="text-emerald-500/50" />
-                            <div className="flex flex-col items-end">
-                                <span className="text-[9px] font-black text-zinc-600 uppercase tracking-[0.4em] mb-1">Security Standard</span>
-                                <span className="text-[10px] font-bold text-zinc-300 uppercase tracking-widest">HostelGH-Safe V2</span>
-                            </div>
-                        </div>
-                        <div className="w-px h-10 bg-white/10 hidden sm:block" />
-                        <button
-                            onClick={scrollToTop}
-                            className="w-14 h-14 bg-white/[0.03] border border-white/10 rounded-2xl flex items-center justify-center text-white hover:bg-blue-600 hover:border-blue-500 transition-all active:scale-95 group shadow-xl"
-                        >
-                            <ChevronUp size={24} className="transition-transform group-hover:-translate-y-1" />
-                        </button>
+                {/* Bottom bar */}
+                <div className="border-t border-white/8 pt-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 text-xs text-zinc-500">
+                    <div className="flex items-center gap-3 flex-wrap">
+                        <span>© {currentYear} HostelGH. All Rights Reserved.</span>
+                        <span className="hidden sm:inline">·</span>
+                        <span>Made by <span className="text-zinc-400 font-semibold">Minded Technologies</span></span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                        <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                        <span className="text-emerald-400 font-medium">All systems operational</span>
                     </div>
                 </div>
             </div>
         </footer>
     );
 }
-

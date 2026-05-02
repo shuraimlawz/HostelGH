@@ -18,6 +18,7 @@ import { UserRole } from "@prisma/client";
 import { SubmitProofDto } from "./dto/submit-proof.dto";
 import { InitiateBankPaymentDto, SelectPaymentMethodDto, PaymentMethodType } from "./dto/initiate-bank-payment.dto";
 import { BankTransferService } from "./bank-transfer.service";
+import { Public } from "../../common/decorators/public.decorator";
 
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Controller("payments")
@@ -56,6 +57,7 @@ export class PaymentsController {
   }
 
   @Get("bank/list")
+  @Public()
   @HttpCode(HttpStatus.OK)
   getBankList() {
     return this.bankTransfer.getBankList();

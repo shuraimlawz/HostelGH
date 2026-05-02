@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 import { toast } from "sonner";
@@ -16,15 +17,18 @@ import {
     CalendarCheck,
     ArrowRight,
     ShieldCheck,
-    Smartphone
+    Smartphone,
+    Receipt
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
+import ReceiptModal from "@/components/bookings/ReceiptModal";
 
 export default function TenantBookingsPage() {
     const queryClient = useQueryClient();
+    const [receiptBookingId, setReceiptBookingId] = useState<string | null>(null);
 
     const { data: bookings, isLoading } = useQuery({
         queryKey: ["tenant-bookings"],
@@ -269,6 +273,16 @@ export default function TenantBookingsPage() {
                                         >
                                             View Listing <ChevronRight size={14} />
                                         </Link>
+
+                                        {/* Receipt button — shown for any booking with a successful payment */}
+                                        {booking.payment?.status === "SUCCESS" && (
+                                            <button
+                                                onClick={() => setReceiptBookingId(booking.id)}
+                                                className="w-full h-10 flex items-center justify-center gap-2 rounded-xl text-emerald-700 font-bold text-xs uppercase tracking-widest bg-emerald-50 border border-emerald-100 hover:bg-emerald-100 transition-all"
+                                            >
+                                                <Receipt size={14} /> View Receipt
+                                            </button>
+                                        )}
                                     </div>
                                 </div>
                             </div>
@@ -276,6 +290,14 @@ export default function TenantBookingsPage() {
                     ))
                 )}
             </div>
+
+            {/* Receipt Modal */}
+            {receiptBookingId && (
+                <ReceiptModal
+                    bookingId={receiptBookingId}
+                    onClose={() => setReceiptBookingId(null)}
+                />
+            )}
 
             {/* Support Disclaimer */}
             <div className="bg-gray-900 p-8 rounded-2xl text-white relative overflow-hidden group shadow-xl">

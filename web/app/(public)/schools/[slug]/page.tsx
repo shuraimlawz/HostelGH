@@ -25,17 +25,59 @@ function SchoolContent({ slug, school }: { slug: string; school: (typeof SCHOOLS
     const { data: hostels = [], isLoading } = useQuery({
         queryKey: ["school-hostels", slug],
         queryFn: async () => {
+            const aliases = school.aliases ?? [school.name, school.shortName];
+
+            // Send all known name variants in a single request — the backend builds an OR
+            // query across all of them, so "GCTU" / "Ghana Communication Technology University" /
+            // "Ghana Telecom University College" all resolve correctly.
             const { data } = await api.get("/hostels/public", {
-                params: { university: school.name, sort: "relevance", limit: 40 },
+                params: {
+                    universityAliases: aliases.join("|"),
+                    sort: "relevance",
+                    limit: 40,
+                },
             });
-            // Also try matching by city as fallback
-            if (!Array.isArray(data) || data.length === 0) {
-                const { data: cityData } = await api.get("/hostels/public", {
-                    params: { city: school.city, sort: "relevance", limit: 40 },
+
+            if (Array.isArray(data) && data.length > 0) return data;
+
+            // Fallback: search by city but filter to school-relevant hostels to avoid
+            // returning every hostel in Accra for a single Accra-based school
+            const { data: cityData } = await api.get("/hostels/public", {
+                params: { city: school.city, sort: "relevance", limit: 80 },
+            });
+
+            if (Array.isArray(cityData) && cityData.length > 0) {
+                const schoolAreas = (school.areas ?? []).map((a: string) => a.toLowerCase());
+                const schoolAliasesLower = aliases.map((a: string) => a.toLowerCase());
+
+                const relevant = cityData.filter((h: any) => {
+                    const uniField = (h.university ?? "").toLowerCase();
+                    const addrField = (h.addressLine ?? "").toLowerCase();
+
+                    // Match if the university field contains any alias
+                    if (schoolAliasesLower.some(a => uniField.includes(a) || a.includes(uniField.trim()))) {
+                        return true;
+                    }
+                    // Match if address contains one of the school's known areas
+                    if (schoolAreas.some(area => addrField.includes(area))) {
+                        return true;
+                    }
+                    return false;
                 });
-                return Array.isArray(cityData) ? cityData : [];
+
+                // If we found relevant ones, use them; otherwise fall back to all city results
+                return relevant.length > 0 ? relevant : cityData;
             }
-            return Array.isArray(data) ? data : [];
+
+            // Last resort: region-level results
+            if (school.region) {
+                const { data: regionData } = await api.get("/hostels/public", {
+                    params: { region: school.region, sort: "relevance", limit: 40 },
+                });
+                if (Array.isArray(regionData) && regionData.length > 0) return regionData;
+            }
+
+            return [];
         },
         staleTime: 5 * 60 * 1000,
     });

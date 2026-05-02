@@ -144,6 +144,8 @@ export const SCHOOLS_MAP: Record<string, {
     color: string; // Tailwind gradient classes
     description: string;
     areas?: string[];
+    /** All known name variants a manager might have typed when listing a hostel */
+    aliases: string[];
 }> = {
     "knust": {
         name: "Kwame Nkrumah University of Science and Technology",
@@ -153,6 +155,7 @@ export const SCHOOLS_MAP: Record<string, {
         color: "from-yellow-600 to-orange-700",
         description: "Ghana's leading science and technology university located in Kumasi, Ashanti region.",
         areas: ["Ayeduase", "Kotei", "Maxima", "Bomso", "Kentinkrono"],
+        aliases: ["KNUST", "Kwame Nkrumah University of Science and Technology", "Kwame Nkrumah UST", "KN University", "Tech"],
     },
     "ug": {
         name: "University of Ghana (Legon)",
@@ -162,6 +165,7 @@ export const SCHOOLS_MAP: Record<string, {
         color: "from-blue-700 to-indigo-800",
         description: "Ghana's premier university, located at Legon, Accra. Home to thousands of undergraduate and postgraduate students.",
         areas: ["Legon", "Madina", "Atomic Junction", "Adenta", "Haatso"],
+        aliases: ["University of Ghana", "University of Ghana (Legon)", "UG", "UG Legon", "Legon", "University of Ghana (UG)"],
     },
     "ucc": {
         name: "University of Cape Coast",
@@ -171,6 +175,7 @@ export const SCHOOLS_MAP: Record<string, {
         color: "from-green-700 to-teal-800",
         description: "One of Ghana's leading universities situated in the historic Cape Coast.",
         areas: ["Pedu", "Kwaprow", "Abura", "Oguaa"],
+        aliases: ["UCC", "University of Cape Coast", "Cape Coast University"],
     },
     "gctu": {
         name: "Ghana Communication Technology University",
@@ -180,6 +185,14 @@ export const SCHOOLS_MAP: Record<string, {
         color: "from-purple-700 to-violet-800",
         description: "A technology-focused university in Tesano, Accra. Formerly Ghana Telecom University College.",
         areas: ["Tesano", "Achimota", "Abelemkpe", "Dzorwulu"],
+        aliases: [
+            "GCTU",
+            "Ghana Communication Technology University",
+            "Ghana Communication Technology University (GCTU)",
+            "Ghana Telecom University",
+            "Ghana Telecom University College",
+            "GTUC",
+        ],
     },
     "uhas": {
         name: "University of Health and Allied Sciences",
@@ -189,6 +202,7 @@ export const SCHOOLS_MAP: Record<string, {
         color: "from-pink-700 to-rose-800",
         description: "Ghana's dedicated health sciences university, located in Ho, Volta Region.",
         areas: ["Ho", "Sokode", "Kpando"],
+        aliases: ["UHAS", "University of Health and Allied Sciences", "University of Health & Allied Sciences"],
     },
     "uds": {
         name: "University for Development Studies",
@@ -198,6 +212,7 @@ export const SCHOOLS_MAP: Record<string, {
         color: "from-cyan-700 to-sky-800",
         description: "A multi-campus development-focused university with campuses across northern Ghana.",
         areas: ["Tamale", "Nyankpala", "Wa", "Navrongo"],
+        aliases: ["UDS", "University for Development Studies"],
     },
     "uew": {
         name: "University of Education, Winneba",
@@ -207,6 +222,7 @@ export const SCHOOLS_MAP: Record<string, {
         color: "from-red-700 to-orange-800",
         description: "Ghana's university dedicated to teacher education, with campuses in Winneba and Kumasi.",
         areas: ["Winneba", "Kumasi Campus"],
+        aliases: ["UEW", "University of Education, Winneba", "University of Education Winneba"],
     },
     "umat": {
         name: "University of Mines and Technology",
@@ -216,6 +232,7 @@ export const SCHOOLS_MAP: Record<string, {
         color: "from-stone-600 to-zinc-800",
         description: "Specialist university for mining and technology in Tarkwa, Western Region.",
         areas: ["Tarkwa", "Bogoso"],
+        aliases: ["UMaT", "UMAT", "University of Mines and Technology", "Mines Tech"],
     },
     "upsa": {
         name: "UPSA",
@@ -225,6 +242,7 @@ export const SCHOOLS_MAP: Record<string, {
         color: "from-teal-700 to-cyan-800",
         description: "University of Professional Studies, Accra — a leading business and professional education institution.",
         areas: ["Legon", "Adenta", "Madina"],
+        aliases: ["UPSA", "University of Professional Studies", "University of Professional Studies, Accra"],
     },
     "gimpa": {
         name: "GIMPA",
@@ -234,5 +252,6 @@ export const SCHOOLS_MAP: Record<string, {
         color: "from-slate-700 to-gray-800",
         description: "Ghana Institute of Management and Public Administration — a leading management school in Greenhill, Accra.",
         areas: ["Greenhill", "Achimota", "East Legon"],
+        aliases: ["GIMPA", "Ghana Institute of Management and Public Administration"],
     },
 };
