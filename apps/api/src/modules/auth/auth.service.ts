@@ -41,7 +41,8 @@ export class AuthService {
   }
 
   async register(dto: RegisterDto) {
-    return this.prisma.$transaction(async (tx) => {
+    // 1. Transactional DB Work: Create User and Token
+    const result = await this.prisma.$transaction(async (tx) => {
       try {
         if (dto.role === UserRole.ADMIN) {
           throw new BadRequestException(
@@ -90,13 +91,12 @@ export class AuthService {
 
         this.logger.log(`User created: ${user.id} (${user.email})`);
 
-        await this.createAndSendVerificationEmail(user.email, tx);
+        // Create token in DB but DON'T send email yet
+        const rawToken = await this.prepareVerificationToken(user.email, tx);
 
         return {
-          message: "Account created. Please verify your email to activate your account.",
-          requiresEmailVerification: true,
-          userId: user.id,
           user,
+          rawToken
         };
       } catch (error) {
         // Handle Prisma Unique Constraint Violation (P2002)
@@ -110,6 +110,21 @@ export class AuthService {
         throw error;
       }
     });
+
+    // 2. Post-Transaction Work: Send the email (Outside the 5s DB lock)
+    try {
+      await this.emailService.sendEmailVerification(result.user.email, result.rawToken);
+    } catch (emailError) {
+      this.logger.error(`Email delivery failed for ${result.user.email} but account was created: ${emailError.message}`);
+      // Account is still created, user can use "Resend Verification" if they didn't get it
+    }
+
+    return {
+      message: "Account created. Please verify your email to activate your account.",
+      requiresEmailVerification: true,
+      userId: result.user.id,
+      user: result.user,
+    };
   }
 
   async login(dto: LoginDto) {
@@ -429,7 +444,7 @@ export class AuthService {
     };
   }
 
-  private async createAndSendVerificationEmail(email: string, tx?: any) {
+  private async prepareVerificationToken(email: string, tx?: any) {
     const rawToken = randomBytes(32).toString("hex");
     const hashedToken = sha256(rawToken);
     const expiresAt = new Date(Date.now() + 1000 * 60 * 60 * 24); // 24 hours
@@ -444,6 +459,11 @@ export class AuthService {
       },
     });
 
+    return rawToken;
+  }
+
+  private async createAndSendVerificationEmail(email: string, tx?: any) {
+    const rawToken = await this.prepareVerificationToken(email, tx);
     await this.emailService.sendEmailVerification(email, rawToken);
   }
 
