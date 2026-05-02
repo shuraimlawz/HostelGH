@@ -25,8 +25,6 @@ const SCHOOLS = [
 const LEGAL = [
     { label: "Privacy Policy", href: "/support/privacy" },
     { label: "Terms of Service", href: "/support/terms" },
-    { label: "Cookie Policy", href: "/support/cookies" },
-    { label: "Security", href: "/support/security" },
 ];
 
 const TRUST_BADGES = [
