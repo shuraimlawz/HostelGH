@@ -1,88 +1,60 @@
 import { Injectable, Logger, OnModuleInit } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
-import * as nodemailer from "nodemailer";
+import { Resend } from 'resend';
 
 @Injectable()
 export class EmailService implements OnModuleInit {
-    private transporter: nodemailer.Transporter;
-    private logger = new Logger(EmailService.name);
+    private resend: Resend;
+    private readonly logger = new Logger(EmailService.name);
 
     constructor(private config: ConfigService) { }
 
     async onModuleInit() {
-        const smtpHost = this.config.get<string>("SMTP_HOST");
-        const smtpPort = this.config.get<number>("SMTP_PORT");
-        const smtpUser = this.config.get<string>("SMTP_USER");
-        const smtpPass = this.config.get<string>("SMTP_PASS");
+        const apiKey = this.config.get<string>("RESEND_API_KEY");
 
-        // If we have SMTP credentials, use them (regardless of production/development)
-        if (smtpHost && smtpUser && smtpPass) {
-            this.transporter = nodemailer.createTransport({
-                host: smtpHost,
-                port: smtpPort || 587,
-                secure: (smtpPort || 587) === 465, // use TLS if port is 465
-                auth: {
-                    user: smtpUser,
-                    pass: smtpPass,
-                },
-            });
-
-            this.logger.log(`Email service initialized with SMTP: ${smtpHost}:${smtpPort}`);
-            return;
-        }
-
-        // Fallback: Development: Use ethereal test account
-        this.logger.warn("SMTP configuration incomplete. Falling back to development test account (Ethereal).");
-        try {
-            const account = await nodemailer.createTestAccount();
-            this.transporter = nodemailer.createTransport({
-                host: "smtp.ethereal.email",
-                port: 587,
-                secure: false,
-                auth: {
-                    user: account.user,
-                    pass: account.pass,
-                },
-            });
-            this.logger.log(`Ethereal Email initialized. Emails: https://ethereal.email/login`);
-        } catch (err) {
-            this.logger.error("Failed to initialize Ethereal fallback", err);
+        if (apiKey) {
+            this.resend = new Resend(apiKey);
+            this.logger.log("Email service initialized with official Resend SDK");
+        } else {
+            this.logger.warn("RESEND_API_KEY is missing. Email delivery will fail.");
         }
     }
 
+    /**
+     * Sends an email using the official Resend SDK.
+     * Follows the { data, error } pattern.
+     */
     async send(options: {
-        to: string;
+        to: string | string[];
         subject: string;
         html: string;
         from?: string;
+        text?: string;
+        idempotencyKey?: string;
     }) {
-        if (!this.transporter) {
-            this.logger.error("Transporter not initialized. Cannot send email.");
-            return false;
+        if (!this.resend) {
+            this.logger.error("Resend client not initialized. Check RESEND_API_KEY.");
+            return { data: null, error: { message: "Client not initialized", name: "InitError" } };
         }
 
-        const defaultFrom = this.config.get<string>("EMAIL_FROM") || '"HostelGH" <noreply@hostelgh.com>';
-        const mailOptions = {
+        const defaultFrom = this.config.get<string>("EMAIL_FROM") || 'HostelGH <onboarding@resend.dev>';
+        
+        const { data, error } = await this.resend.emails.send({
             from: options.from || defaultFrom,
             to: options.to,
             subject: options.subject,
             html: options.html,
-        };
+            text: options.text,
+            idempotencyKey: options.idempotencyKey,
+        });
 
-        try {
-            const info = await this.transporter.sendMail(mailOptions);
-            this.logger.log(`Email sent to ${options.to}`);
-
-            // Log test URL in development
-            if (info.messageId?.includes("ethereal")) {
-                this.logger.log(`Preview: ${nodemailer.getTestMessageUrl(info)}`);
-            }
-
-            return true;
-        } catch (error) {
-            this.logger.error(`Failed to send email to ${options.to}`, error);
-            return false;
+        if (error) {
+            this.logger.error(`Failed to send email to ${options.to}: ${error.message}`);
+            return { data: null, error };
         }
+
+        this.logger.log(`Email sent successfully: ${data.id}`);
+        return { data, error: null };
     }
 
     async sendPasswordResetEmail(to: string, resetToken: string) {
@@ -105,6 +77,7 @@ export class EmailService implements OnModuleInit {
             to,
             subject: "Password Reset Request",
             html,
+            idempotencyKey: `pw-reset/${to}-${Date.now()}`,
         });
     }
 
@@ -128,6 +101,7 @@ export class EmailService implements OnModuleInit {
             to,
             subject: "Verify your email",
             html,
+            idempotencyKey: `verify-email/${to}`,
         });
     }
 }
