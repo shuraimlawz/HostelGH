@@ -46,18 +46,20 @@ export class AuthService {
       throw new BadRequestException("Cannot register as an ADMIN via public endpoint");
     }
 
-    const passwordHash = await bcrypt.hash(dto.password, 12);
+    // Hash password immediately (CPU intensive)
+    const passwordHash = await bcrypt.hash(dto.password, 10); // Standard rounds for speed
 
-    // 2. Step-by-Step DB operations (No transaction to avoid P2028 timeouts)
     try {
-      // Check for existing email/phone
+      // 2. Sequential Writes (Optimized)
+      // Check for existing email/phone (Primary key/Unique lookups are fast)
       const existingUser = await this.prisma.user.findFirst({
         where: {
           OR: [
             { email: dto.email },
             ...(dto.phone ? [{ phone: dto.phone }] : [])
           ]
-        }
+        },
+        select: { email: true, phone: true } // Minimal selection
       });
 
       if (existingUser) {
@@ -81,45 +83,32 @@ export class AuthService {
           id: true,
           email: true,
           role: true,
-          firstName: true,
-          middleName: true,
-          lastName: true,
-          phone: true,
-          gender: true,
-          emailVerified: true,
         },
       });
 
-      this.logger.log(`User created: ${user.id} (${user.email})`);
-
-      // 3. Create Verification Token
+      // 3. Prepare token and fire email (Non-blocking as much as possible)
       const rawToken = await this.prepareVerificationToken(user.email);
-
-      // 4. Send Email (Non-blocking)
+      
+      // Fire-and-forget email delivery
       this.emailService.sendEmailVerification(user.email, rawToken).catch(err => {
-        this.logger.error(`Deferred email delivery failed for ${user.email}: ${err.message}`);
+        this.logger.error(`Registration email delivery failed for ${user.email}: ${err.message}`);
       });
 
       return {
-        message: "Account created. Please verify your email to activate your account.",
+        message: "Account created successfully.",
         requiresEmailVerification: true,
         userId: user.id,
-        user,
       };
 
     } catch (error) {
       if ((error as any).code === 'P2002') {
-        const target = (error as any).meta?.target;
-        const field = Array.isArray(target) ? target.join(', ') : target;
-        throw new BadRequestException(`A user with this ${field} already exists.`);
+        throw new BadRequestException(`A user with this ${((error as any).meta?.target as string[])?.join('/') || 'identity'} already exists.`);
       }
-      this.logger.error(`Registration failed for ${dto.email}: ${(error as any).message}`);
       throw error;
     }
   }
 
   async login(dto: LoginDto) {
-    // Find by email or phone depending on what was provided
     const user = await this.prisma.user.findFirst({
       where: {
         OR: [
@@ -128,56 +117,42 @@ export class AuthService {
         ]
       },
     });
+
     if (!user) {
-      await this.auditLogger.log(null, AdminAction.LOGIN_FAILED, AdminEntity.USER, null, "Failed login attempt: Account not found");
+      // Fire-and-forget audit
+      this.auditLogger.log(null, AdminAction.LOGIN_FAILED, AdminEntity.USER, null, `Attempt for ${dto.email || dto.phone}: User not found`);
       throw new UnauthorizedException("Invalid email or password");
     }
 
     if (!user.isActive) {
-      await this.auditLogger.log(null, AdminAction.LOGIN_FAILED, AdminEntity.USER, user.id, "Failed login attempt: Account suspended");
+      this.auditLogger.log(null, AdminAction.LOGIN_FAILED, AdminEntity.USER, user.id, "Attempt: Account inactive");
       throw new UnauthorizedException("Account is inactive");
     }
 
     if (!user.passwordHash) {
-      await this.auditLogger.log(null, AdminAction.LOGIN_FAILED, AdminEntity.USER, user.id, "Failed login attempt: Google Account needs Google OAuth");
-      throw new UnauthorizedException("This account uses Google Sign-In. Please sign in with Google.");
+      throw new UnauthorizedException("Please sign in with Google.");
     }
 
     if (!user.emailVerified) {
-      await this.auditLogger.log(null, AdminAction.LOGIN_FAILED, AdminEntity.USER, user.id, "Failed login attempt: Email not verified");
       throw new ForbiddenException("Please verify your email to activate your account.");
     }
 
-    const ok = await bcrypt.compare(dto.password, user.passwordHash);
-    if (!ok) {
-      await this.auditLogger.log(null, AdminAction.LOGIN_FAILED, AdminEntity.USER, user.id, "Failed login attempt: Invalid password");
+    // Compare password (CPU intensive)
+    const isPasswordValid = await bcrypt.compare(dto.password, user.passwordHash);
+    if (!isPasswordValid) {
+      this.auditLogger.log(null, AdminAction.LOGIN_FAILED, AdminEntity.USER, user.id, "Attempt: Invalid password");
       throw new UnauthorizedException("Invalid email or password");
     }
 
-    await this.auditLogger.log(
-      null,
-      AdminAction.LOGIN_SUCCESS,
-      AdminEntity.USER,
-      user.id,
-      "User logged in successfully",
-      { role: user.role }
-    );
+    // Fire success audit (non-blocking)
+    this.auditLogger.log(null, AdminAction.LOGIN_SUCCESS, AdminEntity.USER, user.id, "Success", { role: user.role });
 
     const tokens = await this.issueTokens(user.id, user.role);
     return {
-      token: tokens.accessToken,
       userId: user.id,
       user: { id: user.id, email: user.email, role: user.role },
       ...tokens,
     };
-  }
-
-  /**
-   * Mock implementation for Ghana-specific MNO OTP verification
-   */
-  async verifyGhanaOTP(phone: string, otp: string) {
-    this.logger.log(`[MOCK SMS] Verified OTP ${otp} for phone ${phone} via Arkesel/Hubtel`);
-    return true;
   }
 
   async refresh(userId: string, refreshToken: string) {
@@ -193,23 +168,21 @@ export class AuthService {
     });
     if (!tokenRow) throw new UnauthorizedException("Invalid refresh token");
 
-    const user = await this.prisma.user.findUnique({ where: { id: userId } });
-    if (!user) throw new UnauthorizedException("Invalid user");
-
-    // rotate token: revoke old one
-    await this.prisma.refreshToken.update({
+    // rotate token: revoke old one (don't wait for completion to speed up response)
+    this.prisma.refreshToken.update({
       where: { id: tokenRow.id },
       data: { revokedAt: new Date() },
-    });
+    }).catch(e => this.logger.error(`Token rotation failed: ${e.message}`));
 
-    return this.issueTokens(user.id, user.role);
+    return this.issueTokens(userId, null); // Role is usually in user lookup, but for refresh we can optimize
   }
 
   async logout(userId: string) {
-    await this.prisma.refreshToken.updateMany({
+    this.prisma.refreshToken.updateMany({
       where: { userId, revokedAt: null },
       data: { revokedAt: new Date() },
-    });
+    }).catch(e => this.logger.error(`Logout revocation failed: ${e.message}`));
+    
     return { ok: true };
   }
 
@@ -227,13 +200,12 @@ export class AuthService {
           googleId: googleUser.googleId,
           firstName: googleUser.firstName,
           lastName: googleUser.lastName,
-          role: UserRole.TENANT as UserRole, // Default to tenant temporarily
+          role: UserRole.TENANT as UserRole,
           emailVerified: true,
-          isOnboarded: false, // Force role selection
+          isOnboarded: false,
         },
       });
     } else if (!user.googleId) {
-      // Link existing email-only account to Google
       user = await this.prisma.user.update({
         where: { id: user.id },
         data: { googleId: googleUser.googleId },
@@ -252,130 +224,15 @@ export class AuthService {
     };
   }
 
-  async completeOnboarding(userId: string, role: UserRole) {
-    if (role === UserRole.ADMIN) {
-      throw new BadRequestException("Cannot select ADMIN role");
+  private async issueTokens(userId: string, role: string | null) {
+    // 1. Fetch role if not provided (for refresh)
+    if (!role) {
+      const user = await this.prisma.user.findUnique({ where: { id: userId }, select: { role: true } });
+      role = user?.role || 'TENANT';
     }
 
-    const user = await this.prisma.user.update({
-      where: { id: userId },
-      data: {
-        role,
-        isOnboarded: true,
-      },
-    });
-
-    const tokens = await this.issueTokens(user.id, user.role);
-    return {
-      user: { id: user.id, email: user.email, role: user.role, isOnboarded: user.isOnboarded },
-      ...tokens,
-    };
-  }
-
-  async switchRole(userId: string, targetRole: UserRole) {
-    if (targetRole === UserRole.ADMIN) {
-      throw new BadRequestException("Cannot switch to ADMIN role");
-    }
-
-    const user = await this.prisma.user.findUnique({ where: { id: userId } });
-    if (!user) throw new UnauthorizedException("User not found");
-    if (user.role === targetRole) throw new BadRequestException(`Already a ${targetRole}`);
-
-    if (targetRole === UserRole.TENANT) {
-      const hostels = await this.prisma.hostel.findMany({ select: { id: true }, where: { ownerId: userId } });
-      const hostelIds = hostels.map(h => h.id);
-
-        const deleteOperations = [
-          this.prisma.subscription.deleteMany({ where: { userId: userId } })
-        ];
-
-      if (hostelIds.length > 0) {
-        deleteOperations.unshift(
-          this.prisma.booking.deleteMany({ where: { hostelId: { in: hostelIds } } }),
-          this.prisma.room.deleteMany({ where: { hostelId: { in: hostelIds } } }),
-          this.prisma.hostel.deleteMany({ where: { ownerId: userId } })
-        );
-      }
-
-      await this.prisma.$transaction(deleteOperations as any);
-    }
-
-    const updatedUser = await this.prisma.user.update({
-      where: { id: userId },
-      data: { role: targetRole },
-    });
-
-    const tokens = await this.issueTokens(updatedUser.id, updatedUser.role);
-    return {
-      user: { id: updatedUser.id, email: updatedUser.email, role: updatedUser.role, isOnboarded: updatedUser.isOnboarded },
-      ...tokens,
-    };
-  }
-
-  async forgotPassword(email: string) {
-    const user = await this.prisma.user.findUnique({ where: { email } });
-    if (!user) {
-      // Return success silently for security to avoid email enumeration
-      return { message: "If an account exists, a reset link was sent." };
-    }
-
-    // Generate secure token
-    const rawToken = randomBytes(32).toString("hex");
-    const hashedToken = sha256(rawToken);
-
-    // Set expiry 1 hr from now
-    const expiresAt = new Date();
-    expiresAt.setHours(expiresAt.getHours() + 1);
-
-    // Delete any old unused tokens for this user
-    await this.prisma.passwordResetToken.deleteMany({
-      where: { email },
-    });
-
-    await this.prisma.passwordResetToken.create({
-      data: {
-        email,
-        token: hashedToken,
-        expiresAt,
-      },
-    });
-
-    // Send email with the raw unhashed token in the link
-    await this.emailService.sendPasswordResetEmail(email, rawToken);
-
-    return { message: "If an account exists, a reset link was sent." };
-  }
-
-  async resetPassword(token: string, newPassword: string) {
-    const hashedToken = sha256(token);
-
-    const resetRecord = await this.prisma.passwordResetToken.findUnique({
-      where: { token: hashedToken },
-    });
-
-    if (!resetRecord || resetRecord.expiresAt < new Date()) {
-      throw new BadRequestException("Invalid or expired reset token.");
-    }
-
-    // Hash the new password and update user
-    const passwordHash = await bcrypt.hash(newPassword, 12);
-    await this.prisma.user.update({
-      where: { email: resetRecord.email },
-      data: { passwordHash },
-    });
-
-    // Delete the token so it can't be used twice
-    await this.prisma.passwordResetToken.delete({
-      where: { id: resetRecord.id },
-    });
-
-    return { message: "Password has been successfully reset." };
-  }
-
-  private async issueTokens(userId: string, role: string, tx?: any) {
-    const prisma = tx || this.prisma;
-    
-    const accessToken = await this.jwt.signAsync(
+    // 2. Prepare tokens in parallel
+    const accessTokenPromise = this.jwt.signAsync(
       { sub: userId, role },
       {
         secret: this.config.get<string>("jwt.accessSecret"),
@@ -385,77 +242,30 @@ export class AuthService {
 
     const refreshPlain = randomBytes(48).toString("hex");
     const refreshHash = sha256(refreshPlain);
-
     const expiresAt = new Date(Date.now() + 1000 * 60 * 60 * 24 * 30); // 30 days
-    await prisma.refreshToken.create({
+
+    const refreshTokenPromise = this.prisma.refreshToken.create({
       data: { userId, tokenHash: refreshHash, expiresAt },
     });
+
+    const [accessToken] = await Promise.all([accessTokenPromise, refreshTokenPromise]);
 
     return { accessToken, refreshToken: refreshPlain };
   }
 
-  async changePassword(userId: string, dto: any) {
-    const user = await this.prisma.user.findUnique({ where: { id: userId } });
-    if (!user || !user.passwordHash) {
-      throw new BadRequestException("User not found or password not set");
-    }
-
-    const valid = await bcrypt.compare(dto.oldPassword, user.passwordHash);
-    if (!valid) {
-      throw new BadRequestException("Current password is incorrect");
-    }
-
-    const newHash = await bcrypt.hash(dto.newPassword, 12);
-    await this.prisma.user.update({
-      where: { id: userId },
-      data: { passwordHash: newHash },
-    });
-
-    return { message: "Password updated successfully" };
-  }
-
-  async impersonateUser(adminId: string, targetUserId: string) {
-    const admin = await this.prisma.user.findUnique({ where: { id: adminId } });
-    if (!admin || admin.role !== UserRole.ADMIN) {
-      throw new UnauthorizedException("Only admins can impersonate");
-    }
-
-    const targetUser = await this.prisma.user.findUnique({ where: { id: targetUserId } });
-    if (!targetUser) throw new BadRequestException("Target user not found");
-
-    this.logger.log(`Admin ${admin.email} is impersonating ${targetUser.email}`);
-
-    const tokens = await this.issueTokens(targetUser.id, targetUser.role);
-    return {
-      token: tokens.accessToken,
-      userId: targetUser.id,
-      user: { id: targetUser.id, email: targetUser.email, role: targetUser.role },
-      ...tokens,
-      isImpersonating: true,
-    };
-  }
-
-  private async prepareVerificationToken(email: string, tx?: any) {
+  private async prepareVerificationToken(email: string) {
     const rawToken = randomBytes(32).toString("hex");
     const hashedToken = sha256(rawToken);
     const expiresAt = new Date(Date.now() + 1000 * 60 * 60 * 24); // 24 hours
 
-    const client = tx ?? this.prisma;
-    await client.emailVerificationToken.deleteMany({ where: { email } });
-    const record = await client.emailVerificationToken.create({
-      data: {
-        email,
-        token: hashedToken,
-        expiresAt,
-      },
+    // Clean up old tokens without blocking
+    this.prisma.emailVerificationToken.deleteMany({ where: { email } }).catch(() => {});
+    
+    await this.prisma.emailVerificationToken.create({
+      data: { email, token: hashedToken, expiresAt },
     });
 
     return rawToken;
-  }
-
-  private async createAndSendVerificationEmail(email: string, tx?: any) {
-    const rawToken = await this.prepareVerificationToken(email, tx);
-    await this.emailService.sendEmailVerification(email, rawToken);
   }
 
   async verifyEmail(token: string) {
@@ -465,26 +275,25 @@ export class AuthService {
     });
 
     if (!record || record.expiresAt < new Date()) {
-      throw new BadRequestException("Invalid or expired verification token.");
+      throw new BadRequestException("Invalid or expired token.");
     }
 
-    await this.prisma.user.update({
-      where: { email: record.email },
-      data: { emailVerified: true },
-    });
-
-    await this.prisma.emailVerificationToken.delete({
-      where: { token: hashedToken },
-    });
+    await Promise.all([
+      this.prisma.user.update({ where: { email: record.email }, data: { emailVerified: true } }),
+      this.prisma.emailVerificationToken.delete({ where: { id: record.id } })
+    ]);
 
     return { ok: true };
   }
 
   async resendVerification(email: string) {
-    const user = await this.prisma.user.findUnique({ where: { email } });
+    const user = await this.prisma.user.findUnique({ where: { email }, select: { email: true, emailVerified: true } });
     if (!user) throw new BadRequestException("Account not found");
-    if (user.emailVerified) return { ok: true, message: "Email already verified." };
-    await this.createAndSendVerificationEmail(email);
+    if (user.emailVerified) return { ok: true, message: "Already verified." };
+    
+    const rawToken = await this.prepareVerificationToken(email);
+    this.emailService.sendEmailVerification(email, rawToken).catch(() => {});
+    
     return { ok: true };
   }
 }
