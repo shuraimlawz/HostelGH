@@ -17,7 +17,7 @@ export class EmailService implements OnModuleInit {
             const smtpHost = this.config.get<string>("SMTP_HOST");
             const smtpPort = this.config.get<number>("SMTP_PORT");
             const smtpUser = this.config.get<string>("SMTP_USER");
-            const smtpPass = this.config.get<string>("SMTP_PASSWORD");
+            const smtpPass = this.config.get<string>("SMTP_PASS");
 
             if (!smtpHost || !smtpUser || !smtpPass) {
                 this.logger.warn("SMTP configuration incomplete (Host/User/Pass). Falling back to development test account (Ethereal).");
@@ -61,8 +61,9 @@ export class EmailService implements OnModuleInit {
         html: string;
         from?: string;
     }) {
+        const defaultFrom = this.config.get<string>("EMAIL_FROM") || '"HostelGH" <noreply@hostelgh.com>';
         const mailOptions = {
-            from: options.from || '"HostelGH" <noreply@hostelgh.com>',
+            from: options.from || defaultFrom,
             to: options.to,
             subject: options.subject,
             html: options.html,
@@ -88,11 +89,7 @@ export class EmailService implements OnModuleInit {
         const frontendUrl = this.config.get<string>("app.frontendUrl") || "https://hostelgh.vercel.app";
         const resetLink = `${frontendUrl}/auth/reset-password?token=${resetToken}`;
 
-        const mailOptions = {
-            from: '"HostelGH Security" <noreply@hostelgh.com>',
-            to,
-            subject: "Password Reset Request",
-            html: `
+        const html = `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eaeaea; border-radius: 10px;">
           <h2 style="color: #2563eb; text-align: center;">HostelGH Password Reset</h2>
           <p>We received a request to reset your password. Click the button below to set a new one:</p>
@@ -102,31 +99,20 @@ export class EmailService implements OnModuleInit {
           <p style="font-size: 12px; color: #666;">If you did not request a password reset, please ignore this email.</p>
           <p style="font-size: 12px; color: #666;">This link will expire in 1 hour.</p>
         </div>
-      `,
-        };
+      `;
 
-        try {
-            const info = await this.transporter.sendMail(mailOptions);
-            this.logger.log(`Password reset email sent to ${to}`);
-            if (info.messageId?.includes("ethereal")) {
-                this.logger.log(`Preview: ${nodemailer.getTestMessageUrl(info)}`);
-            }
-            return true;
-        } catch (error) {
-            this.logger.error(`Failed to send email to ${to}`, error);
-            return false;
-        }
+        return this.send({
+            to,
+            subject: "Password Reset Request",
+            html,
+        });
     }
 
     async sendEmailVerification(to: string, verifyToken: string) {
         const frontendUrl = this.config.get<string>("app.frontendUrl") || "https://hostelgh.vercel.app";
         const verifyLink = `${frontendUrl}/auth/verify-email?token=${verifyToken}`;
 
-        const mailOptions = {
-            from: '"HostelGH Security" <noreply@hostelgh.com>',
-            to,
-            subject: "Verify your email",
-            html: `
+        const html = `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eaeaea; border-radius: 10px;">
           <h2 style="color: #2563eb; text-align: center;">Confirm your email</h2>
           <p>Thanks for creating a HostelGH account. Please verify your email to activate your account:</p>
@@ -136,19 +122,12 @@ export class EmailService implements OnModuleInit {
           <p style="font-size: 12px; color: #666;">If you did not create an account, you can ignore this email.</p>
           <p style="font-size: 12px; color: #666;">This link will expire in 24 hours.</p>
         </div>
-      `,
-        };
+      `;
 
-        try {
-            const info = await this.transporter.sendMail(mailOptions);
-            this.logger.log(`Verification email sent to ${to}`);
-            if (info.messageId?.includes("ethereal")) {
-                this.logger.log(`Preview: ${nodemailer.getTestMessageUrl(info)}`);
-            }
-            return true;
-        } catch (error) {
-            this.logger.error(`Failed to send verification email to ${to}`, error);
-            return false;
-        }
+        return this.send({
+            to,
+            subject: "Verify your email",
+            html,
+        });
     }
 }
