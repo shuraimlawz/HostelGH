@@ -41,94 +41,81 @@ export class AuthService {
   }
 
   async register(dto: RegisterDto) {
-    // Hash password before starting the transaction to keep it short
-    const passwordHash = await bcrypt.hash(dto.password, 12);
-
-    // 1. Transactional DB Work: Create User and Token
-    const result = await this.prisma.$transaction(async (tx) => {
-      try {
-        if (dto.role === UserRole.ADMIN) {
-          throw new BadRequestException(
-            "Cannot register as an ADMIN via public endpoint",
-          );
-        }
-
-        // Check for existing email
-        const emailExists = await tx.user.findUnique({
-          where: { email: dto.email },
-        });
-        if (emailExists) throw new BadRequestException("Email already in use");
-
-        // Check for existing phone if provided
-        if (dto.phone) {
-          const phoneExists = await tx.user.findUnique({
-            where: { phone: dto.phone },
-          });
-          if (phoneExists) throw new BadRequestException("Phone number already in use");
-        }
-
-        const user = await tx.user.create({
-          data: {
-            email: dto.email,
-            passwordHash,
-            role: dto.role as UserRole,
-            firstName: dto.firstName,
-            middleName: (dto as any).middleName,
-            lastName: dto.lastName,
-            phone: dto.phone,
-            gender: dto.gender as any,
-          },
-          select: {
-            id: true,
-            email: true,
-            role: true,
-            firstName: true,
-            middleName: true,
-            lastName: true,
-            phone: true,
-            gender: true,
-            emailVerified: true,
-          },
-        });
-
-        this.logger.log(`User created: ${user.id} (${user.email})`);
-
-        // Create token in DB but DON'T send email yet
-        const rawToken = await this.prepareVerificationToken(user.email, tx);
-
-        return {
-          user,
-          rawToken
-        };
-      } catch (error) {
-        // Handle Prisma Unique Constraint Violation (P2002)
-        if ((error as any).code === 'P2002') {
-          const target = (error as any).meta?.target;
-          const field = Array.isArray(target) ? target.join(', ') : target;
-          throw new BadRequestException(`A user with this ${field} already exists.`);
-        }
-
-        this.logger.error(`Registration failed for ${dto.email}: ${(error as any).message}`, (error as any).stack);
-        throw error;
-      }
-    }, {
-      timeout: 30000, // 30 seconds
-    });
-
-    // 2. Post-Transaction Work: Send the email (Outside the 5s DB lock)
-    try {
-      await this.emailService.sendEmailVerification(result.user.email, result.rawToken);
-    } catch (emailError) {
-      this.logger.error(`Email delivery failed for ${result.user.email} but account was created: ${emailError.message}`);
-      // Account is still created, user can use "Resend Verification" if they didn't get it
+    // 1. Initial Validations & Hashing (Outside DB)
+    if (dto.role === UserRole.ADMIN) {
+      throw new BadRequestException("Cannot register as an ADMIN via public endpoint");
     }
 
-    return {
-      message: "Account created. Please verify your email to activate your account.",
-      requiresEmailVerification: true,
-      userId: result.user.id,
-      user: result.user,
-    };
+    const passwordHash = await bcrypt.hash(dto.password, 12);
+
+    // 2. Step-by-Step DB operations (No transaction to avoid P2028 timeouts)
+    try {
+      // Check for existing email/phone
+      const existingUser = await this.prisma.user.findFirst({
+        where: {
+          OR: [
+            { email: dto.email },
+            ...(dto.phone ? [{ phone: dto.phone }] : [])
+          ]
+        }
+      });
+
+      if (existingUser) {
+        if (existingUser.email === dto.email) throw new BadRequestException("Email already in use");
+        throw new BadRequestException("Phone number already in use");
+      }
+
+      // Create User
+      const user = await this.prisma.user.create({
+        data: {
+          email: dto.email,
+          passwordHash,
+          role: dto.role as UserRole,
+          firstName: dto.firstName,
+          middleName: (dto as any).middleName,
+          lastName: dto.lastName,
+          phone: dto.phone,
+          gender: dto.gender as any,
+        },
+        select: {
+          id: true,
+          email: true,
+          role: true,
+          firstName: true,
+          middleName: true,
+          lastName: true,
+          phone: true,
+          gender: true,
+          emailVerified: true,
+        },
+      });
+
+      this.logger.log(`User created: ${user.id} (${user.email})`);
+
+      // 3. Create Verification Token
+      const rawToken = await this.prepareVerificationToken(user.email);
+
+      // 4. Send Email (Non-blocking)
+      this.emailService.sendEmailVerification(user.email, rawToken).catch(err => {
+        this.logger.error(`Deferred email delivery failed for ${user.email}: ${err.message}`);
+      });
+
+      return {
+        message: "Account created. Please verify your email to activate your account.",
+        requiresEmailVerification: true,
+        userId: user.id,
+        user,
+      };
+
+    } catch (error) {
+      if ((error as any).code === 'P2002') {
+        const target = (error as any).meta?.target;
+        const field = Array.isArray(target) ? target.join(', ') : target;
+        throw new BadRequestException(`A user with this ${field} already exists.`);
+      }
+      this.logger.error(`Registration failed for ${dto.email}: ${(error as any).message}`);
+      throw error;
+    }
   }
 
   async login(dto: LoginDto) {
@@ -455,7 +442,7 @@ export class AuthService {
 
     const client = tx ?? this.prisma;
     await client.emailVerificationToken.deleteMany({ where: { email } });
-    await client.emailVerificationToken.create({
+    const record = await client.emailVerificationToken.create({
       data: {
         email,
         token: hashedToken,
