@@ -26,10 +26,26 @@ export class HttpExceptionFilter implements ExceptionFilter {
       message = res.message || exception.message;
     }
     // Handle Prisma errors mapping
-    else if ((exception as any)?.code === 'P2002') { // Prisma Client Known Request Error (Unique Constraint)
-      status = HttpStatus.CONFLICT;
+    else if ((exception as any)?.code?.startsWith('P2')) { 
+      status = HttpStatus.BAD_REQUEST;
+      const code = (exception as any).code;
       const target = ((exception as any)?.meta?.target as string[])?.join(", ") || "field";
-      message = `This ${target} is already in use.`;
+      
+      switch (code) {
+        case 'P2002':
+          status = HttpStatus.CONFLICT;
+          message = `A record with this ${target} already exists.`;
+          break;
+        case 'P2003':
+          message = `Foreign key constraint failed on ${target}.`;
+          break;
+        case 'P2025':
+          status = HttpStatus.NOT_FOUND;
+          message = "The requested record was not found.";
+          break;
+        default:
+          message = `Database error (${code}): ${(exception as any).message || 'Unknown database error'}`;
+      }
     }
     // Handle JWT & Token errors
     else if (exception instanceof Error) {
@@ -42,7 +58,6 @@ export class HttpExceptionFilter implements ExceptionFilter {
         status = HttpStatus.UNAUTHORIZED;
         message = "Invalid authentication token.";
       } else {
-        // In production, give a slightly more useful hint for 500s that still hides sensitive paths
         const errorName = exception.constructor.name || exception.name;
         message = process.env.NODE_ENV === "development"
           ? exception.message

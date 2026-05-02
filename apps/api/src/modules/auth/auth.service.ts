@@ -48,10 +48,20 @@ export class AuthService {
             "Cannot register as an ADMIN via public endpoint",
           );
         }
-        const exists = await tx.user.findUnique({
+
+        // Check for existing email
+        const emailExists = await tx.user.findUnique({
           where: { email: dto.email },
         });
-        if (exists) throw new BadRequestException("Email already in use");
+        if (emailExists) throw new BadRequestException("Email already in use");
+
+        // Check for existing phone if provided
+        if (dto.phone) {
+          const phoneExists = await tx.user.findUnique({
+            where: { phone: dto.phone },
+          });
+          if (phoneExists) throw new BadRequestException("Phone number already in use");
+        }
 
         const passwordHash = await bcrypt.hash(dto.password, 12);
         const user = await tx.user.create({
@@ -89,6 +99,13 @@ export class AuthService {
           user,
         };
       } catch (error) {
+        // Handle Prisma Unique Constraint Violation (P2002)
+        if ((error as any).code === 'P2002') {
+          const target = (error as any).meta?.target;
+          const field = Array.isArray(target) ? target.join(', ') : target;
+          throw new BadRequestException(`A user with this ${field} already exists.`);
+        }
+
         this.logger.error(`Registration failed for ${dto.email}: ${(error as any).message}`, (error as any).stack);
         throw error;
       }
