@@ -10,49 +10,44 @@ export class EmailService implements OnModuleInit {
     constructor(private config: ConfigService) { }
 
     async onModuleInit() {
-        const isProduction = this.config.get<string>("NODE_ENV") === "production";
+        const smtpHost = this.config.get<string>("SMTP_HOST");
+        const smtpPort = this.config.get<number>("SMTP_PORT");
+        const smtpUser = this.config.get<string>("SMTP_USER");
+        const smtpPass = this.config.get<string>("SMTP_PASS");
 
-        if (isProduction) {
-            // Use production SMTP configuration
-            const smtpHost = this.config.get<string>("SMTP_HOST");
-            const smtpPort = this.config.get<number>("SMTP_PORT");
-            const smtpUser = this.config.get<string>("SMTP_USER");
-            const smtpPass = this.config.get<string>("SMTP_PASS");
+        // If we have SMTP credentials, use them (regardless of production/development)
+        if (smtpHost && smtpUser && smtpPass) {
+            this.transporter = nodemailer.createTransport({
+                host: smtpHost,
+                port: smtpPort || 587,
+                secure: (smtpPort || 587) === 465, // use TLS if port is 465
+                auth: {
+                    user: smtpUser,
+                    pass: smtpPass,
+                },
+            });
 
-            if (!smtpHost || !smtpUser || !smtpPass) {
-                this.logger.warn("SMTP configuration incomplete (Host/User/Pass). Falling back to development test account (Ethereal).");
-            }
-
-            if (smtpHost && smtpUser && smtpPass) {
-                this.transporter = nodemailer.createTransport({
-                    host: smtpHost,
-                    port: smtpPort || 587,
-                    secure: (smtpPort || 587) === 465, // use TLS if port is 465
-                    auth: {
-                        user: smtpUser,
-                        pass: smtpPass,
-                    },
-                });
-
-                this.logger.log(`Email service initialized with SMTP: ${smtpHost}:${smtpPort}`);
-                return;
-            }
+            this.logger.log(`Email service initialized with SMTP: ${smtpHost}:${smtpPort}`);
+            return;
         }
 
-        // Development: Use ethereal test account
-        const account = await nodemailer.createTestAccount();
-
-        this.transporter = nodemailer.createTransport({
-            host: "smtp.ethereal.email",
-            port: 587,
-            secure: false,
-            auth: {
-                user: account.user,
-                pass: account.pass,
-            },
-        });
-
-        this.logger.log(`Ethereal Email initialized for development. Emails: https://ethereal.email/login`);
+        // Fallback: Development: Use ethereal test account
+        this.logger.warn("SMTP configuration incomplete. Falling back to development test account (Ethereal).");
+        try {
+            const account = await nodemailer.createTestAccount();
+            this.transporter = nodemailer.createTransport({
+                host: "smtp.ethereal.email",
+                port: 587,
+                secure: false,
+                auth: {
+                    user: account.user,
+                    pass: account.pass,
+                },
+            });
+            this.logger.log(`Ethereal Email initialized. Emails: https://ethereal.email/login`);
+        } catch (err) {
+            this.logger.error("Failed to initialize Ethereal fallback", err);
+        }
     }
 
     async send(options: {
@@ -61,6 +56,11 @@ export class EmailService implements OnModuleInit {
         html: string;
         from?: string;
     }) {
+        if (!this.transporter) {
+            this.logger.error("Transporter not initialized. Cannot send email.");
+            return false;
+        }
+
         const defaultFrom = this.config.get<string>("EMAIL_FROM") || '"HostelGH" <noreply@hostelgh.com>';
         const mailOptions = {
             from: options.from || defaultFrom,
