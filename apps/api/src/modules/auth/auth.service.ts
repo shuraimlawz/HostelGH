@@ -41,6 +41,9 @@ export class AuthService {
   }
 
   async register(dto: RegisterDto) {
+    // Hash password before starting the transaction to keep it short
+    const passwordHash = await bcrypt.hash(dto.password, 12);
+
     // 1. Transactional DB Work: Create User and Token
     const result = await this.prisma.$transaction(async (tx) => {
       try {
@@ -64,7 +67,6 @@ export class AuthService {
           if (phoneExists) throw new BadRequestException("Phone number already in use");
         }
 
-        const passwordHash = await bcrypt.hash(dto.password, 12);
         const user = await tx.user.create({
           data: {
             email: dto.email,
@@ -109,6 +111,8 @@ export class AuthService {
         this.logger.error(`Registration failed for ${dto.email}: ${(error as any).message}`, (error as any).stack);
         throw error;
       }
+    }, {
+      timeout: 30000, // 30 seconds
     });
 
     // 2. Post-Transaction Work: Send the email (Outside the 5s DB lock)
