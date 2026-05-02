@@ -39,6 +39,8 @@ export default () => ({
   },
   app: {
     frontendUrl: process.env.FRONTEND_URL,
+    resendApiKey: process.env.RESEND_API_KEY,
+    emailFrom: process.env.EMAIL_FROM,
   },
   cloudinary: {
     cloudName: process.env.CLOUDINARY_CLOUD_NAME,

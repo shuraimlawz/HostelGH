@@ -10,13 +10,13 @@ export class EmailService implements OnModuleInit {
     constructor(private config: ConfigService) { }
 
     async onModuleInit() {
-        const apiKey = this.config.get<string>("RESEND_API_KEY");
+        const apiKey = this.config.get<string>("app.resendApiKey");
 
         if (apiKey) {
             this.resend = new Resend(apiKey);
             this.logger.log("Email service initialized with official Resend SDK");
         } else {
-            this.logger.warn("RESEND_API_KEY is missing. Email delivery will fail.");
+            this.logger.warn("RESEND_API_KEY is missing in configuration mapping. Email delivery will fail.");
         }
     }
 
@@ -33,11 +33,11 @@ export class EmailService implements OnModuleInit {
         idempotencyKey?: string;
     }) {
         if (!this.resend) {
-            this.logger.error("Resend client not initialized. Check RESEND_API_KEY.");
+            this.logger.error("Resend client not initialized. Check RESEND_API_KEY mapping in configuration.ts.");
             return { data: null, error: { message: "Client not initialized", name: "InitError" } };
         }
 
-        const defaultFrom = this.config.get<string>("EMAIL_FROM") || 'HostelGH <onboarding@resend.dev>';
+        const defaultFrom = this.config.get<string>("app.emailFrom") || 'HostelGH <onboarding@resend.dev>';
         
         const { data, error } = await this.resend.emails.send({
             from: options.from || defaultFrom,

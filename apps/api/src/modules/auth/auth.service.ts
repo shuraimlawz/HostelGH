@@ -47,11 +47,10 @@ export class AuthService {
     }
 
     // Hash password immediately (CPU intensive)
-    const passwordHash = await bcrypt.hash(dto.password, 10); // Standard rounds for speed
+    const passwordHash = await bcrypt.hash(dto.password, 10); // 10 rounds for speed
 
     try {
-      // 2. Sequential Writes (Optimized)
-      // Check for existing email/phone (Primary key/Unique lookups are fast)
+      // 2. Sequential Writes (Optimized - No transaction to avoid P2028 timeouts)
       const existingUser = await this.prisma.user.findFirst({
         where: {
           OR: [
@@ -59,7 +58,7 @@ export class AuthService {
             ...(dto.phone ? [{ phone: dto.phone }] : [])
           ]
         },
-        select: { email: true, phone: true } // Minimal selection
+        select: { email: true, phone: true }
       });
 
       if (existingUser) {
@@ -86,7 +85,7 @@ export class AuthService {
         },
       });
 
-      // 3. Prepare token and fire email (Non-blocking as much as possible)
+      // 3. Prepare token and fire email (Non-blocking)
       const rawToken = await this.prepareVerificationToken(user.email);
       
       // Fire-and-forget email delivery
@@ -102,7 +101,7 @@ export class AuthService {
 
     } catch (error) {
       if ((error as any).code === 'P2002') {
-        throw new BadRequestException(`A user with this ${((error as any).meta?.target as string[])?.join('/') || 'identity'} already exists.`);
+        throw new BadRequestException(`A user with this identity already exists.`);
       }
       throw error;
     }
@@ -119,7 +118,6 @@ export class AuthService {
     });
 
     if (!user) {
-      // Fire-and-forget audit
       this.auditLogger.log(null, AdminAction.LOGIN_FAILED, AdminEntity.USER, null, `Attempt for ${dto.email || dto.phone}: User not found`);
       throw new UnauthorizedException("Invalid email or password");
     }
@@ -137,7 +135,6 @@ export class AuthService {
       throw new ForbiddenException("Please verify your email to activate your account.");
     }
 
-    // Compare password (CPU intensive)
     const isPasswordValid = await bcrypt.compare(dto.password, user.passwordHash);
     if (!isPasswordValid) {
       this.auditLogger.log(null, AdminAction.LOGIN_FAILED, AdminEntity.USER, user.id, "Attempt: Invalid password");
@@ -168,13 +165,12 @@ export class AuthService {
     });
     if (!tokenRow) throw new UnauthorizedException("Invalid refresh token");
 
-    // rotate token: revoke old one (don't wait for completion to speed up response)
     this.prisma.refreshToken.update({
       where: { id: tokenRow.id },
       data: { revokedAt: new Date() },
     }).catch(e => this.logger.error(`Token rotation failed: ${e.message}`));
 
-    return this.issueTokens(userId, null); // Role is usually in user lookup, but for refresh we can optimize
+    return this.issueTokens(userId, null);
   }
 
   async logout(userId: string) {
@@ -225,13 +221,11 @@ export class AuthService {
   }
 
   private async issueTokens(userId: string, role: string | null) {
-    // 1. Fetch role if not provided (for refresh)
     if (!role) {
       const user = await this.prisma.user.findUnique({ where: { id: userId }, select: { role: true } });
       role = user?.role || 'TENANT';
     }
 
-    // 2. Prepare tokens in parallel
     const accessTokenPromise = this.jwt.signAsync(
       { sub: userId, role },
       {
