@@ -225,6 +225,9 @@ model Hostel {
   @@index([ownerId])
   @@index([city])
   @@index([isPublished])
+  @@index([university])
+  @@index([averageRating])
+  @@index([minPrice])
 }
 
 model HostelFacility {
@@ -303,6 +306,8 @@ model Room {
   @@index([hostelId])
   @@index([isActive])
   @@index([gender])
+  @@index([pricePerTerm])
+  @@index([roomConfiguration])
 }
 
 model Booking {
@@ -346,6 +351,8 @@ model Booking {
   @@index([tenantId])
   @@index([status])
   @@index([autoReleaseAt])
+  @@index([createdAt])
+  @@index([startDate])
 }
 
 model BookingItem {
@@ -414,7 +421,7 @@ model AdminAuditLog {
 
   createdAt DateTime @default(now())
 
-  admin User? @relation(fields: [adminId], references: [id])
+  admin User? @relation(fields: [adminId], references: [id], onDelete: SetNull)
 
   @@index([adminId])
   @@index([entityType])
@@ -429,8 +436,8 @@ model Review {
   hostelId  String
   createdAt DateTime @default(now())
 
-  tenant User   @relation(fields: [tenantId], references: [id])
-  hostel Hostel @relation(fields: [hostelId], references: [id])
+  tenant User   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  hostel Hostel @relation(fields: [hostelId], references: [id], onDelete: Cascade)
 
   @@index([hostelId])
 }
@@ -455,8 +462,8 @@ model Message {
   isRead         Boolean  @default(false)
   createdAt      DateTime @default(now())
 
-  conversation Conversation @relation(fields: [conversationId], references: [id])
-  sender       User?        @relation(fields: [senderId], references: [id])
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  sender       User?        @relation(fields: [senderId], references: [id], onDelete: SetNull)
 
   @@index([conversationId])
 }

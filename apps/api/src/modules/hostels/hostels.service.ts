@@ -423,7 +423,7 @@ export class HostelsService {
 
     if (sort === "relevance") {
       // Use bookings count as a strong signal of popularity, then rating, then recency
-      orderBy.push({ _count: { bookings: "desc" } }, { averageRating: "desc" }, { createdAt: "desc" });
+      orderBy.push({ bookings: { _count: "desc" } }, { averageRating: "desc" }, { createdAt: "desc" });
     } else if (sort === "price_asc") {
       orderBy.push({ minPrice: "asc" });
     } else if (sort === "price_desc") {
