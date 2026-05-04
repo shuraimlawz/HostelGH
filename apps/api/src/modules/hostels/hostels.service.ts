@@ -510,9 +510,14 @@ export class HostelsService {
     return results;
   }
 
-  async getPublicById(id: string, actor?: UserActor) {
-    const hostel = await this.prisma.hostel.findUnique({
-      where: { id },
+  async getPublicById(idOrSlug: string, actor?: UserActor) {
+    const hostel = await this.prisma.hostel.findFirst({
+      where: {
+        OR: [
+          { id: idOrSlug },
+          { name: { contains: idOrSlug, mode: 'insensitive' } } // Fallback if name is used as slug
+        ]
+      },
       include: {
         rooms: { where: { isActive: true }, orderBy: { createdAt: "asc" } },
         facilities: true,
@@ -544,10 +549,12 @@ export class HostelsService {
     });
 
     if (!hostel.isPublished) {
-      const isOwner =
-        actor && (actor.role === UserRole.ADMIN || actor.id === hostel.ownerId);
-      if (!isOwner)
+      const isAdmin = actor?.role === UserRole.ADMIN || actor?.role === UserRole.MODERATOR;
+      const isOwner = actor?.id === hostel.ownerId;
+      
+      if (!isAdmin && !isOwner) {
         throw new NotFoundException("Hostel not found or not published");
+      }
     }
 
     return { ...hostel, ratingDistribution };
