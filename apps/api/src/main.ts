@@ -57,12 +57,14 @@ async function bootstrap() {
     "https://hostelgh.onrender.com",
     "https://hostelgh.vercel.app",
     "https://hostelgh-api.onrender.com",
-    "http://localhost:3000"
+    "https://hostelgh-api.onrender.com/api",
+    "http://localhost:3000",
+    "http://localhost:3001"
   ].filter(Boolean);
 
   app.enableCors({
     origin: (origin, callback) => {
-      if (!origin || allowedOrigins.includes(origin)) {
+      if (!origin || allowedOrigins.map(o => o.toLowerCase()).includes(origin.toLowerCase())) {
         callback(null, true);
       } else {
         // Log during development to debug CORS issues
