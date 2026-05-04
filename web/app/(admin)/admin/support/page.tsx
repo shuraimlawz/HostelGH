@@ -10,7 +10,7 @@ import { MessageSquare, User, Send, CheckCircle2, Search, Clock, ShieldAlert } f
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 
-const API_BASE_URL = (process.env.NEXT_PUBLIC_API_URL || "https://hostelgh-api.onrender.com").replace(/\/$/, "");
+const API_BASE_URL = (process.env.NEXT_PUBLIC_API_URL || "https://hostelgh.onrender.com").replace(/\/$/, "");
 
 export default function AdminSupportPage() {
     const { user } = useAuth();

@@ -44,7 +44,7 @@ export default function AdminDashboardPage() {
 
     // --- SOCKET INTEGRATION ---
     useEffect(() => {
-        const socketUrl = process.env.NEXT_PUBLIC_API_URL || "https://hostelgh-api.onrender.com";
+        const socketUrl = process.env.NEXT_PUBLIC_API_URL || "https://hostelgh.onrender.com";
         const socket: Socket = io(`${socketUrl}/admin-events`, {
             auth: { token: localStorage.getItem("accessToken") }
         });
