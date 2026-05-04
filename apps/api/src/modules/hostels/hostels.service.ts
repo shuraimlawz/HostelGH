@@ -511,13 +511,9 @@ export class HostelsService {
   }
 
   async getPublicById(idOrSlug: string, actor?: UserActor) {
-    const hostel = await this.prisma.hostel.findFirst({
-      where: {
-        OR: [
-          { id: idOrSlug },
-          { name: { contains: idOrSlug, mode: 'insensitive' } } // Fallback if name is used as slug
-        ]
-      },
+    // First try finding by ID (most common)
+    let hostel = await this.prisma.hostel.findUnique({
+      where: { id: idOrSlug },
       include: {
         rooms: { where: { isActive: true }, orderBy: { createdAt: "asc" } },
         facilities: true,
@@ -533,6 +529,27 @@ export class HostelsService {
         }
       },
     });
+
+    // If not found by ID, try finding by name (slug fallback)
+    if (!hostel) {
+      hostel = await this.prisma.hostel.findFirst({
+        where: { name: { equals: idOrSlug, mode: 'insensitive' } },
+        include: {
+          rooms: { where: { isActive: true }, orderBy: { createdAt: "asc" } },
+          facilities: true,
+          owner: { select: { id: true, firstName: true, lastName: true, avatarUrl: true } },
+          reviews: {
+            include: { 
+              tenant: { select: { id: true, firstName: true, lastName: true, avatarUrl: true } },
+              photos: true,
+              ownerResponse: true
+            },
+            orderBy: { createdAt: "desc" },
+            take: 10,
+          }
+        },
+      });
+    }
 
     if (!hostel) throw new NotFoundException("Hostel not found");
 
