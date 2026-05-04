@@ -41,6 +41,9 @@ import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { ReviewForm } from "@/components/reviews/ReviewForm";
+import { ReviewCard } from "@/components/reviews/ReviewCard";
+import { ReviewAnalytics } from "@/components/reviews/ReviewAnalytics";
 
 // WhatsApp SVG icon (not in lucide-react)
 function WhatsAppIcon({ size = 20, className = "", style }: { size?: number; className?: string; style?: React.CSSProperties }) {
@@ -494,15 +497,15 @@ export default function HostelDetailsPage() {
                         </div>
 
                         {/* Reviews Section */}
-                        <div className="pt-16 border-t border-gray-50">
-                            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
-                                <div className="space-y-1">
-                                    <h2 className="text-3xl font-bold tracking-tighter uppercase text-gray-900 flex items-center gap-4">
-                                        <Star size={32} className="text-orange-400" />
+                        <div className="pt-24 border-t border-gray-50 space-y-16">
+                            <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
+                                <div className="space-y-4">
+                                    <h2 className="text-4xl font-bold tracking-tighter uppercase text-gray-900 flex items-center gap-4">
+                                        <Star size={36} className="text-orange-400 fill-current" />
                                         Student Reviews
                                     </h2>
-                                    <p className="text-gray-400 text-[10px] font-bold uppercase tracking-widest pl-12">
-                                        Total Rating: {hostel.averageRating?.toFixed(1) || "0.0"} / 5.0 ({hostel.totalReviews || 0} reviews)
+                                    <p className="text-gray-400 text-[11px] font-bold uppercase tracking-widest max-w-md leading-relaxed">
+                                        Real feedback from students who have lived here. Verified reviews are marked with a badge.
                                     </p>
                                 </div>
                                 <button 
@@ -510,51 +513,49 @@ export default function HostelDetailsPage() {
                                         if(!user) open("login");
                                         else document.getElementById('review-form')?.scrollIntoView({ behavior: 'smooth' });
                                     }}
-                                    className="h-12 px-8 bg-blue-600 text-white rounded-xl font-bold text-[10px] uppercase tracking-widest hover:bg-blue-700 transition-all shadow-lg shadow-blue-500/20"
+                                    className="h-14 px-10 bg-gray-900 text-white rounded-2xl font-bold text-[10px] uppercase tracking-[0.2em] hover:bg-black transition-all shadow-xl active:scale-[0.98]"
                                 >
-                                    Write a Review
+                                    Share Your Experience
                                 </button>
                             </div>
 
-                            <div className="grid md:grid-cols-2 gap-8 mb-16">
+                            <ReviewAnalytics 
+                                averageRating={hostel.averageRating} 
+                                totalReviews={hostel.totalReviews}
+                                distribution={hostel.ratingDistribution}
+                            />
+
+                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                                 {hostel.reviews?.length > 0 ? (
                                     hostel.reviews.map((r: any) => (
-                                        <div key={r.id} className="bg-white rounded-3xl p-8 border border-gray-100 shadow-sm hover:border-blue-500/10 transition-all group">
-                                            <div className="flex items-center gap-4 mb-6">
-                                                <div className="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center text-white font-bold shadow-lg shadow-blue-500/10 overflow-hidden group-hover:scale-110 transition-transform">
-                                                    {r.tenant?.avatarUrl ? <img src={r.tenant.avatarUrl} className="w-full h-full object-cover" /> : r.tenant?.firstName?.[0]}
-                                                </div>
-                                                <div>
-                                                    <p className="font-bold text-gray-900 uppercase tracking-tight text-sm">{r.tenant?.firstName} {r.tenant?.lastName}</p>
-                                                    <div className="flex gap-0.5 text-orange-400">
-                                                        {[...Array(5)].map((_, i) => (
-                                                            <Star key={i} size={12} className={i < r.rating ? "fill-current" : "text-gray-100"} />
-                                                        ))}
-                                                    </div>
-                                                </div>
-                                                <span className="ml-auto text-[9px] font-bold text-gray-300 uppercase tracking-widest">{new Date(r.createdAt).toLocaleDateString()}</span>
-                                            </div>
-                                            <p className="text-gray-500 text-sm leading-relaxed font-medium uppercase tracking-tight">" {r.comment} "</p>
-                                        </div>
+                                        <ReviewCard key={r.id} review={r} />
                                     ))
                                 ) : (
-                                    <div className="col-span-2 text-center py-20 bg-gray-50 rounded-3xl border border-dashed border-gray-200 space-y-3">
-                                        <div className="w-12 h-12 bg-white rounded-xl shadow-sm border border-gray-100 flex items-center justify-center mx-auto text-gray-200">
-                                            <MessageCircle size={24} />
+                                    <div className="lg:col-span-2 text-center py-24 bg-gray-50 rounded-[3rem] border-2 border-dashed border-gray-100 space-y-4">
+                                        <div className="w-20 h-20 bg-white rounded-3xl shadow-sm flex items-center justify-center mx-auto text-gray-200">
+                                            <MessageCircle size={36} />
                                         </div>
-                                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">No reviews yet. Be the first to share your experience!</p>
+                                        <div className="space-y-1">
+                                            <p className="text-sm font-bold text-gray-900 uppercase tracking-tight">No reviews yet</p>
+                                            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Be the first to share your experience!</p>
+                                        </div>
                                     </div>
                                 )}
                             </div>
 
-                            {/* Review Form */}
-                            <div id="review-form" className="bg-gray-50 rounded-[2.5rem] p-8 md:p-12 border border-gray-100">
-                                <div className="max-w-2xl mx-auto space-y-8">
-                                    <div className="text-center space-y-2">
-                                        <h3 className="text-2xl font-bold uppercase tracking-tight text-gray-900">Share Your Experience</h3>
-                                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Your review helps other students find the perfect home.</p>
+                            {/* Review Form Container */}
+                            <div id="review-form" className="bg-gray-50 rounded-[3.5rem] p-8 md:p-16 border border-gray-100">
+                                <div className="max-w-3xl mx-auto space-y-12">
+                                    <div className="text-center space-y-3">
+                                        <h3 className="text-3xl font-bold uppercase tracking-tight text-gray-900">Post a Review</h3>
+                                        <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest leading-relaxed">
+                                            Your honest feedback helps the student community make better housing decisions.
+                                        </p>
                                     </div>
-                                    <ReviewForm hostelId={hostelId} onSubmitted={() => queryClient.invalidateQueries({ queryKey: ["hostel", hostelId] })} />
+                                    <ReviewForm 
+                                        hostelId={hostelId} 
+                                        onSuccess={() => queryClient.invalidateQueries({ queryKey: ["hostel", hostelId] })} 
+                                    />
                                 </div>
                             </div>
                         </div>
@@ -675,83 +676,3 @@ export default function HostelDetailsPage() {
     );
 }
 
-function ReviewForm({ hostelId, onSubmitted }: { hostelId: string, onSubmitted: () => void }) {
-    const [rating, setRating] = useState(0);
-    const [hoveredRating, setHoveredRating] = useState(0);
-    const [comment, setComment] = useState("");
-    const [isSubmitting, setIsSubmitting] = useState(false);
-    const { user } = useAuth();
-    const { open } = useAuthModal();
-
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!user) {
-            open("login");
-            return;
-        }
-        if (rating === 0) {
-            toast.error("Please select a rating");
-            return;
-        }
-
-        setIsSubmitting(true);
-        try {
-            await api.post(`/reviews/${hostelId}`, { rating, comment });
-            toast.success("Review posted successfully!");
-            setRating(0);
-            setComment("");
-            onSubmitted();
-        } catch (err) {
-            toast.error("Failed to post review. Please try again.");
-        } finally {
-            setIsSubmitting(false);
-        }
-    };
-
-    return (
-        <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="flex flex-col items-center gap-4">
-                <div className="flex gap-2">
-                    {[1, 2, 3, 4, 5].map((star) => (
-                        <button
-                            key={star}
-                            type="button"
-                            onMouseEnter={() => setHoveredRating(star)}
-                            onMouseLeave={() => setHoveredRating(0)}
-                            onClick={() => setRating(star)}
-                            className="transition-transform active:scale-90"
-                        >
-                            <Star
-                                size={40}
-                                className={cn(
-                                    "transition-colors",
-                                    (hoveredRating || rating) >= star ? "text-orange-400 fill-current" : "text-gray-200"
-                                )}
-                            />
-                        </button>
-                    ))}
-                </div>
-                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
-                    {rating === 0 ? "Select a rating" : `You gave ${rating} stars`}
-                </p>
-            </div>
-
-            <textarea
-                value={comment}
-                onChange={(e) => setComment(e.target.value)}
-                placeholder="Write your experience here... (What did you like? What could be improved?)"
-                className="w-full h-32 bg-white border border-gray-100 rounded-2xl p-6 outline-none focus:border-blue-500 transition-all font-medium text-gray-700 text-sm shadow-sm"
-                required
-                minLength={10}
-            />
-
-            <button
-                type="submit"
-                disabled={isSubmitting}
-                className="w-full h-14 bg-blue-600 text-white rounded-xl font-bold uppercase tracking-[0.2em] text-[10px] shadow-xl hover:bg-blue-700 disabled:opacity-50 transition-all"
-            >
-                {isSubmitting ? <Loader2 className="animate-spin mx-auto" /> : "Post Review"}
-            </button>
-        </form>
-    );
-}

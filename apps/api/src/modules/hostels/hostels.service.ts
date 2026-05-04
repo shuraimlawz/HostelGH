@@ -518,7 +518,11 @@ export class HostelsService {
         facilities: true,
         owner: { select: { id: true, firstName: true, lastName: true, avatarUrl: true } },
         reviews: {
-          include: { tenant: { select: { id: true, firstName: true, lastName: true, avatarUrl: true } } },
+          include: { 
+            tenant: { select: { id: true, firstName: true, lastName: true, avatarUrl: true } },
+            photos: true,
+            ownerResponse: true
+          },
           orderBy: { createdAt: "desc" },
           take: 10,
         }
@@ -527,6 +531,18 @@ export class HostelsService {
 
     if (!hostel) throw new NotFoundException("Hostel not found");
 
+    // Calculate rating distribution
+    const reviewStats = await this.prisma.review.groupBy({
+      by: ['rating'],
+      where: { hostelId: id, isModerated: false },
+      _count: { id: true }
+    });
+
+    const ratingDistribution = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 };
+    reviewStats.forEach(s => {
+      ratingDistribution[s.rating as keyof typeof ratingDistribution] = s._count.id;
+    });
+
     if (!hostel.isPublished) {
       const isOwner =
         actor && (actor.role === UserRole.ADMIN || actor.id === hostel.ownerId);
@@ -534,7 +550,7 @@ export class HostelsService {
         throw new NotFoundException("Hostel not found or not published");
     }
 
-    return hostel;
+    return { ...hostel, ratingDistribution };
   }
 
   @Cron(CronExpression.EVERY_HOUR)

@@ -435,16 +435,53 @@ model AdminAuditLog {
 
 model Review {
   id        String   @id @default(cuid())
-  rating    Int
-  comment   String?
-  tenantId  String
-  hostelId  String
-  createdAt DateTime @default(now())
+  bookingId String?  @unique
+  
+  // Ratings
+  rating      Int      // Overall rating
+  cleanliness Int?
+  comfort     Int?
+  value       Int?
+  staff       Int?
+  
+  comment     String?
+  isVerified  Boolean  @default(false)
+  isModerated Boolean  @default(false)
+  
+  tenantId    String
+  hostelId    String
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
-  tenant User   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  hostel Hostel @relation(fields: [hostelId], references: [id], onDelete: Cascade)
+  tenant        User           @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  hostel        Hostel         @relation(fields: [hostelId], references: [id], onDelete: Cascade)
+  photos        ReviewPhoto[]
+  ownerResponse OwnerResponse?
 
   @@index([hostelId])
+  @@index([tenantId])
+}
+
+model ReviewPhoto {
+  id        String   @id @default(cuid())
+  reviewId  String
+  url       String
+  createdAt DateTime @default(now())
+
+  review Review @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+
+  @@index([reviewId])
+}
+
+model OwnerResponse {
+  id        String   @id @default(cuid())
+  reviewId  String   @unique
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  review Review @relation(fields: [reviewId], references: [id], onDelete: Cascade)
 }
 
 model Conversation {
