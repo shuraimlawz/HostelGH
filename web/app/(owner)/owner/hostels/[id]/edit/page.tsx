@@ -64,7 +64,6 @@ const roomSchema = z.object({
     capacity: z.number().min(1),
     roomConfiguration: z.string().min(1, "Config is required (e.g. 2 in a room)"),
     gender: z.enum(["MALE", "FEMALE", "MIXED"]).default("MIXED"),
-    totalSlots: z.number().min(1),
     totalUnits: z.number().min(1),
     pricePerTerm: z.number().min(1),
     description: z.string().optional(),
@@ -455,15 +454,15 @@ function AddRoomForm({ onCancel, onSave, isLoading }: any) {
             capacity: 2,
             roomConfiguration: "2 in a room",
             gender: "MIXED",
-            totalSlots: 2,
             totalUnits: 10,
-            pricePerTerm: 150000,
+            pricePerTerm: 1500,
         }
     });
 
     const onSubmit = (values: any) => {
         onSave({
             ...values,
+            totalSlots: values.capacity * values.totalUnits,
             pricePerTerm: values.pricePerTerm * 100
         });
     };
@@ -478,12 +477,12 @@ function AddRoomForm({ onCancel, onSave, isLoading }: any) {
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                     <div>
-                        <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400 ml-1">Capacity</label>
+                        <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400 ml-1">Capacity (Per Room)</label>
                         <input type="number" {...register("capacity", { valueAsNumber: true })} className="w-full px-5 py-4 bg-gray-50 rounded-2xl border outline-none focus:border-black" />
                     </div>
                     <div>
-                        <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400 ml-1">Total Slots</label>
-                        <input type="number" {...register("totalSlots", { valueAsNumber: true })} className="w-full px-5 py-4 bg-gray-50 rounded-2xl border outline-none focus:border-black" />
+                        <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400 ml-1">Units (Quantity)</label>
+                        <input type="number" {...register("totalUnits", { valueAsNumber: true })} className="w-full px-5 py-4 bg-gray-50 rounded-2xl border outline-none focus:border-black" />
                     </div>
                 </div>
 
@@ -497,8 +496,8 @@ function AddRoomForm({ onCancel, onSave, isLoading }: any) {
                         </select>
                     </div>
                     <div>
-                        <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400 ml-1">Units (Quantity)</label>
-                        <input type="number" {...register("totalUnits", { valueAsNumber: true })} className="w-full px-5 py-4 bg-gray-50 rounded-2xl border outline-none focus:border-black" />
+                        <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400 ml-1">Price (₵)</label>
+                        <input type="number" {...register("pricePerTerm", { valueAsNumber: true })} className="w-full px-5 py-4 bg-gray-50 rounded-2xl border outline-none focus:border-black" placeholder="1500" />
                     </div>
                 </div>
 
@@ -507,11 +506,6 @@ function AddRoomForm({ onCancel, onSave, isLoading }: any) {
                         <Layout size={10} /> Room Configuration
                     </label>
                     <input {...register("roomConfiguration")} className="w-full px-5 py-4 bg-gray-50 rounded-2xl border outline-none focus:border-black" placeholder="e.g. 2 in a room" />
-                </div>
-                <div>
-                    <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400 ml-1">Price (₵)</label>
-                    <input type="number" {...register("pricePerTerm", { valueAsNumber: true })} className="w-full px-5 py-4 bg-gray-50 rounded-2xl border outline-none focus:border-black" placeholder="1500" />
-                    <p className="text-[10px] text-gray-400 mt-1">* Enter amount in Cedis (converted internally)</p>
                 </div>
             </div>
             <div className="flex gap-3 mt-8">

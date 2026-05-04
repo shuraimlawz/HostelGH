@@ -166,6 +166,22 @@ export class AdminService {
 
   // --- HOSTELS ---
 
+  async getHostelById(hostelId: string) {
+    const hostel = await this.prisma.hostel.findUnique({
+      where: { id: hostelId },
+      include: {
+        owner: {
+          select: { id: true, firstName: true, lastName: true, email: true, createdAt: true },
+        },
+        rooms: true,
+        _count: { select: { rooms: true, bookings: true } },
+      },
+    });
+
+    if (!hostel) throw new NotFoundException("Hostel not found");
+    return hostel;
+  }
+
   async getHostels(query: AdminQueryDto) {
     const { page = 1, limit = 10, search, status } = query;
     const skip = (page - 1) * limit;

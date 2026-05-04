@@ -362,8 +362,10 @@ function AdminHostelsContent() {
                                                 {hostel.name}
                                             </h3>
                                             <div className="flex items-center gap-1 shrink-0">
-                                                <Star size={12} className="fill-blue-500 text-blue-500" />
-                                                <span className="text-xs font-bold text-gray-900">4.9</span>
+                                                <Star size={12} className={cn("text-blue-500", (hostel.averageRating || 0) > 0 && "fill-blue-500")} />
+                                                <span className="text-xs font-bold text-gray-900">
+                                                    {(hostel.averageRating || 0) > 0 ? hostel.averageRating.toFixed(1) : "N/A"}
+                                                </span>
                                             </div>
                                         </div>
                                         <p className="text-[11px] text-gray-400 font-bold uppercase tracking-widest truncate">

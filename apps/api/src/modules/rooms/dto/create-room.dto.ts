@@ -68,10 +68,11 @@ export class CreateRoomDto {
   @Min(1)
   totalSlots!: number;
 
-  @ApiProperty({ example: 10, description: "Currently available slots" })
+  @ApiProperty({ example: 10, description: "Currently available slots", required: false })
+  @IsOptional()
   @IsInt()
   @Min(0)
-  availableSlots!: number;
+  availableSlots?: number;
 
   @ApiProperty({ example: false, default: false })
   @IsOptional()

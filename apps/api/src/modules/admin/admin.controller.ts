@@ -103,6 +103,12 @@ export class AdminController {
 
   // --- HOSTELS ---
 
+  @Get("hostels/:id")
+  @ApiOperation({ summary: "Get single hostel for audit" })
+  getHostel(@Param("id") id: string) {
+    return this.adminService.getHostelById(id);
+  }
+
   @Get("hostels")
   @ApiOperation({ summary: "Get all hostels for management" })
   getHostels(@Query() query: AdminQueryDto) {
