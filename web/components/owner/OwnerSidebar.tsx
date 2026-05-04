@@ -144,7 +144,9 @@ export default function OwnerSidebar({ isOpen = false, onClose = () => { } }: Ow
                                         return `${prefix} ${name}`.trim();
                                     })()}
                                 </p>
-                                <p className="text-[10px] text-gray-500 truncate font-medium">Verified Property Manager</p>
+                                <p className="text-[10px] text-gray-500 truncate font-medium">
+                                    {user?.isVerified ? "Verified Property Manager" : user?.verificationStatus === 'PENDING' ? "Verification Pending" : "Unverified Account"}
+                                </p>
                             </div>
                         </div>
                         <button

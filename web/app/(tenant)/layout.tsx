@@ -40,11 +40,11 @@ export default function TenantLayout({ children }: { children: React.ReactNode }
     }
 
     return (
-        <div className="flex min-h-screen bg-gray-50/50">
+        <div className="flex min-h-screen bg-background text-foreground">
             {/* Mobile Menu Button */}
             <button
                 onClick={() => setSidebarOpen(true)}
-                className="md:hidden fixed top-5 left-4 z-40 p-2.5 bg-white text-gray-900 rounded-lg shadow-lg border border-gray-200 hover:bg-gray-50 transition-colors"
+                className="md:hidden fixed top-5 left-4 z-40 p-2.5 bg-background text-foreground rounded-lg shadow-lg border border-border hover:bg-accent transition-colors"
                 aria-label="Open menu"
             >
                 <Menu size={18} />

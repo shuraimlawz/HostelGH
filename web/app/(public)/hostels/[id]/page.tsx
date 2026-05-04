@@ -35,7 +35,8 @@ import {
     Zap,
     Flame,
     Loader2,
-    ShieldAlert
+    ShieldAlert,
+    ArrowRight
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
@@ -44,6 +45,16 @@ import { toast } from "sonner";
 import { ReviewForm } from "@/components/reviews/ReviewForm";
 import { ReviewCard } from "@/components/reviews/ReviewCard";
 import { ReviewAnalytics } from "@/components/reviews/ReviewAnalytics";
+import dynamic from "next/dynamic";
+
+const HostelMap = dynamic(() => import("@/components/common/HostelMap"), {
+    ssr: false,
+    loading: () => (
+        <div className="h-full w-full bg-gray-100 rounded-3xl flex items-center justify-center">
+            <Loader2 className="text-blue-500 animate-spin" size={24} />
+        </div>
+    ),
+});
 
 // WhatsApp SVG icon (not in lucide-react)
 function WhatsAppIcon({ size = 20, className = "", style }: { size?: number; className?: string; style?: React.CSSProperties }) {
@@ -138,6 +149,18 @@ export default function HostelDetailsPage() {
             toast.success(res.data.favorited ? "Added to favorites" : "Removed from favorites");
         },
     });
+
+    const { data: myBookings } = useQuery({
+        queryKey: ["my-bookings"],
+        queryFn: async () => {
+            if (!user) return [];
+            const res = await api.get("/bookings/me");
+            return res.data;
+        },
+        enabled: !!user,
+    });
+
+    const hasBooking = myBookings?.some((b: any) => b.hostelId === hostelId && (b.status === 'PAYMENT_SECURED' || b.status === 'APPROVED' || b.status === 'RESERVED' || b.status === 'COMPLETED'));
 
     const handleShare = () => {
         const url = window.location.href;
@@ -381,6 +404,52 @@ export default function HostelDetailsPage() {
                             </div>
                         </div>
 
+                        {/* Location Map Section */}
+                        {hostel.latitude && hostel.longitude && (
+                            <div className="space-y-8">
+                                <div className="flex items-center gap-4">
+                                    <h2 className="text-3xl font-bold tracking-tighter uppercase text-gray-900">Location</h2>
+                                    <div className="h-0.5 grow bg-gray-50 rounded-xl" />
+                                </div>
+                                <div className="bg-white rounded-[3rem] border border-gray-100 overflow-hidden shadow-xl shadow-gray-100/50">
+                                    {/* Map */}
+                                    <div className="h-80 w-full">
+                                        <HostelMap
+                                            markers={[{
+                                                id: hostel.id,
+                                                lat: hostel.latitude,
+                                                lng: hostel.longitude,
+                                                label: hostel.name,
+                                                sublabel: hostel.addressLine,
+                                                price: hostel.minPrice,
+                                                isFeatured: hostel.isFeatured,
+                                            }]}
+                                            center={[hostel.latitude, hostel.longitude]}
+                                            zoom={15}
+                                            className="w-full h-full"
+                                            singlePin
+                                        />
+                                    </div>
+                                    {/* Address bar below map */}
+                                    <div className="flex items-center gap-4 px-8 py-5 border-t border-gray-50">
+                                        <div className="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center shrink-0">
+                                            <MapPin size={18} className="text-blue-600" />
+                                        </div>
+                                        <div>
+                                            <p className="text-sm font-bold text-gray-900">{hostel.addressLine}</p>
+                                            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{hostel.city}{hostel.region ? `, ${hostel.region}` : ""} — Ghana</p>
+                                        </div>
+                                        {hostel.distanceToCampus && (
+                                            <div className="ml-auto flex items-center gap-2 px-4 py-2 bg-blue-50 rounded-xl border border-blue-100">
+                                                <School size={14} className="text-blue-600" />
+                                                <span className="text-[10px] font-bold text-blue-700 uppercase tracking-widest">{hostel.distanceToCampus} to campus</span>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
                         {/* Room Types Section */}
                         <div className="space-y-8">
                             <div className="flex items-center gap-4">
@@ -398,7 +467,7 @@ export default function HostelDetailsPage() {
                                 <div className="grid gap-6">
                                     {hostel.rooms.map((r: any) => (
                                         <div key={r.id} className="group bg-white rounded-3xl border border-gray-100 p-8 flex flex-col md:flex-row gap-10 items-center shadow-sm hover:shadow-2xl hover:border-blue-500/10 transition-all duration-700">
-                                            <div className="w-full md:w-52 aspect-square rounded-2xl bg-gray-50 border border-gray-100 flex items-center justify-center text-gray-300 relative overflow-hidden shrink-0">
+                                            <div className="w-full md:w-64 aspect-[4/3] md:aspect-square rounded-2xl bg-gray-50 border border-gray-100 flex items-center justify-center text-gray-300 relative overflow-hidden shrink-0 shadow-inner">
                                                 {r.images?.[0] ? <img src={r.images[0]} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000" /> : <Building2 size={40} />}
                                                 <div className="absolute top-4 left-4">
                                                      <span className={cn(
@@ -406,7 +475,7 @@ export default function HostelDetailsPage() {
                                                         r.gender === 'MALE' ? "bg-blue-600 text-white border-white/20" :
                                                             r.gender === 'FEMALE' ? "bg-pink-600 text-white border-white/20" :
                                                                 "bg-gray-900 text-white border-white/10"
-                                                    )}>
+                                                     )}>
                                                         {r.gender === 'MALE' ? <User size={12} /> :
                                                             r.gender === 'FEMALE' ? <UserCheck size={12} /> :
                                                                 <Users size={12} />}
@@ -414,86 +483,172 @@ export default function HostelDetailsPage() {
                                                     </span>
                                                 </div>
                                             </div>
-                                            <div className="flex-1 space-y-6 text-center md:text-left">
-                                                <div className="space-y-2">
-                                                    <h4 className="text-2xl font-bold tracking-tight uppercase text-gray-900">{r.name}</h4>
-                                                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{r.roomConfiguration || `${r.capacity} People`}</p>
-                                                </div>
-                                                <div className="flex flex-wrap justify-center md:justify-start gap-3">
-                                                    <div className="flex items-center gap-2 bg-gray-50 px-4 py-2 rounded-xl border border-gray-100">
-                                                        <Users className="text-gray-400" size={14} />
-                                                        <span className="text-[9px] font-bold uppercase tracking-widest text-gray-600">
-                                                            {r.capacity} Capacity
-                                                        </span>
-                                                    </div>
-                                                    {r.availableSlots !== undefined && (
-                                                        <div className={cn(
-                                                            "flex items-center gap-2 px-4 py-2 rounded-xl border transition-all shadow-sm",
-                                                            r.availableSlots <= 3 ? "bg-red-50 border-red-200 text-red-600" : "bg-emerald-50 border-emerald-200 text-emerald-600"
-                                                        )}>
-                                                            <div className={cn("w-1.5 h-1.5 rounded-full", r.availableSlots <= 3 ? "bg-red-500 animate-pulse" : "bg-emerald-500")} />
-                                                            <span className="text-[9px] font-bold uppercase tracking-widest">
-                                                                {r.availableSlots <= 0 ? "Full" : `${r.availableSlots} Left`}
-                                                            </span>
-                                                        </div>
-                                                    )}
-                                                    {r.hasAC && (
-                                                        <div className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-xl border border-white/10 shadow-lg shadow-blue-500/10">
-                                                            <Wind size={14} />
-                                                            <span className="text-[9px] font-bold uppercase tracking-widest">Cooling Active</span>
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            </div>
-                                            <div className="md:w-64 text-center md:text-right space-y-6 bg-gray-50/50 p-6 rounded-2xl border border-gray-100/50">
-                                                <ContentGate
-                                                    message="Sign in to see pricing & book this room"
-                                                    className="rounded-xl"
-                                                >
-                                                    <div className="space-y-1">
-                                                        <div className="flex items-baseline justify-center md:justify-end gap-1">
-                                                            <span className="text-3xl font-bold text-gray-900 tracking-tight">₵{(r.pricePerTerm / 100).toLocaleString()}</span>
-                                                            <span className="text-[10px] text-gray-400 font-bold uppercase">/ Term</span>
-                                                        </div>
-                                                        <p className="text-[9px] font-bold text-gray-400 uppercase tracking-[0.2em]">Full Academic Year</p>
-                                                    </div>
-                                                    <div className="flex flex-col gap-3">
-                                                        <button
-                                                            onClick={() => onBook(r.id, r)}
-                                                            className="w-full h-14 bg-gray-900 text-white rounded-xl font-bold uppercase tracking-[0.2em] text-[10px] shadow-xl hover:bg-black active:scale-95 transition-all"
-                                                        >
-                                                            Book Now
-                                                        </button>
-
-                                                        {hostel.whatsappNumber && (
-                                                            <button
-                                                                onClick={() => handleWhatsAppClick(
-                                                                    hostel.whatsappNumber,
-                                                                    `Hello! I'm interested in the ${r.name} at ${hostel.name} on HostelGH. Price: ₵${(r.pricePerTerm/100).toLocaleString()}. Please provide more details.`
-                                                                )}
-                                                                disabled={isRedirecting}
-                                                                className="w-full h-12 flex items-center justify-center gap-2 rounded-xl font-bold uppercase tracking-[0.15em] text-[9px] transition-all active:scale-95 group border-2 disabled:opacity-50"
-                                                                style={{
-                                                                    borderColor: "#25D366",
-                                                                    color: "#128C7E",
-                                                                    background: "rgba(37,211,102,0.06)",
-                                                                }}
-                                                            >
-                                                                {isRedirecting ? (
-                                                                    <Loader2 size={16} className="animate-spin text-[#25D366]" />
-                                                                ) : (
-                                                                    <WhatsAppIcon size={16} className="group-hover:scale-110 transition-transform duration-300" style={{ color: "#25D366" }} />
-                                                                )}
-                                                                <span>{isRedirecting ? "Connecting..." : "Enquire on WhatsApp"}</span>
-                                                            </button>
+                                            <div className="flex-1 space-y-6">
+                                                <div className="space-y-3">
+                                                    <div className="flex items-center gap-3">
+                                                        <h4 className="text-2xl font-bold tracking-tight uppercase text-gray-900">{r.name}</h4>
+                                                        {r.isPremium && (
+                                                            <span className="px-2 py-0.5 bg-amber-50 text-amber-600 border border-amber-100 rounded-md text-[8px] font-bold uppercase tracking-widest">Premium</span>
                                                         )}
                                                     </div>
-                                                </ContentGate>
+                                                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest flex items-center gap-2">
+                                                        <ShieldCheck size={12} className="text-blue-500" /> Managed by {hostel.owner?.firstName} • {r.roomConfiguration || `${r.capacity} People`}
+                                                    </p>
+                                                </div>
+                                                
+                                                <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                                                    <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl border border-gray-100">
+                                                        <Users className="text-gray-400" size={14} />
+                                                        <div className="space-y-0.5">
+                                                            <p className="text-[8px] font-bold text-gray-400 uppercase leading-none">Capacity</p>
+                                                            <p className="text-[10px] font-bold text-gray-900 uppercase">{r.capacity} People</p>
+                                                        </div>
+                                                    </div>
+                                                    <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl border border-gray-100">
+                                                        <Clock className="text-gray-400" size={14} />
+                                                        <div className="space-y-0.5">
+                                                            <p className="text-[8px] font-bold text-gray-400 uppercase leading-none">Term</p>
+                                                            <p className="text-[10px] font-bold text-gray-900 uppercase">Per Year</p>
+                                                        </div>
+                                                    </div>
+                                                    <div className={cn(
+                                                        "flex items-center gap-3 p-3 rounded-xl border transition-all",
+                                                        r.availableSlots <= 3 ? "bg-red-50 border-red-100 text-red-600" : "bg-emerald-50 border-emerald-100 text-emerald-600"
+                                                    )}>
+                                                        <div className={cn("w-1.5 h-1.5 rounded-full shadow-sm", r.availableSlots <= 3 ? "bg-red-500 animate-pulse" : "bg-emerald-500")} />
+                                                        <div className="space-y-0.5">
+                                                            <p className="text-[8px] font-bold uppercase leading-none opacity-60">Status</p>
+                                                            <p className="text-[10px] font-bold uppercase">{r.availableSlots <= 0 ? "Full" : `${r.availableSlots} Left`}</p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div className="flex flex-wrap gap-2">
+                                                    {r.hasAC && (
+                                                        <span className="px-3 py-1 bg-blue-50 text-blue-600 border border-blue-100 rounded-lg text-[9px] font-bold uppercase tracking-widest flex items-center gap-1.5 shadow-sm">
+                                                            <Wind size={10} /> AC Included
+                                                        </span>
+                                                    )}
+                                                    {r.utilitiesIncluded?.map((u: string) => (
+                                                        <span key={u} className="px-3 py-1 bg-gray-50 text-gray-500 border border-gray-100 rounded-lg text-[9px] font-bold uppercase tracking-widest shadow-sm">
+                                                            {u}
+                                                        </span>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                            <div className="md:w-72 text-center md:text-right space-y-6 bg-gray-50/50 p-8 rounded-3xl border border-gray-100/50 shadow-inner">
+                                                <div className="space-y-1">
+                                                     <p className="text-[9px] font-bold text-gray-400 uppercase tracking-[0.2em] leading-none mb-1">Academic Year Rate</p>
+                                                     <div className="flex items-baseline justify-center md:justify-end gap-1">
+                                                        <span className="text-3xl font-bold text-gray-900 tracking-tighter uppercase leading-none">₵{(r.pricePerTerm / 100).toLocaleString()}</span>
+                                                        <span className="text-[10px] text-gray-400 font-bold">/ Term</span>
+                                                     </div>
+                                                </div>
+                                                <div className="flex flex-col gap-3">
+                                                    <Link 
+                                                        href={`/hostels/${hostelId}/rooms/${r.id}`}
+                                                        className="w-full h-14 bg-white text-gray-900 border border-gray-200 rounded-2xl font-bold text-[10px] uppercase tracking-widest hover:border-gray-900 transition-all flex items-center justify-center gap-2 shadow-sm active:scale-95"
+                                                    >
+                                                        View Full Spec <ArrowRight size={14} />
+                                                    </Link>
+                                                    <ContentGate
+                                                        message="Sign in to book this room"
+                                                        className="w-full"
+                                                    >
+                                                        {r.availableSlots > 0 ? (
+                                                            <button 
+                                                                onClick={() => onBook(r.id, r)}
+                                                                className="w-full h-14 bg-gray-900 text-white rounded-2xl font-bold text-[10px] uppercase tracking-widest hover:bg-black transition-all shadow-xl shadow-gray-900/10 flex items-center justify-center gap-2 active:scale-95"
+                                                            >
+                                                                Secure My Slot
+                                                            </button>
+                                                        ) : (
+                                                            <button disabled className="w-full h-14 bg-gray-100 text-gray-400 rounded-2xl font-bold text-[10px] uppercase tracking-widest cursor-not-allowed border border-gray-200">
+                                                                Fully Booked
+                                                            </button>
+                                                        )}
+                                                    </ContentGate>
+                                                </div>
                                             </div>
                                         </div>
                                     ))}
                                 </div>
                             )}
+                        </div>
+
+                        {/* Manager Profile Card */}
+                        <div className="bg-gray-900 rounded-[3.5rem] p-10 md:p-16 text-white relative overflow-hidden group">
+                            <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/10 rounded-full -mr-32 -mt-32 blur-3xl group-hover:scale-110 transition-transform duration-1000" />
+                            <div className="relative z-10 flex flex-col md:flex-row items-center gap-10">
+                                <div className="w-32 h-32 bg-white/5 rounded-[2.5rem] border border-white/10 flex items-center justify-center text-4xl font-bold overflow-hidden shrink-0">
+                                    {hostel.owner?.avatarUrl ? (
+                                        <img src={hostel.owner.avatarUrl} className="w-full h-full object-cover" />
+                                    ) : (
+                                        hostel.owner?.firstName?.[0] || "M"
+                                    )}
+                                </div>
+                                <div className="flex-1 space-y-6 text-center md:text-left">
+                                    <div className="space-y-2">
+                                        <div className="flex items-center justify-center md:justify-start gap-3">
+                                            <h3 className="text-3xl font-bold tracking-tight uppercase">{hostel.owner?.firstName} {hostel.owner?.lastName}</h3>
+                                            {hostel.owner?.isVerified && (
+                                                <div className="bg-emerald-500/20 text-emerald-400 px-3 py-1 rounded-full border border-emerald-500/20 text-[9px] font-bold uppercase tracking-widest flex items-center gap-1.5">
+                                                    <ShieldCheck size={12} /> Verified
+                                                </div>
+                                            )}
+                                        </div>
+                                        <p className="text-gray-400 text-[11px] font-bold uppercase tracking-[0.3em]">Official Property Manager</p>
+                                    </div>
+                                    <p className="text-gray-300 text-lg font-medium leading-relaxed max-w-2xl">
+                                        Managing this property with a commitment to student comfort and security. Our team is available 24/7 to ensure your stay is seamless.
+                                    </p>
+                                    <div className="flex flex-wrap justify-center md:justify-start gap-8 pt-4">
+                                        <div className="space-y-1">
+                                            <p className="text-[9px] font-bold text-gray-500 uppercase tracking-widest leading-none">Identity Status</p>
+                                            <p className="text-xs font-bold text-white uppercase">{hostel.owner?.isVerified ? "Legally Verified" : "Verification Ongoing"}</p>
+                                        </div>
+                                        <div className="space-y-1">
+                                            <p className="text-[9px] font-bold text-gray-500 uppercase tracking-widest leading-none">Response Time</p>
+                                            <p className="text-xs font-bold text-white uppercase">&lt; 1 Hour</p>
+                                        </div>
+                                        <div className="space-y-1">
+                                            <p className="text-[9px] font-bold text-gray-500 uppercase tracking-widest leading-none">Tenants Hosted</p>
+                                            <p className="text-xs font-bold text-white uppercase">450+ Students</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Platform Trust & Safety */}
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 pt-12">
+                            <div className="p-10 bg-blue-50 rounded-[2.5rem] border border-blue-100 space-y-6 group hover:bg-blue-600 transition-all duration-500">
+                                <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center text-blue-600 shadow-xl shadow-blue-500/10 group-hover:scale-110 transition-transform">
+                                    <ShieldCheck size={32} />
+                                </div>
+                                <div className="space-y-2">
+                                    <h4 className="text-xl font-bold tracking-tight uppercase group-hover:text-white transition-colors">Verified Listings</h4>
+                                    <p className="text-[10px] font-bold text-blue-600/60 uppercase tracking-widest group-hover:text-blue-100 transition-colors">Every hostel is physically inspected by our team.</p>
+                                </div>
+                            </div>
+                            <div className="p-10 bg-emerald-50 rounded-[2.5rem] border border-emerald-100 space-y-6 group hover:bg-emerald-600 transition-all duration-500">
+                                <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center text-emerald-600 shadow-xl shadow-emerald-500/10 group-hover:scale-110 transition-transform">
+                                    <CheckCircle2 size={32} />
+                                </div>
+                                <div className="space-y-2">
+                                    <h4 className="text-xl font-bold tracking-tight uppercase group-hover:text-white transition-colors">Secure Payments</h4>
+                                    <p className="text-[10px] font-bold text-emerald-600/60 uppercase tracking-widest group-hover:text-emerald-100 transition-colors">Funds are held in escrow until you check in safely.</p>
+                                </div>
+                            </div>
+                            <div className="p-10 bg-amber-50 rounded-[2.5rem] border border-amber-100 space-y-6 group hover:bg-amber-600 transition-all duration-500">
+                                <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center text-amber-600 shadow-xl shadow-amber-500/10 group-hover:scale-110 transition-transform">
+                                    <UserCheck size={32} />
+                                </div>
+                                <div className="space-y-2">
+                                    <h4 className="text-xl font-bold tracking-tight uppercase group-hover:text-white transition-colors">Managed Support</h4>
+                                    <p className="text-[10px] font-bold text-amber-600/60 uppercase tracking-widest group-hover:text-amber-100 transition-colors">Direct access to property managers for all residents.</p>
+                                </div>
+                            </div>
                         </div>
 
                         {/* Reviews Section */}
@@ -579,7 +734,9 @@ export default function HostelDetailsPage() {
                                             <div className="w-6 h-6 bg-emerald-50 text-emerald-600 rounded-lg flex items-center justify-center border border-emerald-100">
                                                 <CheckCircle2 size={14} />
                                             </div>
-                                            <p className="text-[10px] font-bold text-gray-900 uppercase tracking-widest">Verified Manager</p>
+                                            <p className="text-[10px] font-bold text-gray-900 uppercase tracking-widest">
+                                                {hostel.owner?.isVerified ? "Verified Manager" : "Manager Profile"}
+                                            </p>
                                         </div>
                                         <div className="flex items-center gap-4">
                                             <div className="w-6 h-6 bg-emerald-50 text-emerald-600 rounded-lg flex items-center justify-center border border-emerald-100">
@@ -597,26 +754,24 @@ export default function HostelDetailsPage() {
 
                                     <ContentGate message="Sign in to contact the hostel manager" className="rounded-2xl">
                                         {hostel.whatsappNumber && (
-                                            <button
-                                                onClick={() => handleWhatsAppClick(
-                                                    hostel.whatsappNumber,
-                                                    `Hello! I'm interested in booking at ${hostel.name} on HostelGH. Please provide more details about availability and pricing.`
+                                            <a
+                                                href={buildWhatsAppUrl(
+                                                    hostel.whatsappNumber, 
+                                                    hasBooking 
+                                                        ? `Hello, I have a confirmed booking at ${hostel.name}. I'd like to discuss check-in details.` 
+                                                        : `Hello, I'm interested in ${hostel.name} I saw on HostelGH.`
                                                 )}
-                                                disabled={isRedirecting}
-                                                className="w-full h-16 flex items-center justify-center gap-3 rounded-2xl font-bold uppercase tracking-[0.15em] text-[10px] shadow-xl transition-all active:scale-95 group disabled:opacity-80"
-                                                style={{
-                                                    background: isRedirecting ? "gray" : "linear-gradient(135deg, #25D366 0%, #128C7E 100%)",
-                                                    boxShadow: "0 8px 24px rgba(37, 211, 102, 0.25)",
-                                                    color: "#fff",
-                                                }}
+                                                target="_blank"
+                                                className={cn(
+                                                    "w-full h-16 rounded-2xl font-bold text-[10px] uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-3 border shadow-xl",
+                                                    hasBooking 
+                                                        ? "bg-blue-600 text-white border-blue-500 hover:bg-blue-700 shadow-blue-500/20" 
+                                                        : "bg-white text-gray-900 border-gray-100 hover:bg-gray-50 shadow-gray-200/50"
+                                                )}
                                             >
-                                                {isRedirecting ? (
-                                                    <Loader2 size={22} className="animate-spin" />
-                                                ) : (
-                                                    <WhatsAppIcon size={22} className="group-hover:scale-110 transition-transform duration-300" />
-                                                )}
-                                                <span>{isRedirecting ? "Connecting..." : "Book via WhatsApp"}</span>
-                                            </button>
+                                                <WhatsAppIcon size={20} />
+                                                {hasBooking ? "Chat with Manager" : "Inquire via WhatsApp"}
+                                            </a>
                                         )}
 
                                         {hostel.whatsappNumber && (
@@ -642,7 +797,9 @@ export default function HostelDetailsPage() {
                                         <p className="font-bold text-gray-900 tracking-tight uppercase leading-none text-sm group-hover/owner:text-blue-600 transition-colors">
                                             {hostel.owner?.firstName} {hostel.owner?.lastName}
                                         </p>
-                                        <p className="text-[9px] text-gray-400 font-bold uppercase tracking-widest">Verified Hostel Manager</p>
+                                        <p className="text-[9px] text-gray-400 font-bold uppercase tracking-widest">
+                                            {hostel.owner?.isVerified ? "Verified Hostel Manager" : "Property Manager"}
+                                        </p>
                                     </div>
                                 </div>
                             </div>

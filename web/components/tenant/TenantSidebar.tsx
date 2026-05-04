@@ -114,7 +114,9 @@ export default function TenantSidebar({ isOpen = false, onClose = () => { } }: T
                             </div>
                             <div className="min-w-0">
                                 <p className="text-xs font-bold text-gray-900 truncate leading-none mb-1">{user?.firstName || "Resident"}</p>
-                                <p className="text-[10px] text-gray-500 truncate font-medium">Verified Student</p>
+                                <p className="text-[10px] text-gray-500 truncate font-medium">
+                                    {user?.isVerified ? "Verified Student" : user?.verificationStatus === 'PENDING' ? "Verification Pending" : "Unverified Account"}
+                                </p>
                             </div>
                         </div>
                         <button

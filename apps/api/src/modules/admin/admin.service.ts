@@ -164,6 +164,42 @@ export class AdminService {
     return user;
   }
 
+  async getUserById(userId: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        email: true,
+        phone: true,
+        firstName: true,
+        lastName: true,
+        role: true,
+        isActive: true,
+        emailVerified: true,
+        avatarUrl: true,
+        ghanaCardId: true,
+        ghanaCardUrl: true,
+        isVerified: true,
+        verificationStatus: true,
+        verificationNote: true,
+        createdAt: true,
+        updatedAt: true,
+        ownedHostels: {
+          include: { _count: { select: { rooms: true, bookings: true } } }
+        },
+        bookings: {
+          include: { hostel: { select: { name: true } }, payment: true },
+          orderBy: { createdAt: 'desc' },
+          take: 5
+        },
+        _count: { select: { ownedHostels: true, bookings: true, reviews: true } }
+      }
+    });
+
+    if (!user) throw new NotFoundException("User not found");
+    return user;
+  }
+
   // --- HOSTELS ---
 
   async getHostelById(hostelId: string) {
@@ -224,8 +260,12 @@ export class AdminService {
     const admin = await this.prisma.user.findUnique({ where: { id: adminId } });
     const user = await this.prisma.user.update({
       where: { id: userId },
-      // @ts-ignore
-      data: { isVerified: true },
+      data: { 
+        isVerified: true,
+        verificationStatus: 'VERIFIED',
+        verifiedAt: new Date(),
+        verificationNote: null
+      },
     });
 
     await this.audit.log(
@@ -233,10 +273,32 @@ export class AdminService {
       AdminAction.VERIFY,
       AdminEntity.USER,
       userId,
-      `User ${user.email} (Owner) identity verified with Ghana Card`,
+      `User ${user.email} identity verified successfully`,
     );
 
     this.gateway.broadcastActivity('USER_VERIFIED', { userId, email: user.email });
+
+    return user;
+  }
+
+  async rejectUserVerification(adminId: string, userId: string, reason: string) {
+    const admin = await this.prisma.user.findUnique({ where: { id: adminId } });
+    const user = await this.prisma.user.update({
+      where: { id: userId },
+      data: { 
+        isVerified: false,
+        verificationStatus: 'REJECTED',
+        verificationNote: reason
+      },
+    });
+
+    await this.audit.log(
+      admin!,
+      AdminAction.REJECT,
+      AdminEntity.USER,
+      userId,
+      `User ${user.email} identity verification rejected. Reason: ${reason}`,
+    );
 
     return user;
   }
@@ -474,7 +536,9 @@ export class AdminService {
     return {
       activities: data.map((log) => ({
         type: this.getLogType(log.actionType),
-        user: `${log.admin.firstName} ${log.admin.lastName}`,
+        user: log.admin 
+          ? ([log.admin.firstName, log.admin.lastName].filter(Boolean).join(" ") || log.admin.email) 
+          : "SYSTEM",
         action: log.details,
         time: log.createdAt,
         targetUrl:
@@ -558,6 +622,13 @@ export class AdminService {
     return {};
   } // Deprecated in favor of toggleUserSuspension
 
+  async getDisputes(query: AdminQueryDto) {
+    return {
+      data: [],
+      meta: { total: 0, page: query.page || 1, limit: query.limit || 10, totalPages: 0 }
+    };
+  }
+
   async getNotificationCounts() {
     const pendingHostels = await this.prisma.hostel.count({ where: { pendingVerification: true } });
     return {
@@ -590,9 +661,9 @@ export class AdminService {
       }),
       this.prisma.user.findMany({
         // @ts-ignore
-        where: { role: UserRole.OWNER, isVerified: false, ghanaCardUrl: { not: null } },
+        where: { role: UserRole.OWNER, verificationStatus: 'PENDING' },
         // @ts-ignore
-        select: { id: true, firstName: true, lastName: true, email: true, ghanaCardUrl: true, ghanaCardId: true, createdAt: true },
+        select: { id: true, firstName: true, lastName: true, email: true, ghanaCardUrl: true, ghanaCardId: true, verificationStatus: true, createdAt: true },
         orderBy: { createdAt: 'desc' }
       })
     ]);

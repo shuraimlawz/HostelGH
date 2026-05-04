@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ConfirmModal } from "@/components/common/ConfirmModal";
+import { VerificationCenter } from "@/components/auth/VerificationCenter";
 
 export default function AccountPage() {
     const { user, isLoading, updateUser } = useAuth();
@@ -213,15 +214,22 @@ export default function AccountPage() {
 
                             <div className="space-y-1">
                                 <h2 className="text-xl font-bold text-gray-900 tracking-tight leading-none">
-                                    {formData.firstName ? `${formData.firstName} ${formData.lastName}` : "Verified Student"}
+                                    {formData.firstName ? `${formData.firstName} ${formData.lastName}` : "HostelGH User"}
                                 </h2>
                                 <p className="text-sm text-gray-500 font-medium">{user.email}</p>
                             </div>
 
-                            <div className="flex items-center justify-center gap-2 px-4 py-2 bg-emerald-50 text-emerald-700 rounded-xl text-[10px] font-bold uppercase tracking-widest border border-emerald-100">
-                                <ShieldCheck size={14} />
-                                {user.role} ID Verified
-                            </div>
+                            {user.isVerified ? (
+                                <div className="flex items-center justify-center gap-2 px-4 py-2 bg-emerald-50 text-emerald-700 rounded-xl text-[10px] font-bold uppercase tracking-widest border border-emerald-100">
+                                    <ShieldCheck size={14} />
+                                    {user.role} ID Verified
+                                </div>
+                            ) : (
+                                <div className="flex items-center justify-center gap-2 px-4 py-2 bg-amber-50 text-amber-700 rounded-xl text-[10px] font-bold uppercase tracking-widest border border-amber-100">
+                                    <Shield size={14} />
+                                    Unverified {user.role}
+                                </div>
+                            )}
                         </div>
                     </div>
 
@@ -243,6 +251,9 @@ export default function AccountPage() {
                             </button>
                         </div>
                     </div>
+
+                    {/* Verification Center */}
+                    <VerificationCenter />
                 </div>
 
                 {/* Right Content: Forms & Detailed Settings */}

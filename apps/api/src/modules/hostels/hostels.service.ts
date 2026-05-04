@@ -249,6 +249,12 @@ export class HostelsService {
     limit?: number;
     page?: number;
     query?: string;
+    /** Geo-search: user latitude */
+    lat?: number;
+    /** Geo-search: user longitude */
+    lng?: number;
+    /** Radius in km (default 10) */
+    radius?: number;
   }) {
     const searchQueryText = params.query;
 
@@ -498,13 +504,51 @@ export class HostelsService {
       whereConditions.OR = textOrConditions;
     }
 
-    const results = await this.prisma.hostel.findMany({
+    let results = await this.prisma.hostel.findMany({
       where: whereConditions,
       include: { rooms: { where: { isActive: true } } },
       orderBy: orderBy,
       ...(skip !== undefined ? { skip } : {}),
       ...(take !== undefined ? { take } : {}),
     });
+
+    // ── Geo-filter & sort if lat/lng provided ──────────────────────────────
+    const { lat, lng, radius = 10 } = params;
+    if (lat !== undefined && lng !== undefined) {
+      const haversine = (lat1: number, lon1: number, lat2: number, lon2: number) => {
+        const R = 6371; // Earth radius km
+        const dLat = ((lat2 - lat1) * Math.PI) / 180;
+        const dLon = ((lon2 - lon1) * Math.PI) / 180;
+        const a =
+          Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+          Math.cos((lat1 * Math.PI) / 180) *
+            Math.cos((lat2 * Math.PI) / 180) *
+            Math.sin(dLon / 2) *
+            Math.sin(dLon / 2);
+        return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+      };
+
+      // Attach distance and filter by radius
+      const withDistance = results
+        .map((h) => ({
+          ...h,
+          distanceKm:
+            h.latitude !== null && h.longitude !== null
+              ? haversine(lat, lng, h.latitude, h.longitude)
+              : null,
+        }))
+        .filter((h) => h.distanceKm === null || h.distanceKm <= radius);
+
+      // Sort nearest first (override other sorts when geo is active)
+      withDistance.sort((a, b) => {
+        if (a.distanceKm === null) return 1;
+        if (b.distanceKm === null) return -1;
+        return a.distanceKm - b.distanceKm;
+      });
+
+      await this.redis.setJson(cacheKey, withDistance, 300);
+      return withDistance;
+    }
 
     await this.redis.setJson(cacheKey, results, 300); // 5 minutes cache
     return results;

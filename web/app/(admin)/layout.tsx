@@ -51,7 +51,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     }
 
     return (
-        <div className="flex bg-gray-50 min-h-[calc(100vh-80px)]">
+        <div className="flex bg-background text-foreground min-h-[calc(100vh-80px)]">
             {/* Mobile Menu Button - Positioned in navbar area */}
             <button
                 onClick={() => setSidebarOpen(true)}

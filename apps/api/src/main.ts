@@ -56,13 +56,15 @@ async function bootstrap() {
     frontendUrl,
     "https://hostelgh.onrender.com",
     "https://hostelgh.vercel.app",
+    "https://www.hostelgh.vercel.app",
     "http://localhost:3000",
     "http://localhost:3001"
-  ].filter(Boolean);
+  ].filter(Boolean).map(url => url.toLowerCase().replace(/\/$/, ""));
 
   app.enableCors({
     origin: (origin, callback) => {
-      if (!origin || allowedOrigins.map(o => o.toLowerCase()).includes(origin.toLowerCase())) {
+      const normalizedOrigin = origin?.toLowerCase().replace(/\/$/, "");
+      if (!normalizedOrigin || allowedOrigins.includes(normalizedOrigin)) {
         callback(null, true);
       } else {
         // Log during development to debug CORS issues

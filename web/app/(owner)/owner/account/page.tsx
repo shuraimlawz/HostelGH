@@ -42,6 +42,7 @@ import {
     DialogTrigger
 } from "@/components/ui/dialog";
 import { ConfirmModal } from "@/components/common/ConfirmModal";
+import { VerificationCenter } from "@/components/auth/VerificationCenter";
 
 export default function OwnerAccountPage() {
     const { user, isLoading, updateUser } = useAuth();
@@ -188,12 +189,17 @@ export default function OwnerAccountPage() {
                 </div>
 
                 <div className="bg-white border border-gray-100 p-4 rounded-2xl flex items-center gap-4 shadow-sm">
-                    <div className="w-12 h-12 flex items-center justify-center rounded-xl bg-blue-50 text-blue-600 border border-blue-100">
-                        <ShieldCheck size={24} />
+                    <div className={cn(
+                        "w-12 h-12 flex items-center justify-center rounded-xl border",
+                        user.isVerified ? "bg-emerald-50 text-emerald-600 border-emerald-100" : "bg-amber-50 text-amber-600 border-amber-100"
+                    )}>
+                        {user.isVerified ? <ShieldCheck size={24} /> : <ShieldAlert size={24} />}
                     </div>
                     <div>
                         <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest leading-none mb-1">Account Status</p>
-                        <p className="text-xs font-bold text-gray-900 uppercase">Verified Owner</p>
+                        <p className={cn("text-xs font-bold uppercase", user.isVerified ? "text-emerald-700" : "text-amber-700")}>
+                            {user.isVerified ? "Verified Owner" : "Identity Unverified"}
+                        </p>
                     </div>
                 </div>
             </div>
@@ -269,9 +275,17 @@ export default function OwnerAccountPage() {
                                 <p className="text-sm text-gray-500 font-medium">{user.email}</p>
                             </div>
 
-                            <div className="flex items-center justify-center gap-2 px-4 py-2 bg-blue-50 text-blue-700 rounded-xl text-[10px] font-bold uppercase tracking-widest border border-blue-100">
-                                {user.role} Account Verified
-                            </div>
+                            {user.isVerified ? (
+                                <div className="flex items-center justify-center gap-2 px-4 py-2 bg-emerald-50 text-emerald-700 rounded-xl text-[10px] font-bold uppercase tracking-widest border border-emerald-100">
+                                    <ShieldCheck size={14} />
+                                    {user.role} Identity Verified
+                                </div>
+                            ) : (
+                                <div className="flex items-center justify-center gap-2 px-4 py-2 bg-amber-50 text-amber-700 rounded-xl text-[10px] font-bold uppercase tracking-widest border border-amber-100">
+                                    <ShieldAlert size={14} />
+                                    Identity Verification Required
+                                </div>
+                            )}
                         </div>
                     </div>
 
@@ -300,6 +314,8 @@ export default function OwnerAccountPage() {
                             </div>
                         </div>
                     </div>
+
+                    <VerificationCenter />
                 </div>
 
                 {/* Main Content Area */}

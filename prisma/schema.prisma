@@ -82,6 +82,13 @@ enum SubscriptionStatus {
   PENDING
 }
 
+enum VerificationStatus {
+  UNVERIFIED
+  PENDING
+  VERIFIED
+  REJECTED
+}
+
 model User {
   id           String   @id @default(cuid())
   email        String   @unique
@@ -105,9 +112,12 @@ model User {
   updatedAt DateTime @updatedAt
 
   // Trust & Safety
-  isVerified   Boolean @default(false)
-  ghanaCardUrl String?
-  ghanaCardId  String?
+  isVerified         Boolean            @default(false)
+  verificationStatus VerificationStatus @default(UNVERIFIED)
+  ghanaCardUrl       String?
+  ghanaCardId        String?
+  verificationNote   String? // Admin feedback
+  verifiedAt         DateTime?
 
   // Community
   lookingForRoommate    Boolean @default(false)

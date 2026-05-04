@@ -340,7 +340,16 @@ export default function AdminDashboardPage() {
                                                     <DialogHeader>
                                                         <DialogTitle className="text-xl font-bold tracking-tight">Identity Document: {owner.firstName}</DialogTitle>
                                                     </DialogHeader>
-                                                    <div className="py-6">
+                                                    <div className="py-6 flex flex-col gap-6">
+                                                        <div className="flex items-center justify-between px-4 py-3 bg-gray-50 rounded-xl border border-gray-100">
+                                                            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Full Record</p>
+                                                            <Link 
+                                                                href={`/admin/users/${owner.id}`}
+                                                                className="text-[10px] font-bold text-blue-600 uppercase tracking-widest hover:underline flex items-center gap-1"
+                                                            >
+                                                                View Member Profile <ChevronRight size={10} />
+                                                            </Link>
+                                                        </div>
                                                         <img src={owner.ghanaCardUrl} alt="Ghana Card" className="w-full rounded-xl shadow-lg border border-gray-100" />
                                                     </div>
                                                     <DialogFooter className="gap-2">

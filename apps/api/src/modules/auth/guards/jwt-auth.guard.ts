@@ -19,9 +19,16 @@ export class JwtAuthGuard extends AuthGuard("jwt") {
 
     if (isPublic) {
       console.log(`[JwtAuthGuard] Entering public logic for: ${handlerName}`);
+      const request = context.switchToHttp().getRequest();
+      const token = request.headers.authorization;
+      console.log(`[JwtAuthGuard] Public route token present: ${!!token}`);
+      
       try {
         const result = await super.canActivate(context);
         console.log(`[JwtAuthGuard] Public super.canActivate result for ${handlerName}: ${result}`);
+        if (request.user) {
+          console.log(`[JwtAuthGuard] User populated for public route: ${request.user.id}, role: ${request.user.role}`);
+        }
       } catch (err) {
         console.log(`[JwtAuthGuard] Optional JWT failed for public route ${handlerName}: ${(err as any).message}`);
       }

@@ -65,6 +65,12 @@ export class AdminController {
     return this.adminService.getUsers(query);
   }
 
+  @Get("users/:id")
+  @ApiOperation({ summary: "Get single user details" })
+  getUser(@Param("id") id: string) {
+    return this.adminService.getUserById(id);
+  }
+
   @Patch("users/:userId/role")
   @ApiOperation({ summary: "Update user role" })
   updateUserRole(
@@ -93,6 +99,16 @@ export class AdminController {
   @ApiOperation({ summary: "Verify owner's identity (Ghana Card)" })
   verifyUser(@Param("userId") userId: string, @User() admin) {
     return this.adminService.verifyUser(admin.id, userId);
+  }
+
+  @Patch("users/:userId/reject-verification")
+  @ApiOperation({ summary: "Reject owner's identity verification" })
+  rejectVerification(
+    @Param("userId") userId: string,
+    @Body() dto: AdminActionDto,
+    @User() admin,
+  ) {
+    return this.adminService.rejectUserVerification(admin.id, userId, dto.reason);
   }
 
   @Post("users")
@@ -197,6 +213,18 @@ export class AdminController {
       page: parseInt(page, 10),
       limit: parseInt(limit, 10),
     });
+  }
+  
+  @Get("notifications/counts")
+  @ApiOperation({ summary: "Get count of pending admin notifications" })
+  getNotificationCounts() {
+    return this.adminService.getNotificationCounts();
+  }
+
+  @Get("disputes")
+  @ApiOperation({ summary: "Get active system disputes" })
+  getDisputes(@Query() query: AdminQueryDto) {
+    return this.adminService.getDisputes(query);
   }
 
   @Post("users/:userId/impersonate")

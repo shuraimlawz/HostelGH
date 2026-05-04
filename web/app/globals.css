@@ -1,4 +1,20 @@
 @import "tailwindcss";
+@import "leaflet/dist/leaflet.css";
+
+/* Leaflet popup custom styling */
+.hostelgh-popup .leaflet-popup-content-wrapper {
+  border-radius: 16px !important;
+  border: 1px solid #f1f5f9 !important;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.12) !important;
+  padding: 0 !important;
+}
+.hostelgh-popup .leaflet-popup-content {
+  margin: 0 !important;
+  padding: 12px 16px !important;
+}
+.hostelgh-popup .leaflet-popup-tip {
+  background: white !important;
+}
 
 @theme {
   /* Mapping existing shadcn/custom variables to Tailwind v4 theme */
@@ -29,6 +45,8 @@
   --color-card: hsl(var(--card));
   --color-card-foreground: hsl(var(--card-foreground));
 
+  /* Removed destructive --color-white overrides that broke text-white. Using specific class overrides below. */
+
   /* Modern SaaS Extensions */
   --color-midnight: hsl(var(--midnight));
   --color-electric: hsl(var(--electric));
@@ -56,6 +74,7 @@
 
 @layer base {
   :root {
+    color-scheme: light;
     --background: 0 0% 100%;
     --foreground: 224 71% 4%;
     --card: 0 0% 100%;
@@ -80,6 +99,32 @@
     --midnight: 224 71% 4%;
     --electric: 221.2 83.2% 53.3%;
     --neon-green: 142.1 70.6% 45.3%;
+  }
+
+  .dark {
+    color-scheme: dark;
+    --background: 222.2 47.4% 11.2%;
+    --foreground: 210 40% 98%;
+    --card: 222.2 47.4% 14%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222.2 47.4% 14%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 217.2 91.2% 59.8%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 224.3 76.3% 48%;
+
+    --midnight: 210 40% 98%;
+    --electric: 217.2 91.2% 59.8%;
   }
 
   * {
@@ -115,6 +160,22 @@
   h1, h2, h3, h4, h5, h6 {
     @apply font-heading tracking-tight font-bold not-italic;
   }
+
+  /* Safe Smart Overrides for Dark Mode - Only affects backgrounds of structural elements, preserving buttons */
+}
+
+@layer utilities {
+  .dark div.bg-white, .dark section.bg-white, .dark aside.bg-white, .dark nav.bg-white, .dark main.bg-white, .dark header.bg-white { background-color: hsl(222.2, 47.4%, 14%) !important; }
+  .dark div.bg-gray-50, .dark section.bg-gray-50, .dark aside.bg-gray-50, .dark nav.bg-gray-50, .dark main.bg-gray-50, .dark header.bg-gray-50 { background-color: hsl(222.2, 47.4%, 12%) !important; }
+  .dark div.bg-gray-100, .dark section.bg-gray-100, .dark aside.bg-gray-100, .dark nav.bg-gray-100, .dark main.bg-gray-100, .dark header.bg-gray-100 { background-color: hsl(222.2, 47.4%, 18%) !important; }
+  .dark div.bg-gray-200, .dark section.bg-gray-200, .dark aside.bg-gray-200, .dark nav.bg-gray-200, .dark main.bg-gray-200, .dark header.bg-gray-200 { background-color: hsl(222.2, 47.4%, 25%) !important; }
+  .dark .text-gray-900 { color: hsl(210, 40%, 98%) !important; }
+  .dark .text-gray-800 { color: hsl(210, 40%, 96%) !important; }
+  .dark .text-gray-700 { color: hsl(215, 20.2%, 80%) !important; }
+  .dark .text-gray-500 { color: hsl(215, 20.2%, 65.1%) !important; }
+  .dark .text-gray-400 { color: hsl(215, 20.2%, 55%) !important; }
+  .dark .border-gray-100 { border-color: hsl(222.2, 47.4%, 20%) !important; }
+  .dark .border-gray-200 { border-color: hsl(222.2, 47.4%, 25%) !important; }
 }
 
 @keyframes letter-reveal {

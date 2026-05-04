@@ -19,6 +19,11 @@ export class UsersService {
         avatarUrl: true,
         createdAt: true,
         emailNotifications: true,
+        isVerified: true,
+        verificationStatus: true,
+        ghanaCardId: true,
+        ghanaCardUrl: true,
+        verificationNote: true,
       },
     });
 
@@ -38,6 +43,19 @@ export class UsersService {
         lastName: true,
         phone: true,
         emailNotifications: true,
+        isVerified: true,
+        verificationStatus: true,
+      },
+    });
+  }
+
+  async submitVerification(id: string, data: { ghanaCardId: string, ghanaCardUrl: string }) {
+    return this.prisma.user.update({
+      where: { id },
+      data: {
+        ghanaCardId: data.ghanaCardId,
+        ghanaCardUrl: data.ghanaCardUrl,
+        verificationStatus: 'PENDING',
       },
     });
   }

@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   Patch,
+  Post,
   Req,
   UseGuards,
 } from "@nestjs/common";
@@ -30,6 +31,12 @@ export class UsersController {
   @ApiOperation({ summary: "Update current user profile" })
   updateProfile(@Req() req: any, @Body() dto: UpdateProfileDto) {
     return this.users.updateProfile(req.user.userId, dto);
+  }
+
+  @Post("verify")
+  @ApiOperation({ summary: "Submit identity verification request" })
+  submitVerification(@Req() req: any, @Body() dto: { ghanaCardId: string, ghanaCardUrl: string }) {
+    return this.users.submitVerification(req.user.userId, dto);
   }
 
   @Delete("me")

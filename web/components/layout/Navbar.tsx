@@ -23,9 +23,9 @@ import {
 } from "lucide-react";
 import { useAuthModal } from "@/components/auth/AuthModalProvider";
 import { useRouter, usePathname } from "next/navigation";
-import RegionSelector from "./RegionSelector";
 import { cn } from "@/lib/utils";
 import StickySearch from "./StickySearch";
+import { ThemeToggle } from "./ThemeToggle";
 
 export default function Navbar() {
     const { user, logout } = useAuth();
@@ -113,7 +113,7 @@ export default function Navbar() {
             className={cn(
                 "sticky top-0 z-50 w-full transition-all duration-500 ease-in-out",
                 scrolled 
-                    ? "py-2 bg-white/70 backdrop-blur-2xl border-b border-gray-100/50 shadow-[0_8px_30px_rgb(0,0,0,0.02)]" 
+                    ? "py-2 bg-background/70 backdrop-blur-2xl border-b border-border shadow-[0_8px_30px_rgb(0,0,0,0.02)]" 
                     : "py-4 bg-transparent border-b border-transparent"
             )}
         >
@@ -125,7 +125,7 @@ export default function Navbar() {
                 )}>
                     <LogoAnimation />
                     <div className="flex flex-col -space-y-1">
-                        <span className="font-black text-lg md:text-xl tracking-tighter text-gray-900 flex overflow-hidden">
+                        <span className="font-black text-lg md:text-xl tracking-tighter text-foreground flex overflow-hidden">
                             HostelGH
                         </span>
                         <div className="hidden lg:block h-[2px] w-0 group-hover:w-full bg-blue-600 transition-all duration-300 rounded-full" />
@@ -139,7 +139,7 @@ export default function Navbar() {
                 <div className="flex items-center justify-end gap-3 md:gap-6">
                     {/* Desktop Main Links — Hidden when sticky search is active */}
                     <nav className={cn(
-                        "hidden lg:flex items-center space-x-2 bg-gray-50/50 p-1 rounded-2xl border border-gray-100/50 backdrop-blur-md transition-all duration-500",
+                        "hidden lg:flex items-center space-x-2 bg-accent/50 p-1 rounded-2xl border border-border backdrop-blur-md transition-all duration-500",
                         showStickySearch ? "opacity-0 -translate-y-4 pointer-events-none absolute scale-95" : "opacity-100 translate-y-0"
                     )}>
                         <Link
@@ -147,8 +147,8 @@ export default function Navbar() {
                             className={cn(
                                 "text-[10px] font-bold uppercase tracking-[0.2em] px-6 py-2.5 rounded-xl transition-all duration-300",
                                 isActive("/hostels") 
-                                    ? "bg-white text-blue-600 shadow-sm border border-gray-100" 
-                                    : "text-gray-400 hover:text-gray-900"
+                                    ? "bg-background text-blue-600 shadow-sm border border-border" 
+                                    : "text-muted-foreground hover:text-foreground"
                             )}
                         >
                             Explore
@@ -191,9 +191,7 @@ export default function Navbar() {
                             </Link>
                         )}
 
-                        <Suspense fallback={<div className="w-10 h-10 rounded-2xl bg-gray-50 animate-pulse" />}>
-                            <RegionSelector />
-                        </Suspense>
+                        <ThemeToggle />
 
                         {/* Control Center Pill */}
                         <div className="relative" ref={menuRef}>
@@ -202,8 +200,8 @@ export default function Navbar() {
                                 className={cn(
                                     "flex items-center gap-2 pl-3 pr-2 py-1.5 rounded-[1.5rem] transition-all duration-500 border border-transparent shadow-sm",
                                     isOpen 
-                                        ? "bg-gray-900 text-white shadow-xl scale-105" 
-                                        : "bg-white hover:bg-gray-50 text-gray-900 border-gray-100"
+                                        ? "bg-foreground text-background shadow-xl scale-105" 
+                                        : "bg-background hover:bg-accent text-foreground border-border"
                                 )}
                             >
                                 {isOpen ? <X size={18} className="animate-in fade-in spin-in-90 duration-300" /> : <Menu size={18} />}
@@ -228,7 +226,7 @@ export default function Navbar() {
 
                             {/* Dropdown Menu */}
                             {isOpen && (
-                                <div className="absolute right-0 top-[calc(100%+1rem)] w-72 bg-white rounded-3xl shadow-[0_32px_64px_-16px_rgba(0,0,0,0.15)] border border-gray-100 py-3 animate-in fade-in zoom-in-95 slide-in-from-top-4 duration-300 overflow-hidden z-50">
+                                <div className="absolute right-0 top-[calc(100%+1rem)] w-72 bg-background rounded-3xl shadow-[0_32px_64px_-16px_rgba(0,0,0,0.15)] border border-border py-3 animate-in fade-in zoom-in-95 slide-in-from-top-4 duration-300 overflow-hidden z-50">
                                     <div className="lg:hidden px-2 mb-2">
                                         <Link
                                             href="/hostels"
@@ -246,7 +244,7 @@ export default function Navbar() {
                                                 <div className="font-bold text-sm truncate text-gray-900">{user.email}</div>
                                                 <div className="flex items-center gap-2 mt-1">
                                                     <div className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
-                                                    <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">{user.role} Hub</span>
+                                                    <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest">{user.role} Hub</span>
                                                 </div>
                                             </div>
 

@@ -4,7 +4,7 @@ import Link from "next/link";
 import { Heart, Star, MapPin, Users, ArrowUpRight, ShieldCheck } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-export default function HostelCard({ hostel }: { hostel: any }) {
+export default function HostelCard({ hostel, compact = false }: { hostel: any, compact?: boolean }) {
     const minPrice = hostel.minPrice
         ? hostel.minPrice / 100
         : (hostel.rooms?.length
@@ -12,6 +12,42 @@ export default function HostelCard({ hostel }: { hostel: any }) {
             : null);
 
     const hasAvailableRooms = hostel.rooms?.some((r: any) => r.availableSlots > 0) ?? false;
+
+    if (compact) {
+        return (
+            <Link href={`/hostels/${hostel.id}`} className="group block h-full">
+                <div className="bg-white rounded-xl border border-gray-100 overflow-hidden hover:shadow-lg transition-all duration-300 flex items-center p-3 gap-4">
+                    <div className="w-20 h-20 rounded-lg overflow-hidden bg-gray-50 shrink-0">
+                        {hostel.images?.[0] ? (
+                            <img src={hostel.images[0]} alt={hostel.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                        ) : (
+                            <div className="w-full h-full flex items-center justify-center text-gray-200">
+                                <MapPin size={24} />
+                            </div>
+                        )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                        <h3 className="font-bold text-gray-900 text-sm tracking-tight truncate group-hover:text-blue-600 transition-colors">
+                            {hostel.name}
+                        </h3>
+                        <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest truncate mt-0.5">
+                            {hostel.city} {hostel.distanceToCampus ? `• ${hostel.distanceToCampus}` : ""}
+                        </p>
+                        <div className="flex items-center justify-between mt-2">
+                            <span className="text-xs font-bold text-gray-900">
+                                ₵{minPrice?.toLocaleString() || "---"}
+                                <span className="text-[8px] text-gray-400 uppercase ml-1">/ Term</span>
+                            </span>
+                            <div className="flex items-center gap-1">
+                                <Star size={10} className="text-blue-500 fill-blue-500" />
+                                <span className="text-[10px] font-bold text-gray-900">{hostel.averageRating?.toFixed(1) || "0.0"}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </Link>
+        );
+    }
 
     return (
         <Link href={`/hostels/${hostel.id}`} className="group block h-full">

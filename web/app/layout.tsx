@@ -69,26 +69,35 @@ export const metadata: Metadata = {
   },
 };
 
+import { ThemeProvider } from "@/components/ThemeProvider";
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body className={`${outfit.variable} ${inter.variable} font-sans antialiased`}>
         <JsonLd />
-        <AuthProvider>
-          <QueryProvider>
-            <AuthModalProvider>
-              <Shell>
-                {children}
-              </Shell>
-              <Toaster position="top-center" richColors />
-              <SupportWidget />
-            </AuthModalProvider>
-          </QueryProvider>
-        </AuthProvider>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <AuthProvider>
+            <QueryProvider>
+              <AuthModalProvider>
+                <Shell>
+                  {children}
+                </Shell>
+                <Toaster position="top-center" richColors />
+                <SupportWidget />
+              </AuthModalProvider>
+            </QueryProvider>
+          </AuthProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

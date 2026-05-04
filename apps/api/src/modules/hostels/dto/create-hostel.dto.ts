@@ -113,6 +113,15 @@ export class CreateHostelDto {
   @IsEnum(RoomGender)
   genderCategory?: RoomGender;
 
+  @ApiProperty({ example: 5.6037, required: false })
+  @IsOptional()
+  @IsNumber()
+  latitude?: number;
+
+  @ApiProperty({ example: -0.187, required: false })
+  @IsOptional()
+  @IsNumber()
+  longitude?: number;
 
 }
 

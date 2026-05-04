@@ -9,11 +9,12 @@ import { api } from "@/lib/api";
 import { toast } from "sonner";
 import {
     Wifi, Wind, Utensils, Waves, Car, ShieldCheck, Coffee, Building2,
-    Zap, Droplets, Flame, ChevronLeft, Loader2, CheckCircle2,
+    Zap, Droplets, Flame, ChevronLeft, Loader2, CheckCircle2, MapPin
 } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import ImageUpload from "@/components/common/ImageUpload";
+import LocationPicker from "@/components/common/LocationPicker";
 import { REGIONAL_UNIVERSITIES } from "@/lib/constants";
 
 const formSchema = z.object({
@@ -29,6 +30,8 @@ const formSchema = z.object({
     images: z.array(z.string()).min(1, "Please upload at least one photo"),
     policiesText: z.string().optional(),
     genderCategory: z.enum(["MALE", "FEMALE", "MIXED"]).optional(),
+    latitude: z.number().optional(),
+    longitude: z.number().optional(),
 });
 
 const AMENITIES = [
@@ -77,6 +80,7 @@ export default function NewHostelPage() {
             university: "", whatsappNumber: "", distanceToCampus: "",
             utilitiesIncluded: [], amenities: [], images: [],
             policiesText: "", genderCategory: "MIXED",
+            latitude: undefined, longitude: undefined,
         }
     });
 
@@ -279,6 +283,29 @@ export default function NewHostelPage() {
                                     placeholder="e.g. Plt 22B, Ring Road"
                                 />
                             </Field>
+                        </div>
+
+                        <div className="p-4 bg-blue-50 border border-blue-100 rounded-xl space-y-3">
+                            <div className="flex items-center gap-2 text-blue-700">
+                                <MapPin size={14} />
+                                <p className="text-xs font-bold uppercase tracking-wide">Pin Your Location on Map</p>
+                            </div>
+                            <p className="text-xs text-blue-500">Search your hostel address below to pin it on the map. Students will see exactly where you are.</p>
+                            <LocationPicker
+                                onSelect={(data) => {
+                                    form.setValue("latitude", data.lat);
+                                    form.setValue("longitude", data.lng);
+                                    if (data.city && !form.getValues("city")) {
+                                        form.setValue("city", data.city);
+                                    }
+                                    if (data.region) form.setValue("addressLine", form.getValues("addressLine") || data.display_name.split(",")[0]);
+                                }}
+                            />
+                            {form.watch("latitude") && (
+                                <p className="text-xs text-emerald-600 font-medium">
+                                    ✓ Coordinates: {form.watch("latitude")?.toFixed(4)}, {form.watch("longitude")?.toFixed(4)}
+                                </p>
+                            )}
                         </div>
 
                         <Field label="Nearest University / Campus" required error={errors.university?.message}>

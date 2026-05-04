@@ -13,6 +13,9 @@ type User = {
     phone?: string;
     gender?: string;
     isOnboarded?: boolean;
+    isVerified?: boolean;
+    verificationStatus?: "UNVERIFIED" | "PENDING" | "VERIFIED" | "REJECTED";
+    verificationNote?: string;
 };
 
 type AuthContextType = {

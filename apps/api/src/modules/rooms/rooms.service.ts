@@ -106,6 +106,35 @@ export class RoomsService {
     });
   }
 
+  async findOnePublic(id: string) {
+    const room = await this.prisma.room.findUnique({
+      where: { id, isActive: true },
+      include: { 
+        hostel: {
+          select: {
+            id: true,
+            name: true,
+            addressLine: true,
+            city: true,
+            whatsappNumber: true,
+            distanceToCampus: true,
+            owner: {
+              select: {
+                id: true,
+                firstName: true,
+                lastName: true,
+                avatarUrl: true,
+                isVerified: true,
+              }
+            }
+          }
+        }
+      },
+    });
+    if (!room) throw new NotFoundException("Room not found");
+    return room;
+  }
+
   private async getRoomWithHostel(id: string) {
     const room = await this.prisma.room.findUnique({
       where: { id },

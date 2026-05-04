@@ -62,7 +62,7 @@ export default function RegionSelector() {
                     <div className="relative">
                         <Globe size={18} className={cn(
                             "transition-all duration-300",
-                            currentRegion ? "text-blue-600 scale-110" : "text-gray-400 group-hover:text-gray-900"
+                            currentRegion ? "text-blue-600 scale-110" : "text-muted-foreground group-hover:text-foreground"
                         )} />
                         {currentRegion && (
                             <div className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-blue-600 rounded-full border-2 border-white shadow-sm animate-pulse" />
@@ -72,7 +72,7 @@ export default function RegionSelector() {
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-72 bg-white rounded-3xl shadow-2xl border border-gray-100 py-3 mt-4 animate-in fade-in zoom-in-95 duration-200 lg:mr-4">
                 <DropdownMenuLabel className="px-5 py-4">
-                    <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400 flex items-center gap-3">
+                    <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground flex items-center gap-3">
                         <Server size={14} className="text-blue-600" />
                         Choose Your Region
                     </div>

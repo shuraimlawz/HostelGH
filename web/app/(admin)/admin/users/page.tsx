@@ -18,7 +18,7 @@ import {
     Ban,
     CheckCircle2,
     ChevronRight,
-    ChevronRight as ChevronRightIcon
+    User as UserIcon
 } from "lucide-react";
 import { useState, Suspense } from "react";
 import { cn } from "@/lib/utils";
@@ -27,6 +27,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Dialog
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
+import Link from "next/link";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -217,7 +218,7 @@ function AdminUsersContent() {
                                         <option value="OWNER">Hostel Owner</option>
                                         <option value="TENANT">Tenant Assistant</option>
                                     </select>
-                                    <ChevronRightIcon className="absolute right-4 top-1/2 -translate-y-1/2 rotate-90 text-gray-300 pointer-events-none" size={16} />
+                                    <ChevronRight className="absolute right-4 top-1/2 -translate-y-1/2 rotate-90 text-gray-300 pointer-events-none" size={16} />
                                 </div>
                             </div>
                         </div>
@@ -259,7 +260,7 @@ function AdminUsersContent() {
                             <option value="OWNER">Owners</option>
                             <option value="TENANT">Tenants</option>
                         </select>
-                        <ChevronRightIcon className="absolute right-4 top-1/2 -translate-y-1/2 rotate-90 text-gray-300 pointer-events-none" size={14} />
+                        <ChevronRight className="absolute right-4 top-1/2 -translate-y-1/2 rotate-90 text-gray-300 pointer-events-none" size={14} />
                     </div>
                 </div>
                 <div className="bg-white border border-gray-100 rounded-xl flex items-center px-6 gap-4 shadow-sm h-12">
@@ -289,7 +290,7 @@ function AdminUsersContent() {
                                 <tr className="bg-gray-50/50 border-b border-gray-50">
                                     <th className="px-8 py-5 text-[10px] font-bold uppercase tracking-widest text-gray-400">Entity Details</th>
                                     <th className="px-8 py-5 text-[10px] font-bold uppercase tracking-widest text-gray-400">Access Role</th>
-                                    <th className="px-8 py-5 text-[10px] font-bold uppercase tracking-widest text-gray-400">Security</th>
+                                    <th className="px-8 py-5 text-[10px] font-bold uppercase tracking-widest text-gray-400">Security & Audit</th>
                                     <th className="px-8 py-5 text-[10px] font-bold uppercase tracking-widest text-gray-400 text-right">Audit</th>
                                 </tr>
                             </thead>
@@ -307,7 +308,7 @@ function AdminUsersContent() {
                                                 </div>
                                                 <div className="min-w-0">
                                                     <p className="font-bold text-gray-900 text-sm tracking-tight flex items-center gap-2">
-                                                        {user.firstName ? `${user.firstName} ${user.lastName}` : "Unnamed Operative"}
+                                                        {[user.firstName, user.lastName].filter(Boolean).join(" ") || "Unnamed Operative"}
                                                         {user.role === 'ADMIN' && <ShieldCheck size={14} className="text-blue-500" />}
                                                     </p>
                                                     <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-1 truncate">
@@ -335,6 +336,12 @@ function AdminUsersContent() {
                                         </td>
                                         <td className="px-8 py-6">
                                             <div className="flex items-center gap-2">
+                                                <Link 
+                                                    href={`/admin/users/${user.id}`}
+                                                    className="px-4 py-2 bg-gray-50 text-gray-900 border border-gray-100 rounded-lg text-[9px] font-bold uppercase tracking-widest hover:bg-gray-900 hover:text-white transition-all flex items-center gap-2"
+                                                >
+                                                    <UserIcon size={12} /> View Profile
+                                                </Link>
                                                 <div className={cn(
                                                     "flex items-center gap-2 px-3 py-1.5 rounded-lg border w-fit font-bold uppercase tracking-widest text-[9px]",
                                                     user.emailVerified ? "bg-emerald-50 border-emerald-100/50 text-emerald-600" : "bg-gray-50 border-gray-100 text-gray-400"
@@ -358,6 +365,11 @@ function AdminUsersContent() {
                                                 </DropdownMenuTrigger>
                                                 <DropdownMenuContent align="end" className="rounded-xl border-gray-100 p-2 shadow-xl w-52">
                                                     <DropdownMenuLabel className="text-[10px] font-bold uppercase tracking-widest text-gray-400 px-3 py-2">Audit Controls</DropdownMenuLabel>
+                                                    <DropdownMenuItem asChild>
+                                                        <Link href={`/admin/users/${user.id}`} className="flex items-center rounded-lg font-bold text-[11px] gap-3 py-2.5 cursor-pointer uppercase tracking-wide">
+                                                            <UserIcon size={14} className="text-blue-500" /> View Profile
+                                                        </Link>
+                                                    </DropdownMenuItem>
                                                     <DropdownMenuItem onClick={() => updateRoleMutation.mutate({ userId: user.id, role: user.role })} className="rounded-lg font-bold text-[11px] gap-3 py-2.5 cursor-pointer uppercase tracking-wide">
                                                         <UserCog size={14} className="text-indigo-500" /> Member Settings
                                                     </DropdownMenuItem>

@@ -18,6 +18,7 @@ import { RoomsService } from "./rooms.service";
 import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
 import { RolesGuard } from "../../common/guards/roles.guard";
 import { Roles } from "../../common/decorators/roles.decorator";
+import { Public } from "../../common/decorators/public.decorator";
 import { UserRole } from "@prisma/client";
 import { CreateRoomDto, UpdateRoomDto } from "./dto/create-room.dto";
 import { UploadService } from "../upload/upload.service";
@@ -51,10 +52,18 @@ export class RoomsController {
     return this.rooms.create(req.user.id, hostelId, dto);
   }
 
+  @Public()
   @Get("hostel/:hostelId")
   @ApiOperation({ summary: "Get all active rooms for a hostel" })
   findByHostel(@Param("hostelId") hostelId: string) {
     return this.rooms.findByHostel(hostelId);
+  }
+
+  @Public()
+  @Get(":id")
+  @ApiOperation({ summary: "Get room details" })
+  findOne(@Param("id") id: string) {
+    return this.rooms.findOnePublic(id);
   }
 
   @Roles(UserRole.OWNER, UserRole.ADMIN)

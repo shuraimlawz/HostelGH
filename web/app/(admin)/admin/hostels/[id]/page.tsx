@@ -131,7 +131,7 @@ export default function HostelAuditPage() {
                             </div>
                             <div className="flex items-center gap-2 border-l pl-6 border-gray-100">
                                 <Activity size={16} />
-                                <span className="text-xs font-medium uppercase tracking-widest text-blue-600">Audit ID: {hostel.id.slice(0, 8)}</span>
+                                <span className="text-xs font-medium uppercase tracking-widest text-blue-600">Audit ID: {hostel.id}</span>
                             </div>
                         </div>
                     </div>

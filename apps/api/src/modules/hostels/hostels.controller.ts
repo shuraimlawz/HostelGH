@@ -96,6 +96,9 @@ export class HostelsController {
     @Query("limit") limit?: string,
     @Query("page") page?: string,
     @Query("query") query?: string,
+    @Query("lat") lat?: string,
+    @Query("lng") lng?: string,
+    @Query("radius") radius?: string,
   ) {
     const amenitiesArr =
       typeof amenities === "string" ? amenities.split(",") : amenities;
@@ -117,6 +120,9 @@ export class HostelsController {
       gender,
       roomConfig,
       query,
+      lat: lat ? parseFloat(lat) : undefined,
+      lng: lng ? parseFloat(lng) : undefined,
+      radius: radius ? parseFloat(radius) : undefined,
     });
   }
 
