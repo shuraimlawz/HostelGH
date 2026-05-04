@@ -539,7 +539,7 @@ export class HostelsService {
     // Calculate rating distribution
     const reviewStats = await this.prisma.review.groupBy({
       by: ['rating'],
-      where: { hostelId: id, isModerated: false },
+      where: { hostelId: hostel.id, isModerated: false },
       _count: { id: true }
     });
 
@@ -549,7 +549,7 @@ export class HostelsService {
     });
 
     if (!hostel.isPublished) {
-      const isAdmin = actor?.role === UserRole.ADMIN || actor?.role === UserRole.MODERATOR;
+      const isAdmin = actor?.role === UserRole.ADMIN;
       const isOwner = actor?.id === hostel.ownerId;
       
       if (!isAdmin && !isOwner) {
