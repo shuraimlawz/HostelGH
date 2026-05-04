@@ -56,8 +56,6 @@ async function bootstrap() {
     frontendUrl,
     "https://hostelgh.onrender.com",
     "https://hostelgh.vercel.app",
-    "https://hostelgh-api.onrender.com",
-    "https://hostelgh-api.onrender.com/api",
     "http://localhost:3000",
     "http://localhost:3001"
   ].filter(Boolean);
@@ -84,7 +82,7 @@ async function bootstrap() {
     const adminEmail = process.env.ADMIN_EMAIL || "admin@example.com";
     const adminPass = process.env.ADMIN_PASSWORD || "Password123!";
     const UserRole = { ADMIN: "ADMIN" }; // Local shim for simplicity if needed, but we have prisma
-    
+
     const user = await prisma.user.findUnique({ where: { email: adminEmail } });
     const bcrypt = require("bcryptjs");
     const passwordHash = await bcrypt.hash(adminPass, 12);
@@ -108,11 +106,11 @@ async function bootstrap() {
       logger.log(`[Self-Healing] Updating admin account: ${adminEmail}`);
       await prisma.user.update({
         where: { email: adminEmail },
-        data: { 
+        data: {
           role: "ADMIN" as any,
           passwordHash,
           isActive: true,
-          emailVerified: true 
+          emailVerified: true
         },
       });
     }
