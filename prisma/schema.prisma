@@ -127,6 +127,7 @@ model User {
   reviews                 Review[]
   conversations           Conversation[]
   messages                Message[]
+  wallets                 Wallet[]
 
   @@index([role])
 }
@@ -394,6 +395,10 @@ model Payment {
   accountNumber String?
   accountName   String?
 
+  // Mobile Money fields
+  momoProvider    String? // MTN, VODAFONE, AIRTELTIGO
+  momoPhoneNumber String?
+
   paidAt          DateTime?
   offlineProofUrl String?
   rawWebhook      Json? // store last webhook payload (optional)
@@ -491,4 +496,19 @@ model Favorite {
   @@unique([userId, hostelId])
   @@index([userId])
   @@index([hostelId])
+}
+
+model Wallet {
+  id          String   @id @default(cuid())
+  userId      String
+  provider    String // MTN, VODAFONE, AIRTELTIGO
+  phoneNumber String
+  status      String   @default("active") // active, suspended
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, provider, phoneNumber])
+  @@index([userId])
 }

@@ -192,3 +192,96 @@ export const useSelectPaymentMethod = (token: string | null) => {
 
   return { selectMethod, loading, error };
 };
+
+/**
+ * Hook to handle mobile money payments
+ */
+export const useMobileMoney = (token: string | null) => {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [reference, setReference] = useState<string | null>(null);
+  const [status, setStatus] = useState<'idle' | 'pending' | 'otp_required' | 'success' | 'failed'>('idle');
+
+  const initiate = async (params: {
+    bookingId: string;
+    phoneNumber: string;
+    provider: string;
+    saveWallet?: boolean;
+  }) => {
+    if (!token) return;
+
+    try {
+      setLoading(true);
+      setError(null);
+
+      const response = await fetch('/api/payments/momo/init', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(params),
+      });
+
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.message || 'Failed to initiate Mobile Money payment');
+      }
+
+      setReference(data.reference);
+      if (data.status === 'send_otp') {
+        setStatus('otp_required');
+      } else {
+        setStatus('pending');
+      }
+
+      return data;
+    } catch (err) {
+      const errorMsg = err instanceof Error ? err.message : 'Unknown error';
+      setError(errorMsg);
+      setStatus('failed');
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const submitOTP = async (otp: string) => {
+    if (!token || !reference) return;
+
+    try {
+      setLoading(true);
+      setError(null);
+
+      const response = await fetch('/api/payments/momo/otp', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ reference, otp }),
+      });
+
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.message || 'Failed to submit OTP');
+      }
+
+      if (data.status === 'success') {
+        setStatus('success');
+      } else {
+        setStatus('pending');
+      }
+
+      return data;
+    } catch (err) {
+      const errorMsg = err instanceof Error ? err.message : 'Unknown error';
+      setError(errorMsg);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return { initiate, submitOTP, loading, error, reference, status };
+};

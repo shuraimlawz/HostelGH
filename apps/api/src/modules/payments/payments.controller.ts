@@ -8,6 +8,7 @@ import {
   HttpCode,
   HttpStatus,
   Get,
+  Delete,
 } from "@nestjs/common";
 import { PaymentsService } from "./payments.service";
 import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
@@ -20,17 +21,52 @@ import { InitiateBankPaymentDto, SelectPaymentMethodDto, PaymentMethodType } fro
 import { BankTransferService } from "./bank-transfer.service";
 import { Public } from "../../common/decorators/public.decorator";
 
+import { InitiateMoMoPaymentDto } from "./dto/initiate-momo-payment.dto";
+import { SubmitMoMoOtpDto } from "./dto/submit-momo-otp.dto";
+import { MobileMoneyService } from "./mobile-money.service";
+
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Controller("payments")
 export class PaymentsController {
   constructor(
     private payments: PaymentsService,
     private bankTransfer: BankTransferService,
+    private momo: MobileMoneyService,
   ) {}
 
   // ==================== CARD PAYMENTS (Paystack) ====================
 
-  @Post("paystack/init/:bookingId")
+  // ==================== MOBILE MONEY PAYMENTS ====================
+
+  @Post("momo/init")
+  @HttpCode(HttpStatus.OK)
+  initMoMo(@Req() req: any, @Body() dto: InitiateMoMoPaymentDto) {
+    return this.momo.initiatePayment({
+      userId: req.user.userId,
+      role: req.user.role,
+      ...dto,
+    });
+  }
+
+  @Post("momo/otp")
+  @HttpCode(HttpStatus.OK)
+  submitMoMoOtp(@Body() dto: SubmitMoMoOtpDto) {
+    return this.momo.submitOTP(dto.reference, dto.otp);
+  }
+
+  @Get("wallets")
+  @HttpCode(HttpStatus.OK)
+  getWallets(@Req() req: any) {
+    return this.momo.getWallets(req.user.userId);
+  }
+
+  @Delete("wallets/:id")
+  @HttpCode(HttpStatus.OK)
+  removeWallet(@Req() req: any, @Param("id") id: string) {
+    return this.momo.removeWallet(req.user.userId, id);
+  }
+
+  // ==================== CARD PAYMENTS (Paystack) ====================
   @HttpCode(HttpStatus.OK)
   init(@Req() req: any, @Param("bookingId") bookingId: string) {
     return this.payments.initPaystackPayment(

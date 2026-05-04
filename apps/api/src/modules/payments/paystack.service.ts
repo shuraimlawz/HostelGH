@@ -137,4 +137,46 @@ export class PaystackService {
       throw new BadRequestException("Failed to initiate transfer");
     }
   }
+
+  async chargeMobileMoney(params: {
+    email: string;
+    amount: number;
+    reference: string;
+    currency: string;
+    mobile_money: {
+      phone: string;
+      provider: string;
+    };
+    metadata?: any;
+  }) {
+    try {
+      const res = await axios.post(`${this.baseUrl}/charge`, params, {
+        headers: { Authorization: `Bearer ${this.secretKey}` },
+      });
+      return res.data;
+    } catch (error) {
+      this.logger.error(
+        `Paystack MoMo Charge Error: ${(error as any).response?.data?.message || (error as any).message}`,
+      );
+      throw new BadRequestException(
+        (error as any).response?.data?.message || "Failed to charge Mobile Money",
+      );
+    }
+  }
+
+  async submitOTP(reference: string, otp: string) {
+    try {
+      const res = await axios.post(
+        `${this.baseUrl}/charge/submit_otp`,
+        { reference, otp },
+        { headers: { Authorization: `Bearer ${this.secretKey}` } },
+      );
+      return res.data;
+    } catch (error) {
+      this.logger.error(
+        `Paystack OTP Error: ${(error as any).response?.data?.message || (error as any).message}`,
+      );
+      throw new BadRequestException("Failed to submit OTP");
+    }
+  }
 }

@@ -3,8 +3,11 @@
 import { api } from "@/lib/api";
 import { useAuth } from "@/lib/auth-context";
 import { useState } from "react";
-import { CheckCircle2, Upload, Loader2, X, AlertCircle } from "lucide-react";
+import { CheckCircle2, Upload, Loader2, X, AlertCircle, CreditCard, Landmark, Phone } from "lucide-react";
 import { cn } from "@/lib/utils";
+import PaymentMethodSelector from "../payments/PaymentMethodSelector";
+import BankTransferForm from "../payments/BankTransferForm";
+import MobileMoneyForm from "../payments/MobileMoneyForm";
 
 export default function BookingModal({
     open,
@@ -22,10 +25,12 @@ export default function BookingModal({
     room?: any;
 }) {
     const { user } = useAuth();
-    const [step, setStep] = useState<"personal" | "kyc" | "summary" | "done">("personal");
+    const [step, setStep] = useState<"personal" | "kyc" | "summary" | "payment" | "done">("personal");
     const [loading, setLoading] = useState(false);
     const [err, setErr] = useState<string | null>(null);
     const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+    const [bookingId, setBookingId] = useState<string | null>(null);
+    const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string | null>(null);
 
     const [firstName, setFirstName] = useState(user?.firstName || "");
     const [lastName, setLastName] = useState(user?.lastName || "");
@@ -102,21 +107,34 @@ export default function BookingModal({
                 admissionDocUrl, passportPhotoUrl,
             });
             
-            // Initiate payment of 5 GHS
-            const paymentRes = await api.post(`/payments/paystack/init/${bookingRes.data.id}`);
-            if (paymentRes.data?.authorizationUrl) {
-                window.location.href = paymentRes.data.authorizationUrl;
-            } else {
-                setStep("done");
-            }
+            setBookingId(bookingRes.data.id);
+            setStep("payment");
         } catch (e: any) {
             setErr(e.response?.data?.message || e.message || "Booking failed. Please try again.");
             setLoading(false);
         }
     };
 
-    const steps = ["Your Info", "Student Details", "Review"];
-    const stepIndex = { personal: 0, kyc: 1, summary: 2, done: 3 }[step];
+    const handlePaymentMethodSelected = async (method: string) => {
+        setSelectedPaymentMethod(method);
+        if (method === "CARD") {
+            setLoading(true);
+            try {
+                const res = await api.post(`/payments/paystack/init/${bookingId}`);
+                if (res.data?.authorizationUrl) {
+                    window.location.href = res.data.authorizationUrl;
+                }
+            } catch (e: any) {
+                setErr(e.response?.data?.message || "Payment initiation failed.");
+                setLoading(false);
+            }
+        }
+    };
+
+    const token = typeof window !== "undefined" ? (localStorage.getItem("accessToken") || sessionStorage.getItem("accessToken")) : null;
+
+    const steps = ["Your Info", "Student Details", "Review", "Payment"];
+    const stepIndex = { personal: 0, kyc: 1, summary: 2, payment: 3, done: 4 }[step];
 
     const inputCls = (field: string) => cn(
         "w-full px-3 py-2.5 border rounded-lg text-sm outline-none transition-colors",
@@ -399,6 +417,42 @@ export default function BookingModal({
                             </div>
                         )}
 
+                        {/* Step 4: Payment */}
+                        {step === "payment" && bookingId && (
+                            <div className="space-y-4">
+                                {selectedPaymentMethod === "BANK_TRANSFER" ? (
+                                    <BankTransferForm 
+                                        bookingId={bookingId} 
+                                        token={token}
+                                        onError={(e) => setErr(e)}
+                                    />
+                                ) : selectedPaymentMethod === "MOBILE_MONEY" ? (
+                                    <MobileMoneyForm 
+                                        bookingId={bookingId} 
+                                        token={token}
+                                        onError={(e) => setErr(e)}
+                                        onSuccess={() => setStep("done")}
+                                    />
+                                ) : (
+                                    <PaymentMethodSelector 
+                                        bookingId={bookingId} 
+                                        token={token} 
+                                        onMethodSelected={handlePaymentMethodSelected}
+                                        onError={(e) => setErr(e)}
+                                    />
+                                )}
+                                
+                                {(selectedPaymentMethod === "BANK_TRANSFER" || selectedPaymentMethod === "MOBILE_MONEY") && (
+                                    <button 
+                                        onClick={() => setSelectedPaymentMethod(null)}
+                                        className="text-xs text-blue-600 hover:underline flex items-center gap-1"
+                                    >
+                                        ← Change payment method
+                                    </button>
+                                )}
+                            </div>
+                        )}
+
                         {/* Done */}
                         {step === "done" && (
                             <div className="text-center py-8 space-y-4">
@@ -424,6 +478,7 @@ export default function BookingModal({
                                         setFieldErrors({}); setErr(null);
                                         if (step === "kyc") setStep("personal");
                                         else if (step === "summary") setStep("kyc");
+                                        else if (step === "payment") setStep("summary");
                                     }}
                                     className="flex-1 py-2.5 border border-gray-200 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors"
                                 >
@@ -446,7 +501,7 @@ export default function BookingModal({
                                 className="flex-1 py-2.5 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
                             >
                                 {loading && <Loader2 size={15} className="animate-spin" />}
-                                {step === "summary" ? "Submit booking" : "Continue"}
+                                {step === "summary" ? "Submit booking" : step === "payment" ? "I have made the transfer" : "Continue"}
                             </button>
                         </div>
                     )}

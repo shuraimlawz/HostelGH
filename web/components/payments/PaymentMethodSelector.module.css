@@ -1,7 +1,3 @@
-import styles from './PaymentMethodSelector.module.css';
-
-export default styles;
-
 /**
  * PaymentMethodSelector.module.css
  * Styles for payment method selector component

@@ -1,7 +1,3 @@
-import styles from './BankTransferForm.module.css';
-
-export default styles;
-
 /**
  * BankTransferForm.module.css
  * Styles for bank transfer payment form component

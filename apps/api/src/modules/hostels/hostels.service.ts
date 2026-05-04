@@ -466,7 +466,7 @@ export class HostelsService {
       isPublished: true,
       city: city ? { contains: city, mode: "insensitive" } : undefined,
       region: region ? { equals: region, mode: "insensitive" } : undefined,
-      gender: genderFilter ? { equals: genderFilter as any } : undefined,
+      genderCategory: genderFilter ? { equals: genderFilter as any } : undefined,
       amenities:
         amenitiesFilter && amenitiesFilter.length > 0
           ? { hasEvery: amenitiesFilter }
