@@ -7,7 +7,7 @@ export default function SupportShell({ children }: { children: React.ReactNode }
         <div className="container mx-auto px-6 py-12 md:py-20">
             <div className="flex flex-col md:flex-row gap-12 lg:gap-20">
                 {/* Mobile Navigation (Top) */}
-                <div className="md:hidden mb-8 bg-gray-50 p-6 rounded-2xl border border-gray-100">
+                <div className="md:hidden mb-8 bg-muted p-6 rounded-2xl border border-border">
                     <SupportNav />
                 </div>
 

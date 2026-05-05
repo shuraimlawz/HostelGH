@@ -1,236 +1,106 @@
 @import "tailwindcss";
 @import "leaflet/dist/leaflet.css";
 
-/* Leaflet popup custom styling */
-.hostelgh-popup .leaflet-popup-content-wrapper {
-  border-radius: 16px !important;
-  border: 1px solid #f1f5f9 !important;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.12) !important;
-  padding: 0 !important;
-}
-.hostelgh-popup .leaflet-popup-content {
-  margin: 0 !important;
-  padding: 12px 16px !important;
-}
-.hostelgh-popup .leaflet-popup-tip {
-  background: white !important;
-}
-
-.custom-div-icon {
-  background: transparent !important;
-  border: none !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-}
+/* Tailwind v4 Dark Mode Class Strategy */
+@custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
-  /* Mapping existing shadcn/custom variables to Tailwind v4 theme */
-  --color-border: hsl(var(--border));
-  --color-input: hsl(var(--input));
-  --color-ring: hsl(var(--ring));
-  --color-background: hsl(var(--background));
-  --color-foreground: hsl(var(--foreground));
-
-  --color-primary: hsl(var(--primary));
-  --color-primary-foreground: hsl(var(--primary-foreground));
-
-  --color-secondary: hsl(var(--secondary));
-  --color-secondary-foreground: hsl(var(--secondary-foreground));
-
-  --color-destructive: hsl(var(--destructive));
-  --color-destructive-foreground: hsl(var(--destructive-foreground));
-
-  --color-muted: hsl(var(--muted));
-  --color-muted-foreground: hsl(var(--muted-foreground));
-
-  --color-accent: hsl(var(--accent));
-  --color-accent-foreground: hsl(var(--accent-foreground));
-
-  --color-popover: hsl(var(--popover));
-  --color-popover-foreground: hsl(var(--popover-foreground));
-
-  --color-card: hsl(var(--card));
-  --color-card-foreground: hsl(var(--card-foreground));
-
-  /* Removed destructive --color-white overrides that broke text-white. Using specific class overrides below. */
-
-  /* Modern SaaS Extensions */
-  --color-midnight: hsl(var(--midnight));
-  --color-electric: hsl(var(--electric));
-  --color-neon-green: hsl(var(--neon-green));
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
 
   --font-sans: var(--font-inter), ui-sans-serif, system-ui;
   --font-heading: var(--font-outfit), ui-sans-serif, system-ui;
 
-  --radius-lg: 0.5rem;
-  --radius-md: calc(0.5rem - 2px);
-  --radius-sm: calc(0.5rem - 4px);
+  --radius-lg: 1rem;
+  --radius-md: 0.75rem;
+  --radius-sm: 0.5rem;
+}
 
-  @keyframes accordion-down {
-    from { height: 0; }
-    to { height: var(--radix-accordion-content-height); }
-  }
-  @keyframes accordion-up {
-    from { height: var(--radix-accordion-content-height); }
-    to { height: 0; }
-  }
+:root {
+  --background: #ffffff;
+  --foreground: #020617;
+  --card: #ffffff;
+  --card-foreground: #020617;
+  --popover: #ffffff;
+  --popover-foreground: #020617;
+  --primary: #2563eb;
+  --primary-foreground: #ffffff;
+  --secondary: #f1f5f9;
+  --secondary-foreground: #0f172a;
+  --muted: #f1f5f9;
+  --muted-foreground: #64748b;
+  --accent: #f1f5f9;
+  --accent-foreground: #0f172a;
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
+  --border: #e2e8f0;
+  --input: #e2e8f0;
+  --ring: #2563eb;
+}
 
-  --animate-accordion-down: accordion-down 0.2s ease-out;
-  --animate-accordion-up: accordion-up 0.2s ease-out;
+.dark {
+  --background: #020617;
+  --foreground: #f8fafc;
+  --card: #0f172a;
+  --card-foreground: #f8fafc;
+  --popover: #0f172a;
+  --popover-foreground: #f8fafc;
+  --primary: #3b82f6;
+  --primary-foreground: #0f172a;
+  --secondary: #1e293b;
+  --secondary-foreground: #f8fafc;
+  --muted: #1e293b;
+  --muted-foreground: #94a3b8;
+  --accent: #1e293b;
+  --accent-foreground: #f8fafc;
+  --destructive: #7f1d1d;
+  --destructive-foreground: #f8fafc;
+  --border: #1e293b;
+  --input: #1e293b;
+  --ring: #3b82f6;
 }
 
 @layer base {
-  :root {
-    color-scheme: light;
-    --background: 0 0% 100%;
-    --foreground: 224 71% 4%;
-    --card: 0 0% 100%;
-    --card-foreground: 224 71% 4%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 224 71% 4%;
-    --primary: 221.2 83.2% 53.3%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 214.3 31.8% 91.4%;
-    --ring: 221.2 83.2% 53.3%;
-    --radius: 0.75rem;
-    
-    /* Modern SaaS Extensions */
-    --midnight: 224 71% 4%;
-    --electric: 221.2 83.2% 53.3%;
-    --neon-green: 142.1 70.6% 45.3%;
-  }
-
-  .dark {
-    color-scheme: dark;
-    --background: 222.2 47.4% 11.2%;
-    --foreground: 210 40% 98%;
-    --card: 222.2 47.4% 14%;
-    --card-foreground: 210 40% 98%;
-    --popover: 222.2 47.4% 14%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 217.2 91.2% 59.8%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 224.3 76.3% 48%;
-
-    --midnight: 210 40% 98%;
-    --electric: 217.2 91.2% 59.8%;
-  }
-
   * {
-    @apply border-border;
+    @apply border-border outline-none;
   }
-
   html {
-    font-size: 14px;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
     scroll-behavior: smooth;
   }
-
   body {
-    @apply bg-background text-foreground selection:bg-primary/20 font-sans;
-    font-feature-settings: "rlig" 1, "calt" 1;
+    @apply bg-background text-foreground font-sans antialiased;
   }
-
-  .container {
-    @apply max-w-[1440px] mx-auto;
-  }
-
-  button, 
-  [role="button"],
-  select,
-  input[type="submit"],
-  input[type="button"],
-  input[type="checkbox"],
-  input[type="radio"] {
-    cursor: pointer;
-  }
-
   h1, h2, h3, h4, h5, h6 {
-    @apply font-heading tracking-tight font-bold not-italic;
-  }
-
-  /* Safe Smart Overrides for Dark Mode - Only affects backgrounds of structural elements, preserving buttons */
-}
-
-@layer utilities {
-  /* Cleaned up shadows for dark mode */
-  .dark [class*="shadow-"] { 
-    --tw-shadow: 0 0 #0000;
-    --tw-shadow-colored: 0 0 #0000;
-    box-shadow: none !important;
-  }
-
-  .dark .group:hover .group-hover\:shadow-xl, 
-  .dark .group:hover .group-hover\:shadow-2xl,
-  .dark .hover\:shadow-xl:hover,
-  .dark .hover\:shadow-2xl:hover {
-    box-shadow: none !important;
-    border-color: hsl(222.2, 47.4%, 30%) !important;
-  }
-  
-  .dark .border-gray-200, .dark .border-gray-100, .dark .border-gray-50 { 
-    border-color: rgba(255, 255, 255, 0.05) !important; 
-  }
-  
-  .dark hr {
-    border-color: rgba(255, 255, 255, 0.05) !important;
+    @apply font-heading font-bold;
   }
 }
 
-@keyframes letter-reveal {
-  0% { transform: translateY(100%); opacity: 0; }
-  100% { transform: translateY(0); opacity: 1; }
+/* Leaflet Overrides */
+.hostelgh-popup .leaflet-popup-content-wrapper {
+  @apply rounded-2xl border border-border bg-card shadow-xl p-0 overflow-hidden;
 }
-
-@keyframes letter-bounce {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-3px); }
+.hostelgh-popup .leaflet-popup-content {
+  @apply m-0 p-4;
 }
-
-@keyframes brand-glow {
-  0%, 100% { text-shadow: 0 0 0px transparent; }
-  50% { text-shadow: 0 0 10px rgba(59, 130, 246, 0.3); color: #3b82f6; }
-}
-
-.animate-letter-reveal {
-  animation: letter-reveal 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) both;
-}
-
-.group:hover .animate-letter-reveal {
-  animation: letter-bounce 0.4s ease-in-out;
-}
-
-.group:hover span {
-  animation: brand-glow 2s ease-in-out infinite;
-}
-
-@keyframes bounce-subtle {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-4px); }
-}
-
-.animate-bounce-subtle {
-  animation: bounce-subtle 2s ease-in-out infinite;
+.hostelgh-popup .leaflet-popup-tip {
+  @apply bg-card;
 }
 
 @utility no-scrollbar {

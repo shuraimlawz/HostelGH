@@ -50,36 +50,36 @@ const SAFETY_TIPS = [
 
 export default function SafetyPage() {
     return (
-        <div className="space-y-16 lg:space-y-24">
+        <div className="space-y-20 lg:space-y-28">
             {/* Header */}
             <div className="space-y-4">
                 <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-primary/10 rounded-full text-primary text-[9px] font-black uppercase tracking-widest border border-primary/20">
                     <Shield size={10} />
                     Trust & Safety
                 </div>
-                <h1 className="text-3xl font-black tracking-tight text-foreground">Safety Guidelines</h1>
-                <p className="text-sm font-medium max-w-xl leading-relaxed text-muted-foreground">
+                <h1 className="text-4xl md:text-5xl font-black tracking-tight text-foreground">Safety Guidelines</h1>
+                <p className="text-sm md:text-base font-medium max-w-xl leading-relaxed text-muted-foreground">
                     Student housing scams happen in Ghana. We've built these guidelines to help you find a safe room and spot red flags early.
                 </p>
             </div>
 
             {/* Tips Grid */}
-            <section className="space-y-6">
-                <h2 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">
+            <section className="space-y-8">
+                <h2 className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground pl-1">
                     What to watch out for
                 </h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {SAFETY_TIPS.map((tip) => (
                         <div
                             key={tip.title}
-                            className="p-6 rounded-[2rem] border-2 border-border bg-card flex gap-5 hover:border-primary/20 hover:shadow-md transition-all"
+                            className="p-8 rounded-[2.5rem] border-2 border-border bg-card flex flex-col sm:flex-row gap-6 hover:border-primary/20 hover:shadow-xl hover:shadow-primary/5 transition-all duration-300"
                         >
-                            <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${tip.iconBg} ${tip.iconColor}`}>
-                                <tip.icon size={22} />
+                            <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 shadow-sm ${tip.iconBg} ${tip.iconColor}`}>
+                                <tip.icon size={28} />
                             </div>
-                            <div className="space-y-1">
-                                <h3 className="text-base font-black text-foreground leading-tight">{tip.title}</h3>
-                                <p className="text-xs text-muted-foreground font-medium leading-relaxed">{tip.description}</p>
+                            <div className="space-y-2">
+                                <h3 className="text-lg font-black text-foreground leading-tight">{tip.title}</h3>
+                                <p className="text-sm text-muted-foreground font-medium leading-relaxed">{tip.description}</p>
                             </div>
                         </div>
                     ))}
@@ -87,37 +87,60 @@ export default function SafetyPage() {
             </section>
 
             {/* Report Section */}
-            <section id="report" className="space-y-6">
-                <div>
-                    <h2 className="text-2xl font-black text-foreground">See something suspicious?</h2>
-                    <p className="text-sm text-muted-foreground font-medium mt-1 max-w-lg">
-                        If a listing looks fake, an owner is asking for offline payments, or you feel unsafe — report it. We act fast.
+            <section id="report" className="space-y-8">
+                <div className="space-y-2">
+                    <h2 className="text-3xl font-black text-foreground">See something suspicious?</h2>
+                    <p className="text-sm md:text-base text-muted-foreground font-medium max-w-2xl leading-relaxed">
+                        If a listing looks fake, an owner is asking for offline payments, or you feel unsafe — report it immediately. We investigate and act fast to protect the community.
                     </p>
                 </div>
                 <ReportForm />
             </section>
 
             {/* Dispute Resolution */}
-            <section className="space-y-5 p-8 md:p-10 bg-muted rounded-[2.5rem] border border-border">
-                <div className="flex items-center gap-3">
-                    <AlertTriangle className="text-orange-500" size={20} />
-                    <h2 className="text-xl font-black text-foreground">Dispute Resolution</h2>
+            <section className="space-y-6 p-10 md:p-12 bg-muted rounded-[3rem] border-2 border-border relative overflow-hidden">
+                <div className="absolute top-0 right-0 p-8 opacity-10 pointer-events-none">
+                    <AlertTriangle size={120} className="text-foreground" />
                 </div>
-                <p className="text-muted-foreground font-medium text-sm leading-relaxed">
-                    If you arrive at a hostel and it doesn't match the verified listing:
-                </p>
-                <ol className="list-decimal pl-5 space-y-2 text-muted-foreground text-sm font-medium">
-                    <li>Don't pay any remaining rent to the owner.</li>
-                    <li>Take clear photos or video of the differences.</li>
-                    <li>Report via the form above within 12 hours of arrival.</li>
-                    <li>Our team investigates and issues a full refund of your booking fee if the claim is valid.</li>
-                </ol>
-                <p className="text-muted-foreground text-xs font-medium pt-2">
-                    Emergency contact:{" "}
-                    <a href="mailto:safety@hostelgh.com" className="text-primary font-bold hover:underline">safety@hostelgh.com</a>
-                    {" "}or WhatsApp{" "}
-                    <a href="https://wa.me/233598494617" className="text-primary font-bold hover:underline">+233 59 849 4617</a>
-                </p>
+                
+                <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 bg-orange-500/10 text-orange-500 rounded-2xl flex items-center justify-center">
+                        <AlertTriangle size={24} />
+                    </div>
+                    <h2 className="text-2xl font-black text-foreground">Dispute Resolution</h2>
+                </div>
+                
+                <div className="space-y-6 relative z-10">
+                    <p className="text-foreground font-bold text-base leading-relaxed">
+                        If you arrive at a hostel and it doesn't match the verified listing:
+                    </p>
+                    <ol className="space-y-4">
+                        {[
+                            "Don't pay any remaining rent to the owner.",
+                            "Take clear photos or video of the differences.",
+                            "Report via the form above within 12 hours of arrival.",
+                            "Our team investigates and issues a full refund of your booking fee if the claim is valid."
+                        ].map((step, i) => (
+                            <li key={i} className="flex gap-4 items-start">
+                                <span className="w-6 h-6 rounded-full bg-foreground text-background flex items-center justify-center text-[10px] font-black shrink-0 mt-0.5">
+                                    {i + 1}
+                                </span>
+                                <span className="text-muted-foreground font-medium text-sm leading-relaxed">{step}</span>
+                            </li>
+                        ))}
+                    </ol>
+                </div>
+
+                <div className="pt-6 border-t border-border/50 flex flex-col sm:flex-row gap-6">
+                    <div className="space-y-1">
+                        <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Emergency Support</p>
+                        <a href="mailto:safety@hostelgh.com" className="text-sm font-black text-primary hover:underline block">safety@hostelgh.com</a>
+                    </div>
+                    <div className="space-y-1">
+                        <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">WhatsApp Hotline</p>
+                        <a href="https://wa.me/233598494617" className="text-sm font-black text-primary hover:underline block">+233 59 849 4617</a>
+                    </div>
+                </div>
             </section>
         </div>
     );

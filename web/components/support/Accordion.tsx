@@ -17,7 +17,7 @@ export default function Accordion({ items }: { items: { q: string; a: string }[]
                         className={cn(
                             "rounded-2xl border-2 transition-all duration-300",
                             isExpanded
-                                ? "border-primary/40 bg-primary/5"
+                                ? "border-primary/40 bg-primary/5 shadow-sm"
                                 : "border-border bg-card hover:border-border/80"
                         )}
                     >
@@ -25,7 +25,10 @@ export default function Accordion({ items }: { items: { q: string; a: string }[]
                             onClick={() => setExpandedIndex(isExpanded ? null : idx)}
                             className="w-full px-6 py-5 flex items-center justify-between text-left"
                         >
-                            <span className="text-sm font-bold text-foreground pr-4 leading-snug">
+                            <span className={cn(
+                                "text-base font-bold pr-4 leading-snug transition-colors",
+                                isExpanded ? "text-primary" : "text-foreground"
+                            )}>
                                 {item.q}
                             </span>
                             <div className={cn(

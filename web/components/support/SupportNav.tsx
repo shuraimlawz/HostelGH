@@ -18,7 +18,7 @@ export default function SupportNav() {
     return (
         <nav className="space-y-8">
             <div>
-                <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 mb-6">
+                <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground mb-6 pl-4">
                     Support
                 </h3>
                 <ul className="space-y-1">
@@ -29,10 +29,10 @@ export default function SupportNav() {
                                 <Link
                                     href={link.href}
                                     className={cn(
-                                        "group flex items-center justify-between py-2.5 px-4 rounded-lg text-sm font-semibold transition-all duration-200",
+                                        "group flex items-center justify-between py-3 px-4 rounded-xl text-sm font-bold transition-all duration-200",
                                         isActive
-                                            ? "bg-blue-50 text-blue-600 border-l-4 border-blue-600 pl-3"
-                                            : "text-gray-500 hover:text-gray-900 hover:bg-gray-50 hover:pl-5"
+                                            ? "bg-primary/10 text-primary border-l-4 border-primary pl-3"
+                                            : "text-muted-foreground hover:text-foreground hover:bg-muted hover:pl-5"
                                     )}
                                 >
                                     <span>{link.name}</span>

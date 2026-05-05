@@ -95,10 +95,10 @@ export default function HelpCenterPage() {
     };
 
     return (
-        <div className="max-w-[1200px] mx-auto px-4 py-12 space-y-16 pb-20 pt-4">
+        <div className="space-y-16 pb-20">
             {/* Header */}
             <div className="space-y-4">
-                <span className="px-3 py-1 bg-primary text-primary-foreground rounded-full text-[9px] font-bold uppercase tracking-widest">
+                <span className="px-3 py-1.5 bg-primary text-primary-foreground rounded-full text-[9px] font-black uppercase tracking-widest">
                     Help Center
                 </span>
                 <h1 className="text-4xl md:text-5xl font-black tracking-tight text-foreground">
@@ -116,22 +116,22 @@ export default function HelpCenterPage() {
                         key={cat.id}
                         onClick={() => { setActiveCategory(cat.id); setFeedback(null); }}
                         className={cn(
-                            "group flex flex-col items-start gap-4 p-6 rounded-2xl border-2 transition-all text-left",
+                            "group flex flex-col items-start gap-4 p-8 rounded-3xl border-2 transition-all text-left active:scale-[0.98]",
                             activeCategory === cat.id
-                                ? "border-primary bg-primary/5"
+                                ? "border-primary bg-primary/5 shadow-md"
                                 : "border-border bg-card hover:border-primary/30"
                         )}
                     >
                         <div className={cn(
-                            "w-12 h-12 rounded-xl flex items-center justify-center transition-all",
+                            "w-12 h-12 rounded-2xl flex items-center justify-center transition-all",
                             activeCategory === cat.id
-                                ? "bg-primary text-primary-foreground"
+                                ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20"
                                 : "bg-muted text-muted-foreground group-hover:bg-primary/10 group-hover:text-primary"
                         )}>
                             <cat.icon size={22} />
                         </div>
                         <span className={cn(
-                            "font-black text-xs uppercase tracking-widest",
+                            "font-black text-[10px] uppercase tracking-widest",
                             activeCategory === cat.id ? "text-primary" : "text-muted-foreground"
                         )}>
                             {cat.title}
@@ -142,19 +142,19 @@ export default function HelpCenterPage() {
 
             {/* Article Section */}
             <section className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-                <div className="bg-card rounded-3xl border border-border p-8 md:p-12">
-                    <div className="flex items-center gap-3 mb-8 pb-6 border-b border-border">
-                        <Clock size={14} className="text-primary" />
-                        <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
-                            {HELP_CATEGORIES.find(c => c.id === activeCategory)?.title}
+                <div className="bg-card rounded-[2.5rem] border-2 border-border p-8 md:p-12 shadow-sm">
+                    <div className="flex items-center gap-3 mb-10 pb-6 border-b border-border">
+                        <Clock size={16} className="text-primary" />
+                        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">
+                            {HELP_CATEGORIES.find(c => c.id === activeCategory)?.title} Articles
                         </span>
                     </div>
 
                     <Accordion items={HELP_CATEGORIES.find(c => c.id === activeCategory)?.articles || []} />
 
                     {/* Feedback */}
-                    <div className="mt-10 pt-8 border-t border-border flex flex-col sm:flex-row items-center justify-between gap-6">
-                        <span className="text-xs font-bold text-muted-foreground uppercase tracking-widest">
+                    <div className="mt-12 pt-8 border-t border-border flex flex-col sm:flex-row items-center justify-between gap-6">
+                        <span className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em]">
                             Was this helpful?
                         </span>
                         <div className="flex gap-3">
@@ -165,7 +165,7 @@ export default function HelpCenterPage() {
                                     "flex items-center gap-2 px-6 py-3 rounded-xl border-2 transition-all font-bold text-[10px] uppercase tracking-widest active:scale-95 disabled:opacity-60",
                                     feedback === "helpful"
                                         ? "border-green-500 bg-green-500/10 text-green-600"
-                                        : "border-border hover:border-green-500 hover:text-green-600 text-muted-foreground"
+                                        : "border-border hover:border-green-500 hover:text-green-600 text-muted-foreground bg-muted/50"
                                 )}
                             >
                                 {feedback === "helpful" ? <Check size={14} /> : <ThumbsUp size={14} />}
@@ -178,7 +178,7 @@ export default function HelpCenterPage() {
                                     "flex items-center gap-2 px-6 py-3 rounded-xl border-2 transition-all font-bold text-[10px] uppercase tracking-widest active:scale-95 disabled:opacity-60",
                                     feedback === "not-helpful"
                                         ? "border-orange-400 bg-orange-500/10 text-orange-600"
-                                        : "border-border hover:border-destructive hover:text-destructive text-muted-foreground"
+                                        : "border-border hover:border-destructive hover:text-destructive text-muted-foreground bg-muted/50"
                                 )}
                             >
                                 {feedback === "not-helpful" ? <Check size={14} /> : <ThumbsDown size={14} />}
@@ -191,26 +191,26 @@ export default function HelpCenterPage() {
 
             {/* Contact Cards */}
             <div className="grid md:grid-cols-2 gap-6">
-                <div className="p-8 rounded-3xl bg-foreground border border-border/10 space-y-4 hover:border-primary/30 transition-all">
-                    <div className="w-12 h-12 bg-background/10 rounded-xl flex items-center justify-center text-primary">
-                        <Mail size={24} />
+                <div className="p-10 rounded-[2.5rem] bg-foreground text-background space-y-6 hover:scale-[1.02] transition-all duration-300">
+                    <div className="w-14 h-14 bg-background/10 rounded-2xl flex items-center justify-center text-primary">
+                        <Mail size={28} />
                     </div>
                     <div>
-                        <h3 className="text-lg font-black text-background">Email Us</h3>
-                        <p className="text-xs text-background/50 font-medium mt-1">We reply within 24 hours on business days.</p>
+                        <h3 className="text-xl font-black">Email Us</h3>
+                        <p className="text-sm font-medium opacity-60 mt-1">We reply within 24 hours on business days.</p>
                     </div>
-                    <a href="mailto:hello@hostelgh.com" className="text-sm font-bold text-primary hover:underline">hello@hostelgh.com</a>
+                    <a href="mailto:hello@hostelgh.com" className="inline-block text-base font-black text-primary hover:underline">hello@hostelgh.com</a>
                 </div>
 
-                <div className="p-8 rounded-3xl bg-foreground border border-border/10 space-y-4 hover:border-green-500/30 transition-all">
-                    <div className="w-12 h-12 bg-background/10 rounded-xl flex items-center justify-center text-green-400">
-                        <MessageCircle size={24} />
+                <div className="p-10 rounded-[2.5rem] bg-foreground text-background space-y-6 hover:scale-[1.02] transition-all duration-300">
+                    <div className="w-14 h-14 bg-background/10 rounded-2xl flex items-center justify-center text-green-400">
+                        <MessageCircle size={28} />
                     </div>
                     <div>
-                        <h3 className="text-lg font-black text-background">WhatsApp Support</h3>
-                        <p className="text-xs text-background/50 font-medium mt-1">Available Mon – Sat, 9 AM – 9 PM GMT.</p>
+                        <h3 className="text-xl font-black">WhatsApp</h3>
+                        <p className="text-sm font-medium opacity-60 mt-1">Available Mon – Sat, 9 AM – 9 PM GMT.</p>
                     </div>
-                    <a href="https://wa.me/233598494617" target="_blank" rel="noopener noreferrer" className="text-sm font-bold text-green-400 hover:underline">+233 59 849 4617</a>
+                    <a href="https://wa.me/233598494617" target="_blank" rel="noopener noreferrer" className="inline-block text-base font-black text-green-400 hover:underline">+233 59 849 4617</a>
                 </div>
             </div>
         </div>

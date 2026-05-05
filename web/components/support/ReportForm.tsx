@@ -15,12 +15,12 @@ export default function ReportForm() {
 
     if (submitted) {
         return (
-            <div className="bg-green-500/10 rounded-3xl p-12 text-center space-y-4 border border-green-500/20 animate-in fade-in zoom-in-95 duration-500">
+            <div className="bg-green-500/10 rounded-[2.5rem] p-12 text-center space-y-4 border border-green-500/20 animate-in fade-in zoom-in-95 duration-500">
                 <div className="w-16 h-16 bg-card text-green-600 rounded-full flex items-center justify-center mx-auto shadow-sm">
                     <CheckCircle2 size={32} />
                 </div>
                 <h3 className="text-2xl font-black text-foreground">Report Received</h3>
-                <p className="text-muted-foreground font-medium max-w-sm mx-auto text-sm">
+                <p className="text-muted-foreground font-medium max-sm mx-auto text-sm">
                     Thanks for keeping HostelGH safe. Our team will review your report within 24 hours and take action.
                 </p>
                 <button
@@ -34,7 +34,7 @@ export default function ReportForm() {
     }
 
     return (
-        <div className="bg-card rounded-[2.5rem] border-2 border-border p-8 md:p-12">
+        <div className="bg-card rounded-[2.5rem] border-2 border-border p-8 md:p-12 shadow-sm">
             <div className="flex items-center gap-4 mb-8">
                 <div className="w-12 h-12 bg-destructive/10 text-destructive rounded-2xl flex items-center justify-center">
                     <AlertTriangle size={24} />
@@ -51,20 +51,25 @@ export default function ReportForm() {
                     <label className="text-xs font-black text-muted-foreground uppercase tracking-widest pl-1">
                         Issue Type
                     </label>
-                    <select
-                        required
-                        value={type}
-                        onChange={(e) => setType(e.target.value)}
-                        className="w-full px-5 py-4 rounded-2xl bg-muted border-2 border-border focus:border-destructive outline-none transition-all font-medium text-foreground appearance-none"
-                    >
-                        <option value="" disabled>Select issue type...</option>
-                        <option value="scam">Potential Scam / Fraud</option>
-                        <option value="fake">Fake Listing / Wrong Photos</option>
-                        <option value="unsafe">Unsafe Property or Host Behaviour</option>
-                        <option value="payment">Payment Requested Outside Platform</option>
-                        <option value="harassment">Harassment or Intimidation</option>
-                        <option value="other">Other Concern</option>
-                    </select>
+                    <div className="relative">
+                        <select
+                            required
+                            value={type}
+                            onChange={(e) => setType(e.target.value)}
+                            className="w-full px-5 py-4 rounded-2xl bg-muted border-2 border-border focus:border-primary outline-none transition-all font-bold text-foreground appearance-none cursor-pointer"
+                        >
+                            <option value="" disabled className="bg-card">Select issue type...</option>
+                            <option value="scam" className="bg-card">Potential Scam / Fraud</option>
+                            <option value="fake" className="bg-card">Fake Listing / Wrong Photos</option>
+                            <option value="unsafe" className="bg-card">Unsafe Property or Host Behaviour</option>
+                            <option value="payment" className="bg-card">Payment Requested Outside Platform</option>
+                            <option value="harassment" className="bg-card">Harassment or Intimidation</option>
+                            <option value="other" className="bg-card">Other Concern</option>
+                        </select>
+                        <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-muted-foreground">
+                            <ChevronDown size={20} />
+                        </div>
+                    </div>
                 </div>
 
                 {/* Message */}
@@ -78,7 +83,7 @@ export default function ReportForm() {
                         onChange={(e) => setMessage(e.target.value)}
                         placeholder="Describe what you saw or experienced. Include hostel name, date, and any other details..."
                         rows={4}
-                        className="w-full px-5 py-4 rounded-2xl bg-muted border-2 border-border focus:border-destructive outline-none transition-all font-medium resize-none text-foreground placeholder:text-muted-foreground"
+                        className="w-full px-5 py-4 rounded-2xl bg-muted border-2 border-border focus:border-primary outline-none transition-all font-medium resize-none text-foreground placeholder:text-muted-foreground"
                     />
                 </div>
 
@@ -87,24 +92,42 @@ export default function ReportForm() {
                     <label className="text-xs font-black text-muted-foreground uppercase tracking-widest pl-1">
                         Evidence (Optional)
                     </label>
-                    <div className="group relative border-2 border-dashed border-border rounded-2xl p-8 transition-colors hover:border-destructive/50 hover:bg-destructive/5 cursor-pointer">
+                    <div className="group relative border-2 border-dashed border-border rounded-2xl p-8 transition-colors hover:border-primary/50 hover:bg-primary/5 cursor-pointer">
                         <input type="file" accept=".jpg,.jpeg,.png,.pdf" className="absolute inset-0 opacity-0 cursor-pointer w-full h-full" />
                         <div className="text-center space-y-2">
-                            <Upload className="mx-auto text-muted-foreground group-hover:text-destructive transition-colors" size={24} />
-                            <p className="text-sm font-bold text-muted-foreground">Upload screenshot or document</p>
-                            <p className="text-xs text-muted-foreground/60">Max 5MB — JPG, PNG, PDF</p>
+                            <Upload className="mx-auto text-muted-foreground group-hover:text-primary transition-colors" size={24} />
+                            <p className="text-sm font-bold text-foreground">Upload screenshot or document</p>
+                            <p className="text-xs text-muted-foreground">Max 5MB — JPG, PNG, PDF</p>
                         </div>
                     </div>
                 </div>
 
                 <button
                     type="submit"
-                    className="w-full py-5 bg-destructive hover:bg-destructive/90 text-white rounded-2xl font-black text-base hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2"
+                    className="w-full py-5 bg-destructive hover:bg-destructive/90 text-destructive-foreground rounded-2xl font-black text-base hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2 shadow-lg shadow-destructive/20"
                 >
                     <Send size={20} />
                     Submit Report
                 </button>
             </form>
         </div>
+    );
+}
+
+function ChevronDown({ size }: { size: number }) {
+    return (
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width={size}
+            height={size}
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+        >
+            <path d="m6 9 6 6 6-6" />
+        </svg>
     );
 }
