@@ -21,6 +21,7 @@ enum BookingStatus {
   COMPLETED
   CANCELLED
   DISPUTED
+  DELETED
 }
 
 enum PaymentProvider {
@@ -352,6 +353,8 @@ model Booking {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  disputes Dispute[]
+
   hostel Hostel @relation(fields: [hostelId], references: [id], onDelete: Restrict)
   tenant User   @relation("BookingTenant", fields: [tenantId], references: [id], onDelete: Cascade)
 
@@ -558,4 +561,18 @@ model Wallet {
 
   @@unique([userId, provider, phoneNumber])
   @@index([userId])
+}
+
+model Dispute {
+  id        String   @id @default(cuid())
+  bookingId String
+  reason    String
+  status    String   @default("OPEN") // OPEN, RESOLVED, DISMISSED
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  booking Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+
+  @@index([bookingId])
+  @@index([status])
 }

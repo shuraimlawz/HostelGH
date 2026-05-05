@@ -40,6 +40,8 @@ export default function SortBar({ total }: { total: number }) {
                         <SelectValue placeholder="Select order" />
                     </SelectTrigger>
                     <SelectContent className="rounded-xl border-gray-100 dark:border-slate-800 shadow-xl p-1 bg-white dark:bg-slate-900 text-gray-900 dark:text-white">
+                        <SelectItem value="relevance" className="rounded-lg text-xs font-bold py-2.5 focus:bg-gray-50 dark:focus:bg-slate-800">Popularity</SelectItem>
+                        <SelectItem value="rating" className="rounded-lg text-xs font-bold py-2.5 focus:bg-gray-50 dark:focus:bg-slate-800">Top Rated</SelectItem>
                         <SelectItem value="price_asc" className="rounded-lg text-xs font-bold py-2.5 focus:bg-gray-50 dark:focus:bg-slate-800">Price: Low to High</SelectItem>
                         <SelectItem value="price_desc" className="rounded-lg text-xs font-bold py-2.5 focus:bg-gray-50 dark:focus:bg-slate-800">Price: High to Low</SelectItem>
                         <SelectItem value="newest" className="rounded-lg text-xs font-bold py-2.5 focus:bg-gray-50 dark:focus:bg-slate-800">Newest First</SelectItem>

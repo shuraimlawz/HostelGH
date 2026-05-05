@@ -41,6 +41,7 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import ImageUpload from "@/components/common/ImageUpload";
+import LocationPicker from "@/components/common/LocationPicker";
 import { REGIONAL_UNIVERSITIES } from "@/lib/constants";
 
 const hostelSchema = z.object({
@@ -57,6 +58,8 @@ const hostelSchema = z.object({
     isPublished: z.boolean(),
     policiesText: z.string().optional(),
     genderCategory: z.enum(["MALE", "FEMALE", "MIXED"]).optional(),
+    latitude: z.number().optional(),
+    longitude: z.number().optional(),
 });
 
 const roomSchema = z.object({
@@ -116,6 +119,8 @@ export default function EditHostelPage() {
             isPublished: false,
             policiesText: "",
             genderCategory: "MIXED",
+            latitude: undefined,
+            longitude: undefined,
         }
     });
 
@@ -135,6 +140,8 @@ export default function EditHostelPage() {
                 isPublished: hostel.isPublished,
                 policiesText: hostel.policiesText || "",
                 genderCategory: hostel.genderCategory || "MIXED",
+                latitude: hostel.latitude ?? undefined,
+                longitude: hostel.longitude ?? undefined,
             });
         }
     }, [hostel, form]);
@@ -266,6 +273,27 @@ export default function EditHostelPage() {
                             <div className="space-y-4">
                                 <input {...form.register("city")} className="w-full px-5 py-4 bg-gray-50 rounded-2xl outline-none border focus:border-black transition-all" placeholder="City" />
                                 <input {...form.register("addressLine")} className="w-full px-5 py-4 bg-gray-50 rounded-2xl outline-none border focus:border-black transition-all" placeholder="Address Line" />
+
+                                {/* Location Picker */}
+                                <div className="p-4 bg-blue-50 border border-blue-100 rounded-2xl space-y-3">
+                                    <p className="text-[10px] font-bold text-blue-700 uppercase tracking-widest flex items-center gap-2">
+                                        <MapPin size={12} /> Pin on Map
+                                    </p>
+                                    <LocationPicker
+                                        defaultValue={hostel?.addressLine || ""}
+                                        onSelect={(data) => {
+                                            form.setValue("latitude", data.lat);
+                                            form.setValue("longitude", data.lng);
+                                            if (data.city) form.setValue("city", data.city);
+                                        }}
+                                    />
+                                    {form.watch("latitude") && (
+                                        <p className="text-[10px] text-emerald-600 font-bold">
+                                            ✓ Pinned: {form.watch("latitude")?.toFixed(4)}, {form.watch("longitude")?.toFixed(4)}
+                                        </p>
+                                    )}
+                                </div>
+
                                 <select {...form.register("university")} className="w-full px-5 py-4 bg-gray-50 rounded-2xl outline-none border focus:border-black transition-all appearance-none">
                                     <option value="">Select University</option>
                                     {REGIONAL_UNIVERSITIES.map(group => (

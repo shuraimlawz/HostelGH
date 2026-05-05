@@ -54,8 +54,24 @@ export default function HeroSearch() {
         return () => window.removeEventListener("scroll", handleScroll);
     }, []);
 
+    const [isFocused, setIsFocused] = useState(false);
+    const [recentSearches, setRecentSearches] = useState<string[]>([]);
+
+    useEffect(() => {
+        const saved = localStorage.getItem("recent_hostel_searches");
+        if (saved) setRecentSearches(JSON.parse(saved));
+    }, []);
+
+    const saveRecentSearch = (q: string) => {
+        if (!q || q.trim().length < 2) return;
+        const updated = [q, ...recentSearches.filter(s => s !== q)].slice(0, 5);
+        setRecentSearches(updated);
+        localStorage.setItem("recent_hostel_searches", JSON.stringify(updated));
+    };
+
     const handleSearch = (overrideQuery?: string) => {
         const searchVal = overrideQuery !== undefined ? overrideQuery : city;
+        if (searchVal) saveRecentSearch(searchVal);
         router.push(`/hostels${searchVal ? `?query=${encodeURIComponent(searchVal)}` : ""}`);
     };
 
@@ -129,8 +145,11 @@ export default function HeroSearch() {
                 </div>
 
                 {/* Search Box — always visible */}
-                <div className="w-full max-w-3xl">
-                    <div className="bg-white/10 backdrop-blur-2xl p-2.5 rounded-2xl border border-white/10 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.5)] flex flex-col md:flex-row items-center gap-2">
+                <div className="w-full max-w-3xl relative">
+                    <div className={cn(
+                        "bg-white/10 backdrop-blur-2xl p-2.5 rounded-2xl border border-white/10 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.5)] flex flex-col md:flex-row items-center gap-2 transition-all duration-300",
+                        isFocused && "bg-white/20 border-white/30"
+                    )}>
                         <div className="relative z-10 flex-1 flex items-center px-5 h-14 rounded-xl bg-white/5 border border-white/5 focus-within:bg-white focus-within:border-white transition-all w-full focus-within:shadow-xl group">
                             <MapPin className="text-blue-500 mr-3 shrink-0 transition-colors group-focus-within:text-blue-600" size={20} />
                             <div className="flex-1 text-left">
@@ -141,18 +160,68 @@ export default function HeroSearch() {
                                     className="w-full text-white group-focus-within:text-gray-900 placeholder:text-gray-500 font-bold bg-transparent border-none outline-none text-sm uppercase tracking-widest"
                                     value={city}
                                     onChange={(e) => setCity(e.target.value)}
-                                    onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+                                    onFocus={() => setIsFocused(true)}
+                                    onBlur={() => setTimeout(() => setIsFocused(false), 200)}
+                                    onKeyDown={(e) => {
+                                        if (e.key === "Enter") {
+                                            handleSearch();
+                                            setIsFocused(false);
+                                        }
+                                    }}
                                 />
                             </div>
                         </div>
                         <button
-                            onClick={() => handleSearch()}
+                            onClick={() => { handleSearch(); setIsFocused(false); }}
                             className="bg-blue-600 text-white h-14 px-8 rounded-xl transition-all shadow-xl shadow-blue-600/20 hover:bg-blue-700 flex items-center justify-center gap-2 w-full md:w-auto font-bold text-[11px] uppercase tracking-widest active:scale-95"
                         >
                             <Search size={18} />
                             <span>Search</span>
                         </button>
                     </div>
+
+                    {/* Suggestions Dropdown (Home Page) */}
+                    {isFocused && (
+                        <div className="absolute top-full left-0 right-0 mt-3 bg-white border border-gray-100 rounded-2xl shadow-2xl z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-300 text-left">
+                            {recentSearches.length > 0 && (
+                                <div className="p-4 border-b border-gray-50">
+                                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3 flex items-center gap-2">
+                                        Recent Searches
+                                    </p>
+                                    <div className="flex flex-wrap gap-2">
+                                        {recentSearches.map(s => (
+                                            <button 
+                                                key={s} 
+                                                onClick={() => { setCity(s); handleSearch(s); setIsFocused(false); }}
+                                                className="px-3 py-1.5 bg-gray-50 hover:bg-blue-50 text-xs font-bold text-gray-600 rounded-lg border border-gray-100 hover:border-blue-200 transition-all"
+                                            >
+                                                {s}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+
+                            <div className="p-4">
+                                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3">Popular Schools</p>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-1">
+                                    {["KNUST", "University of Ghana", "UCC", "UPSA", "UDS"].map(uni => (
+                                        <button 
+                                            key={uni}
+                                            onClick={() => { setCity(uni); handleSearch(uni); setIsFocused(false); }}
+                                            className="flex items-center gap-3 p-2.5 hover:bg-blue-50 rounded-xl transition-all group"
+                                        >
+                                            <div className="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center text-gray-400 group-hover:bg-white group-hover:text-blue-500 transition-all">
+                                                <Search size={14} />
+                                            </div>
+                                            <span className="text-sm font-bold text-gray-700 group-hover:text-blue-600">{uni}</span>
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                </div>
 
                     {/* Trending quick-links — hides when scrolled */}
                     <div className={cn(
@@ -173,7 +242,6 @@ export default function HeroSearch() {
                         ) : (
                             !isLoadingLocations && <span className="opacity-20 py-2 px-4">Loading...</span>
                         )}
-                    </div>
                 </div>
             </div>
 

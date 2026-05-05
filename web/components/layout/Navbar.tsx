@@ -184,7 +184,7 @@ export default function Navbar() {
                         {!user && (
                             <Link
                                 href="/auth/register?role=OWNER"
-                                className="hidden md:flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.15em] px-6 py-3 rounded-2xl bg-gray-900 text-white hover:bg-black hover:shadow-xl hover:shadow-gray-200 transition-all active:scale-95 group"
+                                className="hidden md:flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.15em] px-6 py-3 rounded-2xl bg-gray-900 text-white dark:bg-blue-600 hover:bg-black dark:hover:bg-blue-700 hover:shadow-xl dark:hover:shadow-none transition-all active:scale-95 group"
                             >
                                 <Plus size={14} className="group-hover:rotate-90 transition-transform duration-300" />
                                 <span>List Hostel</span>

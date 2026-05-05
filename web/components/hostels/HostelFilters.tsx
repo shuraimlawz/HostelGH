@@ -25,7 +25,9 @@ import {
     SlidersHorizontal,
     ChevronDown,
     Search,
-    X
+    X,
+    Clock,
+    Star
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
@@ -46,17 +48,40 @@ export default function HostelFilters() {
     const router = useRouter();
     const params = useSearchParams();
 
-    const [query, setQuery] = useState(params.get("query") ?? params.get("city") ?? "");
-    const [city, setCity] = useState(params.get("city") ?? "");
+    const [query, setQuery] = useState(params.get("query") ?? "");
     const [university, setUniversity] = useState(params.get("university") ?? "");
     const [minPrice, setMinPrice] = useState(params.get("minPrice") ? (parseInt(params.get("minPrice")!) / 100).toString() : "");
     const [maxPrice, setMaxPrice] = useState(params.get("maxPrice") ? (parseInt(params.get("maxPrice")!) / 100).toString() : "");
     const [gender, setGender] = useState(params.get("gender") ?? "");
     const [roomConfig, setRoomConfig] = useState(params.get("roomConfig") ?? "");
+    const [availableOnly, setAvailableOnly] = useState(params.get("availableOnly") === "true");
     const [selectedAmenities, setSelectedAmenities] = useState<string[]>(
         params.get("amenities")?.split(",").filter(Boolean) ?? []
     );
+    const [isFocused, setIsFocused] = useState(false);
+    const [recentSearches, setRecentSearches] = useState<string[]>([]);
 
+    // Load recent searches
+    useEffect(() => {
+        const saved = localStorage.getItem("recent_hostel_searches");
+        if (saved) setRecentSearches(JSON.parse(saved));
+    }, []);
+
+    const saveRecentSearch = (q: string) => {
+        if (!q || q.trim().length < 2) return;
+        const updated = [q, ...recentSearches.filter(s => s !== q)].slice(0, 5);
+        setRecentSearches(updated);
+        localStorage.setItem("recent_hostel_searches", JSON.stringify(updated));
+    };
+    // Debounced search
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            if (query !== (params.get("query") ?? "")) {
+                handleApply({ query });
+            }
+        }, 500);
+        return () => clearTimeout(timer);
+    }, [query]);
 
 
     const handleApply = (overrides?: any) => {
@@ -71,6 +96,7 @@ export default function HostelFilters() {
         if (roomConfig) p.set("roomConfig", roomConfig);
         if (minPrice) p.set("minPrice", (parseFloat(minPrice) * 100).toString());
         if (maxPrice) p.set("maxPrice", (parseFloat(maxPrice) * 100).toString());
+        if (availableOnly) p.set("availableOnly", "true");
         if (selectedAmenities.length > 0) p.set("amenities", selectedAmenities.join(","));
 
         router.push(`/hostels?${p.toString()}`);
@@ -78,7 +104,6 @@ export default function HostelFilters() {
 
     const clearFilters = () => {
         setQuery("");
-        setCity("");
         setUniversity("");
         setGender("");
         setRoomConfig("");
@@ -99,15 +124,70 @@ export default function HostelFilters() {
             <div className="flex flex-col lg:flex-row items-center gap-2 lg:gap-0">
                 
                 {/* Smart Global Search */}
-                <div className="flex-1 w-full lg:w-auto relative group flex items-center hover:bg-gray-50 dark:hover:bg-slate-800/50 rounded-xl lg:rounded-2xl transition-colors">
-                    <Search className="absolute left-5 text-gray-400 group-focus-within:text-blue-500 transition-colors" size={20} />
+                <div className="flex-1 w-full lg:w-auto relative group rounded-xl lg:rounded-2xl transition-all">
+                    <Search className={cn(
+                        "absolute left-5 top-1/2 -translate-y-1/2 transition-colors duration-300",
+                        isFocused ? "text-blue-500" : "text-gray-400"
+                    )} size={20} />
                     <input
                         value={query}
                         onChange={(e) => setQuery(e.target.value)}
-                        onKeyDown={(e) => e.key === "Enter" && handleApply()}
+                        onFocus={() => setIsFocused(true)}
+                        onBlur={() => setTimeout(() => setIsFocused(false), 200)}
+                        onKeyDown={(e) => {
+                            if (e.key === "Enter") {
+                                handleApply();
+                                saveRecentSearch(query);
+                                setIsFocused(false);
+                            }
+                        }}
                         className="w-full h-14 bg-transparent pl-12 pr-4 outline-none font-semibold text-gray-900 dark:text-white placeholder:text-gray-400 text-sm lg:text-base"
                         placeholder="Search hostels, schools, or cities..."
                     />
+
+                    {/* Suggestions Dropdown */}
+                    {isFocused && (
+                        <div className="absolute top-full left-0 right-0 mt-3 bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 rounded-2xl shadow-2xl z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-300">
+                            {recentSearches.length > 0 && (
+                                <div className="p-4 border-b dark:border-slate-800">
+                                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3 flex items-center gap-2">
+                                        <Clock size={10} /> Recent Searches
+                                    </p>
+                                    <div className="flex flex-wrap gap-2">
+                                        {recentSearches.map(s => (
+                                            <button 
+                                                key={s} 
+                                                onClick={() => { setQuery(s); handleApply({ query: s }); setIsFocused(false); }}
+                                                className="px-3 py-1.5 bg-gray-50 dark:bg-slate-800 hover:bg-blue-50 dark:hover:bg-blue-500/10 text-xs font-medium text-gray-700 dark:text-gray-300 rounded-lg border border-gray-100 dark:border-slate-700 hover:border-blue-200 dark:hover:border-blue-500/30 transition-all"
+                                            >
+                                                {s}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+
+                            <div className="p-4">
+                                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3 flex items-center gap-2">
+                                    <Star size={10} className="text-yellow-500" /> Popular Schools
+                                </p>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-1">
+                                    {["KNUST", "University of Ghana", "UCC", "UPSA", "UDS"].map(uni => (
+                                        <button 
+                                            key={uni}
+                                            onClick={() => { setUniversity(uni); handleApply({ university: uni }); setIsFocused(false); }}
+                                            className="flex items-center gap-3 p-2.5 hover:bg-blue-50 dark:hover:bg-blue-500/10 rounded-xl text-left transition-all group"
+                                        >
+                                            <div className="w-8 h-8 rounded-lg bg-gray-50 dark:bg-slate-800 flex items-center justify-center text-gray-400 group-hover:bg-white dark:group-hover:bg-slate-700 group-hover:text-blue-500 transition-all">
+                                                <School size={14} />
+                                            </div>
+                                            <span className="text-sm font-semibold text-gray-700 dark:text-gray-300 group-hover:text-blue-600 dark:group-hover:text-blue-400">{uni}</span>
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                    )}
                 </div>
 
                 <div className="hidden lg:block w-px h-8 bg-gray-200 dark:bg-slate-800 mx-2" />
@@ -168,7 +248,27 @@ export default function HostelFilters() {
                     <PopoverContent className="w-80 p-6 rounded-2xl border-gray-100 dark:border-slate-800 shadow-2xl space-y-8 bg-white dark:bg-slate-900" align="end">
                         <div className="flex items-center justify-between border-b dark:border-slate-800 pb-4">
                             <h3 className="font-bold text-gray-900 dark:text-white text-sm">Filters</h3>
-                            <button onClick={clearFilters} className="text-[10px] font-bold text-blue-600 dark:text-blue-400 hover:underline uppercase tracking-widest">Reset All</button>
+                            <button onClick={() => { clearFilters(); setAvailableOnly(false); }} className="text-[10px] font-bold text-blue-600 dark:text-blue-400 hover:underline uppercase tracking-widest">Reset All</button>
+                        </div>
+
+                        {/* Availability Toggle */}
+                        <div className="flex items-center justify-between p-4 bg-emerald-50/50 dark:bg-emerald-500/5 rounded-2xl border border-emerald-100 dark:border-emerald-500/10">
+                            <div className="space-y-0.5">
+                                <p className="text-xs font-bold text-emerald-700 dark:text-emerald-400">Available Only</p>
+                                <p className="text-[9px] font-medium text-emerald-600/70 dark:text-emerald-400/50">Hide hostels with no rooms left</p>
+                            </div>
+                            <button 
+                                onClick={() => setAvailableOnly(!availableOnly)}
+                                className={cn(
+                                    "w-10 h-5 rounded-full transition-all relative",
+                                    availableOnly ? "bg-emerald-500 shadow-md shadow-emerald-500/20" : "bg-gray-200 dark:bg-slate-800"
+                                )}
+                            >
+                                <div className={cn(
+                                    "absolute top-1 w-3 h-3 bg-white rounded-full transition-all",
+                                    availableOnly ? "left-6" : "left-1"
+                                )} />
+                            </button>
                         </div>
 
                         {/* Room Config */}
@@ -251,7 +351,7 @@ export default function HostelFilters() {
                 </Popover>
 
                 {/* Reset Shortcut */}
-                {(query || city || university || gender || minPrice || selectedAmenities.length > 0) && (
+                {(query || university || gender || minPrice || selectedAmenities.length > 0) && (
                     <button 
                         onClick={clearFilters}
                         className="h-14 w-14 lg:ml-2 flex items-center justify-center rounded-xl lg:rounded-[1.5rem] bg-red-50 dark:bg-red-500/10 text-red-500 hover:bg-red-100 dark:hover:bg-red-500/20 transition-colors shrink-0"
@@ -261,6 +361,43 @@ export default function HostelFilters() {
                     </button>
                 )}
             </div>
+
+            {/* Active Filter Chips */}
+            {(query || university || gender || roomConfig || minPrice || maxPrice || selectedAmenities.length > 0) && (
+                <div className="flex flex-wrap items-center gap-2 mt-4 px-2">
+                    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mr-2">Active Filters:</span>
+                    
+                    {query && (
+                        <FilterChip label={`"${query}"`} onRemove={() => { setQuery(""); handleApply({ query: "" }); }} />
+                    )}
+                    {university && (
+                        <FilterChip label={university} onRemove={() => { setUniversity(""); handleApply({ university: "" }); }} />
+                    )}
+                    {gender && (
+                        <FilterChip label={gender === "MIXED" ? "Mixed" : gender === "MALE" ? "Males Only" : "Females Only"} onRemove={() => { setGender(""); handleApply({ gender: "" }); }} />
+                    )}
+                    {roomConfig && (
+                        <FilterChip label={roomConfig} onRemove={() => { setRoomConfig(""); handleApply({ roomConfig: "" }); }} />
+                    )}
+                    {selectedAmenities.map(a => (
+                        <FilterChip key={a} label={a} onRemove={() => toggleAmenity(a)} />
+                    ))}
+                    {(minPrice || maxPrice) && (
+                        <FilterChip label={`₵${minPrice || 0} - ₵${maxPrice || 'Any'}`} onRemove={() => { setMinPrice(""); setMaxPrice(""); handleApply({ minPrice: "", maxPrice: "" }); }} />
+                    )}
+                </div>
+            )}
+        </div>
+    );
+}
+
+function FilterChip({ label, onRemove }: { label: string; onRemove: () => void }) {
+    return (
+        <div className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 dark:bg-blue-500/10 border border-blue-100 dark:border-blue-500/20 rounded-full text-[10px] font-bold text-blue-600 dark:text-blue-400">
+            {label}
+            <button onClick={onRemove} className="hover:text-blue-800 dark:hover:text-blue-200 transition-colors">
+                <X size={10} />
+            </button>
         </div>
     );
 }

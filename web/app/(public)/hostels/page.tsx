@@ -177,8 +177,8 @@ function HostelsListingContent() {
                             className={cn(
                                 "flex items-center gap-2 h-8 px-4 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-all",
                                 view === "map"
-                                    ? "bg-white text-gray-900 shadow-sm"
-                                    : "text-gray-400 hover:text-gray-700"
+                                    ? "bg-white dark:bg-slate-700 text-gray-900 dark:text-white shadow-sm"
+                                    : "text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
                             )}
                         >
                             <Map size={13} /> Map

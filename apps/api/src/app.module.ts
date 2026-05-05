@@ -26,8 +26,8 @@ import { ReviewsModule } from "./modules/reviews/reviews.module";
 import { ChatModule } from "./modules/chat/chat.module";
 import { NewsletterModule } from "./modules/newsletter/newsletter.module";
 import { FavoritesModule } from "./modules/favorites/favorites.module";
-// import { SearchModule } from "./modules/search/search.module"; // Temporarily disabled
-
+import { SearchModule } from "./modules/search/search.module";
+import { BullModule } from "@nestjs/bullmq";
 import { AppController } from "./app.controller";
 
 @Module({
@@ -55,7 +55,16 @@ import { AppController } from "./app.controller";
     ChatModule,
     NewsletterModule,
     FavoritesModule,
-    // SearchModule, // Temporarily disabled due to LangChain ES module issues
+    SearchModule,
+    BullModule.forRootAsync({
+      inject: [ConfigService],
+      useFactory: (config: ConfigService) => ({
+        connection: {
+          host: config.get<string>("REDIS_HOST") || "localhost",
+          port: config.get<number>("REDIS_PORT") || 6379,
+        },
+      }),
+    }),
     ScheduleModule.forRoot(),
     ThrottlerModule.forRoot([
       {

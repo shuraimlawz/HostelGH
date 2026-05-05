@@ -623,9 +623,40 @@ export class AdminService {
   } // Deprecated in favor of toggleUserSuspension
 
   async getDisputes(query: AdminQueryDto) {
+    const { page = 1, limit = 10, search, status } = query;
+    const skip = (page - 1) * limit;
+
+    const where: any = {};
+    if (status) where.status = status;
+    if (search) {
+      where.OR = [
+        { reason: { contains: search, mode: 'insensitive' } },
+        { booking: { id: { contains: search, mode: 'insensitive' } } },
+        { booking: { tenant: { email: { contains: search, mode: 'insensitive' } } } },
+      ];
+    }
+
+    const [data, total] = await Promise.all([
+      this.prisma.dispute.findMany({
+        where,
+        include: {
+          booking: {
+            include: {
+              tenant: { select: { firstName: true, email: true } },
+              hostel: { select: { name: true } }
+            }
+          }
+        },
+        orderBy: { createdAt: 'desc' },
+        skip,
+        take: limit
+      }),
+      this.prisma.dispute.count({ where })
+    ]);
+
     return {
-      data: [],
-      meta: { total: 0, page: query.page || 1, limit: query.limit || 10, totalPages: 0 }
+      data,
+      meta: { total, page, limit, totalPages: Math.ceil(total / limit) }
     };
   }
 
@@ -672,14 +703,21 @@ export class AdminService {
   }
 
   async getFinancialStats() {
-    const totalVolume = await this.prisma.payment.aggregate({
-      _sum: { amount: true },
-      where: { status: 'SUCCESS' }
-    });
+    const [totalVolume, pendingPayouts] = await Promise.all([
+      this.prisma.payment.aggregate({
+        _sum: { amount: true },
+        where: { status: 'SUCCESS' }
+      }),
+      this.prisma.payment.aggregate({
+        _sum: { ownerEarnings: true },
+        where: { status: 'SUCCESS', booking: { status: { notIn: ['COMPLETED', 'CANCELLED'] } } }
+      })
+    ]);
+
     return {
       totalVolume: totalVolume._sum.amount || 0,
-      escrowBalance: 0,
-      pendingPayouts: 0
+      escrowBalance: pendingPayouts._sum.ownerEarnings || 0, // Roughly earnings not yet disbursed
+      pendingPayouts: pendingPayouts._sum.ownerEarnings || 0
     };
   }
 

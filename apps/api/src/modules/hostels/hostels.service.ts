@@ -7,7 +7,9 @@ import {
 import { PrismaService } from "../../prisma/prisma.service";
 import { UserRole, RoomGender, BookingStatus } from "@prisma/client";
 import { RedisService } from "../redis/redis.service";
-// import { SearchService } from "../search/search.service"; // Temporarily disabled
+import { InjectQueue } from "@nestjs/bullmq";
+import { Queue } from "bullmq";
+import { SearchService } from "../search/search.service";
 import { SubscriptionsService } from "../subscriptions/subscriptions.service";
 import {
   AdminAuditLogService,
@@ -27,7 +29,8 @@ export class HostelsService {
     private readonly redis: RedisService,
     private readonly subscriptions: SubscriptionsService,
     private readonly audit: AdminAuditLogService,
-    // private readonly search: SearchService, // Temporarily disabled
+    private readonly search: SearchService,
+    @InjectQueue("hostel-indexing") private readonly indexingQueue: Queue,
   ) { }
 
   async create(ownerId: string, dto: CreateHostelDto) {
@@ -87,6 +90,11 @@ export class HostelsService {
       { requiresVerification: isFirstHostel },
     );
 
+    // Indexing (Background)
+    if (!hostel.pendingVerification) {
+      await this.indexingQueue.add("sync", { hostelId: hostel.id });
+    }
+
     return {
       ...hostel,
       requiresVerification: isFirstHostel,
@@ -99,10 +107,14 @@ export class HostelsService {
     });
     if (!hostel) throw new NotFoundException("Hostel not found");
 
-    return this.prisma.hostel.update({
+    const updated = await this.prisma.hostel.update({
       where: { id: hostelId },
       data: { isPublished: true, pendingVerification: false },
     });
+
+    await this.indexingQueue.add("sync", { hostelId });
+
+    return updated;
   }
 
   async rejectHostel(hostelId: string, reason?: string) {
@@ -111,10 +123,15 @@ export class HostelsService {
     });
     if (!hostel) throw new NotFoundException("Hostel not found");
 
-    return this.prisma.hostel.update({
+    const updated = await this.prisma.hostel.update({
       where: { id: hostelId },
       data: { isPublished: false, pendingVerification: false },
     });
+
+    // Remove from search index
+    await this.indexingQueue.add("sync", { hostelId });
+
+    return updated;
   }
 
   async update(actor: UserActor, hostelId: string, dto: UpdateHostelDto) {
@@ -132,10 +149,14 @@ export class HostelsService {
       }
     }
 
-    return this.prisma.hostel.update({
+    const updated = await this.prisma.hostel.update({
       where: { id: hostelId },
       data: dto,
     });
+
+    await this.indexingQueue.add("sync", { hostelId });
+
+    return updated;
   }
 
   async delete(actor: UserActor, hostelId: string) {
@@ -255,6 +276,7 @@ export class HostelsService {
     lng?: number;
     /** Radius in km (default 10) */
     radius?: number;
+    availableOnly?: string;
   }) {
     const searchQueryText = params.query;
 
@@ -292,6 +314,7 @@ export class HostelsService {
       gender,
       roomConfig,
       query,
+      availableOnly,
     } = params;
 
     // Smart Aliases Mapping
@@ -430,6 +453,8 @@ export class HostelsService {
     if (sort === "relevance") {
       // Use bookings count as a strong signal of popularity, then rating, then recency
       orderBy.push({ bookings: { _count: "desc" } }, { averageRating: "desc" }, { createdAt: "desc" });
+    } else if (sort === "rating") {
+      orderBy.push({ averageRating: "desc" }, { totalReviews: "desc" });
     } else if (sort === "price_asc") {
       orderBy.push({ minPrice: "asc" });
     } else if (sort === "price_desc") {
@@ -441,33 +466,11 @@ export class HostelsService {
     }
 
     // handle optional pagination
-    const take = params.limit ?? 12; // Adjusted to a smaller chunk for better infinite scroll experience
+    const take = params.limit ?? 12;
     const page = params.page ?? 1;
     const skip = (page - 1) * take;
 
-    // Build the university OR conditions across all known aliases
-    const universityConditions = universityFilters.length > 0
-      ? universityFilters.map(alias => ({ university: { contains: alias, mode: "insensitive" as const } }))
-      : null;
-
-    // Build the free-text OR conditions including fuzzy-expanded neighbours
-    const textOrConditions: any[] = searchQuery
-      ? [
-          { name: { contains: searchQuery, mode: "insensitive" } },
-          { city: { contains: searchQuery, mode: "insensitive" } },
-          { university: { contains: searchQuery, mode: "insensitive" } },
-          { description: { contains: searchQuery, mode: "insensitive" } },
-          { addressLine: { contains: searchQuery, mode: "insensitive" } },
-          // Add fuzzy-expanded neighbours so typos still find results
-          ...fuzzyExpandedTerms.map(term => ({ name: { contains: term, mode: "insensitive" as const } })),
-          ...fuzzyExpandedTerms.map(term => ({ city: { contains: term, mode: "insensitive" as const } })),
-          ...fuzzyExpandedTerms.map(term => ({ addressLine: { contains: term, mode: "insensitive" as const } })),
-        ]
-      : [];
-
-    // When we have BOTH a university filter AND a text query we combine with AND:
-    // hostel must match one of the university aliases AND match the text query.
-    // When we only have one of them, that one acts alone.
+    // 1. Initialize Base Conditions
     const whereConditions: any = {
       isPublished: true,
       city: city ? { contains: city, mode: "insensitive" } : undefined,
@@ -478,18 +481,53 @@ export class HostelsService {
           ? { hasEvery: amenitiesFilter }
           : undefined,
       bookingStatus: { not: "CLOSED" },
+      // Optional: Show only hostels with physical space left
+      ...(params.availableOnly === "true" ? {
+        rooms: {
+          some: {
+            isActive: true,
+            availableSlots: { gt: 0 }
+          }
+        }
+      } : {}),
       minPrice:
         minPriceFilter !== undefined || maxPriceFilter !== undefined
-          ? { gte: minPriceFilter, lte: maxPriceFilter }
+          ? {
+              gte: minPriceFilter,
+              lte: maxPriceFilter,
+            }
           : undefined,
-      rooms: {
+    };
+
+    // 2. Room Configuration Filter
+    if (roomConfigFilter) {
+      whereConditions.rooms = {
         some: {
           isActive: true,
-          availableSlots: { gt: 0 },
-          roomConfiguration: roomConfigFilter ? { equals: roomConfigFilter } : undefined,
+          roomConfiguration: { contains: roomConfigFilter, mode: "insensitive" },
         },
-      },
-    };
+      };
+    }
+
+    // 3. Search Query Logic
+    const textOrConditions = [];
+    if (searchQuery) {
+      textOrConditions.push(
+        { name: { contains: searchQuery, mode: "insensitive" } },
+        { city: { contains: searchQuery, mode: "insensitive" } },
+        { addressLine: { contains: searchQuery, mode: "insensitive" } },
+        { description: { contains: searchQuery, mode: "insensitive" } },
+      );
+
+      // Add fuzzy matches
+      fuzzyExpandedTerms.forEach(term => {
+        textOrConditions.push({ name: { contains: term, mode: "insensitive" } });
+      });
+    }
+
+    const universityConditions = universityFilters.length > 0
+      ? universityFilters.map(u => ({ university: { contains: u, mode: "insensitive" } }))
+      : null;
 
     // Attach OR conditions intelligently
     if (universityConditions && textOrConditions.length > 0) {
@@ -504,54 +542,85 @@ export class HostelsService {
       whereConditions.OR = textOrConditions;
     }
 
-    let results = await this.prisma.hostel.findMany({
-      where: whereConditions,
-      include: { rooms: { where: { isActive: true } } },
-      orderBy: orderBy,
-      ...(skip !== undefined ? { skip } : {}),
-      ...(take !== undefined ? { take } : {}),
-    });
-
-    // ── Geo-filter & sort if lat/lng provided ──────────────────────────────
-    const { lat, lng, radius = 10 } = params;
-    if (lat !== undefined && lng !== undefined) {
-      const haversine = (lat1: number, lon1: number, lat2: number, lon2: number) => {
-        const R = 6371; // Earth radius km
-        const dLat = ((lat2 - lat1) * Math.PI) / 180;
-        const dLon = ((lon2 - lon1) * Math.PI) / 180;
-        const a =
-          Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-          Math.cos((lat1 * Math.PI) / 180) *
-            Math.cos((lat2 * Math.PI) / 180) *
-            Math.sin(dLon / 2) *
-            Math.sin(dLon / 2);
-        return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-      };
-
-      // Attach distance and filter by radius
-      const withDistance = results
-        .map((h) => ({
-          ...h,
-          distanceKm:
-            h.latitude !== null && h.longitude !== null
-              ? haversine(lat, lng, h.latitude, h.longitude)
-              : null,
-        }))
-        .filter((h) => h.distanceKm === null || h.distanceKm <= radius);
-
-      // Sort nearest first (override other sorts when geo is active)
-      withDistance.sort((a, b) => {
-        if (a.distanceKm === null) return 1;
-        if (b.distanceKm === null) return -1;
-        return a.distanceKm - b.distanceKm;
-      });
-
-      await this.redis.setJson(cacheKey, withDistance, 300);
-      return withDistance;
+    // -----------------------------------------------------------------------
+    // SCALABLE SEARCH ARCHITECTURE (Redis -> Elasticsearch -> Prisma Fallback)
+    // -----------------------------------------------------------------------
+    
+    // 1. Check Redis Cache First
+    const cacheKey = `search:${JSON.stringify(params)}`;
+    const cachedResults = await this.redis.get(cacheKey);
+    if (cachedResults) {
+      this.logger.debug(`Search Cache Hit: ${cacheKey}`);
+      try { return JSON.parse(cachedResults); } catch (e) {}
     }
 
-    await this.redis.setJson(cacheKey, results, 300); // 5 minutes cache
-    return results;
+    try {
+      // 2. Query Elasticsearch
+      const esResults = await this.search.searchHostels({
+        query: searchQuery,
+        city,
+        university: universityFilter,
+        gender: genderFilter,
+        minPrice: minPriceFilter,
+        maxPrice: maxPriceFilter,
+        amenities: amenitiesFilter,
+        sort,
+        limit: take,
+        offset: skip,
+      });
+
+      if (esResults && esResults.data.length > 0) {
+        const result = {
+          data: esResults.data,
+          total: esResults.total,
+          meta: {
+            total: esResults.total,
+            page,
+            limit: take,
+            totalPages: Math.ceil(esResults.total / take),
+          },
+          source: "elasticsearch"
+        };
+        
+        // Cache for 5 minutes
+        await this.redis.set(cacheKey, JSON.stringify(result), 300);
+        return result;
+      }
+    } catch (error) {
+      this.logger.error("Elasticsearch search failed, falling back to Prisma", error.stack);
+    }
+
+    // 3. Fallback to Prisma Database Query (Legacy Logic)
+    const [data, total] = await Promise.all([
+      this.prisma.hostel.findMany({
+        where: whereConditions,
+        include: {
+          rooms: { where: { isActive: true } },
+          _count: { select: { rooms: true } },
+        },
+        orderBy,
+        skip,
+        take,
+      }),
+      this.prisma.hostel.count({ where: whereConditions }),
+    ]);
+
+    const finalResult = {
+      data,
+      total,
+      meta: {
+        total,
+        page,
+        limit: take,
+        totalPages: Math.ceil(total / take),
+      },
+      source: "prisma_fallback"
+    };
+
+    // Cache fallback results too (shorter TTL)
+    await this.redis.set(cacheKey, JSON.stringify(finalResult), 60);
+    
+    return finalResult;
   }
 
   async getPublicById(idOrSlug: string, actor?: UserActor) {

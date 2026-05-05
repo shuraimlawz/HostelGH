@@ -4,10 +4,10 @@ import { HostelsController } from "./hostels.controller";
 import { PrismaModule } from "../../prisma/prisma.module";
 import { UploadModule } from "../upload/upload.module";
 import { AuditModule } from "../audit/audit.module";
-// import { SearchModule } from "../search/search.module"; // Temporarily disabled
+import { SearchModule } from "../search/search.module";
 
 @Module({
-  imports: [PrismaModule, UploadModule, AuditModule], // SearchModule temporarily disabled
+  imports: [PrismaModule, UploadModule, AuditModule, SearchModule],
   providers: [HostelsService],
   controllers: [HostelsController],
   exports: [HostelsService],

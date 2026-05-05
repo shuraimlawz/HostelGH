@@ -118,8 +118,9 @@ export default function HostelMap({
 
             const icon = L.divIcon({
                 html: iconHtml,
-                className: "",
-                iconAnchor: singlePin ? [20, 40] : [0, 0],
+                className: "custom-div-icon",
+                iconSize: [0, 0], // Let CSS handle sizing, but needs a size to render
+                iconAnchor: singlePin ? [20, 40] : [20, 15],
             });
 
             const marker = L.marker([m.lat, m.lng], { icon })
@@ -139,12 +140,16 @@ export default function HostelMap({
             markersRef.current.set(m.id, marker);
         });
 
-        // Fit bounds if multiple markers
-        if (markers.length > 1 && !center) {
+        // Center map based on markers if no explicit center provided
+        if (markers.length > 0 && !center) {
             const coords = markers.map((m) => [m.lat, m.lng] as [number, number]);
-            try {
-                map.fitBounds(coords, { padding: [40, 40], maxZoom: 15 });
-            } catch { /* ignore */ }
+            if (markers.length === 1) {
+                map.setView(coords[0], zoom || 15);
+            } else {
+                try {
+                    map.fitBounds(coords, { padding: [40, 40], maxZoom: 15 });
+                } catch { /* ignore */ }
+            }
         }
     };
 

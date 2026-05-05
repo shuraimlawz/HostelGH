@@ -1,123 +1,165 @@
 import { Injectable, OnModuleInit, Logger } from "@nestjs/common";
-import { ConfigService } from "@nestjs/config";
-import { Meilisearch } from "meilisearch";
+import { ElasticsearchService } from "@nestjs/elasticsearch";
 import { PrismaService } from "../../prisma/prisma.service";
-import { OpenAIEmbeddings } from "@langchain/openai";
 
 @Injectable()
 export class SearchService implements OnModuleInit {
   private readonly logger = new Logger(SearchService.name);
-  private client: Meilisearch | null = null;
-  private embeddings: OpenAIEmbeddings | null = null;
+  private readonly index = "hostels";
 
   constructor(
-    private config: ConfigService,
-    private prisma: PrismaService,
-  ) {
-    const host = this.config.get<string>("MEILISEARCH_HOST");
-    const apiKey = this.config.get<string>("MEILISEARCH_KEY");
-    const openAIKey = this.config.get<string>("OPENAI_API_KEY");
-
-    if (host && apiKey) {
-      this.client = new Meilisearch({ host, apiKey });
-    }
-
-    if (openAIKey) {
-      this.embeddings = new OpenAIEmbeddings({
-        openAIApiKey: openAIKey,
-        modelName: "text-embedding-3-small",
-      });
-    }
-  }
+    private readonly elasticsearchService: ElasticsearchService,
+    private readonly prisma: PrismaService,
+  ) {}
 
   async onModuleInit() {
-    if (!this.client) {
-      this.logger.warn("Meilisearch not configured. Search fallback to Prisma.");
-    } else {
-      await this.setupIndex();
-    }
-
-    if (!this.embeddings) {
-      this.logger.warn("OpenAI Embeddings not configured. Semantic search disabled.");
-    }
+    await this.setupIndex();
   }
 
   private async setupIndex() {
     try {
-      const index = this.client!.index("hostels");
-      await index.updateSettings({
-        searchableAttributes: ["name", "description", "city", "university", "amenities"],
-        filterableAttributes: ["gender", "minPrice", "university", "city", "isPublished"],
-        sortableAttributes: ["minPrice", "rating", "createdAt", "averageRating"],
-        rankingRules: [
-          "words",
-          "typo",
-          "proximity",
-          "attribute",
-          "sort",
-          "exactness",
-          "isFeatured:desc",
-        ],
+      const indexExists = await this.elasticsearchService.indices.exists({
+        index: this.index,
       });
-      this.logger.log("Meilisearch index 'hostels' configured.");
+
+      if (!indexExists) {
+        await this.elasticsearchService.indices.create({
+          index: this.index,
+          body: {
+            settings: {
+              analysis: {
+                analyzer: {
+                  custom_analyzer: {
+                    type: "custom",
+                    tokenizer: "standard",
+                    filter: ["lowercase", "trim"],
+                  },
+                },
+              },
+            },
+            mappings: {
+              properties: {
+                id: { type: "keyword" },
+                name: { type: "text", analyzer: "custom_analyzer" },
+                description: { type: "text", analyzer: "custom_analyzer" },
+                city: { type: "keyword" },
+                university: { type: "keyword" },
+                location: { type: "text", analyzer: "custom_analyzer" },
+                price: { type: "integer" },
+                amenities: { type: "keyword" },
+                gender: { type: "keyword" },
+                isPublished: { type: "boolean" },
+                isFeatured: { type: "boolean" },
+                rating: { type: "float" },
+                createdAt: { type: "date" },
+              },
+            },
+          },
+        });
+        this.logger.log("Elasticsearch index 'hostels' created with mappings.");
+      }
     } catch (error) {
-      this.logger.error("Failed to setup Meilisearch index", (error as Error).stack);
+      this.logger.error("Failed to setup Elasticsearch index", (error as Error).stack);
     }
   }
 
-  async syncHostels() {
-    const hostels = await this.prisma.hostel.findMany({
-      where: { isPublished: true },
-      include: {
-        rooms: { where: { isActive: true } },
-      },
+  async indexHostel(hostelId: string) {
+    const h = await this.prisma.hostel.findUnique({
+      where: { id: hostelId },
+      include: { rooms: { where: { isActive: true } } },
     });
 
-    if (this.client) {
-      const documents = hostels.map((h) => ({
+    if (!h || !h.isPublished) {
+      // If hostel was deleted or unpublished, remove from index
+      try {
+        await this.elasticsearchService.delete({
+          index: this.index,
+          id: hostelId,
+        });
+      } catch (e) {}
+      return;
+    }
+
+    await this.elasticsearchService.index({
+      index: this.index,
+      id: h.id,
+      body: {
         id: h.id,
         name: h.name,
         description: h.description,
         city: h.city,
         university: h.university,
-        gender: h.genderCategory,
-        minPrice: h.minPrice,
-        rating: h.averageRating,
+        location: `${h.city} ${h.addressLine}`,
+        price: h.minPrice,
         amenities: h.amenities,
+        gender: h.genderCategory,
         isPublished: h.isPublished,
         isFeatured: h.isFeatured,
+        rating: h.averageRating,
         createdAt: h.createdAt,
-      }));
-
-      await this.client.index("hostels").addDocuments(documents);
-      this.logger.log(`Synced ${documents.length} hostels to Meilisearch.`);
-    }
-
-    // In a real scenario, we would also store embeddings in a vector DB (like PGVector)
-    if (this.embeddings) {
-      this.logger.log("Generating embeddings for hostels (Phase 3 simulation)...");
-      // This is where we'd generate embeddings and save to vector store
-    }
-  }
-
-  async search(query: string, options: any = {}) {
-    if (!this.client) return null;
-
-    const index = this.client.index("hostels");
-    return index.search(query, {
-      limit: options.limit || 20,
-      offset: options.offset || 0,
-      filter: options.filter,
-      sort: options.sort,
+      },
     });
+    this.logger.debug(`Indexed hostel ${h.name} in Elasticsearch.`);
   }
 
-  async semanticSearch(query: string) {
-    if (!this.embeddings) return null;
+  async searchHostels(params: any) {
+    const { query, city, minPrice, maxPrice, gender, amenities, university, sort, limit = 12, offset = 0 } = params;
+
+    const must: any[] = [{ term: { isPublished: true } }];
+    const filter: any[] = [];
+
+    if (query) {
+      must.push({
+        multi_match: {
+          query,
+          fields: ["name^3", "description", "location^2", "university"],
+          fuzziness: "AUTO",
+        },
+      });
+    }
+
+    if (city) filter.push({ term: { city } });
+    if (university) filter.push({ term: { university } });
+    if (gender) filter.push({ term: { gender } });
     
-    this.logger.log(`Performing semantic AI search for: ${query}`);
-    const vector = await this.embeddings.embedQuery(query);
-    // In production, you would perform a vector search against PGVector or Pinecone here.
-    return vector; 
+    if (minPrice !== undefined || maxPrice !== undefined) {
+      filter.push({
+        range: {
+          price: {
+            gte: minPrice,
+            lte: maxPrice,
+          },
+        },
+      });
+    }
+
+    if (amenities && amenities.length > 0) {
+      amenities.forEach((a: string) => {
+        filter.push({ term: { amenities: a } });
+      });
+    }
+
+    let sortOption: any = [{ isFeatured: "desc" }];
+    if (sort === "price_asc") sortOption.push({ price: "asc" });
+    else if (sort === "price_desc") sortOption.push({ price: "desc" });
+    else if (sort === "rating") sortOption.push({ rating: "desc" });
+    else sortOption.push({ createdAt: "desc" });
+
+    const response = await this.elasticsearchService.search({
+      index: this.index,
+      body: {
+        query: {
+          bool: { must, filter },
+        },
+        sort: sortOption,
+        from: offset,
+        size: limit,
+      },
+    });
+
+    return {
+      total: (response.hits.total as any).value,
+      data: response.hits.hits.map((hit) => hit._source),
+    };
   }
 }

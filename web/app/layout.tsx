@@ -40,13 +40,14 @@ export const metadata: Metadata = {
   },
   openGraph: {
     type: "website",
-    url: "/",
+    url: "https://hostelgh.vercel.app",
     title: "HostelGH – Find & Book Affordable Hostels in Ghana",
     description:
-      "Search, compare and book verified student hostels in Ghana.",
+      "Search, compare and book verified student hostels in Ghana. The #1 platform for student accommodation.",
     siteName: "HostelGH",
+    locale: "en_GH",
     images: [
-      { url: "/og.png", width: 1200, height: 630, alt: "HostelGH" },
+      { url: "/og.png", width: 1200, height: 630, alt: "HostelGH Preview" },
     ],
   },
   twitter: {
@@ -55,6 +56,7 @@ export const metadata: Metadata = {
     description:
       "Search, compare and book verified student hostels in Ghana.",
     images: ["/og.png"],
+    creator: "@hostelgh",
   },
   robots: {
     index: true,

@@ -153,6 +153,13 @@ async function main() {
                 bookingStatus: "OPEN",
                 genderCategory: "MIXED",
                 utilitiesIncluded: ["Water", "Trash", "Electricity"],
+                // Coordinates
+                latitude: location.city === "Accra" ? 5.65 + (Math.random() - 0.5) * 0.05 : 
+                          location.city === "Kumasi" ? 6.67 + (Math.random() - 0.5) * 0.05 : 
+                          5.10 + (Math.random() - 0.5) * 0.05,
+                longitude: location.city === "Accra" ? -0.18 + (Math.random() - 0.5) * 0.05 : 
+                           location.city === "Kumasi" ? -1.57 + (Math.random() - 0.5) * 0.05 : 
+                           -1.28 + (Math.random() - 0.5) * 0.05,
             },
         });
 

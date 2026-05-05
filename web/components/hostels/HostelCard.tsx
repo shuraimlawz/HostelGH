@@ -51,7 +51,7 @@ export default function HostelCard({ hostel, compact = false }: { hostel: any, c
 
     return (
         <Link href={`/hostels/${hostel.id}`} className="group block h-full">
-            <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden hover:shadow-2xl hover:shadow-gray-200/50 transition-all duration-500 flex flex-col h-full active:scale-[0.98]">
+            <div className="bg-white dark:bg-slate-900 rounded-2xl border border-gray-100 dark:border-slate-800 overflow-hidden hover:shadow-2xl hover:shadow-gray-200/50 dark:hover:shadow-none dark:hover:border-blue-500/50 transition-all duration-500 flex flex-col h-full active:scale-[0.98]">
                 {/* Media Section */}
                 <div className="relative aspect-[16/11] overflow-hidden bg-gray-50">
                     {hostel.images?.[0] ? (
@@ -73,9 +73,25 @@ export default function HostelCard({ hostel, compact = false }: { hostel: any, c
                                 Premium
                             </div>
                         )}
-                        {hasAvailableRooms && (
-                            <div className="h-6 px-2.5 flex items-center bg-emerald-600/90 text-white text-[9px] font-bold uppercase tracking-widest rounded-lg backdrop-blur-md shadow-sm border border-emerald-500/50">
-                                Instant Stay
+                        {hasAvailableRooms ? (
+                            (() => {
+                                const totalAvailable = hostel.rooms?.reduce((acc: number, r: any) => acc + (r.availableSlots || 0), 0) || 0;
+                                if (totalAvailable < 5 && totalAvailable > 0) {
+                                    return (
+                                        <div className="h-6 px-2.5 flex items-center bg-orange-600/90 text-white text-[9px] font-bold uppercase tracking-widest rounded-lg backdrop-blur-md shadow-sm border border-orange-500/50 animate-pulse">
+                                            High Demand: {totalAvailable} Left
+                                        </div>
+                                    );
+                                }
+                                return (
+                                    <div className="h-6 px-2.5 flex items-center bg-emerald-600/90 text-white text-[9px] font-bold uppercase tracking-widest rounded-lg backdrop-blur-md shadow-sm border border-emerald-500/50">
+                                        Instant Stay
+                                    </div>
+                                );
+                            })()
+                        ) : (
+                            <div className="h-6 px-2.5 flex items-center bg-red-600/90 text-white text-[9px] font-bold uppercase tracking-widest rounded-lg backdrop-blur-md shadow-sm border border-red-500/50">
+                                Fully Booked
                             </div>
                         )}
                     </div>
@@ -142,7 +158,7 @@ export default function HostelCard({ hostel, compact = false }: { hostel: any, c
                             <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest leading-none mb-1">Starts From</span>
                             <span className="text-sm font-bold text-gray-900 tracking-tight">₵{minPrice?.toLocaleString() || "---"} <span className="text-[10px] text-gray-400 font-medium">/ term</span></span>
                         </div>
-                        <div className="h-9 px-4 rounded-xl bg-gray-900 text-white text-[10px] font-bold uppercase tracking-widest flex items-center gap-2 group-hover:bg-blue-600 transition-all shadow-md shadow-gray-900/10">
+                        <div className="h-9 px-4 rounded-xl bg-gray-900 dark:bg-blue-600 text-white text-[10px] font-bold uppercase tracking-widest flex items-center gap-2 group-hover:bg-blue-600 dark:group-hover:bg-blue-700 transition-all shadow-md dark:shadow-none">
                             Book Now <ArrowUpRight size={12} />
                         </div>
                     </div>

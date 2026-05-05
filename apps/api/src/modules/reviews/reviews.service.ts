@@ -24,7 +24,7 @@ export class ReviewsService {
     if (!hostel) throw new NotFoundException("Hostel not found");
 
     // Check if review already exists for this booking
-    if (bookingId) {
+    if (bookingId && bookingId.trim() !== "") {
       const existing = await this.prisma.review.findUnique({ where: { bookingId } });
       if (existing) throw new BadRequestException("You have already reviewed this stay");
 
@@ -39,7 +39,7 @@ export class ReviewsService {
       data: {
         tenantId,
         hostelId,
-        bookingId,
+        bookingId: (bookingId && bookingId.trim() !== "") ? bookingId : undefined,
         rating,
         cleanliness,
         comfort,
