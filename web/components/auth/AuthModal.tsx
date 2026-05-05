@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import LoginForm from "./LoginForm";
 import RegisterForm from "./RegisterForm";
 
@@ -83,7 +84,10 @@ export default function AuthModal({
 
                 {/* Footer info (optional for Airbnb style) */}
                 <div className="px-6 py-4 bg-muted/50 border-t text-[11px] text-muted-foreground leading-tight">
-                    By continuing, you agree to our <span className="underline cursor-pointer">Terms of Service</span>, <span className="underline cursor-pointer">Privacy Policy</span>, and <span className="underline cursor-pointer">Guest Refund Policy</span>.
+                    By continuing, you agree to our{" "}
+                    <Link href="/support/terms" onClick={onClose} className="underline cursor-pointer hover:text-primary transition-colors">Terms of Service</Link>,{" "}
+                    <Link href="/support/privacy" onClick={onClose} className="underline cursor-pointer hover:text-primary transition-colors">Privacy Policy</Link>, and{" "}
+                    <Link href="/support/help-center" onClick={onClose} className="underline cursor-pointer hover:text-primary transition-colors">Guest Refund Policy</Link>.
                 </div>
             </div>
 
