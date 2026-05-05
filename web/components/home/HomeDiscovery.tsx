@@ -237,50 +237,7 @@ function LastRoomsSection({ hostels, isLoading }: { hostels: any[]; isLoading: b
     );
 }
 
-// ── Schools Shortcut Strip ────────────────────────────────────────
-const FEATURED_SCHOOLS = [
-    { name: "KNUST", full: "Kwame Nkrumah Uni. of Science & Tech", href: "/schools/knust", color: "from-yellow-600 to-orange-600" },
-    { name: "UG Legon", full: "University of Ghana, Legon", href: "/schools/ug", color: "from-blue-700 to-indigo-700" },
-    { name: "UCC", full: "University of Cape Coast", href: "/schools/ucc", color: "from-green-700 to-teal-700" },
-    { name: "GCTU", full: "Ghana Communication Technology University", href: "/schools/gctu", color: "from-purple-700 to-violet-700" },
-    { name: "UHAS", full: "University of Health and Allied Sciences", href: "/schools/uhas", color: "from-pink-700 to-rose-700" },
-    { name: "UDS", full: "University for Development Studies", href: "/schools/uds", color: "from-cyan-700 to-sky-700" },
-];
 
-function SchoolsShortcut() {
-    return (
-        <div className="py-10 border-t border-gray-50">
-            <div className="flex items-center justify-between mb-6">
-                <div>
-                    <h3 className="text-xl font-bold tracking-tighter text-gray-900 uppercase">By School</h3>
-                    <p className="text-gray-400 text-xs font-medium uppercase tracking-widest mt-0.5">Browse hostels near your campus</p>
-                </div>
-                <Link href="/schools" className="group inline-flex items-center gap-2 h-9 px-4 bg-gray-100 hover:bg-gray-900 hover:text-white text-gray-700 rounded-xl font-bold text-[10px] uppercase tracking-widest transition-all">
-                    All Schools <ArrowRight size={13} className="group-hover:translate-x-0.5 transition-transform" />
-                </Link>
-            </div>
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-                {FEATURED_SCHOOLS.map(school => (
-                    <Link
-                        key={school.name}
-                        href={school.href}
-                        className={cn(
-                            "relative group rounded-2xl p-4 bg-gradient-to-br text-white overflow-hidden flex flex-col justify-end min-h-[100px] hover:shadow-xl transition-all duration-300 hover:-translate-y-0.5",
-                            school.color
-                        )}
-                    >
-                        <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors" />
-                        <div className="relative">
-                            <p className="font-black text-lg tracking-tight leading-tight">{school.name}</p>
-                            <p className="text-[9px] text-white/70 font-bold uppercase tracking-widest mt-0.5 leading-tight line-clamp-2">{school.full}</p>
-                        </div>
-                        <ArrowRight size={14} className="absolute top-3 right-3 text-white/50 group-hover:text-white group-hover:translate-x-0.5 transition-all" />
-                    </Link>
-                ))}
-            </div>
-        </div>
-    );
-}
 
 // ── Main Export ───────────────────────────────────────────────────
 export default function HomeDiscovery() {

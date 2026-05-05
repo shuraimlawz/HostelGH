@@ -30,7 +30,7 @@ export default function FeaturedHostels() {
                         </div>
                     </div>
                     <div className="space-y-2">
-                        <h3 className="text-4xl md:text-5xl font-bold tracking-tighter text-slate-900 dark:text-white uppercase leading-tight">
+                        <h3 className="text-4xl md:text-5xl font-bold tracking-tighter text-gray-900 dark:text-white uppercase leading-tight">
                             Trending <span className="text-blue-600">Spaces</span>
                         </h3>
                         <p className="text-gray-400 dark:text-gray-500 max-w-lg font-bold text-xs md:text-sm uppercase tracking-widest leading-relaxed">
