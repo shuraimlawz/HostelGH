@@ -403,8 +403,12 @@ function FilterContent({
                                 className="w-full h-14 bg-gray-50 dark:bg-slate-800 border border-gray-100 dark:border-slate-700 rounded-2xl px-12 outline-none font-bold text-xs text-gray-900 dark:text-white appearance-none focus:ring-2 focus:ring-blue-500/20 transition-all"
                             >
                                 <option value="">Any University</option>
-                                {REGIONAL_UNIVERSITIES.map(u => (
-                                    <option key={u} value={u}>{u}</option>
+                                {REGIONAL_UNIVERSITIES.map(group => (
+                                    <optgroup key={group.region} label={group.region} className="text-gray-500 font-bold bg-gray-50 dark:bg-slate-800">
+                                        {group.unis.map(u => (
+                                            <option key={u} value={u} className="text-gray-900 dark:text-white font-semibold bg-white dark:bg-slate-900">{u}</option>
+                                        ))}
+                                    </optgroup>
                                 ))}
                             </select>
                             <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" size={16} />
