@@ -123,7 +123,7 @@ export default function SupportWidget() {
         <div className="fixed bottom-4 right-4 sm:bottom-8 sm:right-8 z-[999] flex flex-col items-end gap-3 sm:gap-4 pointer-events-none">
             {/* Chat Window */}
             {isOpen && (
-                <div className="w-[calc(100vw-2rem)] sm:w-[380px] h-[500px] sm:h-[600px] max-h-[calc(100vh-120px)] sm:max-h-[700px] bg-white rounded-[2rem] shadow-[0_32px_64px_-16px_rgba(0,0,0,0.15)] border border-gray-100 flex flex-col overflow-hidden animate-in fade-in slide-in-from-bottom-8 duration-500 pointer-events-auto">
+                <div className="w-[calc(100vw-2rem)] sm:w-[380px] h-[500px] sm:h-[600px] max-h-[calc(100vh-120px)] sm:max-h-[700px] bg-card rounded-[2rem] shadow-[0_32px_64px_-16px_rgba(0,0,0,0.15)] border border-border flex flex-col overflow-hidden animate-in fade-in slide-in-from-bottom-8 duration-500 pointer-events-auto">
                     {/* Header */}
                     <div className="p-6 bg-blue-600 text-white flex items-center justify-between shadow-lg shadow-blue-500/10">
                         <div className="flex items-center gap-3">
@@ -148,7 +148,7 @@ export default function SupportWidget() {
                     {/* Messages */}
                     <div className="flex-1 overflow-y-auto p-6 space-y-4 scroll-smooth" ref={scrollRef}>
                         <div className="text-center pb-4">
-                            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Beginning of conversation</p>
+                            <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Beginning of conversation</p>
                         </div>
                         
                         {messages.map((msg, i) => {
@@ -164,11 +164,11 @@ export default function SupportWidget() {
                                         "max-w-[85%] px-4 py-3 rounded-2xl text-xs font-medium leading-relaxed",
                                         isMe 
                                             ? "bg-blue-600 text-white rounded-tr-none shadow-md shadow-blue-500/10" 
-                                            : "bg-gray-100 text-gray-900 rounded-tl-none"
+                                            : "bg-muted text-foreground rounded-tl-none"
                                     )}>
                                         {msg.content}
                                     </div>
-                                    <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mt-1.5 px-1">
+                                    <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest mt-1.5 px-1">
                                         {isAdmin ? "ADMIN " : (isMe ? "YOU • " : "")} {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                     </span>
                                 </div>
@@ -177,16 +177,16 @@ export default function SupportWidget() {
                     </div>
 
                     {/* Footer / Input */}
-                    <div className="p-6 border-t border-gray-50 bg-gray-50/50">
+                    <div className="p-6 border-t border-border bg-muted/30">
                         {isGuestInit ? (
                             <form onSubmit={handleGuestSubmit} className="space-y-4 animate-in fade-in zoom-in-95 duration-300">
-                                <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Enter your name to start</p>
+                                <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Enter your name to start</p>
                                 <input 
                                     type="text" 
                                     value={guestName}
                                     onChange={(e) => setGuestName(e.target.value)}
                                     placeholder="Your Display Name"
-                                    className="w-full h-12 px-4 rounded-xl bg-white border border-gray-100 text-xs font-bold outline-none focus:border-blue-500 transition-colors"
+                                    className="w-full h-12 px-4 rounded-xl bg-card border border-border text-xs font-bold outline-none focus:border-blue-500 transition-colors text-foreground"
                                     autoFocus
                                 />
                                 <Button type="submit" className="w-full bg-blue-600 h-12 rounded-xl text-[10px] font-bold uppercase tracking-widest">Connect to Admin</Button>
@@ -198,7 +198,7 @@ export default function SupportWidget() {
                                     value={newMessage}
                                     onChange={(e) => setNewMessage(e.target.value)}
                                     placeholder="Type your message..."
-                                    className="flex-1 h-12 pl-4 pr-12 rounded-xl bg-white border border-gray-100 text-xs font-medium outline-none focus:border-blue-500 transition-colors shadow-sm"
+                                    className="flex-1 h-12 pl-4 pr-12 rounded-xl bg-card border border-border text-xs font-medium outline-none focus:border-blue-500 transition-colors shadow-sm text-foreground"
                                 />
                                 <button type="submit" className="absolute right-1 w-10 h-10 flex items-center justify-center bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all active:scale-95 shadow-lg shadow-blue-500/20">
                                     <Send size={16} />
