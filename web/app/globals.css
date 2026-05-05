@@ -173,33 +173,18 @@
 }
 
 @layer utilities {
-  .dark .bg-white { background-color: hsl(222.2, 47.4%, 14%) !important; }
-  .dark .bg-gray-50 { background-color: hsl(222.2, 47.4%, 12%) !important; }
-  .dark .bg-gray-100 { background-color: hsl(222.2, 47.4%, 18%) !important; }
-  .dark .bg-gray-200 { background-color: hsl(222.2, 47.4%, 25%) !important; }
+  /* Cleaned up: Removed aggressive global overrides that leaked into light mode */
   
-  .dark .text-gray-900 { color: hsl(210, 40%, 98%) !important; }
-  .dark .text-gray-800 { color: hsl(210, 40%, 96%) !important; }
-  .dark .text-gray-700 { color: hsl(215, 20.2%, 80%) !important; }
-  .dark .text-gray-600 { color: hsl(215, 20.2%, 70%) !important; }
-  .dark .text-gray-500 { color: hsl(215, 20.2%, 60%) !important; }
-  .dark .text-gray-400 { color: hsl(215, 20.2%, 50%) !important; }
-
-  /* Ensure body always follows the theme background */
-  body {
-    background-color: hsl(var(--background)) !important;
-    color: hsl(var(--foreground)) !important;
-  }
-
-  /* Global Neutralization of "White Light" Shadows in Dark Mode */
   .dark [class*="shadow-"] { 
     --tw-shadow: 0 0 #0000;
     --tw-shadow-colored: 0 0 #0000;
-    box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+    box-shadow: none !important;
   }
+
   .dark .shadow-blue-100, .dark .shadow-gray-200, .dark .shadow-gray-100 {
     box-shadow: none !important;
   }
+
   .dark .group:hover .group-hover\:shadow-xl, 
   .dark .group:hover .group-hover\:shadow-2xl,
   .dark .hover\:shadow-xl:hover,
@@ -207,6 +192,7 @@
     box-shadow: none !important;
     border-color: hsl(222.2, 47.4%, 30%) !important;
   }
+  .dark .border-gray-200 { border-color: hsl(222.2, 47.4%, 25%) !important; }
   .dark .border-gray-200 { border-color: hsl(222.2, 47.4%, 25%) !important; }
 }
 
