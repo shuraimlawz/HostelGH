@@ -65,90 +65,74 @@ export default function Footer() {
             <div className="relative container mx-auto px-6 pt-16 pb-10">
 
                 {/* Top: Brand + tagline + CTA */}
-                <div className="grid gap-12 lg:grid-cols-[2fr_1fr] mb-14">
+                <div className="grid gap-10 lg:grid-cols-2 mb-16">
                     <div className="space-y-6">
-                        <div className="inline-flex items-center gap-3 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-white w-fit">
+                        <div className="flex items-center gap-2 text-white">
                             <LogoAnimation />
-                            <span className="uppercase tracking-[0.25em]">HostelGH</span>
+                            <span className="font-bold tracking-tight text-xl uppercase">HostelGH</span>
                         </div>
-                        <div>
-                            <p className="text-xs font-semibold uppercase tracking-[0.35em] text-blue-400/90 mb-3">
-                                Engineered for modern hostel living
-                            </p>
-                            <h2 className="text-3xl sm:text-4xl font-black leading-tight tracking-tight">
-                                Powerful and reliable.
-                                <span className="block text-blue-500">Full hostel automation you can afford.</span>
+                        <div className="space-y-4">
+                            <h2 className="text-3xl font-bold tracking-tight">
+                                Simple hostel booking.
+                                <span className="block text-blue-500">Fast and reliable.</span>
                             </h2>
-                            <p className="mt-4 text-zinc-400 text-sm leading-7 max-w-lg">
-                                A complete platform for students and hostel owners, designed with trusted workflows, secure payments, and a sleek digital experience that keeps every booking seamless.
+                            <p className="text-zinc-400 text-sm leading-6 max-w-md">
+                                Find and book verified hostels with ease. We make student housing simple for everyone.
                             </p>
                         </div>
-
-                        {/* Trust badges */}
-                        <div className="flex flex-wrap gap-3">
-                            {TRUST_BADGES.map(({ icon: Icon, label }) => (
-                                <div key={label} className="inline-flex items-center gap-2 rounded-full border border-white/8 bg-white/5 px-3 py-1.5 text-xs font-semibold text-zinc-300">
-                                    <Icon size={12} className="text-blue-400" />
-                                    {label}
-                                </div>
-                            ))}
-                        </div>
-
-                        <div className="flex flex-wrap gap-3">
+                        
+                        <div className="flex flex-wrap gap-4 pt-2">
                             <a
                                 href={WHATSAPP_CHANNEL}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="inline-flex h-9 items-center gap-2 rounded-2xl border border-blue-500/20 bg-white/5 px-4 text-sm font-semibold text-blue-100 transition hover:border-blue-400/40 hover:bg-blue-500/10"
+                                className="inline-flex h-10 items-center gap-2 rounded-xl bg-white/5 px-5 text-sm font-medium hover:bg-white/10 transition"
                             >
-                                <MessageCircle size={15} className="text-blue-400" />
-                                Join WhatsApp Channel
+                                <MessageCircle size={16} />
+                                Join WhatsApp
                             </a>
                             <a
                                 href="/support"
-                                className="inline-flex h-9 items-center gap-2 rounded-2xl bg-blue-500 px-4 text-sm font-semibold text-white transition hover:bg-blue-400"
+                                className="inline-flex h-10 items-center gap-2 rounded-xl bg-blue-600 px-5 text-sm font-medium hover:bg-blue-500 transition shadow-lg shadow-blue-600/20"
                             >
-                                <ArrowRight size={15} />
-                                Get Support
+                                Get Help
                             </a>
                         </div>
                     </div>
 
                     {/* Newsletter card */}
-                    <div className="rounded-[2rem] border border-white/10 bg-white/5 p-6 shadow-2xl shadow-blue-900/15 backdrop-blur-2xl self-start">
-                        <div className="flex items-center gap-3 mb-4">
-                            <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-blue-500 text-white shadow-[0_8px_20px_-10px_rgba(59,130,246,0.9)]">
-                                <Send size={16} />
-                            </div>
-                            <div>
-                                <p className="text-xs uppercase tracking-[0.3em] text-blue-300/80">Stay Informed</p>
-                                <p className="font-black text-white text-lg leading-tight">Subscribe to updates</p>
-                            </div>
+                    <div className="rounded-3xl border border-white/10 bg-white/[0.02] p-8 self-start">
+                        <div className="space-y-2 mb-6">
+                            <p className="text-xs font-bold uppercase tracking-widest text-blue-400">Get Updates</p>
+                            <h3 className="text-xl font-bold">Join our newsletter</h3>
+                            <p className="text-sm text-zinc-400">Stay updated with new listings and student housing tips.</p>
                         </div>
-                        <p className="text-xs text-zinc-400 mb-4 leading-relaxed">Get new listings, price drops, and student housing tips straight to your inbox.</p>
-                        <form className="space-y-3" onSubmit={handleSubscribe}>
-                            <label className="block text-sm font-semibold text-zinc-300" htmlFor="footer-email">
-                                Your email address
-                            </label>
-                            <div className="relative rounded-2xl border border-white/10 bg-[#0c1321] px-4 py-3 focus-within:border-blue-500/70 transition-colors">
-                                <input
-                                    id="footer-email"
-                                    type="email"
-                                    value={email}
-                                    onChange={e => setEmail(e.target.value)}
-                                    placeholder="e.g. student@ug.edu.gh"
-                                    className="w-full border-none bg-transparent pr-10 text-sm text-white outline-none placeholder:text-zinc-500"
-                                />
-                                <button
-                                    type="submit"
-                                    disabled={isSubmitting}
-                                    className="absolute right-3 top-1/2 -translate-y-1/2 inline-flex h-8 w-8 items-center justify-center rounded-xl bg-blue-500 text-white transition hover:bg-blue-400 disabled:opacity-60"
-                                >
-                                    <ArrowRight size={16} />
-                                </button>
+                        
+                        <form className="space-y-4" onSubmit={handleSubscribe}>
+                            <div className="space-y-2">
+                                <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider" htmlFor="footer-email">
+                                    Email Address
+                                </label>
+                                <div className="relative group">
+                                    <input
+                                        id="footer-email"
+                                        type="email"
+                                        value={email}
+                                        onChange={e => setEmail(e.target.value)}
+                                        placeholder="e.g. student@ug.edu.gh"
+                                        className="w-full h-12 rounded-xl border border-white/10 bg-black/20 px-4 text-sm outline-none focus:border-blue-500 transition"
+                                    />
+                                    <button
+                                        type="submit"
+                                        disabled={isSubmitting}
+                                        className="absolute right-1.5 top-1.5 h-9 w-9 flex items-center justify-center rounded-lg bg-blue-600 text-white hover:bg-blue-500 transition disabled:opacity-50"
+                                    >
+                                        <ArrowRight size={18} />
+                                    </button>
+                                </div>
                             </div>
-                            <p className="text-[11px] leading-5 text-zinc-500">
-                                No spam. Unsubscribe anytime.
+                            <p className="text-[10px] text-zinc-500">
+                                No spam. Just helpful updates.
                             </p>
                         </form>
                     </div>
