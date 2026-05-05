@@ -112,7 +112,7 @@ export class AuthService {
           ]
         },
       });
-    } catch (error) {
+    } catch (error: any) {
       this.logger.error(`Login DB Error: ${error.message}`);
       throw new BadRequestException("An error occurred during login. Please try again later.");
     }

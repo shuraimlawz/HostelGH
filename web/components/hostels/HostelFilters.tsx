@@ -32,7 +32,8 @@ import {
     Search,
     X,
     Clock,
-    Star
+    Star,
+    GraduationCap
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
