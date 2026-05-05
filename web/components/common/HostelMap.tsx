@@ -126,10 +126,10 @@ export default function HostelMap({
             const marker = L.marker([m.lat, m.lng], { icon })
                 .addTo(map)
                 .bindPopup(`
-                    <div style="min-width:160px;padding:4px">
-                        <p style="font-weight:700;font-size:13px;color:#0f172a;margin:0 0 4px">${m.label}</p>
-                        ${m.sublabel ? `<p style="font-size:11px;color:#64748b;margin:0 0 4px">${m.sublabel}</p>` : ""}
-                        ${m.price ? `<p style="font-size:12px;font-weight:700;color:#1d4ed8;margin:0">₵${(m.price / 100).toLocaleString()} / Term</p>` : ""}
+                    <div class="p-1">
+                        <p class="font-bold text-sm text-foreground mb-1">${m.label}</p>
+                        ${m.sublabel ? `<p class="text-[11px] text-muted-foreground mb-1 font-medium">${m.sublabel}</p>` : ""}
+                        ${m.price ? `<p class="text-xs font-bold text-primary">₵${(m.price / 100).toLocaleString()} <span class="text-[10px] text-muted-foreground font-medium">/ Term</span></p>` : ""}
                     </div>
                 `, { maxWidth: 220, className: "hostelgh-popup" });
 

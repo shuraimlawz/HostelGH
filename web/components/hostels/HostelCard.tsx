@@ -16,31 +16,31 @@ export default function HostelCard({ hostel, compact = false }: { hostel: any, c
     if (compact) {
         return (
             <Link href={`/hostels/${hostel.id}`} className="group block h-full">
-                <div className="bg-white rounded-xl border border-gray-100 overflow-hidden hover:shadow-lg transition-all duration-300 flex items-center p-3 gap-4">
-                    <div className="w-20 h-20 rounded-lg overflow-hidden bg-gray-50 shrink-0">
+                <div className="bg-card rounded-xl border border-border overflow-hidden hover:shadow-lg transition-all duration-300 flex items-center p-3 gap-4">
+                    <div className="w-20 h-20 rounded-lg overflow-hidden bg-muted shrink-0">
                         {hostel.images?.[0] ? (
                             <img src={hostel.images[0]} alt={hostel.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
                         ) : (
-                            <div className="w-full h-full flex items-center justify-center text-gray-200">
+                            <div className="w-full h-full flex items-center justify-center text-muted-foreground">
                                 <MapPin size={24} />
                             </div>
                         )}
                     </div>
                     <div className="flex-1 min-w-0">
-                        <h3 className="font-bold text-gray-900 text-sm tracking-tight truncate group-hover:text-blue-600 transition-colors">
+                        <h3 className="font-bold text-foreground text-sm tracking-tight truncate group-hover:text-primary transition-colors">
                             {hostel.name}
                         </h3>
-                        <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest truncate mt-0.5">
+                        <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest truncate mt-0.5">
                             {hostel.city} {hostel.distanceToCampus ? `• ${hostel.distanceToCampus}` : ""}
                         </p>
                         <div className="flex items-center justify-between mt-2">
-                            <span className="text-xs font-bold text-gray-900">
+                            <span className="text-xs font-bold text-foreground">
                                 ₵{minPrice?.toLocaleString() || "---"}
-                                <span className="text-[8px] text-gray-400 uppercase ml-1">/ Term</span>
+                                <span className="text-[8px] text-muted-foreground uppercase ml-1">/ Term</span>
                             </span>
                             <div className="flex items-center gap-1">
-                                <Star size={10} className="text-blue-500 fill-blue-500" />
-                                <span className="text-[10px] font-bold text-gray-900">{hostel.averageRating?.toFixed(1) || "0.0"}</span>
+                                <Star size={10} className="text-primary fill-primary" />
+                                <span className="text-[10px] font-bold text-foreground">{hostel.averageRating?.toFixed(1) || "0.0"}</span>
                             </div>
                         </div>
                     </div>
@@ -51,9 +51,9 @@ export default function HostelCard({ hostel, compact = false }: { hostel: any, c
 
     return (
         <Link href={`/hostels/${hostel.id}`} className="group block h-full">
-            <div className="bg-white dark:bg-slate-900 rounded-2xl border border-gray-100 dark:border-slate-800 overflow-hidden hover:shadow-2xl hover:shadow-gray-200/50 dark:hover:shadow-none dark:hover:border-blue-500/50 transition-all duration-500 flex flex-col h-full active:scale-[0.98]">
+            <div className="bg-card rounded-2xl border border-border overflow-hidden hover:shadow-2xl hover:shadow-primary/5 transition-all duration-500 flex flex-col h-full active:scale-[0.98]">
                 {/* Media Section */}
-                <div className="relative aspect-[16/11] overflow-hidden bg-gray-50">
+                <div className="relative aspect-[16/11] overflow-hidden bg-muted">
                     {hostel.images?.[0] ? (
                         <img
                             src={hostel.images[0]}
@@ -61,8 +61,8 @@ export default function HostelCard({ hostel, compact = false }: { hostel: any, c
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                         />
                     ) : (
-                        <div className="w-full h-full flex flex-col items-center justify-center text-gray-300 bg-gray-50 gap-2">
-                            <span className="text-[10px] font-bold uppercase tracking-widest">No Visual Asset</span>
+                        <div className="w-full h-full flex flex-col items-center justify-center text-muted-foreground bg-muted gap-2">
+                            <span className="text-[10px] font-black uppercase tracking-widest">No Visual Asset</span>
                         </div>
                     )}
 
@@ -97,8 +97,8 @@ export default function HostelCard({ hostel, compact = false }: { hostel: any, c
                     </div>
 
                     {/* Interaction Button */}
-                    <button className="absolute top-3 right-3 w-8 h-8 flex items-center justify-center rounded-lg bg-white/90 backdrop-blur-sm border border-white/50 hover:bg-white transition-all z-10 text-gray-600 shadow-sm">
-                        <Heart size={14} className="group-hover:text-red-500 transition-colors" />
+                    <button className="absolute top-3 right-3 w-8 h-8 flex items-center justify-center rounded-lg bg-card/90 backdrop-blur-sm border border-border hover:bg-card transition-all z-10 text-foreground shadow-sm">
+                        <Heart size={14} className="group-hover:text-destructive transition-colors" />
                     </button>
 
                     {/* Verification Mark */}
@@ -113,40 +113,40 @@ export default function HostelCard({ hostel, compact = false }: { hostel: any, c
                 <div className="p-5 flex-1 flex flex-col space-y-4">
                     <div className="space-y-1">
                         <div className="flex justify-between items-start gap-4">
-                            <h3 className="font-bold text-gray-900 text-[15px] tracking-tight group-hover:text-blue-600 transition-colors leading-tight truncate">
+                            <h3 className="font-bold text-foreground text-[15px] tracking-tight group-hover:text-primary transition-colors leading-tight truncate">
                                 {hostel.name}
                             </h3>
-                            <div className="flex items-center gap-1 shrink-0 px-2 py-0.5 bg-gray-50 rounded-md border border-gray-100">
-                                <Star size={11} className={cn("text-blue-500", hostel.averageRating > 0 && "fill-blue-500")} />
-                                <span className="text-[11px] font-bold text-gray-900">
+                            <div className="flex items-center gap-1 shrink-0 px-2 py-0.5 bg-muted rounded-md border border-border">
+                                <Star size={11} className={cn("text-primary", hostel.averageRating > 0 && "fill-primary")} />
+                                <span className="text-[11px] font-bold text-foreground">
                                     {hostel.averageRating?.toFixed(1) || "0.0"}
                                 </span>
                                 {hostel.totalReviews > 0 && (
-                                    <span className="text-[9px] text-gray-400 font-medium ml-0.5">
+                                    <span className="text-[9px] text-muted-foreground font-medium ml-0.5">
                                         ({hostel.totalReviews})
                                     </span>
                                 )}
                             </div>
                         </div>
-                        <div className="flex items-center gap-1.5 text-gray-400 text-[10px] font-bold uppercase tracking-widest truncate">
-                            <MapPin size={10} className="text-gray-300" />
+                        <div className="flex items-center gap-1.5 text-muted-foreground text-[10px] font-bold uppercase tracking-widest truncate">
+                            <MapPin size={10} className="text-muted-foreground/60" />
                             <span>{hostel.city}</span>
-                            <span className="text-gray-200 mx-0.5">•</span>
+                            <span className="text-muted-foreground/40 mx-0.5">•</span>
                             <span className="truncate">{hostel.distanceToCampus || "PRIME ZONE"}</span>
                         </div>
                     </div>
 
                     {/* Data Points */}
-                    <div className="grid grid-cols-2 gap-4 py-3 border-y border-gray-50">
+                    <div className="grid grid-cols-2 gap-4 py-3 border-y border-border">
                         <div className="space-y-0.5">
-                            <p className="text-[8px] font-bold uppercase tracking-widest text-gray-400">Capacity</p>
-                            <p className="text-xs font-bold text-gray-900 flex items-center gap-1.5">
-                                <Users size={12} className="text-gray-400" /> {hostel._count?.rooms || "Multiple"} Units
+                            <p className="text-[8px] font-black uppercase tracking-widest text-muted-foreground">Capacity</p>
+                            <p className="text-xs font-bold text-foreground flex items-center gap-1.5">
+                                <Users size={12} className="text-muted-foreground" /> {hostel._count?.rooms || "Multiple"} Units
                             </p>
                         </div>
                         <div className="space-y-0.5 text-right md:text-left">
-                            <p className="text-[8px] font-bold uppercase tracking-widest text-gray-400">Pricing</p>
-                            <p className="text-xs font-bold text-gray-900">
+                            <p className="text-[8px] font-black uppercase tracking-widest text-muted-foreground">Pricing</p>
+                            <p className="text-xs font-bold text-foreground">
                                 {minPrice ? `₵${minPrice.toLocaleString()}` : "Contact for rate"}
                             </p>
                         </div>
@@ -155,10 +155,10 @@ export default function HostelCard({ hostel, compact = false }: { hostel: any, c
                     {/* Footer */}
                     <div className="pt-1 flex items-center justify-between mt-auto">
                         <div className="flex flex-col">
-                            <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest leading-none mb-1">Starts From</span>
-                            <span className="text-sm font-bold text-gray-900 tracking-tight">₵{minPrice?.toLocaleString() || "---"} <span className="text-[10px] text-gray-400 font-medium">/ term</span></span>
+                            <span className="text-[9px] font-black text-muted-foreground uppercase tracking-widest leading-none mb-1">Starts From</span>
+                            <span className="text-sm font-black text-foreground tracking-tight">₵{minPrice?.toLocaleString() || "---"} <span className="text-[10px] text-muted-foreground font-medium">/ term</span></span>
                         </div>
-                        <div className="h-9 px-4 rounded-xl bg-gray-900 dark:bg-blue-600 text-white text-[10px] font-bold uppercase tracking-widest flex items-center gap-2 group-hover:bg-blue-600 dark:group-hover:bg-blue-700 transition-all shadow-md dark:shadow-none">
+                        <div className="h-9 px-4 rounded-xl bg-foreground text-background text-[10px] font-black uppercase tracking-widest flex items-center gap-2 hover:bg-primary hover:text-primary-foreground transition-all shadow-md">
                             Book Now <ArrowUpRight size={12} />
                         </div>
                     </div>

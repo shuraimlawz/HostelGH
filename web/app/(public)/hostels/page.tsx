@@ -17,7 +17,7 @@ import { cn } from "@/lib/utils";
 const HostelMap = dynamic(() => import("@/components/common/HostelMap"), {
     ssr: false,
     loading: () => (
-        <div className="h-full w-full bg-gray-100 rounded-3xl flex items-center justify-center">
+        <div className="h-full w-full bg-muted rounded-3xl flex items-center justify-center">
             <Loader2 className="text-blue-500 animate-spin" size={32} />
         </div>
     ),
@@ -160,14 +160,14 @@ function HostelsListingContent() {
                     )}
 
                     {/* List / Map toggle */}
-                    <div className="flex items-center bg-gray-100 dark:bg-slate-800 rounded-xl p-1 gap-1">
+                    <div className="flex items-center bg-muted rounded-xl p-1 gap-1">
                         <button
                             onClick={() => setView("list")}
                             className={cn(
                                 "flex items-center gap-2 h-8 px-4 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-all",
                                 view === "list"
-                                    ? "bg-white dark:bg-blue-600 text-gray-900 dark:text-white shadow-sm"
-                                    : "text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
+                                    ? "bg-card text-foreground shadow-sm"
+                                    : "text-muted-foreground hover:text-foreground"
                             )}
                         >
                             <List size={13} /> List
@@ -177,8 +177,8 @@ function HostelsListingContent() {
                             className={cn(
                                 "flex items-center gap-2 h-8 px-4 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-all",
                                 view === "map"
-                                    ? "bg-white dark:bg-blue-600 text-gray-900 dark:text-white shadow-sm"
-                                    : "text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
+                                    ? "bg-card text-foreground shadow-sm"
+                                    : "text-muted-foreground hover:text-foreground"
                             )}
                         >
                             <Map size={13} /> Map
@@ -215,7 +215,7 @@ function HostelsListingContent() {
                     {view === "map" && (
                         <div className="grid grid-cols-1 lg:grid-cols-[1fr_420px] gap-6 min-h-[600px]">
                             {/* Map Panel */}
-                            <div className="sticky top-24 h-[calc(100vh-180px)] rounded-3xl overflow-hidden border border-gray-100 shadow-xl shadow-gray-200/30 bg-gray-50">
+                            <div className="sticky top-24 h-[calc(100vh-180px)] rounded-3xl overflow-hidden border border-border shadow-xl bg-muted/30">
                                 {mapMarkers.length > 0 ? (
                                     <HostelMap
                                         markers={mapMarkers}
@@ -259,8 +259,8 @@ function HostelsListingContent() {
                                     ))
                                 ) : (
                                     <div className="py-20 flex flex-col items-center justify-center gap-4 text-center">
-                                        <SearchX size={32} className="text-gray-300" />
-                                        <p className="text-sm font-bold text-gray-400 uppercase tracking-widest">No Results Found</p>
+                                        <SearchX size={32} className="text-muted-foreground" />
+                                        <p className="text-sm font-bold text-muted-foreground uppercase tracking-widest">No Results Found</p>
                                     </div>
                                 )}
                             </div>
@@ -286,17 +286,17 @@ function HostelsListingContent() {
                                         </div>
                                     ))
                                 ) : (
-                                    <div className="col-span-full py-32 flex flex-col items-center justify-center bg-gray-50 rounded-2xl border border-dashed border-gray-200 text-center p-10 space-y-4">
-                                        <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center text-gray-300 shadow-sm border border-gray-100">
-                                            <SearchX size={32} />
+                                    <div className="col-span-full py-32 flex flex-col items-center justify-center bg-muted/30 rounded-[2.5rem] border-2 border-dashed border-border text-center p-10 space-y-6">
+                                        <div className="w-20 h-20 bg-card rounded-2xl flex items-center justify-center text-muted-foreground shadow-sm border border-border">
+                                            <SearchX size={40} />
                                         </div>
-                                        <div className="space-y-1">
-                                            <h3 className="text-xl font-bold text-gray-900 uppercase tracking-tight">No Results Found</h3>
-                                            <p className="text-gray-400 text-sm font-medium">No hostels match your search filters. Try widening the scope.</p>
+                                        <div className="space-y-2">
+                                            <h3 className="text-2xl font-black text-foreground uppercase tracking-tight">No Results Found</h3>
+                                            <p className="text-muted-foreground text-sm font-medium">No hostels match your search filters. Try widening the scope.</p>
                                         </div>
                                         <button
                                             onClick={() => router.push('/hostels')}
-                                            className="mt-4 px-6 py-2 bg-gray-900 text-white rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-black transition-all"
+                                            className="mt-4 px-8 py-4 bg-foreground text-background rounded-xl text-[10px] font-black uppercase tracking-widest hover:scale-105 active:scale-95 transition-all shadow-lg"
                                         >
                                             Reset Filters
                                         </button>
@@ -312,14 +312,14 @@ function HostelsListingContent() {
                                         disabled={isFetchingNextPage}
                                         className="group flex flex-col items-center gap-3 active:scale-95 transition-all"
                                     >
-                                        <div className="w-16 h-16 rounded-full border-2 border-gray-100 flex items-center justify-center group-hover:border-blue-500 group-hover:text-blue-600 transition-all shadow-sm bg-white">
+                                        <div className="w-16 h-16 rounded-full border-2 border-border flex items-center justify-center group-hover:border-primary group-hover:text-primary transition-all shadow-sm bg-card">
                                             {isFetchingNextPage ? (
                                                 <Loader2 size={24} className="animate-spin" />
                                             ) : (
                                                 <ChevronDown size={24} className="group-hover:translate-y-1 transition-transform" />
                                             )}
                                         </div>
-                                        <span className="text-[10px] font-bold uppercase tracking-widest text-gray-900">
+                                        <span className="text-[10px] font-black uppercase tracking-widest text-foreground">
                                             {isFetchingNextPage ? "Loading More..." : "See More Properties"}
                                         </span>
                                     </button>

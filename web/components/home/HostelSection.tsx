@@ -34,7 +34,7 @@ export default function HostelSection({
     if (!isLoading && hostels.length === 0) return null;
 
     return (
-        <div className="py-12 border-t border-gray-50">
+        <div className="py-12 border-t border-border">
             {/* Header */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 mb-8">
                 <div className="space-y-2">
@@ -50,7 +50,7 @@ export default function HostelSection({
                         {title}
                     </h3>
                     {subtitle && (
-                        <p className="text-gray-400 dark:text-gray-500 font-medium text-xs uppercase tracking-widest max-w-xl">
+                        <p className="text-muted-foreground font-medium text-xs uppercase tracking-widest max-w-xl">
                             {subtitle}
                         </p>
                     )}
@@ -59,7 +59,7 @@ export default function HostelSection({
                 {viewAllHref && (
                     <Link
                         href={viewAllHref}
-                        className="group inline-flex items-center gap-2 h-10 px-5 bg-gray-100 hover:bg-gray-900 hover:text-white text-gray-700 rounded-xl font-bold text-[10px] uppercase tracking-widest transition-all"
+                        className="group inline-flex items-center gap-2 h-10 px-5 bg-muted hover:bg-foreground hover:text-background text-foreground rounded-xl font-black text-[10px] uppercase tracking-widest transition-all shadow-sm"
                     >
                         View All <ArrowRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
                     </Link>
@@ -91,9 +91,9 @@ export default function HostelSection({
                     ))}
                 </div>
             ) : (
-                <div className="flex flex-col items-center justify-center py-16 text-gray-400 text-sm">
-                    <Building2 size={32} className="mb-3 text-gray-200" />
-                    {emptyMessage}
+                <div className="flex flex-col items-center justify-center py-16 text-muted-foreground text-sm bg-muted/30 rounded-[2.5rem] border-2 border-dashed border-border">
+                    <Building2 size={32} className="mb-3 text-muted-foreground/50" />
+                    <span className="font-bold uppercase tracking-widest text-[10px]">{emptyMessage}</span>
                 </div>
             )}
         </div>
