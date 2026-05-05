@@ -21,7 +21,7 @@ export default function SupportCard({
     return (
         <button
             onClick={onClick}
-            className="p-8 rounded-3xl bg-white border-2 border-gray-50 hover:border-blue-100 hover:shadow-xl transition-all text-left group w-full"
+            className="p-8 rounded-3xl bg-white dark:bg-slate-900 border-2 border-gray-50 dark:border-slate-800 hover:border-blue-200 dark:hover:border-blue-800 hover:shadow-xl dark:hover:shadow-none transition-all text-left group w-full"
         >
             <div
                 className={cn(
@@ -32,8 +32,8 @@ export default function SupportCard({
             >
                 <Icon size={28} />
             </div>
-            <h3 className="text-xl font-bold text-gray-900 mb-2 truncate">{title}</h3>
-            <p className="text-sm text-gray-500 font-medium leading-relaxed line-clamp-2">
+            <h3 className="text-lg font-black text-gray-900 dark:text-white mb-2">{title}</h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400 font-medium leading-relaxed line-clamp-2">
                 {description}
             </p>
         </button>
