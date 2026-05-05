@@ -4,9 +4,9 @@ import { useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 import HostelSection from "./HostelSection";
 import Link from "next/link";
-import { GraduationCap, Flame, TrendingDown, AlertTriangle, Star, Building2, ArrowRight } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
+import PromoCarousel from "./PromoCarousel";
 
 const MIN_SLOTS_ALERT = 4; // "Last rooms available" threshold
 
@@ -289,8 +289,8 @@ export default function HomeDiscovery() {
 
     return (
         <div className="space-y-0">
-            {/* Schools shortcut */}
-            <SchoolsShortcut />
+            {/* Promotional Carousel Ads */}
+            <PromoCarousel />
 
             {/* Hostels of the Week */}
             <HostelsOfTheWeek hostels={hostels} isLoading={isLoading} />
