@@ -25,41 +25,39 @@ export class SearchService implements OnModuleInit {
       if (!indexExists) {
         await this.elasticsearchService.indices.create({
           index: this.index,
-          body: {
-            settings: {
-              analysis: {
-                analyzer: {
-                  custom_analyzer: {
-                    type: "custom",
-                    tokenizer: "standard",
-                    filter: ["lowercase", "trim"],
-                  },
+          settings: {
+            analysis: {
+              analyzer: {
+                custom_analyzer: {
+                  type: "custom",
+                  tokenizer: "standard",
+                  filter: ["lowercase", "trim"],
                 },
               },
             },
-            mappings: {
-              properties: {
-                id: { type: "keyword" },
-                name: { type: "text", analyzer: "custom_analyzer" },
-                description: { type: "text", analyzer: "custom_analyzer" },
-                city: { type: "keyword" },
-                university: { type: "keyword" },
-                location: { type: "text", analyzer: "custom_analyzer" },
-                price: { type: "integer" },
-                amenities: { type: "keyword" },
-                gender: { type: "keyword" },
-                isPublished: { type: "boolean" },
-                isFeatured: { type: "boolean" },
-                rating: { type: "float" },
-                createdAt: { type: "date" },
-              },
+          },
+          mappings: {
+            properties: {
+              id: { type: "keyword" },
+              name: { type: "text", analyzer: "custom_analyzer" },
+              description: { type: "text", analyzer: "custom_analyzer" },
+              city: { type: "keyword" },
+              university: { type: "keyword" },
+              location: { type: "text", analyzer: "custom_analyzer" },
+              price: { type: "integer" },
+              amenities: { type: "keyword" },
+              gender: { type: "keyword" },
+              isPublished: { type: "boolean" },
+              isFeatured: { type: "boolean" },
+              rating: { type: "float" },
+              createdAt: { type: "date" },
             },
           },
         });
         this.logger.log("Elasticsearch index 'hostels' created with mappings.");
       }
     } catch (error) {
-      this.logger.error("Failed to setup Elasticsearch index", (error as Error).stack);
+      this.logger.error("Elasticsearch search failed, falling back to Prisma", (error as Error).stack);
     }
   }
 
@@ -83,7 +81,7 @@ export class SearchService implements OnModuleInit {
     await this.elasticsearchService.index({
       index: this.index,
       id: h.id,
-      body: {
+      document: {
         id: h.id,
         name: h.name,
         description: h.description,
@@ -147,14 +145,12 @@ export class SearchService implements OnModuleInit {
 
     const response = await this.elasticsearchService.search({
       index: this.index,
-      body: {
-        query: {
-          bool: { must, filter },
-        },
-        sort: sortOption,
-        from: offset,
-        size: limit,
+      query: {
+        bool: { must, filter },
       },
+      sort: sortOption,
+      from: offset,
+      size: limit,
     });
 
     return {

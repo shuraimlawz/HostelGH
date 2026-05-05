@@ -298,10 +298,6 @@ export class HostelsService {
     //   });
     // }
 
-    const cacheKey = `search:${JSON.stringify(params)}`;
-    const cached = await this.redis.getJson<any[]>(cacheKey);
-    if (cached) return cached;
-
     const {
       city,
       region,
@@ -587,7 +583,7 @@ export class HostelsService {
         return result;
       }
     } catch (error) {
-      this.logger.error("Elasticsearch search failed, falling back to Prisma", error.stack);
+      this.logger.error("Elasticsearch search failed, falling back to Prisma", (error as Error).stack);
     }
 
     // 3. Fallback to Prisma Database Query (Legacy Logic)

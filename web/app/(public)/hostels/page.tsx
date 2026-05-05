@@ -123,7 +123,7 @@ function HostelsListingContent() {
                         <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest leading-none">Explore</span>
                     </div>
                     <h1 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white tracking-tight">Find Your Hostel</h1>
-                    <p className="text-gray-500 dark:text-gray-400 text-sm max-w-md">Browse verified student hostels across Ghana.</p>
+                    <p className="text-gray-500 dark:text-gray-400 text-sm max-w-md font-medium">Browse verified student hostels across Ghana.</p>
                 </div>
 
                 <HostelFilters />
@@ -138,7 +138,7 @@ function HostelsListingContent() {
                     {geoActive ? (
                         <button
                             onClick={clearGeo}
-                            className="flex items-center gap-2 h-10 px-4 bg-blue-600 text-white rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-blue-700 transition-all shadow-lg shadow-blue-200"
+                            className="flex items-center gap-2 h-10 px-4 bg-blue-600 text-white rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-blue-700 transition-all shadow-lg dark:shadow-none"
                         >
                             <LocateFixed size={14} />
                             Near Me Active
@@ -166,7 +166,7 @@ function HostelsListingContent() {
                             className={cn(
                                 "flex items-center gap-2 h-8 px-4 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-all",
                                 view === "list"
-                                    ? "bg-white dark:bg-slate-700 text-gray-900 dark:text-white shadow-sm"
+                                    ? "bg-white dark:bg-blue-600 text-gray-900 dark:text-white shadow-sm"
                                     : "text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
                             )}
                         >
@@ -177,7 +177,7 @@ function HostelsListingContent() {
                             className={cn(
                                 "flex items-center gap-2 h-8 px-4 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-all",
                                 view === "map"
-                                    ? "bg-white dark:bg-slate-700 text-gray-900 dark:text-white shadow-sm"
+                                    ? "bg-white dark:bg-blue-600 text-gray-900 dark:text-white shadow-sm"
                                     : "text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
                             )}
                         >
@@ -189,9 +189,9 @@ function HostelsListingContent() {
 
             {/* Distance badge when geo-active */}
             {geoActive && (
-                <div className="mb-6 flex items-center gap-2 px-4 py-2 bg-blue-50 border border-blue-100 rounded-xl w-fit">
-                    <LocateFixed size={14} className="text-blue-600" />
-                    <span className="text-[10px] font-bold text-blue-700 uppercase tracking-widest">
+                <div className="mb-6 flex items-center gap-2 px-4 py-2 bg-blue-50 dark:bg-blue-500/10 border border-blue-100 dark:border-blue-500/20 rounded-xl w-fit">
+                    <LocateFixed size={14} className="text-blue-600 dark:text-blue-400" />
+                    <span className="text-[10px] font-bold text-blue-700 dark:text-blue-300 uppercase tracking-widest">
                         Showing hostels within 15km of your location — sorted by distance
                     </span>
                 </div>
