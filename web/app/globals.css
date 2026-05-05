@@ -188,8 +188,16 @@
     border-color: hsl(222.2, 47.4%, 30%) !important;
   }
   
-  .dark .border-gray-200, .dark .border-gray-100 { 
-    border-color: hsl(222.2, 47.4%, 25%) !important; 
+  .dark .border-gray-200, .dark .border-gray-100, .dark .border-gray-50 { 
+    border-color: rgba(255, 255, 255, 0.05) !important; 
+  }
+  
+  .dark .text-gray-900 { 
+    color: hsl(210, 40%, 98%) !important; 
+  }
+
+  .dark hr {
+    border-color: rgba(255, 255, 255, 0.05) !important;
   }
 }
 
