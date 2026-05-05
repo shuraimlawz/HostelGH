@@ -24,13 +24,13 @@ export default function FeaturedHostels() {
                         <span className="px-3 py-1 bg-blue-600 text-white rounded-full text-[9px] font-bold uppercase tracking-widest border border-white/10 shadow-lg shadow-blue-500/10">
                             Our Best
                         </span>
-                        <div className="flex items-center text-amber-600 font-bold text-[9px] gap-2 bg-amber-50 dark:bg-amber-950/30 px-3 py-1 rounded-full border border-amber-100 dark:border-amber-900/50 uppercase tracking-widest shadow-sm">
+                        <div className="flex items-center text-amber-700 dark:text-amber-500 font-bold text-[9px] gap-2 bg-amber-100/50 dark:bg-amber-950/30 px-3 py-1 rounded-full border border-amber-200 dark:border-amber-900/50 uppercase tracking-widest shadow-sm">
                             <Flame size={12} className="fill-amber-500" />
                             <span>Trending</span>
                         </div>
                     </div>
                     <div className="space-y-2">
-                        <h3 className="text-4xl md:text-5xl font-bold tracking-tighter text-gray-900 dark:text-white uppercase leading-tight">
+                        <h3 className="text-4xl md:text-5xl font-bold tracking-tighter text-slate-900 dark:text-white uppercase leading-tight">
                             Trending <span className="text-blue-600">Spaces</span>
                         </h3>
                         <p className="text-gray-400 dark:text-gray-500 max-w-lg font-bold text-xs md:text-sm uppercase tracking-widest leading-relaxed">
@@ -71,8 +71,8 @@ export default function FeaturedHostels() {
                                 <Building2 className="text-gray-200 dark:text-gray-600" size={40} />
                             </div>
                             <div className="space-y-2">
-                                <h4 className="text-xl font-bold text-gray-900 dark:text-white uppercase tracking-tight">Updating Lists</h4>
-                                <p className="max-w-xs font-bold text-[10px] uppercase tracking-widest text-gray-400">Our team is currently verifying new hostels. Check back soon for new listings.</p>
+                                <h4 className="text-xl font-bold text-slate-900 dark:text-white uppercase tracking-tight">Updating Lists</h4>
+                                <p className="max-w-xs font-bold text-[10px] uppercase tracking-widest text-gray-500 dark:text-gray-400">Our team is currently verifying new hostels. Check back soon for new listings.</p>
                             </div>
                         </div>
                     )}

@@ -192,10 +192,6 @@
     border-color: rgba(255, 255, 255, 0.05) !important; 
   }
   
-  .dark .text-gray-900 { 
-    color: hsl(210, 40%, 98%) !important; 
-  }
-
   .dark hr {
     border-color: rgba(255, 255, 255, 0.05) !important;
   }

@@ -17,7 +17,7 @@ export default function SchoolsComingSoon() {
 
                 {/* Hero Section */}
                 <div className="space-y-6">
-                    <h1 className="text-5xl md:text-7xl font-bold tracking-tighter text-gray-900 dark:text-white uppercase leading-[0.9]">
+                    <h1 className="text-5xl md:text-7xl font-bold tracking-tighter text-slate-900 dark:text-white uppercase leading-[0.9]">
                         Empowering <span className="text-blue-600">Institutions.</span>
                     </h1>
                     <p className="text-gray-500 dark:text-gray-400 text-lg md:text-xl font-medium max-w-2xl mx-auto leading-relaxed">
@@ -31,7 +31,7 @@ export default function SchoolsComingSoon() {
                         <div className="w-12 h-12 bg-white dark:bg-slate-800 rounded-2xl flex items-center justify-center shadow-sm border border-gray-100 dark:border-slate-700">
                             <ShieldCheck className="text-blue-600" size={24} />
                         </div>
-                        <h3 className="font-bold text-gray-900 dark:text-white uppercase text-sm tracking-tight">Verified Listings</h3>
+                        <h3 className="font-bold text-slate-900 dark:text-white uppercase text-sm tracking-tight">Verified Listings</h3>
                         <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed font-medium">Ensure every hostel near your campus meets your safety and quality standards.</p>
                     </div>
 
@@ -39,7 +39,7 @@ export default function SchoolsComingSoon() {
                         <div className="w-12 h-12 bg-white dark:bg-slate-800 rounded-2xl flex items-center justify-center shadow-sm border border-gray-100 dark:border-slate-700">
                             <Building2 className="text-blue-600" size={24} />
                         </div>
-                        <h3 className="font-bold text-gray-900 dark:text-white uppercase text-sm tracking-tight">Analytics Dashboard</h3>
+                        <h3 className="font-bold text-slate-900 dark:text-white uppercase text-sm tracking-tight">Analytics Dashboard</h3>
                         <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed font-medium">Monitor housing trends, price fluctuations, and student distribution in real-time.</p>
                     </div>
 
@@ -47,7 +47,7 @@ export default function SchoolsComingSoon() {
                         <div className="w-12 h-12 bg-white dark:bg-slate-800 rounded-2xl flex items-center justify-center shadow-sm border border-gray-100 dark:border-slate-700">
                             <Zap className="text-blue-600" size={24} />
                         </div>
-                        <h3 className="font-bold text-gray-900 dark:text-white uppercase text-sm tracking-tight">Direct Support</h3>
+                        <h3 className="font-bold text-slate-900 dark:text-white uppercase text-sm tracking-tight">Direct Support</h3>
                         <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed font-medium">Collaborate directly with our team to resolve student housing disputes quickly.</p>
                     </div>
                 </div>
