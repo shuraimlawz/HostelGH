@@ -126,8 +126,8 @@ export default function HostelFilters() {
     };
 
     return (
-        <div className="w-full bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-2xl lg:rounded-[2rem] p-2 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-none mb-10 transition-all">
-            <div className="flex flex-col lg:flex-row items-center gap-2 lg:gap-0">
+        <div className="w-full bg-gray-50/50 dark:bg-slate-900/80 backdrop-blur-3xl border border-gray-200/50 dark:border-slate-800/50 rounded-2xl lg:rounded-[2.5rem] p-3 shadow-2xl shadow-gray-200/20 dark:shadow-none mb-10 transition-all">
+            <div className="flex flex-col lg:flex-row items-center gap-3 lg:gap-0">
                 
                 {/* Smart Global Search */}
                 <div className="flex-1 w-full lg:w-auto relative group rounded-xl lg:rounded-2xl transition-all">

@@ -4,10 +4,20 @@ import { useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 import HostelCard from "@/components/hostels/HostelCard";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ArrowRight, Flame, MapPin, Building2 } from "lucide-react";
+import { ArrowRight, Flame, Building2 } from "lucide-react";
 import Link from "next/link";
+import { useTheme } from "next-themes";
+import { useEffect, useState } from "react";
 
 export default function FeaturedHostels() {
+    const { resolvedTheme } = useTheme();
+    const [mounted, setMounted] = useState(false);
+
+    // Prevent hydration mismatch — only render theme-dependent styles after mount
+    useEffect(() => { setMounted(true); }, []);
+
+    const isDark = mounted && resolvedTheme === "dark";
+
     const { data: hostels, isLoading } = useQuery({
         queryKey: ["featured-hostels"],
         queryFn: async () => {
@@ -17,67 +27,122 @@ export default function FeaturedHostels() {
     });
 
     return (
-        <div className="py-20 border-t border-gray-50">
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-8 mb-12">
-                <div className="space-y-4">
-                    <div className="flex items-center gap-3">
-                        <span className="px-3 py-1 bg-blue-600 text-white rounded-full text-[9px] font-bold uppercase tracking-widest border border-white/10 shadow-lg shadow-blue-500/10">
-                            Our Best
-                        </span>
-                        <div className="flex items-center text-amber-700 dark:text-amber-500 font-bold text-[9px] gap-2 bg-amber-100/50 dark:bg-amber-950/30 px-3 py-1 rounded-full border border-amber-200 dark:border-amber-900/50 uppercase tracking-widest shadow-sm">
-                            <Flame size={12} className="fill-amber-500" />
-                            <span>Trending</span>
+        <section className="py-16 md:py-24 relative overflow-hidden">
+            {/* Decorative blob */}
+            <div className="absolute top-0 right-0 -translate-y-1/3 translate-x-1/3 w-[500px] h-[500px] bg-blue-500/5 rounded-full blur-3xl pointer-events-none" />
+
+            <div className="relative z-10">
+                {/* ── Header ─────────────────────────────── */}
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-8 mb-14">
+
+                    <div className="space-y-5 max-w-2xl">
+                        {/* Pill badges */}
+                        <div className="flex items-center gap-3 flex-wrap">
+                            <span className="px-4 py-1.5 bg-blue-600 text-white text-[9px] font-black uppercase tracking-[0.25em] rounded-full shadow-lg shadow-blue-600/30">
+                                Our Best
+                            </span>
+                            <span
+                                className="flex items-center gap-1.5 px-4 py-1.5 text-[9px] font-black uppercase tracking-[0.25em] rounded-full border shadow-sm"
+                                style={{
+                                    backgroundColor: isDark ? "rgba(120,53,15,0.2)" : "#fffbeb",
+                                    borderColor: isDark ? "rgba(120,53,15,0.3)" : "#fde68a",
+                                    color: isDark ? "#fbbf24" : "#92400e",
+                                }}
+                            >
+                                <Flame size={12} className="fill-current" />
+                                Trending
+                            </span>
                         </div>
-                    </div>
-                    <div className="space-y-2">
-                        <h3 className="text-4xl md:text-5xl font-bold tracking-tighter text-black! dark:text-white! uppercase leading-tight">
-                            Trending <span className="text-blue-600">Spaces</span>
-                        </h3>
-                        <p className="text-gray-400 dark:text-gray-500 max-w-lg font-bold text-xs md:text-sm uppercase tracking-widest leading-relaxed">
-                            Ghana's most-booked student hostels — ranked by student demand.
+
+                        {/* ── Main heading: hardcoded inline colours, never inherits theme ── */}
+                        <div>
+                            <h2
+                                className="text-5xl md:text-7xl font-black tracking-tighter leading-[0.85] uppercase"
+                                style={{ color: isDark ? "#ffffff" : "#111827" }}
+                            >
+                                Trending
+                            </h2>
+                            <h2
+                                className="text-5xl md:text-7xl font-black tracking-tighter leading-[0.85] uppercase italic"
+                                style={{ color: "#2563eb" }}
+                            >
+                                Spaces
+                            </h2>
+                        </div>
+
+                        {/* Subtitle */}
+                        <p
+                            className="text-xs md:text-sm font-bold uppercase tracking-[0.15em] leading-relaxed pl-5 border-l-4 border-blue-600 max-w-md"
+                            style={{ color: isDark ? "#9ca3af" : "#6b7280" }}
+                        >
+                            Ghana&apos;s most-booked student hostels —{" "}
+                            <br className="hidden md:block" />
+                            ranked by student demand.
                         </p>
                     </div>
+
+                    {/* CTA */}
+                    <Link
+                        href="/hostels"
+                        className="group flex-shrink-0 flex h-14 items-center gap-3 px-10 rounded-2xl font-black text-[10px] uppercase tracking-[0.25em] transition-all hover:scale-105 active:scale-95 shadow-xl"
+                        style={{
+                            backgroundColor: isDark ? "#ffffff" : "#111827",
+                            color: isDark ? "#111827" : "#ffffff",
+                        }}
+                    >
+                        <span>View All Hostels</span>
+                        <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+                    </Link>
                 </div>
 
-                <Link
-                    href="/hostels"
-                    className="group relative inline-flex h-14 items-center gap-3 bg-gray-900 text-white px-8 rounded-2xl font-bold text-[10px] uppercase tracking-widest hover:bg-black transition-all active:scale-[0.98] shadow-xl"
-                >
-                    <span>View All Hostels</span>
-                    <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
-                </Link>
+                {/* ── Hostel Cards ─────────────────────── */}
+                {isLoading ? (
+                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+                        {[1, 2, 3, 4].map((i) => (
+                            <div key={i} className="space-y-4">
+                                <Skeleton className="aspect-[4/5] w-full rounded-3xl" />
+                                <Skeleton className="h-5 w-3/4" />
+                                <Skeleton className="h-4 w-1/2" />
+                            </div>
+                        ))}
+                    </div>
+                ) : (
+                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-12">
+                        {Array.isArray(hostels) && hostels.slice(0, 4).map((hostel: any) => (
+                            <HostelCard key={hostel.id} hostel={hostel} />
+                        ))}
+
+                        {(!hostels || hostels.length === 0) && (
+                            <div className="col-span-full py-20 flex flex-col items-center justify-center rounded-[3rem] border-2 border-dashed text-center space-y-4"
+                                style={{
+                                    backgroundColor: isDark ? "rgba(15,23,42,0.5)" : "#f9fafb",
+                                    borderColor: isDark ? "rgba(51,65,85,0.8)" : "#e5e7eb",
+                                }}
+                            >
+                                <div className="w-16 h-16 rounded-2xl shadow-xl flex items-center justify-center border"
+                                    style={{
+                                        backgroundColor: isDark ? "#1e293b" : "#ffffff",
+                                        borderColor: isDark ? "#334155" : "#f3f4f6",
+                                    }}
+                                >
+                                    <Building2 className="text-blue-500" size={32} />
+                                </div>
+                                <div className="space-y-1">
+                                    <h4
+                                        className="text-xl font-black uppercase tracking-tight"
+                                        style={{ color: isDark ? "#ffffff" : "#111827" }}
+                                    >
+                                        Updating Lists
+                                    </h4>
+                                    <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400">
+                                        Our team is verifying new hostels. Check back soon.
+                                    </p>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                )}
             </div>
-
-            {isLoading ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
-                    {[1, 2, 3, 4].map((i) => (
-                        <div key={i} className="space-y-6">
-                            <Skeleton className="aspect-[4/5] w-full rounded-3xl" />
-                            <div className="space-y-3 px-1">
-                                <Skeleton className="h-6 w-3/4 rounded-xl" />
-                                <Skeleton className="h-4 w-1/2 rounded-xl" />
-                            </div>
-                        </div>
-                    ))}
-                </div>
-            ) : (
-                <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-12">
-                    {Array.isArray(hostels) && hostels.slice(0, 4).map((hostel: any) => (
-                        <HostelCard key={hostel.id} hostel={hostel} />
-                    ))}
-                    {(!hostels || hostels.length === 0) && (
-                        <div className="col-span-full h-96 flex flex-col items-center justify-center bg-gray-50/50 dark:bg-slate-800/30 border border-gray-100/50 dark:border-slate-700/30 rounded-[3rem] text-gray-400 p-12 text-center space-y-6">
-                            <div className="w-20 h-20 bg-white dark:bg-slate-800 rounded-2xl shadow-sm flex items-center justify-center border border-gray-100 dark:border-slate-700">
-                                <Building2 className="text-gray-200 dark:text-gray-600" size={40} />
-                            </div>
-                            <div className="space-y-2">
-                                <h4 className="text-xl font-bold text-slate-900 dark:text-white uppercase tracking-tight">Updating Lists</h4>
-                                <p className="max-w-xs font-bold text-[10px] uppercase tracking-widest text-gray-500 dark:text-gray-400">Our team is currently verifying new hostels. Check back soon for new listings.</p>
-                            </div>
-                        </div>
-                    )}
-                </div>
-            )}
-        </div>
+        </section>
     );
 }
