@@ -31,65 +31,68 @@ export default function ForgotPasswordPage() {
     };
 
     return (
-        <div className="min-h-screen bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-blue-50 via-white to-cyan-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8 relative overflow-hidden">
-            <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-400/10 rounded-full blur-[120px] animate-pulse"></div>
-            <div className="absolute bottom-[-10%] right-[-10%] w-[30%] h-[30%] bg-cyan-400/10 rounded-full blur-[100px] animate-pulse [animation-delay:2s]"></div>
+        <div className="min-h-screen bg-background flex flex-col justify-center py-12 sm:px-6 lg:px-8 relative overflow-hidden transition-colors duration-500">
+            {/* Background Aesthetic */}
+            <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-500/5 rounded-full blur-[120px] animate-pulse"></div>
+            <div className="absolute bottom-[-10%] right-[-10%] w-[30%] h-[30%] bg-indigo-500/5 rounded-full blur-[100px] animate-pulse [animation-delay:2s]"></div>
 
-            <div className="sm:mx-auto sm:w-full sm:max-w-md relative z-10">
-                <div className="text-center group relative inline-flex justify-center w-full">
-                    <div className="transform group-hover:scale-110 group-hover:rotate-3 transition-all duration-500">
-                        <LogoAnimation />
-                    </div>
+            <div className="sm:mx-auto sm:w-full sm:max-w-md relative z-10 px-6">
+                <div className="text-center">
+                    <Link href="/" className="inline-flex items-center gap-3 group transition-all duration-300">
+                        <div className="p-1 group-hover:scale-110 transition-transform duration-500">
+                            <LogoAnimation />
+                        </div>
+                        <span className="uppercase tracking-[0.3em] text-[10px] font-bold text-muted-foreground group-hover:text-foreground transition-colors">HostelGH</span>
+                    </Link>
                 </div>
 
-                <div className="mt-8 space-y-2">
-                    <h1 className="text-center text-3xl font-black text-gray-900 tracking-tight leading-tight">
-                        Password <span className="text-[#1877F2]">Recovery</span>
+                <div className="mt-8 space-y-3">
+                    <h1 className="text-center text-4xl font-bold text-foreground tracking-tight uppercase">
+                        Forgot Password
                     </h1>
-                    <p className="text-center text-sm font-bold text-gray-400 max-w-[280px] mx-auto leading-relaxed">
-                        Enter your email below and we&apos;ll send you a magic link to regain access.
+                    <p className="text-center text-[11px] font-bold text-muted-foreground uppercase tracking-widest max-w-[280px] mx-auto leading-relaxed">
+                        Enter your email and we'll send you a link to reset your password.
                     </p>
                 </div>
             </div>
 
-            <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-[480px] relative z-10">
-                <div className="bg-white/80 backdrop-blur-2xl py-12 px-6 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.08)] sm:rounded-[3rem] sm:px-12 border border-white/40 relative overflow-hidden">
-                    <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-blue-500/20 to-transparent"></div>
+            <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-[480px] relative z-10 px-6">
+                <div className="bg-card border border-border p-10 md:p-12 rounded-[2.5rem] shadow-2xl shadow-blue-900/5 animate-in fade-in zoom-in-95 duration-700 relative overflow-hidden">
+                    {/* Top Accent Line */}
+                    <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-blue-600/30 to-transparent"></div>
 
                     {success ? (
                         <div className="text-center space-y-8 animate-in fade-in zoom-in-95 duration-500">
-                            <div className="w-20 h-20 bg-gradient-to-br from-green-50 to-green-100 rounded-full flex items-center justify-center mx-auto relative border border-green-200">
-                                <CheckCircle2 className="w-10 h-10 text-green-500" />
+                            <div className="w-20 h-20 bg-blue-600/10 rounded-3xl flex items-center justify-center mx-auto relative border border-blue-600/20">
+                                <CheckCircle2 className="w-10 h-10 text-blue-600" />
                             </div>
                             
-                            <div className="space-y-3">
-                                <h3 className="text-2xl font-black text-gray-900 tracking-tight">Check Your Inbox</h3>
-                                <p className="text-[15px] text-gray-500 leading-relaxed px-2">
-                                    A reset link has been dispatched to <br/>
-                                    <span className="font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-lg">{email}</span>
+                            <div className="space-y-4">
+                                <h3 className="text-xl font-bold text-foreground uppercase tracking-tight">Check Your Inbox</h3>
+                                <p className="text-[12px] text-muted-foreground font-medium leading-relaxed px-2">
+                                    We have sent a reset link to <br/>
+                                    <span className="font-bold text-foreground mt-2 inline-block border-b border-border">{email}</span>
                                 </p>
                             </div>
 
-                            <div className="pt-8">
+                            <div className="pt-6">
                                 <Link
                                     href="/auth/login"
-                                    className="w-full inline-flex justify-center items-center gap-3 rounded-2xl border-2 border-gray-100 bg-white px-6 py-4 text-sm font-black text-gray-700 hover:bg-gray-50 hover:border-gray-200 transition-all active:scale-[0.98] shadow-sm"
+                                    className="w-full inline-flex justify-center items-center gap-3 rounded-2xl bg-muted/50 border border-border px-6 py-4 text-[10px] font-bold text-foreground uppercase tracking-widest hover:bg-muted transition-all active:scale-[0.98]"
                                 >
-                                    <ArrowLeft size={18} className="text-blue-600" />
-                                    Return to Authentication
+                                    <ArrowLeft size={16} className="text-blue-600" />
+                                    Return to Login
                                 </Link>
                             </div>
                         </div>
                     ) : (
-                        <form className="space-y-8" onSubmit={handleSubmit}>
-                            <div className="space-y-2.5 group">
-                                <label htmlFor="email" className="block text-xs font-black text-gray-400 uppercase tracking-[0.2em] px-1 group-focus-within:text-blue-600 transition-all duration-300">
-                                    Registered Email
+                        <form className="space-y-10" onSubmit={handleSubmit}>
+                            <div className="space-y-3 group">
+                                <label htmlFor="email" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-[0.2em] ml-1 group-focus-within:text-blue-600 transition-all duration-300">
+                                    Email Address
                                 </label>
-                                <div className="relative group/input">
-                                    <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within/input:text-blue-500 transition-colors">
-                                        <Mail size={18} />
-                                    </div>
+                                <div className="relative">
+                                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-blue-600 transition-colors" size={16} />
                                     <input
                                         id="email"
                                         name="email"
@@ -98,45 +101,45 @@ export default function ForgotPasswordPage() {
                                         required
                                         value={email}
                                         onChange={(e) => setEmail(e.target.value)}
-                                        className="w-full pl-12 pr-4 py-4 bg-gray-50/50 border-2 border-transparent hover:border-gray-100 rounded-2xl outline-none focus:bg-white focus:border-blue-500/20 focus:ring-[6px] focus:ring-blue-500/5 transition-all text-[15px] font-medium placeholder:text-gray-300 shadow-inner"
-                                        placeholder="alex@example.com"
+                                        className="w-full pl-11 pr-4 h-14 bg-muted/50 border border-border rounded-2xl outline-none focus:bg-card focus:border-blue-600 transition-all text-xs font-bold uppercase tracking-tight placeholder:text-muted-foreground/50 text-foreground shadow-sm"
+                                        placeholder="USER@EMAIL.COM"
                                     />
                                 </div>
                             </div>
 
                             {error && (
-                                <div className="flex items-start gap-3 text-sm bg-red-50/80 backdrop-blur-sm text-red-600 font-bold px-5 py-4 rounded-2xl border border-red-100 animate-in fade-in slide-in-from-top-2 duration-300">
-                                    <AlertCircle className="w-5 h-5 shrink-0 mt-0.5" />
-                                    <span className="leading-tight">{error}</span>
+                                <div className="flex items-start gap-4 text-[11px] bg-red-500/5 text-red-500 font-bold px-5 py-4 rounded-2xl border border-red-500/20 animate-in fade-in slide-in-from-top-2 duration-300">
+                                    <AlertCircle className="w-5 h-5 shrink-0" />
+                                    <span className="leading-relaxed uppercase tracking-wide">
+                                        {error.toLowerCase().includes('prisma') || error.toLowerCase().includes('database') 
+                                            ? "Unable to process request. Please try again later." 
+                                            : error}
+                                    </span>
                                 </div>
                             )}
 
-                            <div className="pt-2">
+                            <div className="space-y-8">
                                 <button
                                     type="submit"
                                     disabled={loading}
-                                    className="group relative w-full flex justify-center py-5 px-6 border border-transparent rounded-2xl text-[15px] font-black text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 focus:outline-none focus:ring-[6px] focus:ring-blue-500/10 shadow-[0_12px_24px_-8px_rgba(37,99,235,0.4)] hover:shadow-[0_20px_32px_-8px_rgba(37,99,235,0.5)] transition-all active:scale-[0.98] disabled:opacity-70 disabled:grayscale overflow-hidden"
+                                    className="group relative w-full h-14 rounded-2xl bg-blue-600 text-white font-bold py-3.5 hover:bg-blue-700 transition-all active:scale-[0.98] disabled:opacity-50 text-[11px] uppercase tracking-[0.3em] shadow-lg shadow-blue-600/20 flex items-center justify-center gap-3"
                                 >
                                     {loading ? (
-                                        <div className="flex items-center gap-2.5">
+                                        <>
                                             <div className="w-1.5 h-1.5 bg-white rounded-full animate-bounce [animation-delay:-0.3s]"></div>
                                             <div className="w-1.5 h-1.5 bg-white rounded-full animate-bounce [animation-delay:-0.15s]"></div>
                                             <div className="w-1.5 h-1.5 bg-white rounded-full animate-bounce"></div>
-                                            <span className="ml-1 tracking-tight">Syncing...</span>
-                                        </div>
+                                        </>
                                     ) : (
-                                        <div className="flex items-center gap-2 underline decoration-white/30 decoration-2 underline-offset-4">
-                                            Secure Recovery Link
-                                        </div>
+                                        "Send Reset Link"
                                     )}
                                 </button>
                                 
-                                <p className="mt-8 text-center text-xs font-bold text-gray-400 tracking-wide">
-                                    Remember it? {" "}
-                                    <Link href="/auth/login" className="text-blue-600 border-b-2 border-blue-600/20 hover:border-blue-600 transition-all pb-0.5 ml-1">
-                                        Head back to login
+                                <div className="text-center">
+                                    <Link href="/auth/login" className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest hover:text-foreground transition-all border-b border-transparent hover:border-foreground pb-1">
+                                        Back to Login
                                     </Link>
-                                </p>
+                                </div>
                             </div>
                         </form>
                     )}
@@ -144,4 +147,5 @@ export default function ForgotPasswordPage() {
             </div>
         </div>
     );
+}
 }
