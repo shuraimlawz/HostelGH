@@ -72,9 +72,16 @@ function RegisterContent({ onSuccess }: { onSuccess?: () => void }) {
                 });
             } else {
                 const raw = error.response?.data?.message;
-                const message = (!raw || raw === "Internal server error")
+                let message = (!raw || raw === "Internal server error")
                     ? "Failed to create account. Please check your details."
                     : (Array.isArray(raw) ? raw[0] : raw);
+
+                // Sanitization: Hide technical/Prisma errors
+                const technicalKeywords = ["prisma", "database", "column", "p2022", "invocation", "sql", "findfirst", "create"];
+                if (technicalKeywords.some(key => message.toLowerCase().includes(key))) {
+                    message = "An error occurred while creating your account. Please try again later.";
+                }
+
                 setErr(message);
             }
         } finally {

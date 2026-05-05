@@ -50,9 +50,16 @@ export default function LoginForm({ onSuccess }: { onSuccess?: (user: any) => vo
                 });
             } else {
                 const raw = error.response?.data?.message;
-                const message = (!raw || raw === "Internal server error")
+                let message = (!raw || raw === "Internal server error")
                     ? "Invalid credentials. Please check your email and password."
                     : (Array.isArray(raw) ? raw[0] : raw);
+
+                // Secondary Sanitization: Hide technical/Prisma errors
+                const technicalKeywords = ["prisma", "database", "column", "p2022", "invocation", "sql", "findfirst"];
+                if (technicalKeywords.some(key => message.toLowerCase().includes(key))) {
+                    message = "An error occurred while processing your request. Please try again later.";
+                }
+
                 setErr(message);
             }
         } finally {

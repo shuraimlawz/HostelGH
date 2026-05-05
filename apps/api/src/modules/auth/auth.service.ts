@@ -102,14 +102,20 @@ export class AuthService {
   }
 
   async login(dto: LoginDto) {
-    const user = await this.prisma.user.findFirst({
-      where: {
-        OR: [
-          ...(dto.email ? [{ email: dto.email }] : []),
-          ...(dto.phone ? [{ phone: dto.phone }] : [])
-        ]
-      },
-    });
+    let user;
+    try {
+      user = await this.prisma.user.findFirst({
+        where: {
+          OR: [
+            ...(dto.email ? [{ email: dto.email }] : []),
+            ...(dto.phone ? [{ phone: dto.phone }] : [])
+          ]
+        },
+      });
+    } catch (error) {
+      this.logger.error(`Login DB Error: ${error.message}`);
+      throw new BadRequestException("An error occurred during login. Please try again later.");
+    }
 
     if (!user) {
       this.auditLogger.log(null, AdminAction.LOGIN_FAILED, AdminEntity.USER, null, `Attempt for ${dto.email || dto.phone}: User not found`);
