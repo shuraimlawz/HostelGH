@@ -103,7 +103,7 @@ function RegisterContent({ onSuccess }: { onSuccess?: () => void }) {
                             <User className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-blue-600 transition-colors" size={16} />
                             <input
                                 type="text"
-                                className="w-full pl-11 pr-4 h-12 bg-gray-50 border border-gray-100 rounded-2xl outline-none focus:bg-white focus:border-blue-600 transition-all text-xs font-bold uppercase tracking-tight placeholder:text-gray-300"
+                                className="w-full pl-11 pr-4 h-12 bg-muted/50 border border-border rounded-2xl outline-none focus:bg-card focus:border-blue-600 transition-all text-xs font-bold uppercase tracking-tight placeholder:text-muted-foreground/50 text-foreground"
                                 value={firstName}
                                 onChange={(e) => setFirstName(e.target.value)}
                                 placeholder="ISAAC"
@@ -116,7 +116,7 @@ function RegisterContent({ onSuccess }: { onSuccess?: () => void }) {
                         <label className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] ml-1 group-focus-within:text-blue-600">Last Name</label>
                         <input
                             type="text"
-                            className="w-full px-4 h-12 bg-gray-50 border border-gray-100 rounded-2xl outline-none focus:bg-white focus:border-blue-600 transition-all text-xs font-bold uppercase tracking-tight placeholder:text-gray-300"
+                            className="w-full px-4 h-12 bg-muted/50 border border-border rounded-2xl outline-none focus:bg-card focus:border-blue-600 transition-all text-xs font-bold uppercase tracking-tight placeholder:text-muted-foreground/50 text-foreground"
                             value={lastName}
                             onChange={(e) => setLastName(e.target.value)}
                             placeholder="MENSAH"
@@ -131,7 +131,7 @@ function RegisterContent({ onSuccess }: { onSuccess?: () => void }) {
                         <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-blue-600 transition-colors" size={16} />
                         <input
                             type="email"
-                            className="w-full pl-11 pr-4 h-12 bg-gray-50 border border-gray-100 rounded-2xl outline-none focus:bg-white focus:border-blue-600 transition-all text-xs font-bold uppercase tracking-tight placeholder:text-gray-300"
+                            className="w-full pl-11 pr-4 h-12 bg-muted/50 border border-border rounded-2xl outline-none focus:bg-card focus:border-blue-600 transition-all text-xs font-bold uppercase tracking-tight placeholder:text-muted-foreground/50 text-foreground"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             placeholder="USER@EMAIL.COM"
@@ -146,7 +146,7 @@ function RegisterContent({ onSuccess }: { onSuccess?: () => void }) {
                         <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-blue-600 transition-colors" size={16} />
                         <input
                             type={showPassword ? "text" : "password"}
-                            className="w-full pl-11 pr-11 h-12 bg-gray-50 border border-gray-100 rounded-2xl outline-none focus:bg-white focus:border-blue-600 transition-all text-xs font-bold tracking-widest placeholder:text-gray-300"
+                            className="w-full pl-11 pr-11 h-12 bg-muted/50 border border-border rounded-2xl outline-none focus:bg-card focus:border-blue-600 transition-all text-xs font-bold tracking-widest placeholder:text-muted-foreground/50 text-foreground"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             placeholder="••••••••"
@@ -155,7 +155,7 @@ function RegisterContent({ onSuccess }: { onSuccess?: () => void }) {
                         <button
                             type="button"
                             onClick={() => setShowPassword(!showPassword)}
-                            className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-300 hover:text-gray-900 transition-colors outline-none"
+                            className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-300 hover:text-foreground transition-colors outline-none"
                         >
                             {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                         </button>
@@ -166,12 +166,12 @@ function RegisterContent({ onSuccess }: { onSuccess?: () => void }) {
                     <label className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] ml-1 group-focus-within:text-blue-600">Account Type</label>
                     <div className="relative">
                         <select
-                            className="w-full px-5 h-12 bg-gray-50 border border-gray-100 rounded-2xl outline-none focus:bg-white focus:border-blue-600 transition-all text-[10px] font-bold uppercase tracking-widest shadow-sm appearance-none cursor-pointer text-gray-900"
+                            className="w-full px-5 h-12 bg-muted/50 border border-border rounded-2xl outline-none focus:bg-card focus:border-blue-600 transition-all text-[10px] font-bold uppercase tracking-widest shadow-sm appearance-none cursor-pointer text-foreground"
                             value={role}
                             onChange={(e) => setRole(e.target.value as any)}
                         >
-                            <option value="TENANT">Student Hub (Resident)</option>
-                            <option value="OWNER">Owner Hub (Property Owner)</option>
+                            <option value="TENANT" className="bg-card">Student Hub (Resident)</option>
+                            <option value="OWNER" className="bg-card">Owner Hub (Property Owner)</option>
                         </select>
                         <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
                             <svg width="10" height="10" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -190,7 +190,7 @@ function RegisterContent({ onSuccess }: { onSuccess?: () => void }) {
 
                 <button
                     disabled={loading}
-                    className="group relative w-full h-14 rounded-2xl bg-gray-900 text-white font-bold py-3.5 hover:bg-black transition-all active:scale-[0.98] disabled:opacity-50 text-[11px] uppercase tracking-[0.3em] shadow-2xl shadow-gray-200 flex items-center justify-center gap-3"
+                    className="group relative w-full h-14 rounded-2xl bg-blue-600 text-white font-bold py-3.5 hover:bg-blue-700 transition-all active:scale-[0.98] disabled:opacity-50 text-[11px] uppercase tracking-[0.3em] shadow-lg shadow-blue-600/20 flex items-center justify-center gap-3"
                 >
                     {loading ? (
                         <>
@@ -208,17 +208,17 @@ function RegisterContent({ onSuccess }: { onSuccess?: () => void }) {
 
             <div className="relative py-2">
                 <div className="absolute inset-0 flex items-center">
-                    <div className="w-full border-t border-gray-100"></div>
+                    <div className="w-full border-t border-border"></div>
                 </div>
                 <div className="relative flex justify-center text-[9px] uppercase tracking-[0.4em] font-bold">
-                    <span className="bg-white px-4 text-gray-300">Alternate</span>
+                    <span className="bg-card px-4 text-muted-foreground/50">Alternate</span>
                 </div>
             </div>
 
             <button
                 onClick={handleGoogleLogin}
                 type="button"
-                className="w-full h-14 flex items-center justify-center gap-3 rounded-2xl border border-gray-100 bg-white text-gray-900 font-bold hover:bg-gray-50 hover:border-gray-200 transition-all active:scale-[0.98] text-[10px] uppercase tracking-widest shadow-sm"
+                className="w-full h-14 flex items-center justify-center gap-3 rounded-2xl border border-border bg-card text-foreground font-bold hover:bg-muted/50 transition-all active:scale-[0.98] text-[10px] uppercase tracking-widest"
             >
                 <svg viewBox="0 0 18 18" width="16" height="16" xmlns="http://www.w3.org/2000/svg">
                     <path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z" />
@@ -229,8 +229,8 @@ function RegisterContent({ onSuccess }: { onSuccess?: () => void }) {
                 Continue with Google
             </button>
 
-            <div className="text-center text-[10px] font-bold text-gray-400 uppercase tracking-widest pt-2">
-                Already have an account? <Link href="/auth/login" className="text-gray-900 border-b border-gray-200 hover:border-gray-900 transition-all ml-2">Login Here</Link>
+            <div className="text-center text-[10px] font-bold text-muted-foreground uppercase tracking-widest pt-2">
+                Already have an account? <Link href="/auth/login" className="text-foreground border-b border-border hover:border-foreground transition-all ml-2">Login Here</Link>
             </div>
         </div>
     );

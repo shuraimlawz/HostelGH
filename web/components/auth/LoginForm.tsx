@@ -99,7 +99,7 @@ export default function LoginForm({ onSuccess }: { onSuccess?: (user: any) => vo
                             <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-blue-600 transition-colors" size={18} />
                             <input
                                 type="email"
-                                className="w-full pl-12 pr-4 h-14 bg-gray-50 border border-gray-100 rounded-2xl outline-none focus:bg-white focus:border-blue-600 transition-all text-[13px] font-bold text-gray-900 placeholder:text-gray-300"
+                                className="w-full pl-12 pr-4 h-14 bg-muted/50 border border-border rounded-2xl outline-none focus:bg-card focus:border-blue-600 transition-all text-[13px] font-bold text-foreground placeholder:text-muted-foreground/50"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                                 placeholder="USER@EMAIL.COM"
@@ -121,7 +121,7 @@ export default function LoginForm({ onSuccess }: { onSuccess?: (user: any) => vo
                             <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-blue-600 transition-colors" size={18} />
                             <input
                                 type={showPassword ? "text" : "password"}
-                                className="w-full pl-12 pr-12 h-14 bg-gray-50 border border-gray-100 rounded-2xl outline-none focus:bg-white focus:border-blue-600 transition-all text-[13px] font-bold tracking-widest text-gray-900 placeholder:text-gray-300"
+                                className="w-full pl-12 pr-12 h-14 bg-muted/50 border border-border rounded-2xl outline-none focus:bg-card focus:border-blue-600 transition-all text-[13px] font-bold tracking-widest text-foreground placeholder:text-muted-foreground/50"
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
                                 placeholder="••••••••"
@@ -146,11 +146,11 @@ export default function LoginForm({ onSuccess }: { onSuccess?: (user: any) => vo
                                 type="checkbox"
                                 checked={rememberMe}
                                 onChange={(e) => setRememberMe(e.target.checked)}
-                                className="peer appearance-none w-5 h-5 rounded-lg border border-gray-200 bg-gray-50 checked:bg-blue-600 checked:border-blue-600 transition-all cursor-pointer"
+                                className="peer appearance-none w-5 h-5 rounded-lg border border-border bg-muted checked:bg-blue-600 checked:border-blue-600 transition-all cursor-pointer"
                             />
                             <ShieldCheck className="absolute inset-0 m-auto text-white scale-0 peer-checked:scale-100 transition-transform pointer-events-none" size={12} />
                         </div>
-                        <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest group-hover/check:text-gray-900 transition-colors">Keep me logged in</span>
+                        <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest group-hover/check:text-foreground transition-colors">Keep me logged in</span>
                     </label>
                 </div>
 
@@ -174,7 +174,7 @@ export default function LoginForm({ onSuccess }: { onSuccess?: (user: any) => vo
 
                 <button
                     disabled={loading}
-                    className="group relative w-full h-14 rounded-2xl bg-gray-900 text-white font-bold py-3.5 hover:bg-black transition-all active:scale-[0.98] disabled:opacity-50 text-[11px] uppercase tracking-[0.3em] shadow-2xl shadow-gray-200 flex items-center justify-center gap-3"
+                    className="group relative w-full h-14 rounded-2xl bg-blue-600 text-white font-bold py-3.5 hover:bg-blue-700 transition-all active:scale-[0.98] disabled:opacity-50 text-[11px] uppercase tracking-[0.3em] shadow-lg shadow-blue-600/20 flex items-center justify-center gap-3"
                 >
                     {loading ? (
                         <>
@@ -192,17 +192,17 @@ export default function LoginForm({ onSuccess }: { onSuccess?: (user: any) => vo
 
             <div className="relative py-2">
                 <div className="absolute inset-0 flex items-center">
-                    <div className="w-full border-t border-gray-100"></div>
+                    <div className="w-full border-t border-border"></div>
                 </div>
                 <div className="relative flex justify-center text-[9px] uppercase tracking-[0.4em] font-bold">
-                    <span className="bg-white px-4 text-gray-300">Alternate</span>
+                    <span className="bg-card px-4 text-muted-foreground/50">Alternate</span>
                 </div>
             </div>
 
             <button
                 onClick={handleGoogleLogin}
                 type="button"
-                className="w-full h-14 flex items-center justify-center gap-3 rounded-2xl border border-gray-100 bg-white text-gray-900 font-bold hover:bg-gray-50 hover:border-gray-200 transition-all active:scale-[0.98] text-[10px] uppercase tracking-widest shadow-sm"
+                className="w-full h-14 flex items-center justify-center gap-3 rounded-2xl border border-border bg-card text-foreground font-bold hover:bg-muted/50 transition-all active:scale-[0.98] text-[10px] uppercase tracking-widest"
             >
                 <svg viewBox="0 0 18 18" width="16" height="16" xmlns="http://www.w3.org/2000/svg">
                     <path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z" />
@@ -213,8 +213,8 @@ export default function LoginForm({ onSuccess }: { onSuccess?: (user: any) => vo
                 Continue with Google
             </button>
 
-            <div className="text-center text-[10px] font-bold text-gray-400 uppercase tracking-widest pt-4">
-                No account yet? <Link href="/auth/register" className="text-gray-900 border-b border-gray-200 hover:border-gray-900 transition-all ml-2">Register Here</Link>
+            <div className="text-center text-[10px] font-bold text-muted-foreground uppercase tracking-widest pt-4">
+                No account yet? <Link href="/auth/register" className="text-foreground border-b border-border hover:border-foreground transition-all ml-2">Register Here</Link>
             </div>
         </div>
     );

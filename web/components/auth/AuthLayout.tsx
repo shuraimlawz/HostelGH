@@ -47,7 +47,7 @@ export default function AuthLayout({ children, title, subtitle }: AuthLayoutProp
     }, []);
 
     return (
-        <div className="min-h-screen w-full flex bg-white font-sans">
+        <div className="min-h-screen w-full flex bg-background font-sans transition-colors duration-500">
             {/* Left Side - Image Carousel */}
             <div className="hidden lg:flex w-1/2 bg-gray-900 relative overflow-hidden items-center justify-center">
                 <div className="absolute inset-0 z-0">
@@ -103,9 +103,9 @@ export default function AuthLayout({ children, title, subtitle }: AuthLayoutProp
             </div>
 
             {/* Right Side - Form Content */}
-            <div className="w-full lg:w-1/2 flex flex-col items-center justify-center p-12 bg-white relative">
+            <div className="w-full lg:w-1/2 flex flex-col items-center justify-center p-12 bg-background relative transition-colors duration-500">
                 {/* Subtle background glow */}
-                <div className="absolute inset-x-0 top-0 h-96 bg-gradient-to-b from-blue-50/50 to-transparent pointer-events-none" />
+                <div className="absolute inset-x-0 top-0 h-96 bg-gradient-to-b from-blue-500/5 to-transparent pointer-events-none" />
 
                 <div className="w-full max-w-md relative z-10 space-y-12">
                     {/* Header */}
@@ -115,15 +115,15 @@ export default function AuthLayout({ children, title, subtitle }: AuthLayoutProp
                                 <span className="p-1 group-hover:scale-110 transition-transform duration-500">
                                     <LogoAnimation />
                                 </span>
-                                <span className="uppercase tracking-[0.3em] text-[10px] text-gray-900">HostelGH</span>
+                                <span className="uppercase tracking-[0.3em] text-[10px] text-foreground">HostelGH</span>
                             </Link>
                         </div>
                         <div className="space-y-3">
-                            <h1 className="text-4xl font-bold tracking-tighter text-gray-900 uppercase leading-none">
+                            <h1 className="text-4xl font-bold tracking-tighter text-foreground uppercase leading-none">
                                 {title}
                             </h1>
                             {subtitle && (
-                                <p className="text-gray-400 font-bold text-[11px] uppercase tracking-widest leading-relaxed">
+                                <p className="text-muted-foreground font-bold text-[11px] uppercase tracking-widest leading-relaxed">
                                     {subtitle}
                                 </p>
                             )}
@@ -132,7 +132,7 @@ export default function AuthLayout({ children, title, subtitle }: AuthLayoutProp
                     </div>
 
                     {/* Form Container */}
-                    <div className="bg-white border border-gray-100 p-10 md:p-12 rounded-[2.5rem] shadow-[0_32px_64px_-16px_rgba(0,0,0,0.08)] animate-in fade-in zoom-in-95 duration-700">
+                    <div className="bg-card border border-border p-10 md:p-12 rounded-[2.5rem] shadow-2xl shadow-blue-900/5 animate-in fade-in zoom-in-95 duration-700">
                         {children}
                     </div>
 
