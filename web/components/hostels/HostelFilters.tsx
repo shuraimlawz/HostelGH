@@ -238,123 +238,81 @@ export default function HostelFilters() {
                     <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" size={16} />
                 </div>
 
-                {/* More Filters Popover */}
-                <Popover>
-                    <PopoverTrigger asChild>
-                        <button className="h-14 w-full lg:w-auto px-8 lg:ml-2 bg-blue-600 text-white hover:bg-blue-700 rounded-xl lg:rounded-[1.5rem] font-bold text-sm flex items-center justify-center gap-2 shadow-lg shadow-blue-600/20 transition-all active:scale-95 shrink-0">
-                            <SlidersHorizontal size={16} /> Filters
-                        </button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-80 p-6 rounded-2xl border-gray-100 dark:border-slate-800 shadow-2xl space-y-8 bg-white dark:bg-slate-900" align="end">
-                        <div className="flex items-center justify-between border-b dark:border-slate-800 pb-4">
-                            <h3 className="font-bold text-gray-900 dark:text-white text-sm">Filters</h3>
-                            <button onClick={() => { clearFilters(); setAvailableOnly(false); }} className="text-[10px] font-bold text-blue-600 dark:text-blue-400 hover:underline uppercase tracking-widest">Reset All</button>
-                        </div>
+                <div className="hidden lg:block w-px h-8 bg-gray-200 dark:bg-slate-800 mx-2" />
 
-                        {/* Availability Toggle */}
-                        <div className="flex items-center justify-between p-4 bg-emerald-50/50 dark:bg-emerald-500/5 rounded-2xl border border-emerald-100 dark:border-emerald-500/10">
-                            <div className="space-y-0.5">
-                                <p className="text-xs font-bold text-emerald-700 dark:text-emerald-400">Available Only</p>
-                                <p className="text-[9px] font-medium text-emerald-600/70 dark:text-emerald-400/50">Hide hostels with no rooms left</p>
-                            </div>
-                            <button 
-                                onClick={() => setAvailableOnly(!availableOnly)}
-                                className={cn(
-                                    "w-10 h-5 rounded-full transition-all relative",
-                                    availableOnly ? "bg-emerald-500 shadow-md shadow-emerald-500/20" : "bg-gray-200 dark:bg-slate-800"
-                                )}
-                            >
-                                <div className={cn(
-                                    "absolute top-1 w-3 h-3 bg-white rounded-full transition-all",
-                                    availableOnly ? "left-6" : "left-1"
-                                )} />
+                {/* Desktop Filter Popover */}
+                <div className="hidden lg:block">
+                    <Popover>
+                        <PopoverTrigger asChild>
+                            <button className="h-11 px-6 rounded-xl bg-blue-600 text-white flex items-center gap-2 font-bold text-xs uppercase tracking-widest hover:bg-blue-700 transition-all shadow-lg shadow-blue-600/20 active:scale-95">
+                                <SlidersHorizontal size={14} />
+                                Filters
                             </button>
-                        </div>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-80 p-6 rounded-2xl border-gray-100 dark:border-slate-800 shadow-2xl space-y-8 bg-white dark:bg-slate-900" align="end">
+                            <FilterContent 
+                                clearFilters={clearFilters} 
+                                setAvailableOnly={setAvailableOnly}
+                                availableOnly={availableOnly}
+                                roomConfig={roomConfig}
+                                setRoomConfig={setRoomConfig}
+                                minPrice={minPrice}
+                                setMinPrice={setMinPrice}
+                                maxPrice={maxPrice}
+                                setMaxPrice={setMaxPrice}
+                                selectedAmenities={selectedAmenities}
+                                toggleAmenity={toggleAmenity}
+                                handleApply={handleApply}
+                            />
+                        </PopoverContent>
+                    </Popover>
+                </div>
 
-                        {/* Room Config */}
-                        <div className="space-y-3">
-                            <Label className="text-[10px] font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500">Room Type</Label>
-                            <select
-                                value={roomConfig}
-                                onChange={(e) => setRoomConfig(e.target.value)}
-                                className="w-full h-11 bg-gray-50 dark:bg-slate-800 border border-gray-100 dark:border-slate-700 rounded-xl px-4 outline-none font-bold text-xs text-gray-900 dark:text-white"
-                            >
-                                <option value="" className="bg-white dark:bg-slate-900">Any Room Type</option>
-                                <option value="1 in a room" className="bg-white dark:bg-slate-900">1 in a room (Single)</option>
-                                <option value="2 in a room" className="bg-white dark:bg-slate-900">2 in a room</option>
-                                <option value="3 in a room" className="bg-white dark:bg-slate-900">3 in a room</option>
-                                <option value="4 in a room" className="bg-white dark:bg-slate-900">4 in a room</option>
-                                <option value="5 in a room" className="bg-white dark:bg-slate-900">5 in a room</option>
-                                <option value="6 in a room" className="bg-white dark:bg-slate-900">6 in a room</option>
-                            </select>
-                        </div>
-
-                        {/* Price Range */}
-                        <div className="space-y-3">
-                            <Label className="text-[10px] font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500">Budget (₵)</Label>
-                            <div className="grid grid-cols-2 gap-3">
-                                <div className="relative">
-                                    <Input
-                                        type="number"
-                                        value={minPrice}
-                                        onChange={(e) => setMinPrice(e.target.value)}
-                                        className="rounded-xl h-11 bg-gray-50 dark:bg-slate-800 border-gray-100 dark:border-slate-700 font-bold text-xs pl-6 text-gray-900 dark:text-white placeholder:text-gray-400"
-                                        placeholder="Min"
-                                    />
-                                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-300 dark:text-gray-600 text-[10px]">₵</span>
-                                </div>
-                                <div className="relative">
-                                    <Input
-                                        type="number"
-                                        value={maxPrice}
-                                        onChange={(e) => setMaxPrice(e.target.value)}
-                                        className="rounded-xl h-11 bg-gray-50 dark:bg-slate-800 border-gray-100 dark:border-slate-700 font-bold text-xs pl-6 text-gray-900 dark:text-white placeholder:text-gray-400"
-                                        placeholder="Max"
-                                    />
-                                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-300 dark:text-gray-600 text-[10px]">₵</span>
-                                </div>
+                {/* Mobile Filter Sheet */}
+                <div className="lg:hidden w-full px-2 lg:px-0 mt-2 lg:mt-0">
+                    <Sheet>
+                        <SheetTrigger asChild>
+                            <button className="w-full h-14 rounded-xl bg-blue-600 text-white flex items-center justify-center gap-2 font-bold text-xs uppercase tracking-widest hover:bg-blue-700 transition-all shadow-lg shadow-blue-600/20 active:scale-95">
+                                <SlidersHorizontal size={16} />
+                                Filters
+                            </button>
+                        </SheetTrigger>
+                        <SheetContent side="bottom" className="h-[85vh] rounded-t-[2.5rem] p-0 bg-white dark:bg-slate-900 border-t-0">
+                            {/* Drawer Handle */}
+                            <div className="w-full flex justify-center py-4">
+                                <div className="w-12 h-1.5 bg-gray-200 dark:bg-slate-800 rounded-full" />
                             </div>
-                        </div>
-
-                        {/* Amenities */}
-                        <div className="space-y-3">
-                            <Label className="text-[10px] font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500">Essentials</Label>
-                            <div className="grid grid-cols-2 gap-2">
-                                {AMENITIES.map((a) => {
-                                    const isSelected = selectedAmenities.includes(a.id);
-                                    return (
-                                        <button
-                                            key={a.id}
-                                            onClick={() => toggleAmenity(a.id)}
-                                            className={cn(
-                                                "flex items-center gap-2 px-3 py-2.5 rounded-xl border text-[10px] font-bold uppercase tracking-tight transition-all",
-                                                isSelected
-                                                    ? "bg-blue-600 text-white border-blue-600 shadow-md shadow-blue-500/20"
-                                                    : "bg-white dark:bg-slate-800 text-gray-600 dark:text-gray-300 border-gray-100 dark:border-slate-700 hover:border-blue-200 dark:hover:border-blue-500/50"
-                                            )}
-                                        >
-                                            <a.icon size={12} className={cn(isSelected ? "text-blue-200" : "text-gray-300 dark:text-gray-600")} />
-                                            <span className="truncate">{a.id}</span>
-                                        </button>
-                                    );
-                                })}
+                            
+                            <div className="px-6 pb-10 overflow-y-auto h-full space-y-8">
+                                <SheetHeader className="text-left pb-4 border-b dark:border-slate-800">
+                                    <SheetTitle className="text-xl font-bold text-gray-900 dark:text-white">Refine Search</SheetTitle>
+                                </SheetHeader>
+                                
+                                <FilterContent 
+                                    clearFilters={clearFilters} 
+                                    setAvailableOnly={setAvailableOnly}
+                                    availableOnly={availableOnly}
+                                    roomConfig={roomConfig}
+                                    setRoomConfig={setRoomConfig}
+                                    minPrice={minPrice}
+                                    setMinPrice={setMinPrice}
+                                    maxPrice={maxPrice}
+                                    setMaxPrice={setMaxPrice}
+                                    selectedAmenities={selectedAmenities}
+                                    toggleAmenity={toggleAmenity}
+                                    handleApply={handleApply}
+                                    isMobile
+                                />
                             </div>
-                        </div>
-
-                        <Button
-                            onClick={handleApply}
-                            className="w-full rounded-xl h-12 font-bold uppercase tracking-widest text-[10px] bg-blue-600 hover:bg-blue-700 text-white shadow-xl shadow-blue-600/20 transition-all active:scale-[0.98]"
-                        >
-                            Apply Filters
-                        </Button>
-                    </PopoverContent>
-                </Popover>
+                        </SheetContent>
+                    </Sheet>
+                </div>
 
                 {/* Reset Shortcut */}
                 {(query || university || gender || minPrice || selectedAmenities.length > 0) && (
                     <button 
                         onClick={clearFilters}
-                        className="h-14 w-14 lg:ml-2 flex items-center justify-center rounded-xl lg:rounded-[1.5rem] bg-red-50 dark:bg-red-500/10 text-red-500 hover:bg-red-100 dark:hover:bg-red-500/20 transition-colors shrink-0"
+                        className="hidden lg:flex h-14 w-14 lg:ml-2 items-center justify-center rounded-xl lg:rounded-[1.5rem] bg-red-50 dark:bg-red-500/10 text-red-500 hover:bg-red-100 dark:hover:bg-red-500/20 transition-colors shrink-0"
                         title="Clear all filters"
                     >
                         <X size={20} />
@@ -387,6 +345,128 @@ export default function HostelFilters() {
                     )}
                 </div>
             )}
+        </div>
+    );
+}
+
+function FilterContent({ 
+    clearFilters, 
+    setAvailableOnly, 
+    availableOnly, 
+    roomConfig, 
+    setRoomConfig, 
+    minPrice, 
+    setMinPrice, 
+    maxPrice, 
+    setMaxPrice, 
+    selectedAmenities, 
+    toggleAmenity, 
+    handleApply,
+    isMobile = false
+}: any) {
+    return (
+        <div className="space-y-8">
+            {!isMobile && (
+                <div className="flex items-center justify-between border-b dark:border-slate-800 pb-4">
+                    <h3 className="font-bold text-gray-900 dark:text-white text-sm">Filters</h3>
+                    <button onClick={() => { clearFilters(); setAvailableOnly(false); }} className="text-[10px] font-bold text-blue-600 dark:text-blue-400 hover:underline uppercase tracking-widest">Reset All</button>
+                </div>
+            )}
+
+            {/* Availability Toggle */}
+            <div className="flex items-center justify-between p-4 bg-emerald-50/50 dark:bg-emerald-500/5 rounded-2xl border border-emerald-100 dark:border-emerald-500/10">
+                <div className="space-y-0.5">
+                    <p className="text-xs font-bold text-emerald-700 dark:text-emerald-400">Available Only</p>
+                    <p className="text-[9px] font-medium text-emerald-600/70 dark:text-emerald-400/50">Hide hostels with no rooms left</p>
+                </div>
+                <button 
+                    onClick={() => setAvailableOnly(!availableOnly)}
+                    className={cn(
+                        "w-10 h-5 rounded-full transition-all relative",
+                        availableOnly ? "bg-emerald-500 shadow-md shadow-emerald-500/20" : "bg-gray-200 dark:bg-slate-800"
+                    )}
+                >
+                    <div className={cn(
+                        "absolute top-1 w-3 h-3 bg-white rounded-full transition-all",
+                        availableOnly ? "left-6" : "left-1"
+                    )} />
+                </button>
+            </div>
+
+            {/* Room Config */}
+            <div className="space-y-3">
+                <Label className="text-[10px] font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500">Room Type</Label>
+                <select
+                    value={roomConfig}
+                    onChange={(e) => setRoomConfig(e.target.value)}
+                    className="w-full h-11 bg-gray-50 dark:bg-slate-800 border border-gray-100 dark:border-slate-700 rounded-xl px-4 outline-none font-bold text-xs text-gray-900 dark:text-white"
+                >
+                    <option value="" className="bg-white dark:bg-slate-900">Any Room Type</option>
+                    <option value="1 IN A ROOM" className="bg-white dark:bg-slate-900">1 In a Room</option>
+                    <option value="2 IN A ROOM" className="bg-white dark:bg-slate-900">2 In a Room</option>
+                    <option value="3 IN A ROOM" className="bg-white dark:bg-slate-900">3 In a Room</option>
+                    <option value="4 IN A ROOM" className="bg-white dark:bg-slate-900">4 In a Room</option>
+                </select>
+            </div>
+
+            {/* Budget Range */}
+            <div className="space-y-3">
+                <Label className="text-[10px] font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500">Budget (₵)</Label>
+                <div className="grid grid-cols-2 gap-2">
+                    <div className="relative">
+                        <Input
+                            type="number"
+                            value={minPrice}
+                            onChange={(e) => setMinPrice(e.target.value)}
+                            className="rounded-xl h-11 bg-gray-50 dark:bg-slate-800 border-gray-100 dark:border-slate-700 font-bold text-xs pl-6 text-gray-900 dark:text-white placeholder:text-gray-400"
+                            placeholder="Min"
+                        />
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-300 dark:text-gray-600 text-[10px]">₵</span>
+                    </div>
+                    <div className="relative">
+                        <Input
+                            type="number"
+                            value={maxPrice}
+                            onChange={(e) => setMaxPrice(e.target.value)}
+                            className="rounded-xl h-11 bg-gray-50 dark:bg-slate-800 border-gray-100 dark:border-slate-700 font-bold text-xs pl-6 text-gray-900 dark:text-white placeholder:text-gray-400"
+                            placeholder="Max"
+                        />
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-300 dark:text-gray-600 text-[10px]">₵</span>
+                    </div>
+                </div>
+            </div>
+
+            {/* Amenities */}
+            <div className="space-y-3">
+                <Label className="text-[10px] font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500">Essentials</Label>
+                <div className="grid grid-cols-2 gap-2">
+                    {AMENITIES.map((a: any) => {
+                        const isSelected = selectedAmenities.includes(a.id);
+                        return (
+                            <button
+                                key={a.id}
+                                onClick={() => toggleAmenity(a.id)}
+                                className={cn(
+                                    "flex items-center gap-2 px-3 py-2.5 rounded-xl border text-[10px] font-bold uppercase tracking-tight transition-all",
+                                    isSelected
+                                        ? "bg-blue-600 text-white border-blue-600 shadow-md shadow-blue-500/20"
+                                        : "bg-white dark:bg-slate-800 text-gray-600 dark:text-gray-300 border-gray-100 dark:border-slate-700 hover:border-blue-200 dark:hover:border-blue-500/50"
+                                )}
+                            >
+                                <a.icon size={12} className={cn(isSelected ? "text-blue-200" : "text-gray-300 dark:text-gray-600")} />
+                                <span className="truncate">{a.id}</span>
+                            </button>
+                        );
+                    })}
+                </div>
+            </div>
+
+            <Button
+                onClick={handleApply}
+                className="w-full rounded-xl h-12 font-bold uppercase tracking-widest text-[10px] bg-blue-600 hover:bg-blue-700 text-white shadow-xl shadow-blue-600/20 transition-all active:scale-[0.98]"
+            >
+                Apply Filters
+            </Button>
         </div>
     );
 }

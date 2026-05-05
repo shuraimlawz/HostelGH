@@ -173,15 +173,10 @@
 }
 
 @layer utilities {
-  /* Cleaned up: Removed aggressive global overrides that leaked into light mode */
-  
+  /* Cleaned up shadows for dark mode */
   .dark [class*="shadow-"] { 
     --tw-shadow: 0 0 #0000;
     --tw-shadow-colored: 0 0 #0000;
-    box-shadow: none !important;
-  }
-
-  .dark .shadow-blue-100, .dark .shadow-gray-200, .dark .shadow-gray-100 {
     box-shadow: none !important;
   }
 
@@ -192,8 +187,10 @@
     box-shadow: none !important;
     border-color: hsl(222.2, 47.4%, 30%) !important;
   }
-  .dark .border-gray-200 { border-color: hsl(222.2, 47.4%, 25%) !important; }
-  .dark .border-gray-200 { border-color: hsl(222.2, 47.4%, 25%) !important; }
+  
+  .dark .border-gray-200, .dark .border-gray-100 { 
+    border-color: hsl(222.2, 47.4%, 25%) !important; 
+  }
 }
 
 @keyframes letter-reveal {
