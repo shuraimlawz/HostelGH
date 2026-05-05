@@ -46,7 +46,7 @@ export default function HostelSection({
                             </span>
                         </div>
                     )}
-                    <h3 className="text-2xl md:text-3xl font-bold tracking-tighter text-slate-900 dark:text-white uppercase leading-tight">
+                    <h3 className="text-2xl md:text-3xl font-bold tracking-tighter text-black! dark:text-white! uppercase leading-tight">
                         {title}
                     </h3>
                     {subtitle && (
