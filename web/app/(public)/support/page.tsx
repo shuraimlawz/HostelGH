@@ -11,7 +11,7 @@ const TOPICS = [
         description: "How to book a room, cancel, and contact your hostel owner.",
         icon: Book,
         color: "text-blue-600",
-        bgColor: "bg-blue-50 dark:bg-blue-950/30",
+        bgColor: "bg-blue-100",
         href: "/support/help-center"
     },
     {
@@ -19,7 +19,7 @@ const TOPICS = [
         description: "MoMo, card payments, booking fees, and refund timelines.",
         icon: CreditCard,
         color: "text-green-600",
-        bgColor: "bg-green-50 dark:bg-green-950/30",
+        bgColor: "bg-green-100",
         href: "/support/help-center"
     },
     {
@@ -27,7 +27,7 @@ const TOPICS = [
         description: "How to create a listing, add rooms, and get verified.",
         icon: Home,
         color: "text-purple-600",
-        bgColor: "bg-purple-50 dark:bg-purple-950/30",
+        bgColor: "bg-purple-100",
         href: "/support/help-center"
     },
     {
@@ -35,7 +35,7 @@ const TOPICS = [
         description: "Update your profile, change password, and verify your identity.",
         icon: UserCheck,
         color: "text-orange-600",
-        bgColor: "bg-orange-50 dark:bg-orange-950/30",
+        bgColor: "bg-orange-100",
         href: "/support/help-center"
     },
     {
@@ -43,15 +43,15 @@ const TOPICS = [
         description: "Spot scams, report fake listings, and stay safe.",
         icon: Shield,
         color: "text-red-600",
-        bgColor: "bg-red-50 dark:bg-red-950/30",
+        bgColor: "bg-red-100",
         href: "/support/safety"
     },
     {
         title: "Technical Issues",
         description: "Page not loading, login problems, or payment errors.",
         icon: LifeBuoy,
-        color: "text-gray-600",
-        bgColor: "bg-gray-50 dark:bg-slate-800",
+        color: "text-muted-foreground",
+        bgColor: "bg-muted",
         href: "/support/help-center"
     }
 ];
@@ -69,21 +69,21 @@ export default function SupportPage() {
         <div className="space-y-16">
             {/* Hero */}
             <div className="space-y-6">
-                <h1 className="text-4xl md:text-5xl font-black text-gray-900 dark:text-white tracking-tight">
+                <h1 className="text-4xl md:text-5xl font-black tracking-tight text-foreground">
                     How can we help?
                 </h1>
-                <p className="text-gray-500 dark:text-gray-400 text-base font-medium max-w-2xl">
+                <p className="text-sm font-medium max-w-2xl text-muted-foreground">
                     Find answers about bookings, payments, listings, and safety — built for students and hostel owners across Ghana.
                 </p>
 
                 {/* Search */}
                 <div className="relative max-w-xl">
-                    <div className="flex items-center bg-white dark:bg-slate-800 border-2 border-gray-100 dark:border-slate-700 rounded-2xl px-5 py-1 shadow-sm focus-within:border-blue-500 dark:focus-within:border-blue-500 transition-all">
-                        <Search className="text-gray-400 w-5 h-5 shrink-0" />
+                    <div className="flex items-center bg-muted border-2 border-border rounded-2xl px-5 py-1 focus-within:border-primary transition-all">
+                        <Search className="text-muted-foreground w-5 h-5 shrink-0" />
                         <input
                             type="text"
                             placeholder="Search e.g. refund, cancel booking, MoMo..."
-                            className="w-full px-4 py-4 font-medium bg-transparent outline-none placeholder:text-gray-400 dark:placeholder:text-gray-500 text-gray-900 dark:text-white"
+                            className="w-full px-4 py-4 font-medium bg-transparent outline-none placeholder:text-muted-foreground text-foreground"
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                         />
@@ -93,7 +93,7 @@ export default function SupportPage() {
 
             {/* Topics */}
             <section className="space-y-6">
-                <h2 className="text-xs font-black uppercase tracking-[0.2em] text-gray-400">
+                <h2 className="text-xs font-black uppercase tracking-[0.2em] text-muted-foreground">
                     Popular Topics
                 </h2>
                 {filtered.length > 0 ? (
@@ -108,28 +108,28 @@ export default function SupportPage() {
                     </div>
                 ) : (
                     <div className="py-16 text-center space-y-2">
-                        <p className="text-gray-400 font-bold text-sm uppercase tracking-widest">No results for "{searchQuery}"</p>
-                        <p className="text-gray-400 text-xs">Try "booking", "payment", or "cancel"</p>
+                        <p className="text-muted-foreground font-bold text-sm uppercase tracking-widest">No results for "{searchQuery}"</p>
+                        <p className="text-muted-foreground text-xs">Try "booking", "payment", or "cancel"</p>
                     </div>
                 )}
             </section>
 
             {/* CTA */}
-            <div className="p-8 bg-gray-900 dark:bg-slate-950 rounded-[2.5rem] flex flex-col md:flex-row items-center justify-between gap-6 border border-white/5">
+            <div className="p-8 bg-foreground rounded-[2.5rem] flex flex-col md:flex-row items-center justify-between gap-6">
                 <div className="space-y-1 text-center md:text-left">
-                    <h3 className="text-xl font-black text-white">Still need help?</h3>
-                    <p className="text-gray-400 font-medium text-sm">Browse our full Help Center or contact us directly.</p>
+                    <h3 className="text-xl font-black text-background">Still need help?</h3>
+                    <p className="text-background/60 font-medium text-sm">Browse our full Help Center or contact us directly.</p>
                 </div>
                 <div className="flex flex-col sm:flex-row gap-3">
                     <button
                         onClick={() => router.push("/support/help-center")}
-                        className="bg-white text-black px-8 py-4 rounded-2xl font-black text-xs uppercase tracking-widest hover:scale-105 transition-all active:scale-95"
+                        className="bg-background text-foreground px-8 py-4 rounded-2xl font-black text-xs uppercase tracking-widest hover:scale-105 transition-all active:scale-95"
                     >
                         Help Center
                     </button>
                     <a
                         href="mailto:hello@hostelgh.com"
-                        className="bg-blue-600 text-white px-8 py-4 rounded-2xl font-black text-xs uppercase tracking-widest hover:scale-105 transition-all active:scale-95 text-center"
+                        className="bg-primary text-primary-foreground px-8 py-4 rounded-2xl font-black text-xs uppercase tracking-widest hover:scale-105 transition-all active:scale-95 text-center"
                     >
                         Email Us
                     </a>

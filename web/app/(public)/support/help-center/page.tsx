@@ -1,12 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
     BookOpen, CreditCard, ShieldCheck, Mail, MessageCircle,
     ThumbsUp, ThumbsDown, Clock, Check
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useTheme } from "next-themes";
 import Accordion from "@/components/support/Accordion";
 import { toast } from "sonner";
 
@@ -72,7 +71,7 @@ const HELP_CATEGORIES = [
             },
             {
                 q: "Should I pay an owner directly outside HostelGH?",
-                a: "Never pay booking fees outside HostelGH. The booking fee must go through our platform. If an owner asks you to send money to a personal MoMo or bank account before move-in, it is a red flag — report it."
+                a: "Never pay booking fees outside HostelGH. If an owner asks you to send money to a personal MoMo or bank account before move-in, it is a red flag — report it."
             },
             {
                 q: "How do I verify my account?",
@@ -85,21 +84,13 @@ const HELP_CATEGORIES = [
 export default function HelpCenterPage() {
     const [activeCategory, setActiveCategory] = useState(HELP_CATEGORIES[0].id);
     const [feedback, setFeedback] = useState<"helpful" | "not-helpful" | null>(null);
-    const { resolvedTheme } = useTheme();
-    const [mounted, setMounted] = useState(false);
-    useEffect(() => { setMounted(true); }, []);
-    const isDark = mounted && resolvedTheme === "dark";
-    const sectionBg = isDark ? "#0f172a" : "#ffffff";
-    const sectionBorder = isDark ? "#1e293b" : "#f1f5f9";
 
     const handleFeedback = (type: "helpful" | "not-helpful") => {
         setFeedback(type);
         if (type === "helpful") {
             toast.success("Thanks! Glad this helped.");
         } else {
-            toast("We'll improve this article. Email hello@hostelgh.com for faster help.", {
-                icon: "💬",
-            });
+            toast("We'll improve this article. Email hello@hostelgh.com for faster help.", { icon: "💬" });
         }
     };
 
@@ -107,18 +98,13 @@ export default function HelpCenterPage() {
         <div className="max-w-[1200px] mx-auto px-4 py-12 space-y-16 pb-20 pt-4">
             {/* Header */}
             <div className="space-y-4">
-                <div className="flex items-center gap-3">
-                    <span className="px-3 py-1 bg-blue-600 text-white rounded-full text-[9px] font-bold uppercase tracking-widest">
-                        Help Center
-                    </span>
-                </div>
-                <h1
-                    className="text-4xl md:text-5xl font-black tracking-tight"
-                    style={{ color: isDark ? "#ffffff" : "#111827" }}
-                >
+                <span className="px-3 py-1 bg-primary text-primary-foreground rounded-full text-[9px] font-bold uppercase tracking-widest">
+                    Help Center
+                </span>
+                <h1 className="text-4xl md:text-5xl font-black tracking-tight text-foreground">
                     How can we help?
                 </h1>
-                <p style={{ color: isDark ? "#9ca3af" : "#6b7280" }} className="text-sm font-medium max-w-xl">
+                <p className="text-muted-foreground text-sm font-medium max-w-xl">
                     Find answers to the most common questions about booking, payments, safety, and your account.
                 </p>
             </div>
@@ -132,21 +118,21 @@ export default function HelpCenterPage() {
                         className={cn(
                             "group flex flex-col items-start gap-4 p-6 rounded-2xl border-2 transition-all text-left",
                             activeCategory === cat.id
-                                ? "border-blue-500 bg-blue-50/30 dark:bg-blue-950/20 shadow-lg shadow-blue-500/10"
-                                : "border-gray-100 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-blue-200 dark:hover:border-blue-800"
+                                ? "border-primary bg-primary/5"
+                                : "border-border bg-card hover:border-primary/30"
                         )}
                     >
                         <div className={cn(
                             "w-12 h-12 rounded-xl flex items-center justify-center transition-all",
                             activeCategory === cat.id
-                                ? "bg-blue-600 text-white"
-                                : "bg-gray-50 dark:bg-slate-800 text-gray-400 group-hover:bg-blue-50 dark:group-hover:bg-blue-950/30 group-hover:text-blue-600"
+                                ? "bg-primary text-primary-foreground"
+                                : "bg-muted text-muted-foreground group-hover:bg-primary/10 group-hover:text-primary"
                         )}>
                             <cat.icon size={22} />
                         </div>
                         <span className={cn(
                             "font-black text-xs uppercase tracking-widest",
-                            activeCategory === cat.id ? "text-blue-600" : "text-gray-400 dark:text-gray-500"
+                            activeCategory === cat.id ? "text-primary" : "text-muted-foreground"
                         )}>
                             {cat.title}
                         </span>
@@ -156,24 +142,19 @@ export default function HelpCenterPage() {
 
             {/* Article Section */}
             <section className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-                <div
-                    className="rounded-3xl p-8 md:p-12 shadow-sm border"
-                    style={{ backgroundColor: sectionBg, borderColor: sectionBorder }}
-                >
-                    <div className="flex items-center gap-3 mb-8 pb-6 border-b" style={{ borderColor: sectionBorder }}>
-                        <Clock size={14} className="text-blue-600" />
-                        <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400">
+                <div className="bg-card rounded-3xl border border-border p-8 md:p-12">
+                    <div className="flex items-center gap-3 mb-8 pb-6 border-b border-border">
+                        <Clock size={14} className="text-primary" />
+                        <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
                             {HELP_CATEGORIES.find(c => c.id === activeCategory)?.title}
                         </span>
                     </div>
 
-                    <Accordion
-                        items={HELP_CATEGORIES.find(c => c.id === activeCategory)?.articles || []}
-                    />
+                    <Accordion items={HELP_CATEGORIES.find(c => c.id === activeCategory)?.articles || []} />
 
                     {/* Feedback */}
-                    <div className="mt-10 pt-8 border-t flex flex-col sm:flex-row items-center justify-between gap-6" style={{ borderColor: sectionBorder }}>
-                        <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">
+                    <div className="mt-10 pt-8 border-t border-border flex flex-col sm:flex-row items-center justify-between gap-6">
+                        <span className="text-xs font-bold text-muted-foreground uppercase tracking-widest">
                             Was this helpful?
                         </span>
                         <div className="flex gap-3">
@@ -181,10 +162,10 @@ export default function HelpCenterPage() {
                                 onClick={() => handleFeedback("helpful")}
                                 disabled={feedback !== null}
                                 className={cn(
-                                    "flex items-center gap-2 px-6 py-3 rounded-xl border-2 transition-all font-bold text-[10px] uppercase tracking-widest active:scale-95",
+                                    "flex items-center gap-2 px-6 py-3 rounded-xl border-2 transition-all font-bold text-[10px] uppercase tracking-widest active:scale-95 disabled:opacity-60",
                                     feedback === "helpful"
-                                        ? "border-green-500 bg-green-50 dark:bg-green-950/30 text-green-600"
-                                        : "border-gray-100 dark:border-slate-700 hover:border-green-400 hover:text-green-600 dark:hover:border-green-700 text-gray-500 dark:text-gray-400"
+                                        ? "border-green-500 bg-green-500/10 text-green-600"
+                                        : "border-border hover:border-green-500 hover:text-green-600 text-muted-foreground"
                                 )}
                             >
                                 {feedback === "helpful" ? <Check size={14} /> : <ThumbsUp size={14} />}
@@ -194,10 +175,10 @@ export default function HelpCenterPage() {
                                 onClick={() => handleFeedback("not-helpful")}
                                 disabled={feedback !== null}
                                 className={cn(
-                                    "flex items-center gap-2 px-6 py-3 rounded-xl border-2 transition-all font-bold text-[10px] uppercase tracking-widest active:scale-95",
+                                    "flex items-center gap-2 px-6 py-3 rounded-xl border-2 transition-all font-bold text-[10px] uppercase tracking-widest active:scale-95 disabled:opacity-60",
                                     feedback === "not-helpful"
-                                        ? "border-orange-400 bg-orange-50 dark:bg-orange-950/20 text-orange-600"
-                                        : "border-gray-100 dark:border-slate-700 hover:border-red-400 hover:text-red-500 dark:hover:border-red-700 text-gray-500 dark:text-gray-400"
+                                        ? "border-orange-400 bg-orange-500/10 text-orange-600"
+                                        : "border-border hover:border-destructive hover:text-destructive text-muted-foreground"
                                 )}
                             >
                                 {feedback === "not-helpful" ? <Check size={14} /> : <ThumbsDown size={14} />}
@@ -210,24 +191,24 @@ export default function HelpCenterPage() {
 
             {/* Contact Cards */}
             <div className="grid md:grid-cols-2 gap-6">
-                <div className="p-8 rounded-3xl bg-gray-900 dark:bg-slate-950 border border-white/5 space-y-4 hover:border-blue-500/30 transition-all shadow-xl">
-                    <div className="w-12 h-12 bg-white/5 border border-white/10 rounded-xl flex items-center justify-center text-blue-400">
+                <div className="p-8 rounded-3xl bg-foreground border border-border/10 space-y-4 hover:border-primary/30 transition-all">
+                    <div className="w-12 h-12 bg-background/10 rounded-xl flex items-center justify-center text-primary">
                         <Mail size={24} />
                     </div>
                     <div>
-                        <h3 className="text-lg font-black text-white">Email Us</h3>
-                        <p className="text-xs text-gray-400 font-medium mt-1">We reply within 24 hours on business days.</p>
+                        <h3 className="text-lg font-black text-background">Email Us</h3>
+                        <p className="text-xs text-background/50 font-medium mt-1">We reply within 24 hours on business days.</p>
                     </div>
-                    <a href="mailto:hello@hostelgh.com" className="text-sm font-bold text-blue-400 hover:underline">hello@hostelgh.com</a>
+                    <a href="mailto:hello@hostelgh.com" className="text-sm font-bold text-primary hover:underline">hello@hostelgh.com</a>
                 </div>
 
-                <div className="p-8 rounded-3xl bg-gray-950 dark:bg-black border border-white/5 space-y-4 hover:border-green-500/30 transition-all shadow-xl">
-                    <div className="w-12 h-12 bg-white/5 border border-white/10 rounded-xl flex items-center justify-center text-green-400">
+                <div className="p-8 rounded-3xl bg-foreground border border-border/10 space-y-4 hover:border-green-500/30 transition-all">
+                    <div className="w-12 h-12 bg-background/10 rounded-xl flex items-center justify-center text-green-400">
                         <MessageCircle size={24} />
                     </div>
                     <div>
-                        <h3 className="text-lg font-black text-white">WhatsApp Support</h3>
-                        <p className="text-xs text-gray-400 font-medium mt-1">Available Mon – Sat, 9 AM – 9 PM GMT.</p>
+                        <h3 className="text-lg font-black text-background">WhatsApp Support</h3>
+                        <p className="text-xs text-background/50 font-medium mt-1">Available Mon – Sat, 9 AM – 9 PM GMT.</p>
                     </div>
                     <a href="https://wa.me/233598494617" target="_blank" rel="noopener noreferrer" className="text-sm font-bold text-green-400 hover:underline">+233 59 849 4617</a>
                 </div>

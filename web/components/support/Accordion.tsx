@@ -4,11 +4,7 @@ import { useState } from "react";
 import { ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-interface AccordionProps {
-    items: { q: string; a: string }[];
-}
-
-export default function Accordion({ items }: AccordionProps) {
+export default function Accordion({ items }: { items: { q: string; a: string }[] }) {
     const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
 
     return (
@@ -21,22 +17,22 @@ export default function Accordion({ items }: AccordionProps) {
                         className={cn(
                             "rounded-2xl border-2 transition-all duration-300",
                             isExpanded
-                                ? "border-blue-500/40 bg-blue-50/30 dark:bg-blue-950/20 dark:border-blue-700/40"
-                                : "border-gray-100 dark:border-slate-700 bg-white dark:bg-slate-800 hover:border-gray-200 dark:hover:border-slate-600"
+                                ? "border-primary/40 bg-primary/5"
+                                : "border-border bg-card hover:border-border/80"
                         )}
                     >
                         <button
                             onClick={() => setExpandedIndex(isExpanded ? null : idx)}
                             className="w-full px-6 py-5 flex items-center justify-between text-left"
                         >
-                            <span className="text-base font-bold text-gray-900 dark:text-white pr-4 leading-snug">
+                            <span className="text-sm font-bold text-foreground pr-4 leading-snug">
                                 {item.q}
                             </span>
                             <div className={cn(
                                 "w-8 h-8 rounded-full flex items-center justify-center transition-all shrink-0",
                                 isExpanded
-                                    ? "bg-blue-600 text-white rotate-180"
-                                    : "bg-gray-100 dark:bg-slate-700 text-gray-400 dark:text-gray-400"
+                                    ? "bg-primary text-primary-foreground rotate-180"
+                                    : "bg-muted text-muted-foreground"
                             )}>
                                 <ChevronDown size={18} />
                             </div>
@@ -46,7 +42,7 @@ export default function Accordion({ items }: AccordionProps) {
                             isExpanded ? "grid-rows-[1fr] opacity-100 pb-6" : "grid-rows-[0fr] opacity-0"
                         )}>
                             <div className="overflow-hidden px-6">
-                                <div className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed whitespace-pre-line border-t border-gray-100 dark:border-slate-700 pt-4">
+                                <div className="text-sm text-muted-foreground leading-relaxed whitespace-pre-line border-t border-border pt-4">
                                     {item.a}
                                 </div>
                             </div>
