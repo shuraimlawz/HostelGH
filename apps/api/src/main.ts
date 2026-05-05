@@ -85,7 +85,10 @@ async function bootstrap() {
     const adminPass = process.env.ADMIN_PASSWORD || "Password123!";
     const UserRole = { ADMIN: "ADMIN" }; // Local shim for simplicity if needed, but we have prisma
 
-    const user = await prisma.user.findUnique({ where: { email: adminEmail } });
+    const user = await prisma.user.findUnique({ 
+      where: { email: adminEmail },
+      select: { id: true, role: true, email: true }
+    });
     const bcrypt = require("bcryptjs");
     const passwordHash = await bcrypt.hash(adminPass, 12);
 
