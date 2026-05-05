@@ -173,25 +173,23 @@
 }
 
 @layer utilities {
-  .dark div.bg-white, .dark section.bg-white, .dark aside.bg-white, .dark nav.bg-white, .dark main.bg-white, .dark header.bg-white, .dark button.bg-white, .dark input.bg-white, .dark select.bg-white, .dark a.bg-white { background-color: hsl(222.2, 47.4%, 14%) !important; }
-  .dark div.bg-gray-50, .dark section.bg-gray-50, .dark aside.bg-gray-50, .dark nav.bg-gray-50, .dark main.bg-gray-50, .dark header.bg-gray-50, .dark button.bg-gray-50, .dark input.bg-gray-50, .dark select.bg-gray-50, .dark a.bg-gray-50 { background-color: hsl(222.2, 47.4%, 12%) !important; }
-  .dark div.bg-gray-100, .dark section.bg-gray-100, .dark aside.bg-gray-100, .dark nav.bg-gray-100, .dark main.bg-gray-100, .dark header.bg-gray-100, .dark button.bg-gray-100, .dark input.bg-gray-100, .dark select.bg-gray-100, .dark a.bg-gray-100 { background-color: hsl(222.2, 47.4%, 18%) !important; }
-  .dark div.bg-gray-200, .dark section.bg-gray-200, .dark aside.bg-gray-200, .dark nav.bg-gray-200, .dark main.bg-gray-200, .dark header.bg-gray-200, .dark button.bg-gray-200, .dark input.bg-gray-200, .dark select.bg-gray-200, .dark a.bg-gray-200, .dark optgroup, .dark option { background-color: hsl(222.2, 47.4%, 25%) !important; }
-  .dark optgroup, .dark option { color: hsl(210, 40%, 98%) !important; }
-  .dark .hover\:bg-white:hover, .dark .focus\:bg-white:focus, .dark [data-highlighted].bg-white { background-color: hsl(222.2, 47.4%, 16%) !important; }
-  .dark .hover\:bg-gray-50:hover, .dark .focus\:bg-gray-50:focus, .dark [data-highlighted].bg-gray-50, .dark .focus\:bg-gray-50 { background-color: hsl(222.2, 47.4%, 14%) !important; }
-  .dark .hover\:bg-gray-100:hover, .dark .focus\:bg-gray-100:focus, .dark [data-highlighted].bg-gray-100 { background-color: hsl(222.2, 47.4%, 20%) !important; }
-  .dark .hover\:bg-gray-200:hover, .dark .focus\:bg-gray-200:focus, .dark [data-highlighted].bg-gray-200 { background-color: hsl(222.2, 47.4%, 25%) !important; }
-  /* Target Radix UI highlighting specifically */
-  .dark [data-highlighted] { background-color: hsl(222.2, 47.4%, 18%) !important; color: white !important; }
-  .dark .border-gray-100 { border-color: hsl(222.2, 47.4%, 20%) !important; }
-  .dark .border-gray-200 { border-color: hsl(222.2, 47.4%, 25%) !important; }
+  .dark .bg-white { background-color: hsl(222.2, 47.4%, 14%) !important; }
+  .dark .bg-gray-50 { background-color: hsl(222.2, 47.4%, 12%) !important; }
+  .dark .bg-gray-100 { background-color: hsl(222.2, 47.4%, 18%) !important; }
+  .dark .bg-gray-200 { background-color: hsl(222.2, 47.4%, 25%) !important; }
+  
   .dark .text-gray-900 { color: hsl(210, 40%, 98%) !important; }
   .dark .text-gray-800 { color: hsl(210, 40%, 96%) !important; }
   .dark .text-gray-700 { color: hsl(215, 20.2%, 80%) !important; }
   .dark .text-gray-600 { color: hsl(215, 20.2%, 70%) !important; }
   .dark .text-gray-500 { color: hsl(215, 20.2%, 60%) !important; }
   .dark .text-gray-400 { color: hsl(215, 20.2%, 50%) !important; }
+
+  /* Ensure body always follows the theme background */
+  body {
+    background-color: hsl(var(--background)) !important;
+    color: hsl(var(--foreground)) !important;
+  }
 
   /* Global Neutralization of "White Light" Shadows in Dark Mode */
   .dark [class*="shadow-"] { 
