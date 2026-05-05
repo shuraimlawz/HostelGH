@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
     BookOpen, CreditCard, ShieldCheck, Mail, MessageCircle,
     ThumbsUp, ThumbsDown, Clock, Check
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useTheme } from "next-themes";
 import Accordion from "@/components/support/Accordion";
 import { toast } from "sonner";
 
@@ -84,6 +85,12 @@ const HELP_CATEGORIES = [
 export default function HelpCenterPage() {
     const [activeCategory, setActiveCategory] = useState(HELP_CATEGORIES[0].id);
     const [feedback, setFeedback] = useState<"helpful" | "not-helpful" | null>(null);
+    const { resolvedTheme } = useTheme();
+    const [mounted, setMounted] = useState(false);
+    useEffect(() => { setMounted(true); }, []);
+    const isDark = mounted && resolvedTheme === "dark";
+    const sectionBg = isDark ? "#0f172a" : "#ffffff";
+    const sectionBorder = isDark ? "#1e293b" : "#f1f5f9";
 
     const handleFeedback = (type: "helpful" | "not-helpful") => {
         setFeedback(type);
@@ -105,10 +112,13 @@ export default function HelpCenterPage() {
                         Help Center
                     </span>
                 </div>
-                <h1 className="text-4xl md:text-5xl font-black text-gray-900 dark:text-white tracking-tight">
+                <h1
+                    className="text-4xl md:text-5xl font-black tracking-tight"
+                    style={{ color: isDark ? "#ffffff" : "#111827" }}
+                >
                     How can we help?
                 </h1>
-                <p className="text-gray-500 dark:text-gray-400 text-sm font-medium max-w-xl">
+                <p style={{ color: isDark ? "#9ca3af" : "#6b7280" }} className="text-sm font-medium max-w-xl">
                     Find answers to the most common questions about booking, payments, safety, and your account.
                 </p>
             </div>
@@ -146,8 +156,11 @@ export default function HelpCenterPage() {
 
             {/* Article Section */}
             <section className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-                <div className="bg-white dark:bg-slate-900 rounded-3xl border border-gray-100 dark:border-slate-800 p-8 md:p-12 shadow-sm">
-                    <div className="flex items-center gap-3 mb-8 pb-6 border-b border-gray-50 dark:border-slate-800">
+                <div
+                    className="rounded-3xl p-8 md:p-12 shadow-sm border"
+                    style={{ backgroundColor: sectionBg, borderColor: sectionBorder }}
+                >
+                    <div className="flex items-center gap-3 mb-8 pb-6 border-b" style={{ borderColor: sectionBorder }}>
                         <Clock size={14} className="text-blue-600" />
                         <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400">
                             {HELP_CATEGORIES.find(c => c.id === activeCategory)?.title}
@@ -159,7 +172,7 @@ export default function HelpCenterPage() {
                     />
 
                     {/* Feedback */}
-                    <div className="mt-10 pt-8 border-t border-gray-50 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-6">
+                    <div className="mt-10 pt-8 border-t flex flex-col sm:flex-row items-center justify-between gap-6" style={{ borderColor: sectionBorder }}>
                         <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">
                             Was this helpful?
                         </span>
