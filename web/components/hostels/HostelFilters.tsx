@@ -9,13 +9,7 @@ import {
     PopoverContent,
     PopoverTrigger,
 } from "@/components/ui/popover";
-import {
-    Sheet,
-    SheetContent,
-    SheetHeader,
-    SheetTitle,
-    SheetTrigger,
-} from "@/components/ui/sheet";
+import { Drawer } from "vaul";
 import {
     Wifi,
     Wind,
@@ -203,8 +197,8 @@ export default function HostelFilters() {
 
                 <div className="hidden lg:block w-px h-8 bg-gray-200 dark:bg-slate-800 mx-2" />
 
-                {/* University Select */}
-                <div className="w-full lg:w-56 relative hover:bg-gray-50 dark:hover:bg-slate-800/50 rounded-xl lg:rounded-2xl transition-colors">
+                {/* Desktop-Only University Select */}
+                <div className="hidden lg:flex w-full lg:w-56 relative hover:bg-gray-50 dark:hover:bg-slate-800/50 rounded-xl lg:rounded-2xl transition-colors">
                     <School className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
                     <select
                         value={university}
@@ -229,8 +223,8 @@ export default function HostelFilters() {
 
                 <div className="hidden lg:block w-px h-8 bg-gray-200 dark:bg-slate-800 mx-2" />
 
-                {/* Tenant Type */}
-                <div className="w-full lg:w-48 relative hover:bg-gray-50 dark:hover:bg-slate-800/50 rounded-xl lg:rounded-2xl transition-colors">
+                {/* Desktop-Only Tenant Type */}
+                <div className="hidden lg:flex w-full lg:w-48 relative hover:bg-gray-50 dark:hover:bg-slate-800/50 rounded-xl lg:rounded-2xl transition-colors">
                     <Users className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
                     <select
                         value={gender}
@@ -279,44 +273,51 @@ export default function HostelFilters() {
                     </Popover>
                 </div>
 
-                {/* Mobile Filter Sheet */}
-                <div className="lg:hidden w-full px-2 lg:px-0 mt-2 lg:mt-0">
-                    <Sheet>
-                        <SheetTrigger asChild>
-                            <button className="w-full h-14 rounded-xl bg-blue-600 text-white flex items-center justify-center gap-2 font-bold text-xs uppercase tracking-widest hover:bg-blue-700 transition-all shadow-lg shadow-blue-600/20 active:scale-95">
-                                <SlidersHorizontal size={16} />
-                                Filters
+                {/* Mobile Swipeable Filter Drawer (Vaul) */}
+                <div className="lg:hidden w-full mt-2">
+                    <Drawer.Root shouldScaleBackground>
+                        <Drawer.Trigger asChild>
+                            <button className="w-full h-14 rounded-2xl bg-blue-600 text-white flex items-center justify-center gap-3 font-bold text-xs uppercase tracking-widest hover:bg-blue-700 transition-all shadow-lg shadow-blue-600/20 active:scale-95">
+                                <SlidersHorizontal size={18} />
+                                Refine Search
                             </button>
-                        </SheetTrigger>
-                        <SheetContent side="bottom" className="h-[85vh] rounded-t-[2.5rem] p-0 bg-white dark:bg-slate-900 border-t-0">
-                            {/* Drawer Handle */}
-                            <div className="w-full flex justify-center py-4">
-                                <div className="w-12 h-1.5 bg-gray-200 dark:bg-slate-800 rounded-full" />
-                            </div>
-                            
-                            <div className="px-6 pb-10 overflow-y-auto h-full space-y-8">
-                                <SheetHeader className="text-left pb-4 border-b dark:border-slate-800">
-                                    <SheetTitle className="text-xl font-bold text-gray-900 dark:text-white">Refine Search</SheetTitle>
-                                </SheetHeader>
-                                
-                                <FilterContent 
-                                    clearFilters={clearFilters} 
-                                    setAvailableOnly={setAvailableOnly}
-                                    availableOnly={availableOnly}
-                                    roomConfig={roomConfig}
-                                    setRoomConfig={setRoomConfig}
-                                    minPrice={minPrice}
-                                    setMinPrice={setMinPrice}
-                                    maxPrice={maxPrice}
-                                    setMaxPrice={setMaxPrice}
-                                    selectedAmenities={selectedAmenities}
-                                    toggleAmenity={toggleAmenity}
-                                    handleApply={handleApply}
-                                    isMobile
-                                />
-                            </div>
-                        </SheetContent>
-                    </Sheet>
+                        </Drawer.Trigger>
+                        <Drawer.Portal>
+                            <Drawer.Overlay className="fixed inset-0 bg-black/60 z-[100] backdrop-blur-sm" />
+                            <Drawer.Content className="bg-white dark:bg-slate-900 flex flex-col rounded-t-[3rem] h-[92%] mt-24 fixed bottom-0 left-0 right-0 z-[101] outline-none">
+                                <div className="p-6 bg-white dark:bg-slate-900 rounded-t-[3rem] flex-1 overflow-y-auto">
+                                    <div className="mx-auto w-12 h-1.5 flex-shrink-0 rounded-full bg-gray-200 dark:bg-slate-800 mb-8" />
+                                    
+                                    <div className="space-y-10 pb-20">
+                                        <div className="space-y-1">
+                                            <h2 className="text-2xl font-black text-gray-900 dark:text-white uppercase tracking-tighter">Filters</h2>
+                                            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Personalize your search</p>
+                                        </div>
+
+                                        <FilterContent 
+                                            clearFilters={clearFilters} 
+                                            setAvailableOnly={setAvailableOnly}
+                                            availableOnly={availableOnly}
+                                            roomConfig={roomConfig}
+                                            setRoomConfig={setRoomConfig}
+                                            minPrice={minPrice}
+                                            setMinPrice={setMinPrice}
+                                            maxPrice={maxPrice}
+                                            setMaxPrice={setMaxPrice}
+                                            selectedAmenities={selectedAmenities}
+                                            toggleAmenity={toggleAmenity}
+                                            handleApply={handleApply}
+                                            university={university}
+                                            setUniversity={setUniversity}
+                                            gender={gender}
+                                            setGender={setGender}
+                                            isMobile
+                                        />
+                                    </div>
+                                </div>
+                            </Drawer.Content>
+                        </Drawer.Portal>
+                    </Drawer.Root>
                 </div>
 
                 {/* Reset Shortcut */}
@@ -373,14 +374,59 @@ function FilterContent({
     selectedAmenities, 
     toggleAmenity, 
     handleApply,
+    university,
+    setUniversity,
+    gender,
+    setGender,
     isMobile = false
 }: any) {
     return (
-        <div className="space-y-8">
+        <div className="space-y-10">
             {!isMobile && (
                 <div className="flex items-center justify-between border-b dark:border-slate-800 pb-4">
-                    <h3 className="font-bold text-gray-900 dark:text-white text-sm">Filters</h3>
+                    <h3 className="font-bold text-gray-900 dark:text-white text-sm">Quick Filters</h3>
                     <button onClick={() => { clearFilters(); setAvailableOnly(false); }} className="text-[10px] font-bold text-blue-600 dark:text-blue-400 hover:underline uppercase tracking-widest">Reset All</button>
+                </div>
+            )}
+
+            {/* Mobile-Only Selectors */}
+            {isMobile && (
+                <div className="grid grid-cols-1 gap-6">
+                    <div className="space-y-3">
+                        <Label className="text-[10px] font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500">University</Label>
+                        <div className="relative">
+                            <GraduationCap className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" size={16} />
+                            <select
+                                value={university}
+                                onChange={(e) => setUniversity(e.target.value)}
+                                className="w-full h-14 bg-gray-50 dark:bg-slate-800 border border-gray-100 dark:border-slate-700 rounded-2xl px-12 outline-none font-bold text-xs text-gray-900 dark:text-white appearance-none focus:ring-2 focus:ring-blue-500/20 transition-all"
+                            >
+                                <option value="">Any University</option>
+                                {REGIONAL_UNIVERSITIES.map(u => (
+                                    <option key={u} value={u}>{u}</option>
+                                ))}
+                            </select>
+                            <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" size={16} />
+                        </div>
+                    </div>
+
+                    <div className="space-y-3">
+                        <Label className="text-[10px] font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500">Gender</Label>
+                        <div className="relative">
+                            <Users className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" size={16} />
+                            <select
+                                value={gender}
+                                onChange={(e) => setGender(e.target.value)}
+                                className="w-full h-14 bg-gray-50 dark:bg-slate-800 border border-gray-100 dark:border-slate-700 rounded-2xl px-12 outline-none font-bold text-xs text-gray-900 dark:text-white appearance-none focus:ring-2 focus:ring-blue-500/20 transition-all"
+                            >
+                                <option value="">Any Gender</option>
+                                <option value="MALE">Male</option>
+                                <option value="FEMALE">Female</option>
+                                <option value="MIXED">Mixed</option>
+                            </select>
+                            <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" size={16} />
+                        </div>
+                    </div>
                 </div>
             )}
 

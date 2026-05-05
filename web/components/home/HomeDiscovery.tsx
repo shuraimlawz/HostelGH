@@ -7,6 +7,7 @@ import Link from "next/link";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import PromoCarousel from "./PromoCarousel";
+import { Star, GraduationCap, TrendingDown, AlertTriangle, ArrowRight } from "lucide-react";
 
 const MIN_SLOTS_ALERT = 4; // "Last rooms available" threshold
 
