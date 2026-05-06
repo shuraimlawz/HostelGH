@@ -114,8 +114,10 @@ export class AuthService {
       });
     } catch (error: any) {
       this.logger.error(`Login DB Error: ${error.message}`);
-      throw new BadRequestException(`An error occurred during login: ${error.message}`);
+      // Return a user-friendly message for connection/db issues
+      throw new BadRequestException("We are experiencing connection issues. Please try again in a few minutes.");
     }
+
 
 
     if (!user) {
