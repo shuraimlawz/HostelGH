@@ -12,10 +12,11 @@ import { HostelProcessor } from "./hostel.processor";
     ElasticsearchModule.registerAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
-        node: configService.get<string>("ELASTICSEARCH_NODE") || "http://localhost:9200",
-        maxRetries: 5,
+        node: configService.get<string>("ELASTICSEARCH_NODE") || (process.env.NODE_ENV === 'production' ? "http://127.0.0.1:9200" : "http://localhost:9200"),
+        maxRetries: process.env.NODE_ENV === 'production' ? 1 : 5,
         requestTimeout: 10000,
         sniffOnStart: false,
+
       }),
       inject: [ConfigService],
     }),
