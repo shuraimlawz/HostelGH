@@ -9,10 +9,12 @@ export class PrismaService
   implements OnModuleInit, OnModuleDestroy {
   constructor() {
     let connectionString = process.env.DATABASE_URL || "";
+    if (!connectionString) {
+      console.warn("[Prisma] DATABASE_URL is missing! Database operations will fail.");
+    }
 
     try {
-      if (connectionString) {
-        // Remove sslmode=require if present to avoid dual-validation conflicts with node-postgres and Prisma
+      if (connectionString && connectionString.startsWith("postgresql")) {
         const url = new URL(connectionString);
         if (url.searchParams.has("sslmode")) {
           url.searchParams.delete("sslmode");
@@ -20,13 +22,15 @@ export class PrismaService
         connectionString = url.toString();
       }
     } catch (e) {
-      console.error("[Prisma] Failed to parse DATABASE_URL, using raw string:", (e as any).message);
+      console.error("[Prisma] Failed to parse DATABASE_URL:", (e as any).message);
     }
+
 
     const pool = new Pool({
       connectionString,
-      ssl: { rejectUnauthorized: false },
+      ssl: connectionString.includes("supabase") ? { rejectUnauthorized: false } : false,
     });
+
 
     const adapter = new PrismaPg(pool);
     super({ adapter });
