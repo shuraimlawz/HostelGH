@@ -13,12 +13,13 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
     const host = this.configService.get<string>("redis.host") || process.env.REDIS_HOST;
     const port = this.configService.get<number>("redis.port") || parseInt(process.env.REDIS_PORT || "6379");
 
-    const hasConfig = !!(url || (host && host !== "localhost"));
+    const hasConfig = !!(url || (host && host !== "localhost" && host !== "127.0.0.1" && host !== "::1"));
 
     if (!hasConfig) {
-      console.log("[Redis] No configuration found, skipping initialization");
+      this.client = null as any; // Explicitly null to skip operations
       return;
     }
+
 
     const options = {
       lazyConnect: true,

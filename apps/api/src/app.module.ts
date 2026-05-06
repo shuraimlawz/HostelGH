@@ -62,14 +62,23 @@ import { AppController } from "./app.controller";
     DiscoveryModule,
     AIModule,
     BullModule.forRootAsync({
-
       inject: [ConfigService],
-      useFactory: (config: ConfigService) => ({
-        connection: {
-          host: config.get<string>("REDIS_HOST") || "localhost",
-          port: config.get<number>("REDIS_PORT") || 6379,
-        },
-      }),
+      useFactory: (config: ConfigService) => {
+        const redisUrl = config.get<string>("REDIS_URL");
+        const redisHost = config.get<string>("REDIS_HOST");
+        const isDev = process.env.NODE_ENV !== 'production';
+
+        // If no redis config and not in dev, we might want to disable bull or point to a null connection
+        // BullMQ requires a connection, so if missing in prod, we use a fake or just let it fail once
+        return {
+          connection: redisUrl ? redisUrl : {
+            host: redisHost || (isDev ? "localhost" : "127.0.0.1"),
+            port: config.get<number>("REDIS_PORT") || 6379,
+            // Add a small retry limit to prevent spamming logs in prod if it fails
+            maxRetriesPerRequest: isDev ? 20 : 1,
+          },
+        };
+      },
     }),
     ScheduleModule.forRoot(),
     ThrottlerModule.forRoot([
