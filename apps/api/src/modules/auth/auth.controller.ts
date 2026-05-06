@@ -105,19 +105,7 @@ export class AuthController {
     const token = req.cookies?.refresh_token || dto.refreshToken;
     if (!token) throw new BadRequestException("Refresh token missing");
 
-    // Decode JWT token to figure out who is requesting the refresh silently
-    let userId = dto.userId;
-    if (!userId) {
-      try {
-        const decoded = this.jwtService.decode(token) as any;
-        userId = decoded?.sub;
-      } catch (e) {
-        throw new BadRequestException("Invalid refresh token payload");
-      }
-    }
-    if (!userId) throw new BadRequestException("UserId could not be determined");
-
-    const result = await this.auth.refresh(userId, token);
+    const result = await this.auth.refresh(token);
     this.setRefreshCookie(res, result.refreshToken);
     return result;
   }

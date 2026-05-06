@@ -45,13 +45,14 @@ export class AuthService {
       throw new BadRequestException("Cannot register as an ADMIN via public endpoint");
     }
 
+    const normalizedEmail = dto.email.toLowerCase().trim();
     const passwordHash = await bcrypt.hash(dto.password, 10);
 
     try {
       const existingUser = await this.prisma.user.findFirst({
         where: {
           OR: [
-            { email: dto.email },
+            { email: normalizedEmail },
             ...(dto.phone ? [{ phone: dto.phone }] : [])
           ]
         },
@@ -59,13 +60,13 @@ export class AuthService {
       });
 
       if (existingUser) {
-        if (existingUser.email === dto.email) throw new BadRequestException("Email already in use");
+        if (existingUser.email === normalizedEmail) throw new BadRequestException("Email already in use");
         throw new BadRequestException("Phone number already in use");
       }
 
       const user = await this.prisma.user.create({
         data: {
-          email: dto.email,
+          email: normalizedEmail,
           passwordHash,
           role: dto.role as UserRole,
           firstName: dto.firstName,
@@ -102,12 +103,13 @@ export class AuthService {
   }
 
   async login(dto: LoginDto) {
+    const normalizedEmail = dto.email?.toLowerCase().trim();
     let user;
     try {
       user = await this.prisma.user.findFirst({
         where: {
           OR: [
-            ...(dto.email ? [{ email: dto.email }] : []),
+            ...(normalizedEmail ? [{ email: normalizedEmail }] : []),
             ...(dto.phone ? [{ phone: dto.phone }] : [])
           ]
         },
@@ -127,15 +129,15 @@ export class AuthService {
 
     if (!user.isActive) {
       this.auditLogger.log(null, AdminAction.LOGIN_FAILED, AdminEntity.USER, user.id, "Attempt: Account inactive");
-      throw new UnauthorizedException("Account is inactive");
+      throw new UnauthorizedException("Your account is currently inactive. Please contact support for assistance.");
     }
 
     if (!user.passwordHash) {
-      throw new UnauthorizedException("Please sign in with Google.");
+      throw new UnauthorizedException("This account is linked with Google. Please use 'Continue with Google' to sign in.");
     }
 
     if (!user.emailVerified) {
-      throw new ForbiddenException("Please verify your email to activate your account.");
+      throw new ForbiddenException("Email verification is required. Please check your inbox (or spam) for the verification link.");
     }
 
     const isPasswordValid = await bcrypt.compare(dto.password, user.passwordHash);
@@ -154,25 +156,30 @@ export class AuthService {
     };
   }
 
-  async refresh(userId: string, refreshToken: string) {
+  async refresh(refreshToken: string) {
     const tokenHash = sha256(refreshToken);
 
     const tokenRow = await this.prisma.refreshToken.findFirst({
       where: {
-        userId,
         tokenHash,
         revokedAt: null,
         expiresAt: { gt: new Date() },
       },
+      select: { id: true, userId: true },
     });
-    if (!tokenRow) throw new UnauthorizedException("Invalid refresh token");
+    
+    if (!tokenRow) {
+      this.logger.warn(`Refresh attempt with invalid or expired token hash: ${tokenHash.substring(0, 10)}...`);
+      throw new UnauthorizedException("Invalid or expired refresh token");
+    }
 
-    this.prisma.refreshToken.update({
+    // Revoke old token
+    await this.prisma.refreshToken.update({
       where: { id: tokenRow.id },
       data: { revokedAt: new Date() },
     }).catch(e => this.logger.error(`Token rotation failed: ${e.message}`));
 
-    return this.issueTokens(userId, null);
+    return this.issueTokens(tokenRow.userId, null);
   }
 
   async logout(userId: string) {
