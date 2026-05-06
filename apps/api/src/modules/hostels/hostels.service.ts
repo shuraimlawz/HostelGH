@@ -18,7 +18,9 @@ import {
 } from "../admin/admin-audit.service";
 import { CreateHostelDto, UpdateHostelDto } from "./dto/create-hostel.dto";
 import { Cron, CronExpression } from "@nestjs/schedule";
+import { DiscoveryService } from "../discovery/discovery.service";
 import { fuzzyMatch, findBestMatch, levenshteinDistance } from "../../utils/fuzzy-match";
+
 
 @Injectable()
 export class HostelsService {
@@ -30,8 +32,11 @@ export class HostelsService {
     private readonly subscriptions: SubscriptionsService,
     private readonly audit: AdminAuditLogService,
     private readonly search: SearchService,
+    private readonly discovery: DiscoveryService,
+    private readonly ai: AIService,
     @InjectQueue("hostel-indexing") private readonly indexingQueue: Queue,
   ) { }
+
 
   async create(ownerId: string, dto: CreateHostelDto) {
     await this.subscriptions.checkLimit(ownerId, "max_hostels");
@@ -95,7 +100,11 @@ export class HostelsService {
       await this.indexingQueue.add("sync", { hostelId: hostel.id });
     }
 
+    // Invalidate discovery cache
+    await this.discovery.invalidateCache();
+
     return {
+
       ...hostel,
       requiresVerification: isFirstHostel,
     };
@@ -114,7 +123,9 @@ export class HostelsService {
 
     await this.indexingQueue.add("sync", { hostelId });
 
+    await this.discovery.invalidateCache();
     return updated;
+
   }
 
   async rejectHostel(hostelId: string, reason?: string) {
@@ -155,15 +166,19 @@ export class HostelsService {
     });
 
     await this.indexingQueue.add("sync", { hostelId });
+    await this.discovery.invalidateCache();
 
     return updated;
+
   }
 
   async delete(actor: UserActor, hostelId: string) {
     const hostel = await this.getHostelById(hostelId);
     this.validateOwnership(actor, hostel.ownerId);
 
+    await this.discovery.invalidateCache();
     return this.prisma.hostel.delete({ where: { id: hostelId } });
+
   }
 
   async findMyHostels(ownerId: string) {
@@ -278,10 +293,26 @@ export class HostelsService {
     radius?: number;
     availableOnly?: string;
   }) {
-    const searchQueryText = params.query;
+    let searchParams = { ...params };
+    const searchQueryText = searchParams.query;
 
-    // Try Meilisearch first for typos and ranking (Phase 2) - Temporarily disabled
-    // const meiliResults = await this.search.search(searchQueryText || "", {
+    // Smart Search: If query is long/conversational, use LLM to parse filters
+    if (searchQueryText && searchQueryText.split(' ').length > 2) {
+      try {
+        const aiParsed = await this.ai.parseSearchQuery(searchQueryText);
+        this.logger.debug(`AI parsed query "${searchQueryText}" into: ${JSON.stringify(aiParsed)}`);
+        // Merge AI parsed values into searchParams, prioritizing explicitly passed params
+        searchParams = {
+          ...aiParsed,
+          ...searchParams,
+          // Special merge for amenities to combine both
+          amenities: [...new Set([...(aiParsed.amenities || []), ...(searchParams.amenities || [])])]
+        };
+      } catch (err) {
+        this.logger.warn("AI Smart Search parsing failed, falling back to standard search");
+      }
+    }
+
     //   limit: params.limit,
     //   offset: params.page && params.limit ? (params.page - 1) * params.limit : 0,
     //   filter: this.buildMeiliFilter(params),
@@ -311,7 +342,8 @@ export class HostelsService {
       roomConfig,
       query,
       availableOnly,
-    } = params;
+    } = searchParams;
+
 
     // Smart Aliases Mapping
     const ALIASES: Record<string, string[]> = {

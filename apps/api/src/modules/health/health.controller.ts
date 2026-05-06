@@ -12,6 +12,9 @@ export class HealthController {
   @ApiOperation({ summary: "Simple health check with database ping" })
   async check() {
     try {
+      // Real database ping
+      await this.prisma.$queryRaw`SELECT 1`;
+      
       const uptime = process.uptime();
       const memory = process.memoryUsage();
       
@@ -25,6 +28,7 @@ export class HealthController {
         },
         timestamp: new Date().toISOString()
       };
+
     } catch (error) {
       const uptime = process.uptime();
       throw new ServiceUnavailableException({

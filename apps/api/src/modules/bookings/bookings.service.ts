@@ -142,30 +142,65 @@ export class BookingsService {
     });
   }
 
-  async getMyBookings(tenantId: string) {
-    return this.prisma.booking.findMany({
-      where: { tenantId },
-      include: {
-        items: { include: { room: true } },
-        hostel: true,
-        payment: true,
+  async getMyBookings(tenantId: string, limit = 10, page = 1) {
+    const skip = (page - 1) * limit;
+    const [data, total] = await Promise.all([
+      this.prisma.booking.findMany({
+        where: { tenantId },
+        include: {
+          items: { include: { room: true } },
+          hostel: true,
+          payment: true,
+        },
+        orderBy: { createdAt: "desc" },
+        take: limit,
+        skip,
+      }),
+      this.prisma.booking.count({ where: { tenantId } }),
+    ]);
+
+    return {
+      data,
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
       },
-      orderBy: { createdAt: "desc" },
-    });
+    };
   }
 
-  async getOwnerBookings(ownerId: string) {
-    return this.prisma.booking.findMany({
-      where: { hostel: { ownerId } },
-      include: {
-        items: { include: { room: true } },
-        hostel: true,
-        tenant: true,
-        payment: true,
+
+  async getOwnerBookings(ownerId: string, limit = 10, page = 1) {
+    const skip = (page - 1) * limit;
+    const where = { hostel: { ownerId } };
+    const [data, total] = await Promise.all([
+      this.prisma.booking.findMany({
+        where,
+        include: {
+          items: { include: { room: true } },
+          hostel: true,
+          tenant: true,
+          payment: true,
+        },
+        orderBy: { createdAt: "desc" },
+        take: limit,
+        skip,
+      }),
+      this.prisma.booking.count({ where }),
+    ]);
+
+    return {
+      data,
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
       },
-      orderBy: { createdAt: "desc" },
-    });
+    };
   }
+
 
   async approveBooking(
     actor: { id: string; role: UserRole },

@@ -1,6 +1,5 @@
-"use client";
-
 import Link from "next/link";
+import Image from "next/image";
 import { Heart, Star, MapPin, Users, ArrowUpRight, ShieldCheck } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -17,9 +16,14 @@ export default function HostelCard({ hostel, compact = false }: { hostel: any, c
         return (
             <Link href={`/hostels/${hostel.id}`} className="group block h-full">
                 <div className="bg-card rounded-xl border border-border overflow-hidden hover:shadow-lg transition-all duration-300 flex items-center p-3 gap-4">
-                    <div className="w-20 h-20 rounded-lg overflow-hidden bg-muted shrink-0">
+                    <div className="relative w-20 h-20 rounded-lg overflow-hidden bg-muted shrink-0">
                         {hostel.images?.[0] ? (
-                            <img src={hostel.images[0]} alt={hostel.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                            <Image 
+                                src={hostel.images[0]} 
+                                alt={hostel.name} 
+                                fill
+                                className="object-cover group-hover:scale-110 transition-transform duration-500" 
+                            />
                         ) : (
                             <div className="w-full h-full flex items-center justify-center text-muted-foreground">
                                 <MapPin size={24} />
@@ -55,10 +59,12 @@ export default function HostelCard({ hostel, compact = false }: { hostel: any, c
                 {/* Media Section */}
                 <div className="relative aspect-[16/11] overflow-hidden bg-muted">
                     {hostel.images?.[0] ? (
-                        <img
+                        <Image
                             src={hostel.images[0]}
                             alt={hostel.name}
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                            fill
+                            sizes="(max-width: 768px) 50vw, (max-width: 1200px) 25vw, 20vw"
+                            className="object-cover group-hover:scale-105 transition-transform duration-700"
                         />
                     ) : (
                         <div className="w-full h-full flex flex-col items-center justify-center text-muted-foreground bg-muted gap-2">
@@ -67,7 +73,7 @@ export default function HostelCard({ hostel, compact = false }: { hostel: any, c
                     )}
 
                     {/* Overlay Badges */}
-                    <div className="absolute top-3 left-3 flex flex-wrap gap-2">
+                    <div className="absolute top-3 left-3 flex flex-wrap gap-2 z-10">
                         {hostel.isFeatured && (
                             <div className="h-6 px-2.5 flex items-center bg-blue-600/90 text-white text-[9px] font-bold uppercase tracking-widest rounded-lg backdrop-blur-md shadow-sm border border-blue-500/50">
                                 Premium
@@ -103,7 +109,7 @@ export default function HostelCard({ hostel, compact = false }: { hostel: any, c
 
                     {/* Verification Mark */}
                     {hostel.isVerifiedHostel && (
-                        <div className="absolute bottom-3 right-3 w-7 h-7 bg-emerald-500 rounded-lg flex items-center justify-center shadow-lg shadow-emerald-900/10 border border-emerald-400">
+                        <div className="absolute bottom-3 right-3 w-7 h-7 bg-emerald-500 rounded-lg flex items-center justify-center shadow-lg shadow-emerald-900/10 border border-emerald-400 z-10">
                             <ShieldCheck size={14} className="text-white" />
                         </div>
                     )}
@@ -167,3 +173,4 @@ export default function HostelCard({ hostel, compact = false }: { hostel: any, c
         </Link>
     );
 }
+

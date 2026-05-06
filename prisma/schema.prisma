@@ -1,11 +1,12 @@
 generator client {
-  provider        = "prisma-client-js"
-  previewFeatures = ["driverAdapters"]
+  provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "postgresql"
 }
+
+
 
 enum UserRole {
   TENANT
@@ -236,11 +237,13 @@ model Hostel {
 
   @@index([ownerId])
   @@index([city])
+  @@index([region])
   @@index([isPublished])
   @@index([university])
   @@index([averageRating])
   @@index([minPrice])
 }
+
 
 model HostelFacility {
   id        String       @id @default(cuid())

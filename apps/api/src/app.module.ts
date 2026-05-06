@@ -28,7 +28,10 @@ import { NewsletterModule } from "./modules/newsletter/newsletter.module";
 import { FavoritesModule } from "./modules/favorites/favorites.module";
 import { SearchModule } from "./modules/search/search.module";
 import { BullModule } from "@nestjs/bullmq";
+import { DiscoveryModule } from "./modules/discovery/discovery.module";
+import { AIModule } from "./modules/ai/ai.module";
 import { AppController } from "./app.controller";
+
 
 @Module({
   imports: [
@@ -56,7 +59,10 @@ import { AppController } from "./app.controller";
     NewsletterModule,
     FavoritesModule,
     SearchModule,
+    DiscoveryModule,
+    AIModule,
     BullModule.forRootAsync({
+
       inject: [ConfigService],
       useFactory: (config: ConfigService) => ({
         connection: {

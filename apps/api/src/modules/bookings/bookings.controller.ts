@@ -7,8 +7,10 @@ import {
   Patch,
   Post,
   Req,
+  Query,
   UseGuards,
 } from "@nestjs/common";
+
 import { BookingsService } from "./bookings.service";
 import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
 import { Roles } from "../../common/decorators/roles.decorator";
@@ -34,15 +36,32 @@ export class BookingsController {
 
   @Roles(UserRole.TENANT)
   @Get("me")
-  myBookings(@Req() req: any) {
-    return this.bookings.getMyBookings(req.user.id);
+  myBookings(
+    @Req() req: any,
+    @Query("limit") limit?: string,
+    @Query("page") page?: string,
+  ) {
+    return this.bookings.getMyBookings(
+      req.user.id,
+      limit ? parseInt(limit, 10) : undefined,
+      page ? parseInt(page, 10) : undefined,
+    );
   }
 
   @Roles(UserRole.OWNER)
   @Get("owner")
-  ownerBookings(@Req() req: any) {
-    return this.bookings.getOwnerBookings(req.user.id);
+  ownerBookings(
+    @Req() req: any,
+    @Query("limit") limit?: string,
+    @Query("page") page?: string,
+  ) {
+    return this.bookings.getOwnerBookings(
+      req.user.id,
+      limit ? parseInt(limit, 10) : undefined,
+      page ? parseInt(page, 10) : undefined,
+    );
   }
+
 
 
 

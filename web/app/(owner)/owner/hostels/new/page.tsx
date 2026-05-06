@@ -9,8 +9,9 @@ import { api } from "@/lib/api";
 import { toast } from "sonner";
 import {
     Wifi, Wind, Utensils, Waves, Car, ShieldCheck, Coffee, Building2,
-    Zap, Droplets, Flame, ChevronLeft, Loader2, CheckCircle2, MapPin
+    Zap, Droplets, Flame, ChevronLeft, Loader2, CheckCircle2, MapPin, Sparkles
 } from "lucide-react";
+
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import ImageUpload from "@/components/common/ImageUpload";
@@ -72,6 +73,24 @@ export default function NewHostelPage() {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [done, setDone] = useState(false);
     const [requiresVerification, setRequiresVerification] = useState(true);
+    const [isPolishing, setIsPolishing] = useState(false);
+
+    const handleAIPolish = async () => {
+        const desc = form.getValues("description");
+        if (!desc || desc.length < 10) return toast.error("Please enter a short description first (min 10 chars)");
+
+        setIsPolishing(true);
+        try {
+            const { data } = await api.post("/ai/polish-description", { description: desc });
+            form.setValue("description", data.polished);
+            toast.success("Description polished by AI!");
+        } catch (e: any) {
+            toast.error("AI polishing failed. Make sure AI_API_KEY is configured.");
+        } finally {
+            setIsPolishing(false);
+        }
+    };
+
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -232,7 +251,23 @@ export default function NewHostelPage() {
                             />
                         </Field>
 
-                        <Field label="Description" required error={errors.description?.message}>
+                        <Field 
+                            label="Description" 
+                            required 
+                            error={errors.description?.message}
+                        >
+                            <div className="flex items-center justify-between mb-1.5">
+                                <span className="text-[10px] font-black uppercase tracking-widest text-gray-400">Write about your hostel</span>
+                                <button
+                                    type="button"
+                                    disabled={isPolishing}
+                                    onClick={handleAIPolish}
+                                    className="flex items-center gap-1.5 px-2.5 py-1 bg-blue-50 text-blue-600 rounded-md text-[10px] font-bold uppercase tracking-widest hover:bg-blue-100 transition-all disabled:opacity-50 border border-blue-100"
+                                >
+                                    {isPolishing ? <Loader2 size={10} className="animate-spin" /> : <Sparkles size={10} />}
+                                    {isPolishing ? "Polishing..." : "AI Polish"}
+                                </button>
+                            </div>
                             <textarea
                                 {...form.register("description")}
                                 rows={4}
@@ -240,6 +275,7 @@ export default function NewHostelPage() {
                                 placeholder="Describe what makes your hostel great — facilities, atmosphere, environment..."
                             />
                         </Field>
+
 
                         <Field label="Who can stay here?" required>
                             <select {...form.register("genderCategory")} className={inputCls()}>

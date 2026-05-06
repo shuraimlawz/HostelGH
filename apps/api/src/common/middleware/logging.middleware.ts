@@ -9,14 +9,22 @@ export class LoggingMiddleware implements NestMiddleware {
     const { ip, method, originalUrl } = request;
     const userAgent = request.get("user-agent") || "";
 
+    const start = Date.now();
+
     response.on("finish", () => {
       const { statusCode } = response;
       const contentLength = response.get("content-length");
+      const duration = Date.now() - start;
 
       this.logger.log(
-        `${method} ${originalUrl} ${statusCode} ${contentLength} - ${userAgent} ${ip}`,
+        `${method} ${originalUrl} ${statusCode} ${contentLength} - ${duration}ms - ${userAgent} ${ip}`,
       );
+      
+      if (duration > 500) {
+        this.logger.warn(`Slow request detected: ${method} ${originalUrl} took ${duration}ms`);
+      }
     });
+
 
     next();
   }
