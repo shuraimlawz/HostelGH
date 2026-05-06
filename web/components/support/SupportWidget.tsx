@@ -46,7 +46,8 @@ export default function SupportWidget() {
         }
 
         const socket = io(`${API_BASE_URL}/chat`, {
-            auth: { token: localStorage.getItem("accessToken") || sessionStorage.getItem("accessToken") }
+            auth: { token: localStorage.getItem("accessToken") || sessionStorage.getItem("accessToken") },
+            transports: ['websocket']
         });
 
         socketRef.current = socket;
@@ -213,6 +214,7 @@ export default function SupportWidget() {
             <button
                 onClick={() => setIsOpen(!isOpen)}
                 className="w-16 h-16 rounded-full bg-blue-600 text-white flex items-center justify-center shadow-[0_8px_30px_rgb(37,99,235,0.4)] hover:scale-110 hover:shadow-[0_12px_40px_rgb(37,99,235,0.6)] transition-all duration-300 active:scale-95 group pointer-events-auto"
+                aria-label={isOpen ? "Close support chat" : "Open support chat"}
             >
                 {isOpen ? <X size={28} className="animate-in spin-in-90 duration-300" /> : <MessageCircle size={28} className="group-hover:rotate-12 transition-transform" />}
             </button>

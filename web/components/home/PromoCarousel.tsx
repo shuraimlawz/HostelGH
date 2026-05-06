@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import Image from "next/image";
 import { ChevronLeft, ChevronRight, ArrowRight, Sparkles, ShieldCheck, Zap } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
@@ -22,7 +23,7 @@ const PROMOS = [
         title: "Verified by HostelGH",
         subtitle: "Every hostel on our platform is physically verified for safety, water, and electricity standards.",
         badge: "Trust & Safety",
-        cta: "Learn More",
+        cta: "Learn more about our verification",
         href: "/support",
         color: "from-emerald-600 to-teal-700",
         icon: <ShieldCheck className="text-emerald-200" size={40} />,
@@ -76,10 +77,12 @@ export default function PromoCarousel() {
                     >
                         {/* Background Gradient & Image */}
                         <div className={cn("absolute inset-0 bg-gradient-to-r z-10 opacity-90", promo.color)} />
-                        <img 
+                        <Image 
                             src={promo.image} 
                             alt={promo.title}
-                            className="absolute inset-0 w-full h-full object-cover grayscale opacity-30"
+                            fill
+                            sizes="(max-width: 768px) 100vw, 800px"
+                            className="object-cover grayscale opacity-30"
                         />
 
                         {/* Content */}
@@ -123,11 +126,14 @@ export default function PromoCarousel() {
                             <button
                                 key={i}
                                 onClick={() => setCurrent(i)}
-                                className={cn(
+                                className="p-2 group outline-none"
+                                aria-label={`Go to slide ${i + 1}`}
+                            >
+                                <div className={cn(
                                     "h-1.5 rounded-full transition-all duration-500",
-                                    i === current ? "w-8 bg-white" : "w-2 bg-white/30 hover:bg-white/50"
-                                )}
-                            />
+                                    i === current ? "w-8 bg-white" : "w-2 bg-white/30 group-hover:bg-white/50"
+                                )} />
+                            </button>
                         ))}
                     </div>
                 </div>
@@ -136,12 +142,14 @@ export default function PromoCarousel() {
                     <button 
                         onClick={prev}
                         className="h-10 w-10 flex items-center justify-center rounded-xl bg-white/10 border border-white/10 text-white hover:bg-white/20 transition-all active:scale-90"
+                        aria-label="Previous slide"
                     >
                         <ChevronLeft size={20} />
                     </button>
                     <button 
                         onClick={next}
                         className="h-10 w-10 flex items-center justify-center rounded-xl bg-white/10 border border-white/10 text-white hover:bg-white/20 transition-all active:scale-90"
+                        aria-label="Next slide"
                     >
                         <ChevronRight size={20} />
                     </button>

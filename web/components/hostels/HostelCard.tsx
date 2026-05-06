@@ -103,7 +103,10 @@ export default function HostelCard({ hostel, compact = false }: { hostel: any, c
                     </div>
 
                     {/* Interaction Button */}
-                    <button className="absolute top-3 right-3 w-8 h-8 flex items-center justify-center rounded-lg bg-card/90 backdrop-blur-sm border border-border hover:bg-card transition-all z-10 text-foreground shadow-sm">
+                    <button 
+                        className="absolute top-3 right-3 w-8 h-8 flex items-center justify-center rounded-lg bg-card/90 backdrop-blur-sm border border-border hover:bg-card transition-all z-10 text-foreground shadow-sm"
+                        aria-label="Add to wishlist"
+                    >
                         <Heart size={14} className="group-hover:text-destructive transition-colors" />
                     </button>
 

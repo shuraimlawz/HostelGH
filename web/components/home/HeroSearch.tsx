@@ -1,11 +1,13 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import Image from "next/image";
 import { Search, MapPin, Sparkles, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/api";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const FALLBACK_HERO_IMAGES = [
     "/FuubNuyWIAAzS0c.jpg",
@@ -102,11 +104,14 @@ export default function HeroSearch() {
                         index === currentImageIndex ? "opacity-100 z-10" : "opacity-0 z-0"
                     )}
                 >
-                    <img
+                    <Image
                         src={img}
                         alt={`Hostel ${index + 1}`}
+                        fill
+                        priority={index === 0}
+                        sizes="100vw"
                         className={cn(
-                            "w-full h-full object-cover transition-transform duration-[10000ms] ease-linear scale-110",
+                            "object-cover transition-transform duration-[10000ms] ease-linear scale-110",
                             index === currentImageIndex && "scale-100"
                         )}
                     />
@@ -234,13 +239,19 @@ export default function HeroSearch() {
                                 <button
                                     key={loc}
                                     onClick={() => { setCity(loc); handleSearch(loc); }}
-                                    className="px-4 py-2 rounded-xl border border-white/10 hover:border-blue-500/50 hover:bg-blue-600 hover:text-white transition-all backdrop-blur-md active:scale-90 shadow-sm"
+                                    className="px-4 py-2.5 rounded-xl border border-white/10 hover:border-blue-500/50 hover:bg-blue-600 hover:text-white transition-all backdrop-blur-md active:scale-90 shadow-sm"
                                 >
                                     {loc}
                                 </button>
                             ))
                         ) : (
-                            !isLoadingLocations && <span className="opacity-20 py-2 px-4">Loading...</span>
+                            isLoadingLocations && (
+                                <div className="flex gap-2">
+                                    {[1, 2, 3, 4].map(i => (
+                                        <Skeleton key={i} className="h-9 w-24 rounded-xl bg-white/5" />
+                                    ))}
+                                </div>
+                            )
                         )}
                 </div>
             </div>
@@ -254,12 +265,14 @@ export default function HeroSearch() {
                     <button
                         key={index}
                         onClick={() => setCurrentImageIndex(index)}
-                        className={cn(
-                            "h-1.5 transition-all duration-700 rounded-full",
-                            index === currentImageIndex ? "w-8 bg-blue-600 shadow-lg shadow-blue-500/50" : "w-2.5 bg-white/20 hover:bg-white/40"
-                        )}
+                        className="p-2 group outline-none"
                         aria-label={`Image ${index + 1}`}
-                    />
+                    >
+                        <div className={cn(
+                            "h-1.5 transition-all duration-700 rounded-full",
+                            index === currentImageIndex ? "w-8 bg-blue-600 shadow-lg shadow-blue-500/50" : "w-2.5 bg-white/20 group-hover:bg-white/40"
+                        )} />
+                    </button>
                 ))}
             </div>
         </div>

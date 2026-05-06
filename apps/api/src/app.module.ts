@@ -68,6 +68,14 @@ import { AppController } from "./app.controller";
         const redisHost = config.get<string>("REDIS_HOST");
         const isDev = process.env.NODE_ENV !== 'production';
 
+        // If a full REDIS_URL is provided (Standard for Render/Heroku/Upstash)
+        if (redisUrl) {
+          return {
+            connection: redisUrl as any,
+          };
+        }
+
+        // Fallback to host/port
         return {
           connection: {
             host: redisHost || (isDev ? "localhost" : "127.0.0.1"),
@@ -75,8 +83,6 @@ import { AppController } from "./app.controller";
             maxRetriesPerRequest: isDev ? 20 : 1,
           } as any,
         };
-
-
       },
     }),
     ScheduleModule.forRoot(),
