@@ -19,7 +19,9 @@ import {
 import { CreateHostelDto, UpdateHostelDto } from "./dto/create-hostel.dto";
 import { Cron, CronExpression } from "@nestjs/schedule";
 import { DiscoveryService } from "../discovery/discovery.service";
+import { AIService } from "../ai/ai.service";
 import { fuzzyMatch, findBestMatch, levenshteinDistance } from "../../utils/fuzzy-match";
+
 
 
 @Injectable()
