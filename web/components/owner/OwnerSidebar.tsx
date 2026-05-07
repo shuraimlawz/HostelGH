@@ -132,7 +132,7 @@ export default function OwnerSidebar({ isOpen = false, onClose = () => { } }: Ow
                                 {user?.avatarUrl ? (
                                     <img src={user.avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
                                 ) : (
-                                    user?.firstName?.[0] || user?.email?.[0].toUpperCase() || "P"
+                                    user?.firstName?.[0] || user?.email?.[0]?.toUpperCase() || "P"
                                 )}
                             </div>
                             <div className="min-w-0">

@@ -215,7 +215,7 @@ export default function Navbar() {
                                             <img src={user.avatarUrl} alt="Profile" className="w-full h-full object-cover" />
                                         ) : (
                                             <span className={cn(isOpen ? "text-white" : "text-gray-400")}>
-                                                {user.firstName ? user.firstName[0].toUpperCase() : user.email[0].toUpperCase()}
+                                                {user?.firstName ? user.firstName[0].toUpperCase() : (user?.email?.[0]?.toUpperCase() || "U")}
                                             </span>
                                         )
                                     ) : (

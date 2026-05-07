@@ -303,7 +303,7 @@ function AdminUsersContent() {
                                                     {user.avatarUrl ? (
                                                         <img src={user.avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
                                                     ) : (
-                                                        user.firstName ? user.firstName.charAt(0).toUpperCase() : user.email.charAt(0).toUpperCase()
+                                                        user?.firstName ? user.firstName.charAt(0).toUpperCase() : (user?.email?.charAt(0)?.toUpperCase() || "U")
                                                     )}
                                                 </div>
                                                 <div className="min-w-0">

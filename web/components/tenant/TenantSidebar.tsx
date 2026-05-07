@@ -109,7 +109,7 @@ export default function TenantSidebar({ isOpen = false, onClose = () => { } }: T
                                 {user?.avatarUrl ? (
                                     <img src={user.avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
                                 ) : (
-                                    user?.firstName?.[0] || user?.email?.[0].toUpperCase() || "S"
+                                    user?.firstName?.[0] || user?.email?.[0]?.toUpperCase() || "S"
                                 )}
                             </div>
                             <div className="min-w-0">

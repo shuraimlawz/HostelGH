@@ -391,7 +391,7 @@ export default function AdminDashboardPage() {
                                     <div className="space-y-4 max-w-2xl">
                                         <div className="flex items-center gap-3">
                                             <span className="px-2.5 py-1 bg-red-100 text-red-700 rounded-lg text-[9px] font-bold uppercase tracking-widest border border-red-200/50">{dispute.status}</span>
-                                            <p className="text-sm font-bold text-gray-900 dark:text-white uppercase tracking-tight">Booking #{dispute.bookingId?.toString().slice(-6).toUpperCase() || 'UNKNOWN'}</p>
+                                            <p className="text-sm font-bold text-gray-900 dark:text-white uppercase tracking-tight">Booking #{dispute.bookingId?.toString()?.slice(-6)?.toUpperCase() || 'UNKNOWN'}</p>
                                         </div>
                                         <p className="text-gray-600 text-sm font-medium leading-relaxed border-l-2 border-red-500 pl-4">
                                             "{dispute.reason}"

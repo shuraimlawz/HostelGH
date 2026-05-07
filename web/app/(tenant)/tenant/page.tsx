@@ -149,7 +149,7 @@ export default function TenantDashboardPage() {
                                     {user?.avatarUrl ? (
                                         <img src={user.avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
                                     ) : (
-                                        <span className="text-xs font-bold text-blue-600">{user?.firstName?.[0] || user?.email[0].toUpperCase()}</span>
+                                        <span className="text-xs font-bold text-blue-600">{user?.firstName?.[0] || user?.email?.[0]?.toUpperCase() || "U"}</span>
                                     )}
                                 </div>
                             </div>
@@ -306,7 +306,7 @@ export default function TenantDashboardPage() {
                                             <div className="flex-1 min-w-0">
                                                 <p className="text-sm font-bold text-gray-900 dark:text-white truncate mb-1">{booking.hostel.name}</p>
                                                 <div className="flex items-center justify-between">
-                                                    <span className="text-[9px] text-gray-400 dark:text-gray-500 font-bold uppercase tracking-widest">#{booking.id.slice(-6).toUpperCase()}</span>
+                                                    <span className="text-[9px] text-gray-400 dark:text-gray-500 font-bold uppercase tracking-widest">#{booking?.id?.slice(-6)?.toUpperCase() || "UNKNOWN"}</span>
                                                     <span className={cn("text-[8px] font-bold px-2 py-0.5 rounded-md uppercase tracking-widest border", 
                                                         ["RESERVED", "CHECKED_IN", "COMPLETED"].includes(booking.status) ? "bg-emerald-50 text-emerald-600 border-emerald-100/50" : "bg-orange-50 text-orange-600 border-orange-100/50"
                                                     )}>
