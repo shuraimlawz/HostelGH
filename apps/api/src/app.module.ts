@@ -70,8 +70,11 @@ import { AppController } from "./app.controller";
 
         // If a full REDIS_URL is provided (Standard for Render/Heroku/Upstash)
         if (redisUrl) {
+          const Redis = require('ioredis');
           return {
-            connection: redisUrl as any,
+            connection: new Redis(redisUrl, {
+              maxRetriesPerRequest: null,
+            }),
           };
         }
 
