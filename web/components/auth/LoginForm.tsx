@@ -94,7 +94,7 @@ export default function LoginForm({ onSuccess }: { onSuccess?: (user: any) => vo
                 <div className="space-y-5">
                     {/* Email Input */}
                     <div className="space-y-2 group">
-                        <label className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] ml-1 group-focus-within:text-blue-600 transition-colors">Email Address</label>
+                        <label className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] ml-1 group-focus-within:text-blue-600 transition-colors">Email Address</label>
                         <div className="relative">
                             <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-blue-600 transition-colors" size={18} />
                             <input
@@ -112,7 +112,7 @@ export default function LoginForm({ onSuccess }: { onSuccess?: (user: any) => vo
                     {/* Password Input */}
                     <div className="space-y-2 group">
                         <div className="flex justify-between items-center px-1">
-                            <label className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] group-focus-within:text-blue-600 transition-colors">Password</label>
+                            <label className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] group-focus-within:text-blue-600 transition-colors">Password</label>
                             <Link href="/auth/forgot-password" title="Reset password" className="text-[11px] font-bold text-blue-600 uppercase tracking-widest hover:text-black transition-colors">
                                 Forgot Password?
                             </Link>
@@ -131,7 +131,7 @@ export default function LoginForm({ onSuccess }: { onSuccess?: (user: any) => vo
                             <button
                                 type="button"
                                 onClick={() => setShowPassword(!showPassword)}
-                                className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-300 hover:text-gray-900 transition-colors outline-none z-10"
+                                className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-300 hover:text-gray-900 dark:text-white transition-colors outline-none z-10"
                             >
                                 {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                             </button>

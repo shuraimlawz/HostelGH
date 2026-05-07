@@ -51,8 +51,8 @@ export default function ContentGate({
                     <Lock size={20} className="text-white" />
                 </div>
                 <div className="space-y-1">
-                    <p className="text-sm font-semibold text-gray-900">{message}</p>
-                    <p className="text-xs text-gray-400">Create a free account or log in to continue</p>
+                    <p className="text-sm font-semibold text-gray-900 dark:text-white">{message}</p>
+                    <p className="text-xs text-gray-400 dark:text-gray-500">Create a free account or log in to continue</p>
                 </div>
                 <div className="flex items-center gap-2">
                     <button

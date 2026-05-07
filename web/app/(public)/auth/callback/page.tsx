@@ -35,7 +35,7 @@ function AuthCallbackContent() {
     }, [searchParams, login, router]);
 
     return (
-        <div className="min-h-screen bg-white flex flex-col items-center justify-center space-y-10 p-6 relative overflow-hidden">
+        <div className="min-h-screen bg-white dark:bg-gray-950 flex flex-col items-center justify-center space-y-10 p-6 relative overflow-hidden">
             {/* Background Aesthetic */}
             <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none opacity-40">
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-blue-600/5 blur-[120px] rounded-full animate-pulse" />
@@ -56,10 +56,10 @@ function AuthCallbackContent() {
                             Identity Verification
                         </span>
                     </div>
-                    <h1 className="text-xl font-bold text-gray-900 tracking-tighter uppercase leading-tight">
+                    <h1 className="text-xl font-bold text-gray-900 dark:text-white tracking-tighter uppercase leading-tight">
                         Authenticating Handshake
                     </h1>
-                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] animate-pulse">
+                    <p className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] animate-pulse">
                         Synchronizing session with primary registry...
                     </p>
                 </div>
@@ -71,7 +71,7 @@ function AuthCallbackContent() {
 export default function AuthCallbackPage() {
     return (
         <Suspense fallback={
-            <div className="min-h-screen bg-white flex items-center justify-center p-6">
+            <div className="min-h-screen bg-white dark:bg-gray-950 flex items-center justify-center p-6">
                 <Loader2 className="animate-spin text-blue-600" size={48} />
             </div>
         }>

@@ -98,7 +98,7 @@ function RegisterContent({ onSuccess }: { onSuccess?: () => void }) {
             <form onSubmit={submit} className="space-y-6">
                 <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2 group">
-                        <label className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] ml-1 group-focus-within:text-blue-600">First Name</label>
+                        <label className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] ml-1 group-focus-within:text-blue-600">First Name</label>
                         <div className="relative">
                             <User className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-blue-600 transition-colors" size={16} />
                             <input
@@ -113,7 +113,7 @@ function RegisterContent({ onSuccess }: { onSuccess?: () => void }) {
                     </div>
 
                     <div className="space-y-2 group">
-                        <label className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] ml-1 group-focus-within:text-blue-600">Last Name</label>
+                        <label className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] ml-1 group-focus-within:text-blue-600">Last Name</label>
                         <input
                             type="text"
                             className="w-full px-4 h-12 bg-muted/50 border border-border rounded-2xl outline-none focus:bg-card focus:border-blue-600 transition-all text-xs font-bold uppercase tracking-tight placeholder:text-muted-foreground/50 text-foreground"
@@ -126,7 +126,7 @@ function RegisterContent({ onSuccess }: { onSuccess?: () => void }) {
                 </div>
 
                 <div className="space-y-2 group">
-                    <label className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] ml-1 group-focus-within:text-blue-600">Email Address</label>
+                    <label className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] ml-1 group-focus-within:text-blue-600">Email Address</label>
                     <div className="relative">
                         <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-blue-600 transition-colors" size={16} />
                         <input
@@ -141,7 +141,7 @@ function RegisterContent({ onSuccess }: { onSuccess?: () => void }) {
                 </div>
 
                 <div className="space-y-2 group">
-                    <label className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] ml-1 group-focus-within:text-blue-600">Password</label>
+                    <label className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] ml-1 group-focus-within:text-blue-600">Password</label>
                     <div className="relative">
                         <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-blue-600 transition-colors" size={16} />
                         <input
@@ -163,7 +163,7 @@ function RegisterContent({ onSuccess }: { onSuccess?: () => void }) {
                 </div>
 
                 <div className="space-y-2 group">
-                    <label className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] ml-1 group-focus-within:text-blue-600">Account Type</label>
+                    <label className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] ml-1 group-focus-within:text-blue-600">Account Type</label>
                     <div className="relative">
                         <select
                             className="w-full px-5 h-12 bg-muted/50 border border-border rounded-2xl outline-none focus:bg-card focus:border-blue-600 transition-all text-[10px] font-bold uppercase tracking-widest shadow-sm appearance-none cursor-pointer text-foreground"
@@ -173,7 +173,7 @@ function RegisterContent({ onSuccess }: { onSuccess?: () => void }) {
                             <option value="TENANT" className="bg-card">Student Hub (Resident)</option>
                             <option value="OWNER" className="bg-card">Owner Hub (Property Owner)</option>
                         </select>
-                        <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
+                        <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400 dark:text-gray-500">
                             <svg width="10" height="10" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path d="M2 4L6 8L10 4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                             </svg>

@@ -49,10 +49,10 @@ export function withAuth<P extends object>(
 
         if (!isVerified) {
             return (
-                <div className="flex h-screen w-full items-center justify-center bg-gray-50">
+                <div className="flex h-screen w-full items-center justify-center bg-gray-50 dark:bg-gray-900">
                     <div className="flex flex-col items-center gap-4">
                         <div className="h-8 w-8 animate-spin rounded-full border-4 border-emerald-500 border-t-transparent text-emerald-500"></div>
-                        <p className="text-sm font-medium text-gray-500">Checking credentials...</p>
+                        <p className="text-sm font-medium text-gray-500 dark:text-gray-400 dark:text-gray-500">Checking credentials...</p>
                     </div>
                 </div>
             );

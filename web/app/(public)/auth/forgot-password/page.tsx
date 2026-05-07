@@ -57,7 +57,7 @@ export default function ForgotPasswordPage() {
             </div>
 
             <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-[480px] relative z-10 px-6">
-                <div className="bg-card border border-border p-10 md:p-12 rounded-[2.5rem] shadow-2xl shadow-blue-900/5 animate-in fade-in zoom-in-95 duration-700 relative overflow-hidden">
+                <div className="bg-card border border-border p-10 md:p-12 rounded-[2.5rem] shadow-2xl dark:shadow-none shadow-blue-900/5 animate-in fade-in zoom-in-95 duration-700 relative overflow-hidden">
                     {/* Top Accent Line */}
                     <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-blue-600/30 to-transparent"></div>
 
@@ -92,7 +92,7 @@ export default function ForgotPasswordPage() {
                                     Email Address
                                 </label>
                                 <div className="relative">
-                                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-blue-600 transition-colors" size={16} />
+                                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 group-focus-within:text-blue-600 transition-colors" size={16} />
                                     <input
                                         id="email"
                                         name="email"
@@ -126,9 +126,9 @@ export default function ForgotPasswordPage() {
                                 >
                                     {loading ? (
                                         <>
-                                            <div className="w-1.5 h-1.5 bg-white rounded-full animate-bounce [animation-delay:-0.3s]"></div>
-                                            <div className="w-1.5 h-1.5 bg-white rounded-full animate-bounce [animation-delay:-0.15s]"></div>
-                                            <div className="w-1.5 h-1.5 bg-white rounded-full animate-bounce"></div>
+                                            <div className="w-1.5 h-1.5 bg-white dark:bg-gray-950 rounded-full animate-bounce [animation-delay:-0.3s]"></div>
+                                            <div className="w-1.5 h-1.5 bg-white dark:bg-gray-950 rounded-full animate-bounce [animation-delay:-0.15s]"></div>
+                                            <div className="w-1.5 h-1.5 bg-white dark:bg-gray-950 rounded-full animate-bounce"></div>
                                         </>
                                     ) : (
                                         "Send Reset Link"

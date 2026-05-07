@@ -45,7 +45,7 @@ export default function AuthCarousel() {
                     <button
                         key={index}
                         onClick={() => setCurrentIndex(index)}
-                        className={`w-2 h-2 rounded-full transition-all duration-300 ${index === currentIndex ? "bg-white w-6" : "bg-white/40 hover:bg-white/60"
+                        className={`w-2 h-2 rounded-full transition-all duration-300 ${index === currentIndex ? "bg-white dark:bg-gray-950 w-6" : "bg-white dark:bg-gray-950/40 hover:bg-white dark:bg-gray-950/60"
                             }`}
                         aria-label={`Go to slide ${index + 1}`}
                     />

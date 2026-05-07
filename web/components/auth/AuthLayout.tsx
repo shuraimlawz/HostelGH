@@ -67,17 +67,17 @@ export default function AuthLayout({ children, title, subtitle }: AuthLayoutProp
                                         : "opacity-0 -translate-x-12 invisible"
                                 )}
                             >
-                                <div className="inline-block px-4 py-2 rounded-xl border border-white/10 bg-white/5 backdrop-blur-xl shadow-2xl">
+                                <div className="inline-block px-4 py-2 rounded-xl border border-white/10 bg-white dark:bg-gray-950/5 backdrop-blur-xl shadow-2xl dark:shadow-none">
                                     <h2 className="text-[10px] font-bold tracking-[0.3em] text-blue-400 uppercase">Daily Inspiration</h2>
                                 </div>
                                 <div className="space-y-6">
-                                    <p className="text-3xl font-medium tracking-tight opacity-95 leading-relaxed drop-shadow-2xl text-white/90 font-serif lowercase">
+                                    <p className="text-3xl font-medium tracking-tight opacity-95 leading-relaxed drop-shadow-2xl dark:shadow-none text-white/90 font-serif lowercase">
                                         "{quote.text}"
                                     </p>
                                     <div className="h-1 w-16 bg-blue-600 rounded-full" />
                                 </div>
                                 <div className="pt-10">
-                                    <h1 className="text-6xl lg:text-7xl font-bold tracking-tighter leading-tight drop-shadow-2xl whitespace-pre-line text-white uppercase">
+                                    <h1 className="text-6xl lg:text-7xl font-bold tracking-tighter leading-tight drop-shadow-2xl dark:shadow-none whitespace-pre-line text-white uppercase">
                                         {quote.title}
                                     </h1>
                                 </div>
@@ -86,14 +86,14 @@ export default function AuthLayout({ children, title, subtitle }: AuthLayoutProp
                     </div>
 
                     {/* Premium Progress Bar for Quotes */}
-                    <div className="absolute bottom-16 left-20 flex gap-3 items-center bg-white/5 backdrop-blur-2xl p-3 rounded-2xl border border-white/10 shadow-2xl">
+                    <div className="absolute bottom-16 left-20 flex gap-3 items-center bg-white dark:bg-gray-950/5 backdrop-blur-2xl p-3 rounded-2xl border border-white/10 shadow-2xl dark:shadow-none">
                         {QUOTES.map((_, idx) => (
                             <button
                                 key={idx}
                                 onClick={() => setQuoteIndex(idx)}
                                 className={cn(
                                     "h-1.5 rounded-full transition-all duration-700",
-                                    idx === quoteIndex ? "w-10 bg-blue-600 shadow-lg shadow-blue-500/50" : "w-3 bg-white/20 hover:bg-white/40"
+                                    idx === quoteIndex ? "w-10 bg-blue-600 shadow-lg shadow-blue-500/50" : "w-3 bg-white dark:bg-gray-950/20 hover:bg-white dark:bg-gray-950/40"
                                 )}
                                 aria-label={`Select unit ${idx + 1}`}
                             />
@@ -132,7 +132,7 @@ export default function AuthLayout({ children, title, subtitle }: AuthLayoutProp
                     </div>
 
                     {/* Form Container */}
-                    <div className="bg-card border border-border p-10 md:p-12 rounded-[2.5rem] shadow-2xl shadow-blue-900/5 animate-in fade-in zoom-in-95 duration-700">
+                    <div className="bg-card border border-border p-10 md:p-12 rounded-[2.5rem] shadow-2xl dark:shadow-none shadow-blue-900/5 animate-in fade-in zoom-in-95 duration-700">
                         {children}
                     </div>
 

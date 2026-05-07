@@ -46,7 +46,7 @@ export default function AuthModal({
 
             {/* Modal Content */}
             <div
-                className={`relative w-full max-w-[420px] bg-card text-card-foreground rounded-2xl shadow-2xl border overflow-hidden transition-all duration-300 transform ${open ? "translate-y-0 scale-100" : "translate-y-8 scale-95"
+                className={`relative w-full max-w-[420px] bg-card text-card-foreground rounded-2xl shadow-2xl dark:shadow-none border overflow-hidden transition-all duration-300 transform ${open ? "translate-y-0 scale-100" : "translate-y-8 scale-95"
                     }`}
             >
                 {/* Header */}

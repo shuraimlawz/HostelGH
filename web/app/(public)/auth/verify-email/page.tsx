@@ -32,7 +32,7 @@ function VerifyEmailContent() {
     }, [token, router]);
 
     return (
-        <div className="min-h-screen bg-gray-50 dark:bg-gray-950 flex flex-col items-center justify-center p-6 relative overflow-hidden transition-colors">
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-900 dark:bg-gray-950 flex flex-col items-center justify-center p-6 relative overflow-hidden transition-colors">
             {/* Background Aesthetic */}
             <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none opacity-40">
                 <div className="absolute top-1/4 -right-20 w-[600px] h-[600px] bg-blue-600/5 dark:bg-blue-600/10 blur-[120px] rounded-full animate-pulse" />
@@ -40,7 +40,7 @@ function VerifyEmailContent() {
             </div>
 
             <div className="relative z-10 w-full max-w-md">
-                <div className="bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 shadow-2xl rounded-3xl p-10 md:p-12 text-center animate-in zoom-in-95 duration-700">
+                <div className="bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 shadow-2xl dark:shadow-none rounded-3xl p-10 md:p-12 text-center animate-in zoom-in-95 duration-700">
                     
                     {/* Icon Ring */}
                     <div className="relative w-28 h-28 mx-auto mb-10">
@@ -63,7 +63,7 @@ function VerifyEmailContent() {
                     <div className="space-y-8">
                         <div className="space-y-3">
                             <div className="flex items-center justify-center gap-2">
-                                <span className="px-3 py-1 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-full text-xs font-semibold border border-gray-200 dark:border-gray-700 shadow-sm">
+                                <span className="px-3 py-1 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white dark:text-gray-100 rounded-full text-xs font-semibold border border-gray-200 dark:border-gray-700 shadow-sm">
                                     Email Verification
                                 </span>
                             </div>
@@ -75,7 +75,7 @@ function VerifyEmailContent() {
                             <div className="h-1 w-12 bg-blue-600 mx-auto rounded-full" />
                         </div>
 
-                        <div className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed font-medium">
+                        <div className="text-sm text-gray-500 dark:text-gray-400 dark:text-gray-500 leading-relaxed font-medium">
                             {status === 'loading' && "We are checking your verification link. Please wait a moment..."}
                             {status === 'success' && "Your email has been successfully verified. You will be redirected to log in shortly."}
                             {status === 'error' && "The verification link has expired or is invalid. Please request a new one."}
@@ -91,7 +91,7 @@ function VerifyEmailContent() {
                                 </Link>
                                 <button 
                                     onClick={() => window.location.reload()}
-                                    className="text-xs font-semibold text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
+                                    className="text-xs font-semibold text-gray-500 dark:text-gray-400 dark:text-gray-500 hover:text-gray-900 dark:text-white dark:hover:text-white transition-colors"
                                 >
                                     Try Again
                                 </button>
@@ -112,7 +112,7 @@ function VerifyEmailContent() {
                 <div className="mt-10 text-center">
                     <Link 
                         href="/" 
-                        className="inline-flex items-center gap-2 text-xs font-semibold text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors group"
+                        className="inline-flex items-center gap-2 text-xs font-semibold text-gray-500 dark:text-gray-400 dark:text-gray-500 hover:text-gray-900 dark:text-white dark:hover:text-white transition-colors group"
                     >
                         <ChevronLeft size={16} className="group-hover:-translate-x-1 transition-transform" />
                         Back to Home
@@ -126,9 +126,9 @@ function VerifyEmailContent() {
 export default function VerifyEmailPage() {
     return (
         <Suspense fallback={
-            <div className="min-h-screen bg-gray-50 dark:bg-gray-950 flex flex-col items-center justify-center p-6">
+            <div className="min-h-screen bg-gray-50 dark:bg-gray-900 dark:bg-gray-950 flex flex-col items-center justify-center p-6">
                 <Loader2 className="animate-spin text-blue-600 mb-6" size={40} />
-                <p className="text-sm font-semibold text-gray-500 dark:text-gray-400 animate-pulse">Loading verification data...</p>
+                <p className="text-sm font-semibold text-gray-500 dark:text-gray-400 dark:text-gray-500 animate-pulse">Loading verification data...</p>
             </div>
         }>
             <VerifyEmailContent />
