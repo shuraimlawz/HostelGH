@@ -148,10 +148,10 @@ function AdminUsersContent() {
                 <div className="space-y-2">
                     <div className="flex items-center gap-2">
                         <div className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
-                        <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Access Control</span>
+                        <span className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">Access Control</span>
                     </div>
-                    <h1 className="text-3xl md:text-4xl font-bold text-gray-900 tracking-tight">Member Registry</h1>
-                    <p className="text-gray-500 text-sm max-w-md">Manage and verify platform entities, from landlords to student residents.</p>
+                    <h1 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white tracking-tight">Member Registry</h1>
+                    <p className="text-gray-500 dark:text-gray-400 dark:text-gray-500 text-sm max-w-md">Manage and verify platform entities, from landlords to student residents.</p>
                 </div>
 
                 <Dialog open={addUserOpen} onOpenChange={setAddUserOpen}>
@@ -163,23 +163,23 @@ function AdminUsersContent() {
                     <DialogContent className="sm:max-w-md rounded-2xl p-8">
                         <DialogHeader>
                             <DialogTitle className="text-xl font-bold tracking-tight uppercase">Internal Registry</DialogTitle>
-                            <p className="text-xs font-medium text-gray-400 mt-1">Provision a new administrative or support account.</p>
+                            <p className="text-xs font-medium text-gray-400 dark:text-gray-500 mt-1">Provision a new administrative or support account.</p>
                         </DialogHeader>
                         <div className="space-y-6 py-6 border-y border-gray-50 my-6">
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="space-y-2">
-                                    <Label className="text-[10px] font-bold uppercase tracking-widest text-gray-400 ml-1">First Name</Label>
+                                    <Label className="text-[10px] font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500 ml-1">First Name</Label>
                                     <input
-                                        className="h-12 w-full bg-gray-50 border border-gray-100 rounded-xl px-4 font-bold text-gray-900 focus:bg-white focus:border-blue-600 transition-all outline-none text-sm"
+                                        className="h-12 w-full bg-gray-50 dark:bg-gray-950 border border-gray-100 rounded-xl px-4 font-bold text-gray-900 dark:text-white focus:bg-white dark:bg-gray-900 focus:border-blue-600 transition-all outline-none text-sm"
                                         value={addUserForm.firstName}
                                         onChange={e => setAddUserForm({ ...addUserForm, firstName: e.target.value })}
                                         placeholder="John"
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <Label className="text-[10px] font-bold uppercase tracking-widest text-gray-400 ml-1">Last Name</Label>
+                                    <Label className="text-[10px] font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500 ml-1">Last Name</Label>
                                     <input
-                                        className="h-12 w-full bg-gray-50 border border-gray-100 rounded-xl px-4 font-bold text-gray-900 focus:bg-white focus:border-blue-600 transition-all outline-none text-sm"
+                                        className="h-12 w-full bg-gray-50 dark:bg-gray-950 border border-gray-100 rounded-xl px-4 font-bold text-gray-900 dark:text-white focus:bg-white dark:bg-gray-900 focus:border-blue-600 transition-all outline-none text-sm"
                                         value={addUserForm.lastName}
                                         onChange={e => setAddUserForm({ ...addUserForm, lastName: e.target.value })}
                                         placeholder="Doe"
@@ -187,30 +187,30 @@ function AdminUsersContent() {
                                 </div>
                             </div>
                             <div className="space-y-2">
-                                <Label className="text-[10px] font-bold uppercase tracking-widest text-gray-400 ml-1">Email Identifier</Label>
+                                <Label className="text-[10px] font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500 ml-1">Email Identifier</Label>
                                 <input
                                     type="email"
-                                    className="h-12 w-full bg-gray-50 border border-gray-100 rounded-xl px-4 font-bold text-gray-900 focus:bg-white focus:border-blue-600 transition-all outline-none text-sm"
+                                    className="h-12 w-full bg-gray-50 dark:bg-gray-950 border border-gray-100 rounded-xl px-4 font-bold text-gray-900 dark:text-white focus:bg-white dark:bg-gray-900 focus:border-blue-600 transition-all outline-none text-sm"
                                     value={addUserForm.email}
                                     onChange={e => setAddUserForm({ ...addUserForm, email: e.target.value })}
                                     placeholder="operative@hostelgh.com"
                                 />
                             </div>
                             <div className="space-y-2">
-                                <Label className="text-[10px] font-bold uppercase tracking-widest text-gray-400 ml-1">Access Credential</Label>
+                                <Label className="text-[10px] font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500 ml-1">Access Credential</Label>
                                 <input
                                     type="password"
-                                    className="h-12 w-full bg-gray-50 border border-gray-100 rounded-xl px-4 font-bold text-gray-900 focus:bg-white focus:border-blue-600 transition-all outline-none text-sm"
+                                    className="h-12 w-full bg-gray-50 dark:bg-gray-950 border border-gray-100 rounded-xl px-4 font-bold text-gray-900 dark:text-white focus:bg-white dark:bg-gray-900 focus:border-blue-600 transition-all outline-none text-sm"
                                     value={addUserForm.password}
                                     onChange={e => setAddUserForm({ ...addUserForm, password: e.target.value })}
                                     placeholder="••••••••"
                                 />
                             </div>
                             <div className="space-y-2">
-                                <Label className="text-[10px] font-bold uppercase tracking-widest text-gray-400 ml-1">Assigned Role</Label>
+                                <Label className="text-[10px] font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500 ml-1">Assigned Role</Label>
                                 <div className="relative">
                                     <select
-                                        className="h-12 w-full bg-gray-50 border border-gray-100 rounded-xl px-4 font-bold text-gray-900 focus:bg-white focus:border-blue-600 transition-all outline-none text-sm appearance-none cursor-pointer"
+                                        className="h-12 w-full bg-gray-50 dark:bg-gray-950 border border-gray-100 rounded-xl px-4 font-bold text-gray-900 dark:text-white focus:bg-white dark:bg-gray-900 focus:border-blue-600 transition-all outline-none text-sm appearance-none cursor-pointer"
                                         value={addUserForm.role}
                                         onChange={e => setAddUserForm({ ...addUserForm, role: e.target.value })}
                                     >
@@ -244,7 +244,7 @@ function AdminUsersContent() {
                         <input
                             value={search}
                             onChange={(e) => handleSearchChange(e.target.value)}
-                            className="w-full h-12 bg-white border border-gray-100 rounded-xl pl-12 pr-4 outline-none focus:border-blue-500 transition-all font-bold text-gray-900 placeholder:text-gray-300 shadow-sm text-sm"
+                            className="w-full h-12 bg-white dark:bg-gray-900 border border-gray-100 rounded-xl pl-12 pr-4 outline-none focus:border-blue-500 transition-all font-bold text-gray-900 dark:text-white placeholder:text-gray-300 shadow-sm text-sm"
                             placeholder="Search by name, email or ID..."
                         />
                     </div>
@@ -253,7 +253,7 @@ function AdminUsersContent() {
                         <select
                             value={roleFilter}
                             onChange={(e) => handleRoleChange(e.target.value)}
-                            className="w-full h-12 bg-white border border-gray-100 rounded-xl pl-12 pr-10 outline-none focus:border-blue-500 transition-all font-bold text-gray-900 shadow-sm text-sm appearance-none cursor-pointer"
+                            className="w-full h-12 bg-white dark:bg-gray-900 border border-gray-100 rounded-xl pl-12 pr-10 outline-none focus:border-blue-500 transition-all font-bold text-gray-900 dark:text-white shadow-sm text-sm appearance-none cursor-pointer"
                         >
                             <option value="ALL">All Member Roles</option>
                             <option value="ADMIN">Administrators</option>
@@ -263,40 +263,40 @@ function AdminUsersContent() {
                         <ChevronRight className="absolute right-4 top-1/2 -translate-y-1/2 rotate-90 text-gray-300 pointer-events-none" size={14} />
                     </div>
                 </div>
-                <div className="bg-white border border-gray-100 rounded-xl flex items-center px-6 gap-4 shadow-sm h-12">
+                <div className="bg-white dark:bg-gray-900 border border-gray-100 rounded-xl flex items-center px-6 gap-4 shadow-sm h-12">
                     <div className="w-8 h-8 bg-blue-50 rounded-lg flex items-center justify-center text-blue-600 shrink-0">
                         <Users size={16} />
                     </div>
                     <div className="flex items-center gap-2">
-                        <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Total:</p>
+                        <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500">Total:</p>
                         <p className="text-base font-bold text-gray-950 tracking-tight">{meta.total}</p>
                     </div>
                 </div>
             </div>
 
             {/* Registry Table */}
-            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden min-h-[400px]">
+            <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 shadow-sm overflow-hidden min-h-[400px]">
                 {isLoading ? (
                     <div className="flex h-[400px] items-center justify-center">
                         <div className="flex flex-col items-center gap-4 text-center">
                             <Loader2 className="animate-spin text-blue-600" size={32} />
-                            <p className="text-sm font-medium text-gray-400">Syncing registry data...</p>
+                            <p className="text-sm font-medium text-gray-400 dark:text-gray-500">Syncing registry data...</p>
                         </div>
                     </div>
                 ) : (
                     <div className="overflow-x-auto">
                         <table className="w-full text-left border-collapse">
                             <thead>
-                                <tr className="bg-gray-50/50 border-b border-gray-50">
-                                    <th className="px-8 py-5 text-[10px] font-bold uppercase tracking-widest text-gray-400">Entity Details</th>
-                                    <th className="px-8 py-5 text-[10px] font-bold uppercase tracking-widest text-gray-400">Access Role</th>
-                                    <th className="px-8 py-5 text-[10px] font-bold uppercase tracking-widest text-gray-400">Security & Audit</th>
-                                    <th className="px-8 py-5 text-[10px] font-bold uppercase tracking-widest text-gray-400 text-right">Audit</th>
+                                <tr className="bg-gray-50 dark:bg-gray-950/50 border-b border-gray-50">
+                                    <th className="px-8 py-5 text-[10px] font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500">Entity Details</th>
+                                    <th className="px-8 py-5 text-[10px] font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500">Access Role</th>
+                                    <th className="px-8 py-5 text-[10px] font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500">Security & Audit</th>
+                                    <th className="px-8 py-5 text-[10px] font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500 text-right">Audit</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-50">
                                 {users.map((user: any) => (
-                                    <tr key={user.id} className={cn("hover:bg-gray-50/50 transition-all group", !user.isActive && "opacity-60")}>
+                                    <tr key={user.id} className={cn("hover:bg-gray-50 dark:bg-gray-950/50 transition-all group", !user.isActive && "opacity-60")}>
                                         <td className="px-8 py-6">
                                             <div className="flex items-center gap-4">
                                                 <div className="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center text-blue-600 font-bold text-lg shadow-inner overflow-hidden shrink-0 border border-gray-100">
@@ -307,11 +307,11 @@ function AdminUsersContent() {
                                                     )}
                                                 </div>
                                                 <div className="min-w-0">
-                                                    <p className="font-bold text-gray-900 text-sm tracking-tight flex items-center gap-2">
+                                                    <p className="font-bold text-gray-900 dark:text-white text-sm tracking-tight flex items-center gap-2">
                                                         {[user.firstName, user.lastName].filter(Boolean).join(" ") || "Unnamed Operative"}
                                                         {user.role === 'ADMIN' && <ShieldCheck size={14} className="text-blue-500" />}
                                                     </p>
-                                                    <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-1 truncate">
+                                                    <p className="text-[10px] text-gray-400 dark:text-gray-500 font-bold uppercase tracking-widest mt-1 truncate">
                                                         {user.email}
                                                     </p>
                                                 </div>
@@ -326,7 +326,7 @@ function AdminUsersContent() {
                                                 <select
                                                     value={user.role}
                                                     onChange={(e) => updateRoleMutation.mutate({ userId: user.id, role: e.target.value })}
-                                                    className="bg-transparent font-bold text-[10px] uppercase tracking-widest text-gray-900 outline-none cursor-pointer hover:text-blue-600 transition-colors"
+                                                    className="bg-transparent font-bold text-[10px] uppercase tracking-widest text-gray-900 dark:text-white outline-none cursor-pointer hover:text-blue-600 transition-colors"
                                                 >
                                                     <option value="TENANT">Tenant</option>
                                                     <option value="OWNER">Owner</option>
@@ -338,13 +338,13 @@ function AdminUsersContent() {
                                             <div className="flex items-center gap-2">
                                                 <Link 
                                                     href={`/admin/users/${user.id}`}
-                                                    className="px-4 py-2 bg-gray-50 text-gray-900 border border-gray-100 rounded-lg text-[9px] font-bold uppercase tracking-widest hover:bg-gray-900 hover:text-white transition-all flex items-center gap-2"
+                                                    className="px-4 py-2 bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-white border border-gray-100 rounded-lg text-[9px] font-bold uppercase tracking-widest hover:bg-gray-900 hover:text-white transition-all flex items-center gap-2"
                                                 >
                                                     <UserIcon size={12} /> View Profile
                                                 </Link>
                                                 <div className={cn(
                                                     "flex items-center gap-2 px-3 py-1.5 rounded-lg border w-fit font-bold uppercase tracking-widest text-[9px]",
-                                                    user.emailVerified ? "bg-emerald-50 border-emerald-100/50 text-emerald-600" : "bg-gray-50 border-gray-100 text-gray-400"
+                                                    user.emailVerified ? "bg-emerald-50 border-emerald-100/50 text-emerald-600" : "bg-gray-50 dark:bg-gray-950 border-gray-100 text-gray-400 dark:text-gray-500"
                                                 )}>
                                                     {user.emailVerified ? <ShieldCheck size={12} /> : <Shield size={12} />}
                                                     {user.emailVerified ? "Verified" : "Pending"}
@@ -359,12 +359,12 @@ function AdminUsersContent() {
                                         <td className="px-8 py-6 text-right">
                                             <DropdownMenu>
                                                 <DropdownMenuTrigger asChild>
-                                                    <button className="w-10 h-10 flex items-center justify-center hover:bg-white hover:shadow-md rounded-xl transition-all text-gray-300 hover:text-gray-900 border border-transparent hover:border-gray-100">
+                                                    <button className="w-10 h-10 flex items-center justify-center hover:bg-white dark:bg-gray-900 hover:shadow-md rounded-xl transition-all text-gray-300 hover:text-gray-900 dark:text-white border border-transparent hover:border-gray-100">
                                                         <MoreHorizontal size={18} />
                                                     </button>
                                                 </DropdownMenuTrigger>
                                                 <DropdownMenuContent align="end" className="rounded-xl border-gray-100 p-2 shadow-xl w-52">
-                                                    <DropdownMenuLabel className="text-[10px] font-bold uppercase tracking-widest text-gray-400 px-3 py-2">Audit Controls</DropdownMenuLabel>
+                                                    <DropdownMenuLabel className="text-[10px] font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500 px-3 py-2">Audit Controls</DropdownMenuLabel>
                                                     <DropdownMenuItem asChild>
                                                         <Link href={`/admin/users/${user.id}`} className="flex items-center rounded-lg font-bold text-[11px] gap-3 py-2.5 cursor-pointer uppercase tracking-wide">
                                                             <UserIcon size={14} className="text-blue-500" /> View Profile
@@ -387,7 +387,7 @@ function AdminUsersContent() {
                                                             </>
                                                         )}
                                                     </DropdownMenuItem>
-                                                    <DropdownMenuSeparator className="bg-gray-50 my-1" />
+                                                    <DropdownMenuSeparator className="bg-gray-50 dark:bg-gray-950 my-1" />
                                                     <DropdownMenuItem
                                                         onClick={() => {
                                                             if (confirm(`Authorize terminal purge of ${user.email}?`)) {
@@ -408,12 +408,12 @@ function AdminUsersContent() {
 
                         {users.length === 0 && (
                             <div className="py-32 text-center space-y-4">
-                                <div className="w-16 h-16 bg-gray-50 rounded-2xl flex items-center justify-center mx-auto text-gray-200 border border-gray-100 shadow-inner">
+                                <div className="w-16 h-16 bg-gray-50 dark:bg-gray-950 rounded-2xl flex items-center justify-center mx-auto text-gray-200 border border-gray-100 shadow-inner">
                                     <Users size={32} />
                                 </div>
                                 <div className="space-y-1">
-                                    <h3 className="text-lg font-bold text-gray-900 uppercase tracking-tight">Zero Registry Hits</h3>
-                                    <p className="text-gray-400 text-sm font-medium">No members found matching your current parameters.</p>
+                                    <h3 className="text-lg font-bold text-gray-900 dark:text-white uppercase tracking-tight">Zero Registry Hits</h3>
+                                    <p className="text-gray-400 dark:text-gray-500 text-sm font-medium">No members found matching your current parameters.</p>
                                 </div>
                             </div>
                         )}
@@ -421,22 +421,22 @@ function AdminUsersContent() {
                 )} 
 
                 {/* Pagination */}
-                <div className="px-8 py-6 bg-gray-50/30 border-t border-gray-50 flex items-center justify-between">
-                    <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400">
+                <div className="px-8 py-6 bg-gray-50 dark:bg-gray-950/30 border-t border-gray-50 flex items-center justify-between">
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500">
                         Analyzing {users.length} of {meta.total} Strategic Entities
                     </p>
                     <div className="flex gap-2">
                         <button
                             onClick={() => handlePageChange(Math.max(1, page - 1))}
                             disabled={page === 1}
-                            className="w-10 h-10 rounded-xl border border-gray-100 bg-white flex items-center justify-center text-gray-400 hover:bg-gray-900 hover:text-white transition-all disabled:opacity-30 disabled:hover:bg-white disabled:hover:text-gray-400 shadow-sm"
+                            className="w-10 h-10 rounded-xl border border-gray-100 bg-white dark:bg-gray-900 flex items-center justify-center text-gray-400 dark:text-gray-500 hover:bg-gray-900 hover:text-white transition-all disabled:opacity-30 disabled:hover:bg-white dark:bg-gray-900 disabled:hover:text-gray-400 dark:text-gray-500 shadow-sm"
                         >
                             <ChevronLeft size={18} />
                         </button>
                         <button
                             onClick={() => handlePageChange(Math.min(meta.totalPages, page + 1))}
                             disabled={page === meta.totalPages || meta.totalPages === 0}
-                            className="w-10 h-10 rounded-xl border border-gray-100 bg-white flex items-center justify-center text-gray-400 hover:bg-gray-900 hover:text-white transition-all disabled:opacity-30 disabled:hover:bg-white disabled:hover:text-gray-400 shadow-sm"
+                            className="w-10 h-10 rounded-xl border border-gray-100 bg-white dark:bg-gray-900 flex items-center justify-center text-gray-400 dark:text-gray-500 hover:bg-gray-900 hover:text-white transition-all disabled:opacity-30 disabled:hover:bg-white dark:bg-gray-900 disabled:hover:text-gray-400 dark:text-gray-500 shadow-sm"
                         >
                             <ChevronRight size={18} />
                         </button>
@@ -453,7 +453,7 @@ export default function AdminUsersPage() {
             <div className="flex h-[60vh] items-center justify-center">
                 <div className="flex flex-col items-center gap-4 text-center">
                     <Loader2 className="animate-spin text-blue-600" size={32} />
-                    <p className="text-sm font-medium text-gray-400">Loading registry...</p>
+                    <p className="text-sm font-medium text-gray-400 dark:text-gray-500">Loading registry...</p>
                 </div>
             </div>
         }>

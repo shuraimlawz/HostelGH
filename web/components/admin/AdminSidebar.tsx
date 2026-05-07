@@ -26,18 +26,18 @@ import { cn } from "@/lib/utils";
 import { useState } from "react";
 
 const adminLinks = [
-    { name: "Command Center", href: "/admin", icon: LayoutDashboard },
-    { name: "Support Center", href: "/admin/support", icon: MessageSquare },
-    { name: "User Registry", href: "/admin/users", icon: Users },
-    { name: "Asset Control", href: "/admin/hostels", icon: Building2 },
-    { name: "Reservations", href: "/admin/bookings", icon: CalendarCheck },
-    { name: "Financials", href: "/admin/payments", icon: CreditCard },
-    { name: "System Stats", href: "/admin/stats", icon: BarChart3 },
-    { name: "System Logs", href: "/admin/logs", icon: Activity },
-    { name: "Settings Hub", href: "/admin/settings", icon: Settings },
+    { name: "Dashboard", href: "/admin", icon: LayoutDashboard },
+    { name: "Support Tickets", href: "/admin/support", icon: MessageSquare },
+    { name: "Users", href: "/admin/users", icon: Users },
+    { name: "Hostels", href: "/admin/hostels", icon: Building2 },
+    { name: "Bookings", href: "/admin/bookings", icon: CalendarCheck },
+    { name: "Payments", href: "/admin/payments", icon: CreditCard },
+    { name: "Statistics", href: "/admin/stats", icon: BarChart3 },
+    { name: "Activity Logs", href: "/admin/logs", icon: Activity },
+    { name: "Settings", href: "/admin/settings", icon: Settings },
 ];
 
-const deletionLink = { name: "Deletion Requests", href: "/admin/deletions", icon: Trash2 };
+const deletionLink = { name: "Delete Requests", href: "/admin/deletions", icon: Trash2 };
 
 interface AdminSidebarProps {
     isOpen?: boolean;
@@ -76,9 +76,9 @@ export default function AdminSidebar({ isOpen = false, onClose = () => { } }: Ad
             <div className="mb-8 px-2">
                 <div className="flex items-center gap-2 mb-1">
                     <ShieldCheck className="text-blue-500" size={16} />
-                    <h2 className="text-[10px] font-black text-blue-500 uppercase tracking-widest">Admin Control</h2>
+                    <h2 className="text-xs font-bold text-blue-500 uppercase tracking-widest">Admin Dashboard</h2>
                 </div>
-                <p className="text-xs text-gray-500">System Governance Panel</p>
+                <p className="text-sm text-gray-500">Manage HostelGH Platform</p>
             </div>
 
             <nav className="space-y-1">
@@ -135,10 +135,10 @@ export default function AdminSidebar({ isOpen = false, onClose = () => { } }: Ad
                         <div className="relative z-10">
                             <div className="flex items-center gap-2 mb-2">
                                 <AlertCircle size={14} className="text-red-500 animate-pulse" />
-                                <p className="text-[10px] font-black text-red-500 uppercase tracking-widest">System Attention</p>
+                                <p className="text-[10px] font-black text-red-500 uppercase tracking-widest">Action Required</p>
                             </div>
                             <h3 className="font-bold text-xs text-gray-200 mb-1 leading-tight">{activeAlert?.message || "System Alert"}</h3>
-                            <p className="text-[10px] text-gray-400">Action required immediately</p>
+                            <p className="text-[10px] text-gray-400">Please review immediately</p>
                         </div>
                     </div>
                 ) : (

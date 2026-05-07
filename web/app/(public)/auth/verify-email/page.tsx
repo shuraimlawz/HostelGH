@@ -32,15 +32,15 @@ function VerifyEmailContent() {
     }, [token, router]);
 
     return (
-        <div className="min-h-screen bg-white flex flex-col items-center justify-center p-6 relative overflow-hidden">
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-950 flex flex-col items-center justify-center p-6 relative overflow-hidden transition-colors">
             {/* Background Aesthetic */}
             <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none opacity-40">
-                <div className="absolute top-1/4 -right-20 w-[600px] h-[600px] bg-blue-600/5 blur-[120px] rounded-full animate-pulse" />
-                <div className="absolute bottom-1/4 -left-20 w-[600px] h-[600px] bg-blue-600/5 blur-[120px] rounded-full animate-pulse delay-1000" />
+                <div className="absolute top-1/4 -right-20 w-[600px] h-[600px] bg-blue-600/5 dark:bg-blue-600/10 blur-[120px] rounded-full animate-pulse" />
+                <div className="absolute bottom-1/4 -left-20 w-[600px] h-[600px] bg-blue-600/5 dark:bg-blue-600/10 blur-[120px] rounded-full animate-pulse delay-1000" />
             </div>
 
             <div className="relative z-10 w-full max-w-md">
-                <div className="bg-white border border-gray-100 shadow-2xl rounded-3xl p-10 md:p-12 text-center animate-in zoom-in-95 duration-700">
+                <div className="bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 shadow-2xl rounded-3xl p-10 md:p-12 text-center animate-in zoom-in-95 duration-700">
                     
                     {/* Icon Ring */}
                     <div className="relative w-28 h-28 mx-auto mb-10">
@@ -63,45 +63,45 @@ function VerifyEmailContent() {
                     <div className="space-y-8">
                         <div className="space-y-3">
                             <div className="flex items-center justify-center gap-2">
-                                <span className="px-3 py-1 bg-gray-900 text-white rounded-full text-[9px] font-bold uppercase tracking-widest border border-white/10 shadow-xl">
-                                    Identity Protocol
+                                <span className="px-3 py-1 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-full text-xs font-semibold border border-gray-200 dark:border-gray-700 shadow-sm">
+                                    Email Verification
                                 </span>
                             </div>
-                            <h1 className="text-2xl font-bold text-gray-900 tracking-tighter uppercase leading-tight">
-                                {status === 'loading' && "Verifying Asset Access"}
-                                {status === 'success' && "Verification Complete"}
-                                {status === 'error' && "Protocol Violation"}
+                            <h1 className="text-2xl font-bold text-gray-900 dark:text-white tracking-tight leading-tight">
+                                {status === 'loading' && "Verifying your email"}
+                                {status === 'success' && "Verification Successful"}
+                                {status === 'error' && "Verification Failed"}
                             </h1>
-                            <div className="h-1.5 w-12 bg-blue-600 mx-auto rounded-full" />
+                            <div className="h-1 w-12 bg-blue-600 mx-auto rounded-full" />
                         </div>
 
-                        <div className="text-[11px] font-bold text-gray-400 uppercase tracking-widest leading-relaxed">
-                            {status === 'loading' && "Authenticating token against primary registry. Please maintain session sync..."}
-                            {status === 'success' && "Session authorized. Identity confirmed. Auto-redirecting to primary interface."}
-                            {status === 'error' && "The verification token has expired or is invalid. Manual investigation required."}
+                        <div className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed font-medium">
+                            {status === 'loading' && "We are checking your verification link. Please wait a moment..."}
+                            {status === 'success' && "Your email has been successfully verified. You will be redirected to log in shortly."}
+                            {status === 'error' && "The verification link has expired or is invalid. Please request a new one."}
                         </div>
 
                         {status === 'error' && (
                             <div className="pt-6 space-y-4">
                                 <Link 
                                     href="/auth/login" 
-                                    className="flex items-center justify-center gap-3 w-full h-14 bg-gray-900 text-white rounded-2xl text-[10px] font-bold uppercase tracking-widest hover:bg-black transition-all shadow-xl active:scale-95"
+                                    className="flex items-center justify-center gap-3 w-full h-14 bg-blue-600 text-white rounded-2xl text-sm font-bold hover:bg-blue-700 transition-all shadow-xl active:scale-95"
                                 >
-                                    Return to Authentication
+                                    Go to Login
                                 </Link>
                                 <button 
                                     onClick={() => window.location.reload()}
-                                    className="text-[9px] font-bold text-gray-400 uppercase tracking-widest hover:text-gray-900 transition-colors"
+                                    className="text-xs font-semibold text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
                                 >
-                                    Retry Verification Attempt
+                                    Try Again
                                 </button>
                             </div>
                         )}
 
                         {status === 'success' && (
                             <div className="pt-6">
-                                <div className="flex items-center justify-center gap-3 text-[10px] font-bold text-emerald-600 uppercase tracking-widest bg-emerald-50 py-4 rounded-2xl border border-emerald-100 animate-pulse">
-                                    <ShieldCheck size={16} /> Access Granted
+                                <div className="flex items-center justify-center gap-2 text-sm font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/30 py-4 rounded-2xl border border-emerald-100 dark:border-emerald-900/50">
+                                    <ShieldCheck size={18} /> Account Activated
                                 </div>
                             </div>
                         )}
@@ -112,10 +112,10 @@ function VerifyEmailContent() {
                 <div className="mt-10 text-center">
                     <Link 
                         href="/" 
-                        className="inline-flex items-center gap-2 text-[10px] font-bold text-gray-400 uppercase tracking-widest hover:text-gray-900 transition-colors group"
+                        className="inline-flex items-center gap-2 text-xs font-semibold text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors group"
                     >
                         <ChevronLeft size={16} className="group-hover:-translate-x-1 transition-transform" />
-                        Back to Archive Hub
+                        Back to Home
                     </Link>
                 </div>
             </div>
@@ -126,9 +126,9 @@ function VerifyEmailContent() {
 export default function VerifyEmailPage() {
     return (
         <Suspense fallback={
-            <div className="min-h-screen bg-white flex flex-col items-center justify-center p-6">
-                <Loader2 className="animate-spin text-blue-600 mb-6" size={48} />
-                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest animate-pulse">SYNCHRONIZING REGISTRY...</p>
+            <div className="min-h-screen bg-gray-50 dark:bg-gray-950 flex flex-col items-center justify-center p-6">
+                <Loader2 className="animate-spin text-blue-600 mb-6" size={40} />
+                <p className="text-sm font-semibold text-gray-500 dark:text-gray-400 animate-pulse">Loading verification data...</p>
             </div>
         }>
             <VerifyEmailContent />

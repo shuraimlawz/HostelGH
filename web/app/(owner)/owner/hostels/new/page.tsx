@@ -62,8 +62,8 @@ const Field = ({ label, required, error, children }: {
 );
 
 const inputCls = (hasError?: boolean) => cn(
-    "w-full px-4 py-2.5 bg-gray-50 border rounded-lg text-sm text-gray-900 outline-none transition-colors placeholder:text-gray-400",
-    hasError ? "border-red-300 focus:border-red-400 bg-red-50" : "border-gray-200 focus:border-blue-500 focus:bg-white"
+    "w-full px-4 py-2.5 bg-gray-50 dark:bg-gray-950 border rounded-lg text-sm text-gray-900 dark:text-white outline-none transition-colors placeholder:text-gray-400 dark:text-gray-500",
+    hasError ? "border-red-300 focus:border-red-400 bg-red-50" : "border-gray-200 focus:border-blue-500 focus:bg-white dark:bg-gray-900"
 );
 
 export default function NewHostelPage() {
@@ -171,10 +171,10 @@ export default function NewHostelPage() {
                         <CheckCircle2 size={32} className="text-green-600" />
                     </div>
                     <div className="space-y-2">
-                        <h2 className="text-xl font-semibold text-gray-900">
+                        <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
                             {requiresVerification ? "Submitted for Review" : "Hostel Listed!"}
                         </h2>
-                        <p className="text-sm text-gray-500 leading-relaxed">
+                        <p className="text-sm text-gray-500 dark:text-gray-400 dark:text-gray-500 leading-relaxed">
                             {requiresVerification
                                 ? "Your hostel has been submitted and is under review. It'll be visible once approved (usually within 24 hours)."
                                 : "Your hostel is now live and visible to students."}
@@ -195,7 +195,7 @@ export default function NewHostelPage() {
         <div className="max-w-2xl mx-auto pb-20 px-4">
             {/* Back link */}
             <div className="py-6">
-                <Link href="/owner/hostels" className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-900 transition-colors">
+                <Link href="/owner/hostels" className="inline-flex items-center gap-1.5 text-sm text-gray-500 dark:text-gray-400 dark:text-gray-500 hover:text-gray-900 dark:text-white transition-colors">
                     <ChevronLeft size={16} />
                     Back to my hostels
                 </Link>
@@ -203,8 +203,8 @@ export default function NewHostelPage() {
 
             {/* Header */}
             <div className="mb-8">
-                <h1 className="text-2xl font-semibold text-gray-900">List a hostel</h1>
-                <p className="text-sm text-gray-500 mt-1">Fill in the details below to get your hostel in front of students.</p>
+                <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">List a hostel</h1>
+                <p className="text-sm text-gray-500 dark:text-gray-400 dark:text-gray-500 mt-1">Fill in the details below to get your hostel in front of students.</p>
             </div>
 
             {/* Step progress */}
@@ -218,11 +218,11 @@ export default function NewHostelPage() {
                             <div className="flex items-center gap-2 shrink-0">
                                 <div className={cn(
                                     "w-7 h-7 rounded-full flex items-center justify-center text-xs font-semibold transition-colors",
-                                    done ? "bg-blue-600 text-white" : active ? "bg-blue-600 text-white" : "bg-gray-100 text-gray-400"
+                                    done ? "bg-blue-600 text-white" : active ? "bg-blue-600 text-white" : "bg-gray-100 text-gray-400 dark:text-gray-500"
                                 )}>
                                     {done ? <CheckCircle2 size={14} /> : n}
                                 </div>
-                                <span className={cn("text-sm hidden sm:inline", active ? "text-gray-900 font-medium" : done ? "text-blue-600" : "text-gray-400")}>
+                                <span className={cn("text-sm hidden sm:inline", active ? "text-gray-900 dark:text-white font-medium" : done ? "text-blue-600" : "text-gray-400 dark:text-gray-500")}>
                                     {label}
                                 </span>
                             </div>
@@ -239,8 +239,8 @@ export default function NewHostelPage() {
                 {step === 1 && (
                     <div className="space-y-5">
                         <div className="border-b pb-4 mb-6">
-                            <h2 className="font-semibold text-gray-900">Basic Information</h2>
-                            <p className="text-sm text-gray-500 mt-0.5">Tell students what your hostel is about.</p>
+                            <h2 className="font-semibold text-gray-900 dark:text-white">Basic Information</h2>
+                            <p className="text-sm text-gray-500 dark:text-gray-400 dark:text-gray-500 mt-0.5">Tell students what your hostel is about.</p>
                         </div>
 
                         <Field label="Hostel Name" required error={errors.name?.message}>
@@ -257,7 +257,7 @@ export default function NewHostelPage() {
                             error={errors.description?.message}
                         >
                             <div className="flex items-center justify-between mb-1.5">
-                                <span className="text-[10px] font-black uppercase tracking-widest text-gray-400">Write about your hostel</span>
+                                <span className="text-[10px] font-black uppercase tracking-widest text-gray-400 dark:text-gray-500">Write about your hostel</span>
                                 <button
                                     type="button"
                                     disabled={isPolishing}
@@ -300,8 +300,8 @@ export default function NewHostelPage() {
                 {step === 2 && (
                     <div className="space-y-5">
                         <div className="border-b pb-4 mb-6">
-                            <h2 className="font-semibold text-gray-900">Location & Contact</h2>
-                            <p className="text-sm text-gray-500 mt-0.5">Help students find and contact you.</p>
+                            <h2 className="font-semibold text-gray-900 dark:text-white">Location & Contact</h2>
+                            <p className="text-sm text-gray-500 dark:text-gray-400 dark:text-gray-500 mt-0.5">Help students find and contact you.</p>
                         </div>
 
                         <div className="grid grid-cols-2 gap-4">
@@ -371,7 +371,7 @@ export default function NewHostelPage() {
                                 className={inputCls(!!errors.whatsappNumber)}
                                 placeholder="e.g. 0541234567"
                             />
-                            <p className="text-xs text-gray-400 mt-1">
+                            <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
                                 This enables the "Book via WhatsApp" button — students can message you directly from your hostel page.
                             </p>
                         </Field>
@@ -382,8 +382,8 @@ export default function NewHostelPage() {
                 {step === 3 && (
                     <div className="space-y-6">
                         <div className="border-b pb-4 mb-2">
-                            <h2 className="font-semibold text-gray-900">Amenities & Utilities</h2>
-                            <p className="text-sm text-gray-500 mt-0.5">Select everything that's available at your hostel.</p>
+                            <h2 className="font-semibold text-gray-900 dark:text-white">Amenities & Utilities</h2>
+                            <p className="text-sm text-gray-500 dark:text-gray-400 dark:text-gray-500 mt-0.5">Select everything that's available at your hostel.</p>
                         </div>
 
                         <div>
@@ -407,7 +407,7 @@ export default function NewHostelPage() {
                                             }}
                                             className={cn(
                                                 "flex items-center gap-2 px-4 py-2 rounded-lg border text-sm transition-colors",
-                                                isOn ? "bg-blue-600 text-white border-blue-600" : "bg-white border-gray-200 text-gray-600 hover:border-gray-300"
+                                                isOn ? "bg-blue-600 text-white border-blue-600" : "bg-white dark:bg-gray-900 border-gray-200 text-gray-600 hover:border-gray-300"
                                             )}
                                         >
                                             <util.icon size={14} />
@@ -430,7 +430,7 @@ export default function NewHostelPage() {
                                             onClick={() => toggleAmenity(item.id)}
                                             className={cn(
                                                 "flex flex-col items-center gap-2 py-4 rounded-lg border text-sm transition-colors",
-                                                isOn ? "bg-blue-50 border-blue-300 text-blue-700" : "bg-white border-gray-200 text-gray-500 hover:border-gray-300"
+                                                isOn ? "bg-blue-50 border-blue-300 text-blue-700" : "bg-white dark:bg-gray-900 border-gray-200 text-gray-500 dark:text-gray-400 dark:text-gray-500 hover:border-gray-300"
                                             )}
                                         >
                                             <item.icon size={18} />
@@ -447,8 +447,8 @@ export default function NewHostelPage() {
                 {step === 4 && (
                     <div className="space-y-5">
                         <div className="border-b pb-4 mb-6">
-                            <h2 className="font-semibold text-gray-900">Photos</h2>
-                            <p className="text-sm text-gray-500 mt-0.5">Good photos significantly increase bookings. Upload at least one.</p>
+                            <h2 className="font-semibold text-gray-900 dark:text-white">Photos</h2>
+                            <p className="text-sm text-gray-500 dark:text-gray-400 dark:text-gray-500 mt-0.5">Good photos significantly increase bookings. Upload at least one.</p>
                         </div>
 
                         <ImageUpload
@@ -467,7 +467,7 @@ export default function NewHostelPage() {
                         <button
                             type="button"
                             onClick={() => setStep(s => s - 1)}
-                            className="px-5 py-2.5 text-sm font-medium text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+                            className="px-5 py-2.5 text-sm font-medium text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50 dark:bg-gray-950 transition-colors"
                         >
                             Back
                         </button>

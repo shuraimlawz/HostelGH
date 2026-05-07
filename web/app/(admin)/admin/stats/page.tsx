@@ -37,12 +37,12 @@ export default function AdminStatsPage() {
         <div className="space-y-8">
             <div>
                 <h1 className="text-3xl font-bold tracking-tight mb-2">System Statistics</h1>
-                <p className="text-gray-500">Detailed analytics and platform metrics</p>
+                <p className="text-gray-500 dark:text-gray-400 dark:text-gray-500">Detailed analytics and platform metrics</p>
             </div>
 
             {/* Overview Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <div className="bg-white rounded-2xl border p-6 shadow-sm">
+                <div className="bg-white dark:bg-gray-900 rounded-2xl border p-6 shadow-sm">
                     <div className="flex items-center justify-between mb-4">
                         <div className="p-3 bg-blue-50 rounded-xl">
                             <Users className="text-blue-600" size={24} />
@@ -59,7 +59,7 @@ export default function AdminStatsPage() {
                     <p className="text-3xl font-bold">{stats?.totalUsers || 0}</p>
                 </div>
 
-                <div className="bg-white rounded-2xl border p-6 shadow-sm">
+                <div className="bg-white dark:bg-gray-900 rounded-2xl border p-6 shadow-sm">
                     <div className="flex items-center justify-between mb-4">
                         <div className="p-3 bg-green-50 rounded-xl">
                             <Building2 className="text-green-600" size={24} />
@@ -69,7 +69,7 @@ export default function AdminStatsPage() {
                     <p className="text-3xl font-bold">{stats?.liveHostels || 0}</p>
                 </div>
 
-                <div className="bg-white rounded-2xl border p-6 shadow-sm">
+                <div className="bg-white dark:bg-gray-900 rounded-2xl border p-6 shadow-sm">
                     <div className="flex items-center justify-between mb-4">
                         <div className="p-3 bg-purple-50 rounded-xl">
                             <BarChart3 className="text-purple-600" size={24} />
@@ -86,7 +86,7 @@ export default function AdminStatsPage() {
                     <p className="text-3xl font-bold">{stats?.bookings || 0}</p>
                 </div>
 
-                <div className="bg-white rounded-2xl border p-6 shadow-sm">
+                <div className="bg-white dark:bg-gray-900 rounded-2xl border p-6 shadow-sm">
                     <div className="flex items-center justify-between mb-4">
                         <div className="p-3 bg-orange-50 rounded-xl">
                             <TrendingUp className="text-orange-600" size={24} />
@@ -100,7 +100,7 @@ export default function AdminStatsPage() {
             {/* Charts */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* User Growth Chart */}
-                <div className="bg-white rounded-2xl p-6 border shadow-sm">
+                <div className="bg-white dark:bg-gray-900 rounded-2xl p-6 border shadow-sm">
                     <h3 className="text-lg font-bold mb-4">User Growth</h3>
                     <ResponsiveContainer width="100%" height={300}>
                         <AreaChart data={monthlyData}>
@@ -120,7 +120,7 @@ export default function AdminStatsPage() {
                 </div>
 
                 {/* Revenue Chart */}
-                <div className="bg-white rounded-2xl p-6 border shadow-sm">
+                <div className="bg-white dark:bg-gray-900 rounded-2xl p-6 border shadow-sm">
                     <h3 className="text-lg font-bold mb-4">Revenue Trends</h3>
                     <ResponsiveContainer width="100%" height={300}>
                         <BarChart data={monthlyData}>

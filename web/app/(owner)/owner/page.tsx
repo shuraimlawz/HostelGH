@@ -50,20 +50,20 @@ function StatCard({
             "p-6 rounded-2xl border transition-all duration-300 group overflow-hidden relative",
             premium 
                ? "bg-gray-900 text-white border-gray-900 shadow-xl shadow-gray-200" 
-               : "bg-white border-gray-100 shadow-sm hover:shadow-xl hover:shadow-blue-500/5"
+               : "bg-white dark:bg-gray-900 border-gray-100 shadow-sm hover:shadow-xl hover:shadow-blue-500/5"
         )}>
             {premium && <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 rounded-full -mr-16 -mt-16 blur-2xl group-hover:scale-110 transition-transform" />}
             <div className="flex items-center justify-between mb-6 relative z-10">
                 <div className={cn(
                     "w-12 h-12 rounded-xl flex items-center justify-center transition-transform group-hover:scale-110 shadow-sm border border-gray-100/10",
-                    premium ? "bg-white/10 text-white" : cn(bgColor, color)
+                    premium ? "bg-white dark:bg-gray-900/10 text-white" : cn(bgColor, color)
                 )}>
                     <Icon size={22} />
                 </div>
                 <ArrowUpRight size={14} className={premium ? "text-white/20" : "text-gray-200 group-hover:text-blue-500 transition-colors"} />
             </div>
             <div className="relative z-10">
-                <p className={cn("text-[10px] font-bold uppercase tracking-widest mb-1", premium ? "text-gray-400" : "text-gray-400")}>{label}</p>
+                <p className={cn("text-[10px] font-bold uppercase tracking-widest mb-1", premium ? "text-gray-400 dark:text-gray-500" : "text-gray-400 dark:text-gray-500")}>{label}</p>
                 <h3 className="text-2xl font-bold tracking-tight mb-1">{value}</h3>
                 <p className={cn("text-[9px] font-bold uppercase tracking-widest opacity-80", premium ? "text-blue-400" : color)}>{detail}</p>
             </div>
@@ -105,7 +105,7 @@ export default function OwnerDashboardPage() {
             <div className="flex h-[60vh] items-center justify-center">
                 <div className="flex flex-col items-center gap-4 text-center">
                     <Loader2 className="animate-spin text-blue-600" size={32} />
-                    <p className="text-sm font-medium text-gray-400">Loading dashboard...</p>
+                    <p className="text-sm font-medium text-gray-400 dark:text-gray-500">Loading dashboard...</p>
                 </div>
             </div>
         );
@@ -140,7 +140,7 @@ export default function OwnerDashboardPage() {
             case "COMPLETED": return "bg-teal-50 text-teal-600 border-teal-100";
             case "CANCELLED": return "bg-red-50 text-red-600 border-red-100";
             case "DISPUTED": return "bg-rose-50 text-rose-600 border-rose-100";
-            default: return "bg-gray-50 text-gray-500 border-gray-100";
+            default: return "bg-gray-50 dark:bg-gray-950 text-gray-500 dark:text-gray-400 dark:text-gray-500 border-gray-100";
         }
     };
 
@@ -153,9 +153,9 @@ export default function OwnerDashboardPage() {
                         <div className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
                         <span className="text-[10px] font-bold text-blue-600 uppercase tracking-widest leading-none">Open Access Launch</span>
                     </div>
-                    <h1 className="text-3xl md:text-4xl font-bold text-gray-900 tracking-tight">Owner Dashboard</h1>
+                    <h1 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white tracking-tight">Owner Dashboard</h1>
                     <div className="flex flex-col md:flex-row md:items-center gap-4">
-                        <p className="text-gray-500 text-sm max-w-md font-medium">Managing {totalHostels} Hostels with {totalRooms} total rooms.</p>
+                        <p className="text-gray-500 dark:text-gray-400 dark:text-gray-500 text-sm max-w-md font-medium">Managing {totalHostels} Hostels with {totalRooms} total rooms.</p>
                         <div className="flex items-center gap-2 px-3 py-1 bg-emerald-50 text-emerald-700 rounded-full border border-emerald-100 text-[10px] font-bold uppercase tracking-widest">
                             <Zap size={12} className="fill-emerald-600" /> 0% Platform Commission Enabled
                         </div>
@@ -201,13 +201,13 @@ export default function OwnerDashboardPage() {
 
             <div className="grid grid-cols-1 xl:grid-cols-12 gap-10">
                 {/* Financial Trajectory */}
-                <div className="xl:col-span-8 bg-white p-8 rounded-2xl border border-gray-100 shadow-sm flex flex-col space-y-8">
+                <div className="xl:col-span-8 bg-white dark:bg-gray-900 p-8 rounded-2xl border border-gray-100 shadow-sm flex flex-col space-y-8">
                     <div className="flex items-center justify-between border-b border-gray-50 pb-4">
                         <div className="flex items-center gap-3">
                             <BarChart3 className="text-blue-600" size={20} />
-                            <h2 className="text-xl font-bold text-gray-900 tracking-tight">Income History</h2>
+                            <h2 className="text-xl font-bold text-gray-900 dark:text-white tracking-tight">Income History</h2>
                         </div>
-                        <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Last 6 Months</span>
+                        <span className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">Last 6 Months</span>
                     </div>
 
                     <div className="h-[300px] w-full">
@@ -254,7 +254,7 @@ export default function OwnerDashboardPage() {
                 <div className="xl:col-span-4 bg-gray-900 text-white p-8 rounded-2xl shadow-xl relative overflow-hidden group border border-gray-800 flex flex-col justify-between shadow-gray-200">
                     <div className="absolute top-0 right-0 w-48 h-48 bg-blue-500/10 rounded-full -mr-24 -mt-24 blur-3xl group-hover:scale-110 transition-transform duration-1000" />
                     <div className="relative z-10">
-                        <div className="w-12 h-12 bg-white/5 rounded-xl flex items-center justify-center border border-white/10 mb-8 shadow-sm">
+                        <div className="w-12 h-12 bg-white dark:bg-gray-900/5 rounded-xl flex items-center justify-center border border-white/10 mb-8 shadow-sm">
                             <LayoutDashboard size={24} className="text-blue-500" />
                         </div>
                         <h3 className="text-2xl font-bold tracking-tight mb-2 uppercase">My Hostels</h3>
@@ -263,16 +263,16 @@ export default function OwnerDashboardPage() {
 
                     <div className="relative z-10 space-y-6 pt-8">
                         <div className="grid grid-cols-2 gap-4">
-                            <div className="p-4 bg-white/5 rounded-xl border border-white/5 shadow-inner">
+                            <div className="p-4 bg-white dark:bg-gray-900/5 rounded-xl border border-white/5 shadow-inner">
                                 <p className="text-2xl font-bold mb-0.5 tracking-tighter">{totalHostels}</p>
                                 <p className="text-[9px] font-bold text-blue-400 uppercase tracking-widest">Assets</p>
                             </div>
-                            <div className="p-4 bg-white/5 rounded-xl border border-white/5 shadow-inner">
+                            <div className="p-4 bg-white dark:bg-gray-900/5 rounded-xl border border-white/5 shadow-inner">
                                 <p className="text-2xl font-bold mb-0.5 tracking-tighter">{totalRooms}</p>
                                 <p className="text-[9px] font-bold text-blue-400 uppercase tracking-widest">Units</p>
                             </div>
                         </div>
-                        <Link href="/owner/hostels" className="w-full h-12 bg-white text-gray-900 rounded-xl font-bold text-[10px] uppercase tracking-widest hover:bg-gray-100 transition-all flex items-center justify-center gap-2">
+                        <Link href="/owner/hostels" className="w-full h-12 bg-white dark:bg-gray-900 text-gray-900 dark:text-white rounded-xl font-bold text-[10px] uppercase tracking-widest hover:bg-gray-100 transition-all flex items-center justify-center gap-2">
                             View All Hostels <ArrowRight size={14} />
                         </Link>
                     </div>
@@ -280,18 +280,18 @@ export default function OwnerDashboardPage() {
             </div>
 
             {/* Occupation Ledger */}
-            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden flex flex-col">
+            <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 shadow-sm overflow-hidden flex flex-col">
                 <div className="p-8 border-b border-gray-50 flex flex-col sm:flex-row sm:items-center justify-between gap-6">
                     <div className="flex items-center gap-3">
                         <Activity className="text-blue-600" size={20} />
                         <div className="space-y-0.5">
-                            <h2 className="text-xl font-bold text-gray-900 tracking-tight">Recent Bookings</h2>
-                            <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Track your latest student bookings</p>
+                            <h2 className="text-xl font-bold text-gray-900 dark:text-white tracking-tight">Recent Bookings</h2>
+                            <p className="text-[10px] text-gray-400 dark:text-gray-500 font-bold uppercase tracking-widest">Track your latest student bookings</p>
                         </div>
                     </div>
 
                     <div className="overflow-x-auto pb-2 -mx-4 px-4 sm:mx-0 sm:px-0 scrollbar-hide">
-                        <div className="flex bg-gray-50 p-1 rounded-xl border border-gray-100 w-max shrink-0">
+                        <div className="flex bg-gray-50 dark:bg-gray-950 p-1 rounded-xl border border-gray-100 w-max shrink-0">
                             {[
                                 { key: "all", label: "All" },
                                 { key: "pending", label: "Pending" },
@@ -303,8 +303,8 @@ export default function OwnerDashboardPage() {
                                     className={cn(
                                         "px-6 py-2 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-all",
                                         selectedTab === tab.key
-                                            ? "bg-white text-gray-900 shadow-sm border border-gray-100"
-                                            : "text-gray-400 hover:text-gray-900"
+                                            ? "bg-white dark:bg-gray-900 text-gray-900 dark:text-white shadow-sm border border-gray-100"
+                                            : "text-gray-400 dark:text-gray-500 hover:text-gray-900 dark:text-white"
                                     )}>
                                     {tab.label}
                                 </button>
@@ -316,45 +316,45 @@ export default function OwnerDashboardPage() {
                 <div className="overflow-x-auto">
                     {filteredBookings.length === 0 ? (
                         <div className="p-24 text-center space-y-4">
-                            <div className="w-16 h-16 bg-gray-50 rounded-2xl flex items-center justify-center mx-auto text-gray-200 border border-gray-100 shadow-inner">
+                            <div className="w-16 h-16 bg-gray-50 dark:bg-gray-950 rounded-2xl flex items-center justify-center mx-auto text-gray-200 border border-gray-100 shadow-inner">
                                 <Activity size={32} />
                             </div>
                             <div className="space-y-1">
-                                <h3 className="text-lg font-bold text-gray-900 uppercase tracking-tight">No bookings found</h3>
-                                <p className="text-gray-400 text-sm font-medium">No bookings match your selected filter.</p>
+                                <h3 className="text-lg font-bold text-gray-900 dark:text-white uppercase tracking-tight">No bookings found</h3>
+                                <p className="text-gray-400 dark:text-gray-500 text-sm font-medium">No bookings match your selected filter.</p>
                             </div>
                         </div>
                     ) : (
                         <table className="w-full text-left border-collapse">
                             <thead>
-                                <tr className="bg-gray-50/50">
-                                    <th className="px-8 py-5 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Student Info</th>
-                                    <th className="px-8 py-5 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Hostel & Room</th>
-                                    <th className="px-8 py-5 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Date</th>
-                                    <th className="px-8 py-5 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Status</th>
-                                    <th className="px-8 py-5 text-right text-[10px] font-bold text-gray-400 uppercase tracking-widest">View</th>
+                                <tr className="bg-gray-50 dark:bg-gray-950/50">
+                                    <th className="px-8 py-5 text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">Student Info</th>
+                                    <th className="px-8 py-5 text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">Hostel & Room</th>
+                                    <th className="px-8 py-5 text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">Date</th>
+                                    <th className="px-8 py-5 text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">Status</th>
+                                    <th className="px-8 py-5 text-right text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">View</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-50">
                                 {filteredBookings.slice(0, 10).map((booking: any) => (
-                                    <tr key={booking.id} className="hover:bg-gray-50/50 transition-all group/row">
+                                    <tr key={booking.id} className="hover:bg-gray-50 dark:bg-gray-950/50 transition-all group/row">
                                         <td className="px-8 py-6">
                                             <div className="flex items-center gap-4">
                                                 <div className="w-10 h-10 bg-gray-900 text-white rounded-xl flex items-center justify-center font-bold text-xs shadow-md shadow-gray-200">
                                                     {booking.user.firstName?.[0] || 'U'}
                                                 </div>
                                                 <div className="min-w-0">
-                                                    <p className="font-bold text-gray-900 text-sm tracking-tight truncate max-w-[150px]">{booking.user.firstName} {booking.user.lastName}</p>
-                                                    <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest truncate">{booking.user.email}</p>
+                                                    <p className="font-bold text-gray-900 dark:text-white text-sm tracking-tight truncate max-w-[150px]">{booking.user.firstName} {booking.user.lastName}</p>
+                                                    <p className="text-[10px] text-gray-400 dark:text-gray-500 font-bold uppercase tracking-widest truncate">{booking.user.email}</p>
                                                 </div>
                                             </div>
                                         </td>
                                         <td className="px-8 py-6">
-                                            <p className="font-bold text-gray-900 text-sm tracking-tight">{booking.hostel.name}</p>
+                                            <p className="font-bold text-gray-900 dark:text-white text-sm tracking-tight">{booking.hostel.name}</p>
                                             <p className="text-[10px] text-blue-600 font-bold uppercase tracking-widest mt-0.5">{booking.items?.[0]?.room?.name || "Shared Occupancy"}</p>
                                         </td>
                                         <td className="px-8 py-6">
-                                            <span className="text-[11px] font-bold text-gray-900 bg-gray-50 px-2 py-1 rounded-md border border-gray-100">
+                                            <span className="text-[11px] font-bold text-gray-900 dark:text-white bg-gray-50 dark:bg-gray-950 px-2 py-1 rounded-md border border-gray-100">
                                                 {new Date(booking.items?.[0]?.startDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
                                             </span>
                                         </td>
@@ -366,7 +366,7 @@ export default function OwnerDashboardPage() {
                                         <td className="px-8 py-6 text-right">
                                             <Link
                                                 href={`/owner/bookings/${booking.id}`}
-                                                className="w-10 h-10 inline-flex items-center justify-center bg-white border border-gray-100 rounded-xl text-gray-400 hover:text-blue-600 hover:border-blue-200 transition-all shadow-sm"
+                                                className="w-10 h-10 inline-flex items-center justify-center bg-white dark:bg-gray-900 border border-gray-100 rounded-xl text-gray-400 dark:text-gray-500 hover:text-blue-600 hover:border-blue-200 transition-all shadow-sm"
                                             >
                                                 <Eye size={18} />
                                             </Link>
@@ -377,8 +377,8 @@ export default function OwnerDashboardPage() {
                         </table>
                     )}
                 </div>
-                <div className="p-8 bg-gray-50/30 text-center border-t border-gray-50">
-                    <Link href="/owner/bookings" className="text-[10px] font-bold text-gray-400 hover:text-blue-600 uppercase tracking-widest flex items-center justify-center gap-2 group">
+                <div className="p-8 bg-gray-50 dark:bg-gray-950/30 text-center border-t border-gray-50">
+                    <Link href="/owner/bookings" className="text-[10px] font-bold text-gray-400 dark:text-gray-500 hover:text-blue-600 uppercase tracking-widest flex items-center justify-center gap-2 group">
                         View All Bookings <ChevronRight size={14} className="group-hover:translate-x-1 transition-transform" />
                     </Link>
                 </div>

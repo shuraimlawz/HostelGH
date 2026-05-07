@@ -126,7 +126,7 @@ export default function AdminDashboardPage() {
         <div className="flex h-[60vh] items-center justify-center">
             <div className="flex flex-col items-center gap-4 text-center">
                 <Loader2 className="animate-spin text-blue-600" size={32} />
-                <p className="text-sm font-medium text-gray-400">Loading dashboard...</p>
+                <p className="text-sm font-medium text-gray-400 dark:text-gray-500">Loading dashboard...</p>
             </div>
         </div>
     );
@@ -146,14 +146,14 @@ export default function AdminDashboardPage() {
                 <div className="space-y-2">
                     <div className="flex items-center gap-2">
                         <div className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
-                        <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Administration</span>
+                        <span className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">Administration</span>
                     </div>
-                    <h1 className="text-3xl md:text-4xl font-bold text-gray-900 tracking-tight">Admin Overview</h1>
-                    <p className="text-gray-500 text-sm max-w-md">Monitor platform activity, verify hostels, and manage users.</p>
+                    <h1 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white tracking-tight">Admin Overview</h1>
+                    <p className="text-gray-500 dark:text-gray-400 dark:text-gray-500 text-sm max-w-md">Monitor platform activity, verify hostels, and manage users.</p>
                 </div>
 
                 <div className="flex flex-wrap items-center gap-3">
-                    <Link href="/admin/settings" className="h-10 px-5 rounded-xl bg-white border border-gray-100 text-[10px] font-bold uppercase tracking-widest hover:bg-gray-50 transition-all flex items-center gap-2 shadow-sm">
+                    <Link href="/admin/settings" className="h-10 px-5 rounded-xl bg-white dark:bg-gray-900 border border-gray-100 text-[10px] font-bold uppercase tracking-widest hover:bg-gray-50 dark:bg-gray-950 transition-all flex items-center gap-2 shadow-sm">
                         <Settings size={14} /> Configure
                     </Link>
                     <Link href="/admin/logs" className="h-10 px-5 rounded-xl bg-gray-900 text-white text-[10px] font-bold uppercase tracking-widest hover:bg-black transition-all flex items-center gap-2 shadow-lg shadow-gray-900/10">
@@ -164,7 +164,7 @@ export default function AdminDashboardPage() {
 
             <Tabs defaultValue="overview" className="space-y-10" onValueChange={setActiveTab}>
                 <div className="overflow-x-auto pb-4 -mx-4 px-4 sm:mx-0 sm:px-0 scrollbar-hide">
-                    <TabsList className="bg-gray-50 p-1 rounded-xl border border-gray-100 w-max inline-flex">
+                    <TabsList className="bg-gray-50 dark:bg-gray-950 p-1 rounded-xl border border-gray-100 w-max inline-flex">
                         <TabsTrigger value="overview" className="rounded-lg px-6 py-2.5 font-bold uppercase tracking-widest text-[10px]">Overview</TabsTrigger>
                         <TabsTrigger value="approvals" className="rounded-lg px-6 py-2.5 font-bold uppercase tracking-widest text-[10px]">
                             Approvals <span className="ml-1.5 px-1.5 py-0.5 bg-blue-100 text-blue-700 rounded-md text-[8px]">{pendingApprovals}</span>
@@ -200,7 +200,7 @@ export default function AdminDashboardPage() {
                                     <QuickActionLink href="/admin/users" label="User Management" sub="Control platform access" icon={Users} />
                                     <QuickActionLink href="/admin/hostels" label="Hostel Management" sub="Moderate live hostels" icon={Building2} />
                                     <QuickActionLink href="/admin/bookings" label="Reservations" sub="Monitor booking activity" icon={CalendarCheck} />
-                                    <button className="w-full bg-white/5 hover:bg-white/10 rounded-xl p-5 text-left transition-all border border-white/5 flex items-center justify-between group">
+                                    <button className="w-full bg-white dark:bg-gray-900/5 hover:bg-white dark:bg-gray-900/10 rounded-xl p-5 text-left transition-all border border-white/5 flex items-center justify-between group">
                                         <div>
                                             <p className="font-bold text-[11px] uppercase tracking-wider mb-1">Detailed View</p>
                                             <p className="text-[10px] text-white/40">Technical settings</p>
@@ -214,22 +214,22 @@ export default function AdminDashboardPage() {
 
                     <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
                         <div className="lg:col-span-5">
-                            <div className="bg-white rounded-2xl border border-gray-100 p-8 space-y-6 shadow-sm">
+                            <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 p-8 space-y-6 shadow-sm">
                                 <h2 className="text-xl font-bold tracking-tight flex items-center gap-3">
                                     <Bell size={20} className="text-blue-600" /> Pending Actions
                                 </h2>
                                 <div className="space-y-4">
-                                    <div className="flex items-center justify-between p-4 rounded-xl bg-gray-50 border border-gray-100">
+                                    <div className="flex items-center justify-between p-4 rounded-xl bg-gray-50 dark:bg-gray-950 border border-gray-100">
                                         <div>
-                                            <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Pending Hostels</p>
-                                            <p className="text-lg font-bold text-gray-900">{pendingHostels}</p>
+                                            <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500">Pending Hostels</p>
+                                            <p className="text-lg font-bold text-gray-900 dark:text-white">{pendingHostels}</p>
                                         </div>
                                         <Link href="/admin/hostels" className="text-[10px] font-bold uppercase tracking-widest text-blue-600 hover:underline">Review Queue</Link>
                                     </div>
-                                    <div className="flex items-center justify-between p-4 rounded-xl bg-gray-50 border border-gray-100">
+                                    <div className="flex items-center justify-between p-4 rounded-xl bg-gray-50 dark:bg-gray-950 border border-gray-100">
                                         <div>
-                                            <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Pending Payouts</p>
-                                            <p className="text-lg font-bold text-gray-900">GH₵ {(pendingPayoutAmount / 100).toLocaleString()}</p>
+                                            <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500">Pending Payouts</p>
+                                            <p className="text-lg font-bold text-gray-900 dark:text-white">GH₵ {(pendingPayoutAmount / 100).toLocaleString()}</p>
                                         </div>
                                         <Link href="/admin/payments" className="text-[10px] font-bold uppercase tracking-widest text-blue-600 hover:underline">Disburse</Link>
                                     </div>
@@ -244,7 +244,7 @@ export default function AdminDashboardPage() {
                             </div>
                         </div>
                         <div className="lg:col-span-7">
-                            <div className="bg-white rounded-2xl border border-gray-100 p-8 space-y-6 shadow-sm">
+                            <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 p-8 space-y-6 shadow-sm">
                                 <h2 className="text-xl font-bold tracking-tight flex items-center gap-3">
                                     <FileText size={20} className="text-blue-600" /> Control Parameters
                                 </h2>
@@ -263,40 +263,40 @@ export default function AdminDashboardPage() {
                 <TabsContent value="approvals" className="space-y-8 animate-in slide-in-from-bottom-4 duration-500">
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                         {/* Hostel Verification Queue */}
-                        <div className="bg-white rounded-2xl border border-gray-100 p-8 space-y-6 shadow-sm">
+                        <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 p-8 space-y-6 shadow-sm">
                             <div className="flex items-center justify-between border-b border-gray-50 pb-4">
                                 <h2 className="text-xl font-bold tracking-tight flex items-center gap-3">
                                     <Building2 size={24} className="text-blue-600" /> Hostel Verification
                                 </h2>
-                                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Queue: {verificationQueue?.hostels?.length || 0}</span>
+                                <span className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">Queue: {verificationQueue?.hostels?.length || 0}</span>
                             </div>
                             <div className="space-y-4">
                                 {verificationQueue?.hostels?.map((hostel: any) => (
-                                    <div key={hostel.id} className="p-5 rounded-2xl bg-gray-50 border border-gray-100 flex items-center justify-between group hover:border-blue-200 transition-colors">
+                                    <div key={hostel.id} className="p-5 rounded-2xl bg-gray-50 dark:bg-gray-950 border border-gray-100 flex items-center justify-between group hover:border-blue-200 transition-colors">
                                         <div className="flex items-center gap-4 min-w-0">
                                             <div className="w-14 h-14 rounded-xl bg-gray-200 overflow-hidden shrink-0 shadow-inner">
                                                 {hostel.images?.[0] ? (
                                                     <img src={hostel.images[0]} alt="" className="w-full h-full object-cover" />
                                                 ) : (
-                                                    <div className="w-full h-full flex items-center justify-center text-gray-400"><Building2 size={24} /></div>
+                                                    <div className="w-full h-full flex items-center justify-center text-gray-400 dark:text-gray-500"><Building2 size={24} /></div>
                                                 )}
                                             </div>
                                             <div className="min-w-0">
-                                                <p className="font-bold text-sm text-gray-900 truncate">{hostel.name}</p>
-                                                <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest truncate">{hostel.city} • {hostel.owner?.firstName}</p>
+                                                <p className="font-bold text-sm text-gray-900 dark:text-white truncate">{hostel.name}</p>
+                                                <p className="text-[10px] text-gray-400 dark:text-gray-500 font-bold uppercase tracking-widest truncate">{hostel.city} • {hostel.owner?.firstName}</p>
                                             </div>
                                         </div>
                                         <div className="flex items-center gap-2">
                                             <button 
                                                 onClick={() => verifyHostel.mutate(hostel.id)} 
-                                                className="w-10 h-10 flex items-center justify-center bg-white text-emerald-600 rounded-xl border border-emerald-100 hover:bg-emerald-600 hover:text-white transition-all shadow-sm"
+                                                className="w-10 h-10 flex items-center justify-center bg-white dark:bg-gray-900 text-emerald-600 rounded-xl border border-emerald-100 hover:bg-emerald-600 hover:text-white transition-all shadow-sm"
                                                 title="Approve"
                                             >
                                                 <CheckCircle2 size={18} />
                                             </button>
                                             <Link 
                                                 href={`/hostels/${hostel.id}`} 
-                                                className="w-10 h-10 flex items-center justify-center bg-white text-gray-400 rounded-xl border border-gray-100 hover:text-gray-900 transition-all shadow-sm"
+                                                className="w-10 h-10 flex items-center justify-center bg-white dark:bg-gray-900 text-gray-400 dark:text-gray-500 rounded-xl border border-gray-100 hover:text-gray-900 dark:text-white transition-all shadow-sm"
                                                 title="Preview"
                                             >
                                                 <Eye size={18} />
@@ -306,28 +306,28 @@ export default function AdminDashboardPage() {
                                 ))}
                                 {(!verificationQueue?.hostels || verificationQueue?.hostels?.length === 0) && (
                                     <div className="text-center py-12 border border-dashed border-gray-100 rounded-2xl">
-                                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">All listings are up to date</p>
+                                        <p className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">All listings are up to date</p>
                                     </div>
                                 )}
                             </div>
                         </div>
 
                         {/* Owner KYC Queue */}
-                        <div className="bg-white rounded-2xl border border-gray-100 p-8 space-y-6 shadow-sm">
+                        <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 p-8 space-y-6 shadow-sm">
                             <div className="flex items-center justify-between border-b border-gray-50 pb-4">
                                 <h2 className="text-xl font-bold tracking-tight flex items-center gap-3">
                                     <UserCircle size={24} className="text-blue-600" /> User Verification
                                 </h2>
-                                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Queue: {verificationQueue?.owners?.length || 0}</span>
+                                <span className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">Queue: {verificationQueue?.owners?.length || 0}</span>
                             </div>
                             <div className="space-y-4">
                                 {verificationQueue?.owners?.map((owner: any) => (
-                                    <div key={owner.id} className="p-5 rounded-2xl bg-gray-50 border border-gray-100 flex items-center justify-between group hover:border-blue-200 transition-colors">
+                                    <div key={owner.id} className="p-5 rounded-2xl bg-gray-50 dark:bg-gray-950 border border-gray-100 flex items-center justify-between group hover:border-blue-200 transition-colors">
                                         <div className="flex items-center gap-4">
                                             <div className="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600 font-bold border border-blue-100 shadow-sm">{owner.firstName?.[0]}</div>
                                             <div>
-                                                <p className="font-bold text-sm text-gray-900">{owner.firstName} {owner.lastName}</p>
-                                                <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">{owner.ghanaCardId || 'No ID linked'}</p>
+                                                <p className="font-bold text-sm text-gray-900 dark:text-white">{owner.firstName} {owner.lastName}</p>
+                                                <p className="text-[10px] text-gray-400 dark:text-gray-500 font-bold uppercase tracking-widest">{owner.ghanaCardId || 'No ID linked'}</p>
                                             </div>
                                         </div>
                                         <div className="flex items-center gap-2">
@@ -342,8 +342,8 @@ export default function AdminDashboardPage() {
                                                         <DialogTitle className="text-xl font-bold tracking-tight">Identity Document: {owner.firstName}</DialogTitle>
                                                     </DialogHeader>
                                                     <div className="py-6 flex flex-col gap-6">
-                                                        <div className="flex items-center justify-between px-4 py-3 bg-gray-50 rounded-xl border border-gray-100">
-                                                            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Full Record</p>
+                                                        <div className="flex items-center justify-between px-4 py-3 bg-gray-50 dark:bg-gray-950 rounded-xl border border-gray-100">
+                                                            <p className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">Full Record</p>
                                                             <Link 
                                                                 href={`/admin/users/${owner.id}`}
                                                                 className="text-[10px] font-bold text-blue-600 uppercase tracking-widest hover:underline flex items-center gap-1"
@@ -361,7 +361,7 @@ export default function AdminDashboardPage() {
                                             </Dialog>
                                             <button 
                                                 onClick={() => impersonateMutation.mutate(owner.id)} 
-                                                className="w-10 h-10 flex items-center justify-center bg-white text-gray-400 rounded-xl border border-gray-100 hover:text-blue-600 transition-all shadow-sm"
+                                                className="w-10 h-10 flex items-center justify-center bg-white dark:bg-gray-900 text-gray-400 dark:text-gray-500 rounded-xl border border-gray-100 hover:text-blue-600 transition-all shadow-sm"
                                                 title="Shadow Mode"
                                             >
                                                 <Zap size={18} />
@@ -371,7 +371,7 @@ export default function AdminDashboardPage() {
                                 ))}
                                 {(!verificationQueue?.owners || verificationQueue?.owners?.length === 0) && (
                                     <div className="text-center py-12 border border-dashed border-gray-100 rounded-2xl">
-                                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">All owners are verified</p>
+                                        <p className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">All owners are verified</p>
                                     </div>
                                 )}
                             </div>
@@ -381,35 +381,35 @@ export default function AdminDashboardPage() {
 
                 {/* --- DISPUTES --- */}
                 <TabsContent value="disputes" className="space-y-8 animate-in slide-in-from-bottom-4 duration-500">
-                    <div className="bg-white rounded-2xl border border-gray-100 p-8 space-y-8 shadow-sm">
+                    <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 p-8 space-y-8 shadow-sm">
                         <h2 className="text-xl font-bold tracking-tight flex items-center gap-3">
                             <LifeBuoy size={24} className="text-red-500" /> Dispute Resolution
                         </h2>
                         <div className="space-y-4">
                             {disputesList?.map((dispute: any) => (
-                                <div key={dispute.id} className="p-6 rounded-2xl bg-gray-50 border border-gray-100 flex flex-col md:flex-row md:items-start justify-between gap-6 hover:border-red-100 transition-colors">
+                                <div key={dispute.id} className="p-6 rounded-2xl bg-gray-50 dark:bg-gray-950 border border-gray-100 flex flex-col md:flex-row md:items-start justify-between gap-6 hover:border-red-100 transition-colors">
                                     <div className="space-y-4 max-w-2xl">
                                         <div className="flex items-center gap-3">
                                             <span className="px-2.5 py-1 bg-red-100 text-red-700 rounded-lg text-[9px] font-bold uppercase tracking-widest border border-red-200/50">{dispute.status}</span>
-                                            <p className="text-sm font-bold text-gray-900 uppercase tracking-tight">Booking #{dispute.bookingId?.toString().slice(-6).toUpperCase() || 'UNKNOWN'}</p>
+                                            <p className="text-sm font-bold text-gray-900 dark:text-white uppercase tracking-tight">Booking #{dispute.bookingId?.toString().slice(-6).toUpperCase() || 'UNKNOWN'}</p>
                                         </div>
                                         <p className="text-gray-600 text-sm font-medium leading-relaxed border-l-2 border-red-500 pl-4">
                                             "{dispute.reason}"
                                         </p>
-                                        <div className="flex items-center gap-6 text-[10px] text-gray-400 font-bold uppercase tracking-widest">
+                                        <div className="flex items-center gap-6 text-[10px] text-gray-400 dark:text-gray-500 font-bold uppercase tracking-widest">
                                             <span className="flex items-center gap-1.5"><UserCircle size={12} /> Tenant: {dispute.booking?.tenant?.firstName}</span>
                                             <span className="flex items-center gap-1.5"><Building2 size={12} /> Property: {dispute.booking?.hostel?.name}</span>
                                         </div>
                                     </div>
                                     <div className="flex items-center gap-3 shrink-0">
                                         <button className="h-10 px-6 bg-gray-900 text-white rounded-xl font-bold uppercase tracking-widest text-[10px] hover:bg-black transition-all">Mediate</button>
-                                        <button className="h-10 px-6 bg-white text-red-600 rounded-xl font-bold uppercase tracking-widest text-[10px] border border-red-100 hover:bg-red-50 transition-all">Override</button>
+                                        <button className="h-10 px-6 bg-white dark:bg-gray-900 text-red-600 rounded-xl font-bold uppercase tracking-widest text-[10px] border border-red-100 hover:bg-red-50 transition-all">Override</button>
                                     </div>
                                 </div>
                             ))}
                             {(!disputesList || disputesList.length === 0) && (
-                                <div className="text-center py-20 bg-gray-50 rounded-2xl border border-dashed border-gray-100">
-                                    <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">Network conflict level: Zero</p>
+                                <div className="text-center py-20 bg-gray-50 dark:bg-gray-950 rounded-2xl border border-dashed border-gray-100">
+                                    <p className="text-[11px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">Network conflict level: Zero</p>
                                 </div>
                             )}
                         </div>
@@ -420,15 +420,15 @@ export default function AdminDashboardPage() {
                 <TabsContent value="activity" className="space-y-10 animate-in fade-in duration-500">
                     <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
                         <div className="lg:col-span-4">
-                            <div className="bg-white rounded-2xl border border-gray-100 p-8 space-y-6 h-full shadow-sm">
+                            <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 p-8 space-y-6 h-full shadow-sm">
                                 <h2 className="text-xl font-bold tracking-tight flex items-center gap-3 text-blue-600"> <Zap size={24} className="fill-current" /> Live Capture</h2>
                                 <div className="space-y-4">
                                     {realTimeFeed.map((data: any, i: number) => (
-                                        <div key={i} className="flex items-center gap-4 p-4 rounded-xl bg-gray-50 border border-gray-100 border-l-4 border-l-blue-500 animate-in slide-in-from-right-4 duration-500">
+                                        <div key={i} className="flex items-center gap-4 p-4 rounded-xl bg-gray-50 dark:bg-gray-950 border border-gray-100 border-l-4 border-l-blue-500 animate-in slide-in-from-right-4 duration-500">
                                             <Activity size={16} className="text-blue-600" />
                                             <div>
-                                                <p className="text-[11px] font-bold text-gray-900 uppercase tracking-tight">{data.event.replace(/_/g, ' ')}</p>
-                                                <p className="text-[9px] text-gray-400 font-bold uppercase tracking-widest">{new Date(data.timestamp).toLocaleTimeString()}</p>
+                                                <p className="text-[11px] font-bold text-gray-900 dark:text-white uppercase tracking-tight">{data.event.replace(/_/g, ' ')}</p>
+                                                <p className="text-[9px] text-gray-400 dark:text-gray-500 font-bold uppercase tracking-widest">{new Date(data.timestamp).toLocaleTimeString()}</p>
                                             </div>
                                         </div>
                                     ))}
@@ -452,9 +452,9 @@ export default function AdminDashboardPage() {
 
 function StatCard({ label, value, icon: Icon, trend, up }: any) {
     return (
-        <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm hover:shadow-xl hover:shadow-blue-500/5 transition-all group overflow-hidden">
+        <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 p-6 shadow-sm hover:shadow-xl hover:shadow-blue-500/5 transition-all group overflow-hidden">
             <div className="flex items-start justify-between mb-6">
-                <div className="p-3 rounded-xl bg-gray-50 text-blue-600 group-hover:scale-110 transition-transform border border-gray-100">
+                <div className="p-3 rounded-xl bg-gray-50 dark:bg-gray-950 text-blue-600 group-hover:scale-110 transition-transform border border-gray-100">
                     <Icon size={24} />
                 </div>
                 {trend !== undefined && (
@@ -467,20 +467,20 @@ function StatCard({ label, value, icon: Icon, trend, up }: any) {
                     </div>
                 )}
             </div>
-            <h3 className="text-gray-400 text-[10px] font-bold uppercase tracking-widest mb-1">{label}</h3>
-            <p className="text-2xl font-bold text-gray-900 tracking-tight">{value}</p>
+            <h3 className="text-gray-400 dark:text-gray-500 text-[10px] font-bold uppercase tracking-widest mb-1">{label}</h3>
+            <p className="text-2xl font-bold text-gray-900 dark:text-white tracking-tight">{value}</p>
         </div>
     );
 }
 
 function RevenueChart({ data }: any) {
     return (
-        <div className="bg-white rounded-2xl border border-gray-100 p-8 shadow-sm space-y-6">
+        <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 p-8 shadow-sm space-y-6">
             <div className="flex items-center justify-between border-b border-gray-50 pb-4">
                 <h2 className="text-xl font-bold tracking-tight">Revenue Overview</h2>
                 <div className="flex items-center gap-2">
                     <span className="w-2 h-2 rounded-full bg-blue-500" />
-                    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Monthly Growth</span>
+                    <span className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">Monthly Growth</span>
                 </div>
             </div>
             <div className="h-[300px] w-full">
@@ -509,21 +509,21 @@ function RevenueChart({ data }: any) {
 
 function ActivityList({ activities }: any) {
     return (
-        <div className="bg-white rounded-2xl border border-gray-100 p-8 h-full shadow-sm">
+        <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 p-8 h-full shadow-sm">
             <div className="flex items-center justify-between border-b border-gray-50 pb-4 mb-8">
                 <h2 className="text-xl font-bold tracking-tight">System Audit Log</h2>
                 <button className="text-[10px] font-bold text-blue-600 uppercase tracking-widest hover:underline">Download Report</button>
             </div>
             <div className="space-y-4">
                 {activities.slice(0, 10).map((log: any, i: number) => (
-                    <div key={i} className="flex items-center gap-6 p-5 rounded-2xl hover:bg-gray-50 transition-all border border-transparent hover:border-gray-100">
+                    <div key={i} className="flex items-center gap-6 p-5 rounded-2xl hover:bg-gray-50 dark:bg-gray-950 transition-all border border-transparent hover:border-gray-100">
                         <div className={cn("w-1.5 h-10 rounded-full shrink-0 shadow-sm", log.type === "success" ? "bg-emerald-500" : log.type === "warning" ? "bg-amber-500" : "bg-blue-600")} />
                         <div className="flex-1">
                             <p className="text-sm font-semibold text-gray-800">
                                 <span className="text-blue-600 uppercase tracking-widest text-[10px] mr-2 font-bold">{log.user || 'SYSTEM'}</span>
                                 {log.action || log.details || 'System event recorded'}
                             </p>
-                            <p className="text-[9px] text-gray-400 font-bold uppercase tracking-widest mt-1.5">{log.time || log.createdAt ? new Date(log.time || log.createdAt).toLocaleString() : 'Just now'}</p>
+                            <p className="text-[9px] text-gray-400 dark:text-gray-500 font-bold uppercase tracking-widest mt-1.5">{log.time || log.createdAt ? new Date(log.time || log.createdAt).toLocaleString() : 'Just now'}</p>
                         </div>
                         <ChevronRight className="text-gray-200" size={16} />
                     </div>
@@ -535,12 +535,12 @@ function ActivityList({ activities }: any) {
 
 function QuickActionLink({ href, label, sub, icon: Icon }: any) {
     return (
-        <Link href={href} className="w-full bg-white/5 hover:bg-white/10 rounded-xl p-5 text-left transition-all border border-white/5 flex items-center justify-between group">
+        <Link href={href} className="w-full bg-white dark:bg-gray-900/5 hover:bg-white dark:bg-gray-900/10 rounded-xl p-5 text-left transition-all border border-white/5 flex items-center justify-between group">
             <div>
                 <p className="font-bold text-[11px] uppercase tracking-wider mb-1">{label}</p>
                 <p className="text-[10px] text-white/40">{sub}</p>
             </div>
-            <div className="w-9 h-9 rounded-xl bg-white/10 flex items-center justify-center group-hover:bg-blue-600 transition-colors">
+            <div className="w-9 h-9 rounded-xl bg-white dark:bg-gray-900/10 flex items-center justify-center group-hover:bg-blue-600 transition-colors">
                 <Icon size={16} className="text-white/40 group-hover:text-white" />
             </div>
         </Link>
@@ -549,10 +549,10 @@ function QuickActionLink({ href, label, sub, icon: Icon }: any) {
 
 function ConfigLink({ href, label, sub, icon: Icon }: any) {
     return (
-        <Link href={href} className="flex items-center justify-between rounded-xl border border-gray-100 bg-gray-50 p-5 hover:bg-white hover:shadow-md transition-all group">
+        <Link href={href} className="flex items-center justify-between rounded-xl border border-gray-100 bg-gray-50 dark:bg-gray-950 p-5 hover:bg-white dark:bg-gray-900 hover:shadow-md transition-all group">
             <div className="min-w-0">
-                <p className="text-xs font-bold uppercase tracking-widest text-gray-900 truncate">{label}</p>
-                <p className="text-[10px] text-gray-400 font-bold mt-1 truncate">{sub}</p>
+                <p className="text-xs font-bold uppercase tracking-widest text-gray-900 dark:text-white truncate">{label}</p>
+                <p className="text-[10px] text-gray-400 dark:text-gray-500 font-bold mt-1 truncate">{sub}</p>
             </div>
             <div className="w-9 h-9 rounded-xl bg-gray-900 text-white flex items-center justify-center group-hover:bg-blue-600 transition-colors shrink-0">
                 <Icon size={16} />

@@ -198,7 +198,7 @@ export default function EditHostelPage() {
             <div className="flex items-center justify-between mb-8">
                 <Link
                     href="/owner/hostels"
-                    className="inline-flex items-center gap-2 text-sm font-semibold text-gray-500 hover:text-black transition-colors group"
+                    className="inline-flex items-center gap-2 text-sm font-semibold text-gray-500 dark:text-gray-400 dark:text-gray-500 hover:text-black transition-colors group"
                 >
                     <ChevronLeft size={16} className="group-hover:-translate-x-1 transition-transform" />
                     Back to Dashboard
@@ -206,13 +206,13 @@ export default function EditHostelPage() {
                 <div className="flex gap-2 bg-gray-100 p-1 rounded-xl">
                     <button
                         onClick={() => setActiveTab("details")}
-                        className={cn("px-4 py-2 rounded-lg text-sm font-bold transition-all", activeTab === "details" ? "bg-white shadow-sm text-black" : "text-gray-500")}
+                        className={cn("px-4 py-2 rounded-lg text-sm font-bold transition-all", activeTab === "details" ? "bg-white dark:bg-gray-900 shadow-sm text-black" : "text-gray-500 dark:text-gray-400 dark:text-gray-500")}
                     >
                         Property Details
                     </button>
                     <button
                         onClick={() => setActiveTab("rooms")}
-                        className={cn("px-4 py-2 rounded-lg text-sm font-bold transition-all", activeTab === "rooms" ? "bg-white shadow-sm text-black" : "text-gray-500")}
+                        className={cn("px-4 py-2 rounded-lg text-sm font-bold transition-all", activeTab === "rooms" ? "bg-white dark:bg-gray-900 shadow-sm text-black" : "text-gray-500 dark:text-gray-400 dark:text-gray-500")}
                     >
                         Room Types
                     </button>
@@ -222,10 +222,10 @@ export default function EditHostelPage() {
             <div className="mb-10 flex justify-between items-end">
                 <div>
                     <h1 className="text-4xl font-bold tracking-tight mb-2 underline decoration-blue-500 underline-offset-8 decoration-4">{hostel.name}</h1>
-                    <p className="text-gray-500 text-lg">Manage your property details and available inventory.</p>
+                    <p className="text-gray-500 dark:text-gray-400 dark:text-gray-500 text-lg">Manage your property details and available inventory.</p>
                 </div>
-                <div className="flex items-center gap-3 bg-white p-2 border rounded-2xl shadow-sm">
-                    <span className="text-xs font-bold uppercase tracking-wider text-gray-400 ml-2">Status:</span>
+                <div className="flex items-center gap-3 bg-white dark:bg-gray-900 p-2 border rounded-2xl shadow-sm">
+                    <span className="text-xs font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500 ml-2">Status:</span>
                     <button
                         onClick={() => onUpdateHostel({ ...form.getValues(), isPublished: !hostel.isPublished })}
                         className={cn(
@@ -241,38 +241,38 @@ export default function EditHostelPage() {
             {activeTab === "details" ? (
                 <form onSubmit={form.handleSubmit(onUpdateHostel)} className="space-y-12">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                        <section className="bg-white rounded-[2rem] border p-8 shadow-sm space-y-6">
+                        <section className="bg-white dark:bg-gray-900 rounded-[2rem] border p-8 shadow-sm space-y-6">
                             <h2 className="text-xl font-bold flex items-center gap-2">
                                 <Info size={20} className="text-blue-500" />
                                 Basic Info
                             </h2>
                             <div className="space-y-4">
-                                <input {...form.register("name")} className="w-full px-5 py-4 bg-gray-50 rounded-2xl outline-none border focus:border-black transition-all" placeholder="Hostel Name" />
-                                <textarea {...form.register("description")} rows={5} className="w-full px-5 py-4 bg-gray-50 rounded-2xl outline-none border focus:border-black transition-all resize-none" placeholder="Description" />
+                                <input {...form.register("name")} className="w-full px-5 py-4 bg-gray-50 dark:bg-gray-950 rounded-2xl outline-none border focus:border-black transition-all" placeholder="Hostel Name" />
+                                <textarea {...form.register("description")} rows={5} className="w-full px-5 py-4 bg-gray-50 dark:bg-gray-950 rounded-2xl outline-none border focus:border-black transition-all resize-none" placeholder="Description" />
 
                                 <div className="space-y-1">
-                                    <label className="text-[10px] font-bold text-gray-400 uppercase ml-1">Gender Category</label>
-                                    <select {...form.register("genderCategory")} className="w-full px-5 py-4 bg-gray-50 rounded-2xl outline-none border focus:border-black transition-all appearance-none">
+                                    <label className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase ml-1">Gender Category</label>
+                                    <select {...form.register("genderCategory")} className="w-full px-5 py-4 bg-gray-50 dark:bg-gray-950 rounded-2xl outline-none border focus:border-black transition-all appearance-none">
                                         <option value="MIXED">Mixed (Both Boys & Girls)</option>
                                         <option value="MALE">Boys Only</option>
                                         <option value="FEMALE">Girls Only</option>
                                     </select>
                                 </div>
                                 <div className="space-y-1">
-                                    <label className="text-[10px] font-bold text-gray-400 uppercase ml-1">House Rules & Policies</label>
-                                    <textarea {...form.register("policiesText")} rows={4} className="w-full px-5 py-4 bg-gray-50 rounded-2xl outline-none border focus:border-black transition-all resize-none" placeholder="Hostel rules and policies..." />
+                                    <label className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase ml-1">House Rules & Policies</label>
+                                    <textarea {...form.register("policiesText")} rows={4} className="w-full px-5 py-4 bg-gray-50 dark:bg-gray-950 rounded-2xl outline-none border focus:border-black transition-all resize-none" placeholder="Hostel rules and policies..." />
                                 </div>
                             </div>
                         </section>
 
-                        <section className="bg-white rounded-[2rem] border p-8 shadow-sm space-y-6">
+                        <section className="bg-white dark:bg-gray-900 rounded-[2rem] border p-8 shadow-sm space-y-6">
                             <h2 className="text-xl font-bold flex items-center gap-2">
                                 <MapPin size={20} className="text-green-500" />
                                 Location
                             </h2>
                             <div className="space-y-4">
-                                <input {...form.register("city")} className="w-full px-5 py-4 bg-gray-50 rounded-2xl outline-none border focus:border-black transition-all" placeholder="City" />
-                                <input {...form.register("addressLine")} className="w-full px-5 py-4 bg-gray-50 rounded-2xl outline-none border focus:border-black transition-all" placeholder="Address Line" />
+                                <input {...form.register("city")} className="w-full px-5 py-4 bg-gray-50 dark:bg-gray-950 rounded-2xl outline-none border focus:border-black transition-all" placeholder="City" />
+                                <input {...form.register("addressLine")} className="w-full px-5 py-4 bg-gray-50 dark:bg-gray-950 rounded-2xl outline-none border focus:border-black transition-all" placeholder="Address Line" />
 
                                 {/* Location Picker */}
                                 <div className="p-4 bg-blue-50 border border-blue-100 rounded-2xl space-y-3">
@@ -294,7 +294,7 @@ export default function EditHostelPage() {
                                     )}
                                 </div>
 
-                                <select {...form.register("university")} className="w-full px-5 py-4 bg-gray-50 rounded-2xl outline-none border focus:border-black transition-all appearance-none">
+                                <select {...form.register("university")} className="w-full px-5 py-4 bg-gray-50 dark:bg-gray-950 rounded-2xl outline-none border focus:border-black transition-all appearance-none">
                                     <option value="">Select University</option>
                                     {REGIONAL_UNIVERSITIES.map(group => (
                                         <optgroup key={group.region} label={group.region}>
@@ -309,27 +309,27 @@ export default function EditHostelPage() {
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                        <section className="bg-white rounded-[2rem] border p-8 shadow-sm space-y-6">
+                        <section className="bg-white dark:bg-gray-900 rounded-[2rem] border p-8 shadow-sm space-y-6">
                             <h2 className="text-xl font-bold flex items-center gap-2">
                                 <MessageSquare size={20} className="text-pink-500" />
                                 Support Info
                             </h2>
                             <div className="space-y-4">
                                 <div className="space-y-1">
-                                    <label className="text-[10px] font-bold text-gray-400 uppercase ml-1">WhatsApp Number</label>
-                                    <input {...form.register("whatsappNumber")} className="w-full px-5 py-4 bg-gray-50 rounded-2xl border focus:border-black outline-none" placeholder="e.g. 0244000000" />
-                                    <p className="text-[9px] text-gray-400 font-bold uppercase tracking-widest ml-1 leading-relaxed pt-1">
+                                    <label className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase ml-1">WhatsApp Number</label>
+                                    <input {...form.register("whatsappNumber")} className="w-full px-5 py-4 bg-gray-50 dark:bg-gray-950 rounded-2xl border focus:border-black outline-none" placeholder="e.g. 0244000000" />
+                                    <p className="text-[9px] text-gray-400 dark:text-gray-500 font-bold uppercase tracking-widest ml-1 leading-relaxed pt-1">
                                         💬 Enables the &quot;Book via WhatsApp&quot; button — students tap it to send a pre-filled enquiry instantly.
                                     </p>
                                 </div>
                                 <div className="space-y-1">
-                                    <label className="text-[10px] font-bold text-gray-400 uppercase ml-1">Distance to Campus</label>
-                                    <input {...form.register("distanceToCampus")} className="w-full px-5 py-4 bg-gray-50 rounded-2xl border focus:border-black outline-none" placeholder="e.g. 5 min walk" />
+                                    <label className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase ml-1">Distance to Campus</label>
+                                    <input {...form.register("distanceToCampus")} className="w-full px-5 py-4 bg-gray-50 dark:bg-gray-950 rounded-2xl border focus:border-black outline-none" placeholder="e.g. 5 min walk" />
                                 </div>
                             </div>
                         </section>
 
-                        <section className="bg-white rounded-[2rem] border p-8 shadow-sm space-y-6">
+                        <section className="bg-white dark:bg-gray-900 rounded-[2rem] border p-8 shadow-sm space-y-6">
                             <h2 className="text-xl font-bold flex items-center gap-2">
                                 <Zap size={20} className="text-yellow-500" />
                                 Included Utilities
@@ -351,7 +351,7 @@ export default function EditHostelPage() {
                                             }}
                                             className={cn(
                                                 "flex items-center gap-2 px-4 py-3 rounded-xl border-2 transition-all",
-                                                isSelected ? "border-black bg-black text-white" : "border-gray-50 bg-gray-50 text-gray-500"
+                                                isSelected ? "border-black bg-black text-white" : "border-gray-50 bg-gray-50 dark:bg-gray-950 text-gray-500 dark:text-gray-400 dark:text-gray-500"
                                             )}
                                         >
                                             <util.icon size={16} className={isSelected ? "text-white" : util.color} />
@@ -363,7 +363,7 @@ export default function EditHostelPage() {
                         </section>
                     </div>
 
-                    <section className="bg-white rounded-[2rem] border p-10 shadow-sm space-y-8">
+                    <section className="bg-white dark:bg-gray-900 rounded-[2rem] border p-10 shadow-sm space-y-8">
                         <div className="flex items-center gap-3 pb-4 border-b">
                             <ImageIcon size={20} className="text-purple-500" />
                             <h2 className="text-xl font-bold">Property Photos</h2>
@@ -374,7 +374,7 @@ export default function EditHostelPage() {
                         />
                     </section>
 
-                    <section className="bg-white rounded-[2rem] border p-10 shadow-sm space-y-8">
+                    <section className="bg-white dark:bg-gray-900 rounded-[2rem] border p-10 shadow-sm space-y-8">
                         <h2 className="text-xl font-bold">Amenities</h2>
                         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                             {AMENITIES.map(a => (
@@ -387,7 +387,7 @@ export default function EditHostelPage() {
                                     }}
                                     className={cn(
                                         "flex flex-col items-center gap-3 p-6 rounded-3xl border-2 transition-all",
-                                        form.watch("amenities").includes(a.id) ? "border-black bg-black text-white" : "border-gray-50 bg-gray-50 text-gray-500"
+                                        form.watch("amenities").includes(a.id) ? "border-black bg-black text-white" : "border-gray-50 bg-gray-50 dark:bg-gray-950 text-gray-500 dark:text-gray-400 dark:text-gray-500"
                                     )}
                                 >
                                     <a.icon size={24} />
@@ -411,7 +411,7 @@ export default function EditHostelPage() {
                 <div className="space-y-8">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {hostel.rooms.map((room: any) => (
-                            <div key={room.id} className="bg-white rounded-3xl border p-8 shadow-sm group hover:shadow-md transition-shadow">
+                            <div key={room.id} className="bg-white dark:bg-gray-900 rounded-3xl border p-8 shadow-sm group hover:shadow-md transition-shadow">
                                 <div className="flex justify-between items-start mb-6">
                                     <div className="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center text-blue-600">
                                         <BedDouble size={24} />
@@ -425,22 +425,22 @@ export default function EditHostelPage() {
                                 </div>
                                 <h3 className="text-xl font-bold mb-2">{room.name}</h3>
                                 <div className="grid grid-cols-3 gap-4 mt-6">
-                                    <div className="bg-gray-50 rounded-2xl p-4">
-                                        <div className="flex items-center gap-2 text-gray-400 mb-1">
+                                    <div className="bg-gray-50 dark:bg-gray-950 rounded-2xl p-4">
+                                        <div className="flex items-center gap-2 text-gray-400 dark:text-gray-500 mb-1">
                                             <UsersIcon size={12} />
                                             <span className="text-[10px] font-bold uppercase tracking-wider">Pax</span>
                                         </div>
                                         <p className="font-bold">{room.capacity}</p>
                                     </div>
-                                    <div className="bg-gray-50 rounded-2xl p-4">
-                                        <div className="flex items-center gap-2 text-gray-400 mb-1">
+                                    <div className="bg-gray-50 dark:bg-gray-950 rounded-2xl p-4">
+                                        <div className="flex items-center gap-2 text-gray-400 dark:text-gray-500 mb-1">
                                             <Building2 size={12} />
                                             <span className="text-[10px] font-bold uppercase tracking-wider">Units</span>
                                         </div>
                                         <p className="font-bold">{room.totalUnits}</p>
                                     </div>
-                                    <div className="bg-gray-50 rounded-2xl p-4">
-                                        <div className="flex items-center gap-2 text-gray-400 mb-1">
+                                    <div className="bg-gray-50 dark:bg-gray-950 rounded-2xl p-4">
+                                        <div className="flex items-center gap-2 text-gray-400 dark:text-gray-500 mb-1">
                                             <DollarSign size={12} />
                                             <span className="text-[10px] font-bold uppercase tracking-wider">Price</span>
                                         </div>
@@ -459,7 +459,7 @@ export default function EditHostelPage() {
                         ) : (
                             <button
                                 onClick={() => setIsAddingRoom(true)}
-                                className="bg-gray-50 border-2 border-dashed border-gray-200 rounded-3xl p-12 flex flex-col items-center justify-center gap-3 text-gray-400 hover:bg-gray-100 hover:border-gray-300 transition-all group"
+                                className="bg-gray-50 dark:bg-gray-950 border-2 border-dashed border-gray-200 rounded-3xl p-12 flex flex-col items-center justify-center gap-3 text-gray-400 dark:text-gray-500 hover:bg-gray-100 hover:border-gray-300 transition-all group"
                             >
                                 <div className="w-12 h-12 rounded-full border-2 border-dashed border-gray-300 flex items-center justify-center group-hover:scale-110 transition-transform">
                                     <Plus size={24} />
@@ -496,48 +496,48 @@ function AddRoomForm({ onCancel, onSave, isLoading }: any) {
     };
 
     return (
-        <form onSubmit={handleSubmit(onSubmit)} className="bg-white rounded-3xl border-2 border-black p-8 shadow-xl shadow-black/5 flex flex-col">
+        <form onSubmit={handleSubmit(onSubmit)} className="bg-white dark:bg-gray-900 rounded-3xl border-2 border-black p-8 shadow-xl shadow-black/5 flex flex-col">
             <h3 className="text-xl font-bold mb-6">New Room Type</h3>
             <div className="space-y-4 flex-1">
                 <div>
-                    <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400 ml-1">Label</label>
-                    <input {...register("name")} className="w-full px-5 py-4 bg-gray-50 rounded-2xl border outline-none focus:border-black" placeholder="e.g. 2-in-1 Premium" />
+                    <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500 ml-1">Label</label>
+                    <input {...register("name")} className="w-full px-5 py-4 bg-gray-50 dark:bg-gray-950 rounded-2xl border outline-none focus:border-black" placeholder="e.g. 2-in-1 Premium" />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                     <div>
-                        <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400 ml-1">Capacity (Per Room)</label>
-                        <input type="number" {...register("capacity", { valueAsNumber: true })} className="w-full px-5 py-4 bg-gray-50 rounded-2xl border outline-none focus:border-black" />
+                        <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500 ml-1">Capacity (Per Room)</label>
+                        <input type="number" {...register("capacity", { valueAsNumber: true })} className="w-full px-5 py-4 bg-gray-50 dark:bg-gray-950 rounded-2xl border outline-none focus:border-black" />
                     </div>
                     <div>
-                        <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400 ml-1">Units (Quantity)</label>
-                        <input type="number" {...register("totalUnits", { valueAsNumber: true })} className="w-full px-5 py-4 bg-gray-50 rounded-2xl border outline-none focus:border-black" />
+                        <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500 ml-1">Units (Quantity)</label>
+                        <input type="number" {...register("totalUnits", { valueAsNumber: true })} className="w-full px-5 py-4 bg-gray-50 dark:bg-gray-950 rounded-2xl border outline-none focus:border-black" />
                     </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                     <div>
-                        <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400 ml-1">Gender</label>
-                        <select {...register("gender")} className="w-full px-5 py-4 bg-gray-50 rounded-2xl border outline-none focus:border-black appearance-none">
+                        <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500 ml-1">Gender</label>
+                        <select {...register("gender")} className="w-full px-5 py-4 bg-gray-50 dark:bg-gray-950 rounded-2xl border outline-none focus:border-black appearance-none">
                             <option value="MIXED">Mixed</option>
                             <option value="MALE">Boys Only</option>
                             <option value="FEMALE">Girls Only</option>
                         </select>
                     </div>
                     <div>
-                        <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400 ml-1">Price (₵)</label>
-                        <input type="number" {...register("pricePerTerm", { valueAsNumber: true })} className="w-full px-5 py-4 bg-gray-50 rounded-2xl border outline-none focus:border-black" placeholder="1500" />
+                        <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500 ml-1">Price (₵)</label>
+                        <input type="number" {...register("pricePerTerm", { valueAsNumber: true })} className="w-full px-5 py-4 bg-gray-50 dark:bg-gray-950 rounded-2xl border outline-none focus:border-black" placeholder="1500" />
                     </div>
                 </div>
 
                 <div>
-                    <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400 ml-1 flex items-center gap-2">
+                    <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500 ml-1 flex items-center gap-2">
                         <Layout size={10} /> Room Configuration
                     </label>
-                    <input {...register("roomConfiguration")} className="w-full px-5 py-4 bg-gray-50 rounded-2xl border outline-none focus:border-black" placeholder="e.g. 2 in a room" />
+                    <input {...register("roomConfiguration")} className="w-full px-5 py-4 bg-gray-50 dark:bg-gray-950 rounded-2xl border outline-none focus:border-black" placeholder="e.g. 2 in a room" />
                 </div>
             </div>
             <div className="flex gap-3 mt-8">
-                <button type="button" onClick={onCancel} className="flex-1 py-4 font-bold text-gray-500 hover:bg-gray-50 rounded-2xl transition-colors text-sm">Cancel</button>
+                <button type="button" onClick={onCancel} className="flex-1 py-4 font-bold text-gray-500 dark:text-gray-400 dark:text-gray-500 hover:bg-gray-50 dark:bg-gray-950 rounded-2xl transition-colors text-sm">Cancel</button>
                 <button
                     disabled={isLoading}
                     className="flex-1 bg-black text-white py-4 rounded-2xl font-bold shadow-lg shadow-black/10 hover:opacity-90 active:scale-95 transition-all text-sm flex items-center justify-center gap-2"

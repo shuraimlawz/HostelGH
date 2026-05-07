@@ -62,10 +62,10 @@ export default function AdminSettingsPage() {
 
     if (isLoading) {
         return (
-            <div className="flex h-[80vh] items-center justify-center bg-white">
+            <div className="flex h-[80vh] items-center justify-center bg-white dark:bg-gray-900">
                 <div className="flex flex-col items-center gap-4">
                     <Loader2 className="animate-spin text-blue-600" size={40} />
-                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest animate-pulse">Loading Admin Profile...</p>
+                    <p className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest animate-pulse">Loading Admin Profile...</p>
                 </div>
             </div>
         );
@@ -74,8 +74,8 @@ export default function AdminSettingsPage() {
     if (!user) {
         return (
             <div className="text-center py-40">
-                <h1 className="text-2xl font-bold uppercase tracking-tight text-gray-900 mb-2">Access Denied <span className="text-blue-600">.</span></h1>
-                <p className="text-gray-500 font-bold text-[10px] uppercase tracking-widest">Login required for Admin Portal.</p>
+                <h1 className="text-2xl font-bold uppercase tracking-tight text-gray-900 dark:text-white mb-2">Access Denied <span className="text-blue-600">.</span></h1>
+                <p className="text-gray-500 dark:text-gray-400 dark:text-gray-500 font-bold text-[10px] uppercase tracking-widest">Login required for Admin Portal.</p>
             </div>
         );
     }
@@ -91,20 +91,20 @@ export default function AdminSettingsPage() {
                         </span>
                         <div className="flex items-center gap-2">
                             <ShieldCheck size={14} className="text-blue-500" />
-                            <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Portal Access 01</span>
+                            <span className="text-[9px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">Portal Access 01</span>
                         </div>
                     </div>
-                    <h1 className="text-4xl md:text-5xl font-bold text-gray-900 tracking-tighter uppercase leading-tight">
+                    <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white tracking-tighter uppercase leading-tight">
                         Admin Settings <span className="text-blue-600 opacity-40">/</span> Control
                     </h1>
-                    <p className="text-gray-500 text-xs font-bold uppercase tracking-widest max-w-sm">
+                    <p className="text-gray-500 dark:text-gray-400 dark:text-gray-500 text-xs font-bold uppercase tracking-widest max-w-sm">
                         Manage your administrative profile and preferences.
                     </p>
                 </div>
 
                 <div className="bg-blue-600 text-white p-6 rounded-2xl flex items-center gap-4 shadow-xl relative overflow-hidden group">
-                    <div className="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full -mr-12 -mt-12 blur-2xl group-hover:scale-125 transition-transform duration-700" />
-                    <div className="relative z-10 w-12 h-12 flex items-center justify-center rounded-xl bg-white/10 border border-white/20">
+                    <div className="absolute top-0 right-0 w-24 h-24 bg-white dark:bg-gray-900/10 rounded-full -mr-12 -mt-12 blur-2xl group-hover:scale-125 transition-transform duration-700" />
+                    <div className="relative z-10 w-12 h-12 flex items-center justify-center rounded-xl bg-white dark:bg-gray-900/10 border border-white/20">
                         <Lock size={20} />
                     </div>
                     <div className="relative z-10">
@@ -117,7 +117,7 @@ export default function AdminSettingsPage() {
             <div className="grid grid-cols-1 xl:grid-cols-12 gap-12">
                 {/* Sidebar: Profile */}
                 <div className="xl:col-span-4 space-y-10">
-                    <div className="bg-white rounded-3xl border border-gray-100 p-10 shadow-sm text-center relative overflow-hidden group">
+                    <div className="bg-white dark:bg-gray-900 rounded-3xl border border-gray-100 p-10 shadow-sm text-center relative overflow-hidden group">
                         <div className="absolute top-0 right-0 w-32 h-32 bg-blue-600/5 rounded-full -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-700 blur-3xl opacity-0 group-hover:opacity-100" />
                         
                         <div className="relative z-10 space-y-8">
@@ -131,7 +131,7 @@ export default function AdminSettingsPage() {
                                 </div>
                                 <button 
                                     onClick={() => document.getElementById('avatar-upload')?.click()}
-                                    className="absolute -bottom-2 -right-2 bg-white border border-gray-100 shadow-xl rounded-xl p-3 hover:scale-110 transition-all text-blue-600 hover:bg-gray-900 hover:text-white"
+                                    className="absolute -bottom-2 -right-2 bg-white dark:bg-gray-900 border border-gray-100 shadow-xl rounded-xl p-3 hover:scale-110 transition-all text-blue-600 hover:bg-gray-900 hover:text-white"
                                 >
                                     <Camera size={18} />
                                 </button>
@@ -156,10 +156,10 @@ export default function AdminSettingsPage() {
                             </div>
                             
                             <div className="space-y-1">
-                                <h2 className="text-2xl font-bold text-gray-900 uppercase tracking-tight leading-none">
+                                <h2 className="text-2xl font-bold text-gray-900 dark:text-white uppercase tracking-tight leading-none">
                                     {formData.firstName ? `${formData.firstName} ${formData.lastName}` : "Head Admin"}
                                 </h2>
-                                <p className="text-[11px] text-gray-400 font-bold uppercase tracking-widest">{user.email}</p>
+                                <p className="text-[11px] text-gray-400 dark:text-gray-500 font-bold uppercase tracking-widest">{user.email}</p>
                             </div>
 
                             <div className="pt-4">
@@ -174,16 +174,16 @@ export default function AdminSettingsPage() {
                     <div className="bg-gray-950 text-white rounded-3xl p-10 shadow-2xl relative overflow-hidden group border border-white/5">
                         <div className="absolute top-0 right-0 w-40 h-40 bg-blue-600/10 rounded-full -mr-20 -mt-20 blur-3xl opacity-50 group-hover:scale-125 transition-transform duration-700" />
                         <div className="relative z-10 space-y-6">
-                            <div className="w-12 h-12 bg-white/5 rounded-2xl flex items-center justify-center border border-white/10 backdrop-blur-md">
+                            <div className="w-12 h-12 bg-white dark:bg-gray-900/5 rounded-2xl flex items-center justify-center border border-white/10 backdrop-blur-md">
                                 <Zap size={24} className="text-blue-400" />
                             </div>
                             <div className="space-y-2">
                                 <h3 className="text-xl font-bold uppercase tracking-tight leading-none">System Tools</h3>
-                                <p className="text-[10px] text-gray-400 font-bold leading-relaxed uppercase tracking-widest">
+                                <p className="text-[10px] text-gray-400 dark:text-gray-500 font-bold leading-relaxed uppercase tracking-widest">
                                     Manage administrative tasks and system checks.
                                 </p>
                             </div>
-                            <button className="w-full bg-white text-gray-900 py-4 rounded-xl font-bold text-[10px] uppercase tracking-widest hover:bg-blue-600 hover:text-white transition-all">
+                            <button className="w-full bg-white dark:bg-gray-900 text-gray-900 dark:text-white py-4 rounded-xl font-bold text-[10px] uppercase tracking-widest hover:bg-blue-600 hover:text-white transition-all">
                                 VIEW SYSTEM LOGS
                             </button>
                         </div>
@@ -193,33 +193,33 @@ export default function AdminSettingsPage() {
                 {/* Main Content Area */}
                 <div className="xl:col-span-8 space-y-10">
                     {/* Identity Form */}
-                    <form onSubmit={handleUpdate} className="bg-white rounded-3xl border border-gray-100 p-10 shadow-sm space-y-10 group">
+                    <form onSubmit={handleUpdate} className="bg-white dark:bg-gray-900 rounded-3xl border border-gray-100 p-10 shadow-sm space-y-10 group">
                         <div className="flex items-center justify-between border-b border-gray-50 pb-8">
                             <div className="space-y-1">
-                                <h3 className="text-xl font-bold text-gray-900 uppercase tracking-tight">Admin Profile</h3>
-                                <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Your basic details</p>
+                                <h3 className="text-xl font-bold text-gray-900 dark:text-white uppercase tracking-tight">Admin Profile</h3>
+                                <p className="text-[10px] text-gray-400 dark:text-gray-500 font-bold uppercase tracking-widest">Your basic details</p>
                             </div>
-                            <div className="w-10 h-10 bg-gray-50 rounded-xl flex items-center justify-center text-gray-400 group-hover:rotate-12 transition-transform duration-500">
+                            <div className="w-10 h-10 bg-gray-50 dark:bg-gray-950 rounded-xl flex items-center justify-center text-gray-400 dark:text-gray-500 group-hover:rotate-12 transition-transform duration-500">
                                 <User size={20} />
                             </div>
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
                             <div className="space-y-3">
-                                <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400 ml-1 leading-none">First Name</label>
+                                <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500 ml-1 leading-none">First Name</label>
                                 <input
                                     type="text"
-                                    className="w-full px-6 py-5 bg-gray-50 border border-gray-100 rounded-xl outline-none focus:bg-white focus:border-blue-500 transition-all font-bold text-gray-900 text-sm uppercase tracking-tight"
+                                    className="w-full px-6 py-5 bg-gray-50 dark:bg-gray-950 border border-gray-100 rounded-xl outline-none focus:bg-white dark:bg-gray-900 focus:border-blue-500 transition-all font-bold text-gray-900 dark:text-white text-sm uppercase tracking-tight"
                                     value={formData.firstName}
                                     onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
                                 />
                             </div>
 
                             <div className="space-y-3">
-                                <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400 ml-1 leading-none">Last Name</label>
+                                <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500 ml-1 leading-none">Last Name</label>
                                 <input
                                     type="text"
-                                    className="w-full px-6 py-5 bg-gray-50 border border-gray-100 rounded-xl outline-none focus:bg-white focus:border-blue-500 transition-all font-bold text-gray-900 text-sm uppercase tracking-tight"
+                                    className="w-full px-6 py-5 bg-gray-50 dark:bg-gray-950 border border-gray-100 rounded-xl outline-none focus:bg-white dark:bg-gray-900 focus:border-blue-500 transition-all font-bold text-gray-900 dark:text-white text-sm uppercase tracking-tight"
                                     value={formData.lastName}
                                     onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
                                 />
@@ -227,12 +227,12 @@ export default function AdminSettingsPage() {
                         </div>
 
                         <div className="space-y-3 opacity-60 grayscale cursor-not-allowed">
-                            <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400 ml-1">Email (Locked)</label>
+                            <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500 ml-1">Email (Locked)</label>
                             <div className="relative">
                                 <input
                                     type="email"
                                     disabled
-                                    className="w-full pl-6 pr-6 py-5 bg-gray-100 border border-gray-100 rounded-xl font-bold text-gray-500 text-sm uppercase tracking-tight overflow-hidden text-ellipsis"
+                                    className="w-full pl-6 pr-6 py-5 bg-gray-100 border border-gray-100 rounded-xl font-bold text-gray-500 dark:text-gray-400 dark:text-gray-500 text-sm uppercase tracking-tight overflow-hidden text-ellipsis"
                                     value={user.email}
                                 />
                             </div>
@@ -251,23 +251,23 @@ export default function AdminSettingsPage() {
                     </form>
 
                     {/* Preferences Hub */}
-                    <div className="bg-white rounded-3xl border border-gray-100 p-10 shadow-sm space-y-10">
+                    <div className="bg-white dark:bg-gray-900 rounded-3xl border border-gray-100 p-10 shadow-sm space-y-10">
                         <div className="flex items-center justify-between border-b border-gray-50 pb-8">
                             <div className="space-y-1">
-                                <h3 className="text-xl font-bold text-gray-900 uppercase tracking-tight">Notification Settings</h3>
-                                <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Manage how you receive updates</p>
+                                <h3 className="text-xl font-bold text-gray-900 dark:text-white uppercase tracking-tight">Notification Settings</h3>
+                                <p className="text-[10px] text-gray-400 dark:text-gray-500 font-bold uppercase tracking-widest">Manage how you receive updates</p>
                             </div>
                             <Bell size={20} className="text-blue-500" />
                         </div>
 
-                        <div className="flex items-center justify-between p-8 bg-gray-50 rounded-2xl border border-gray-100 group hover:border-blue-600/20 transition-all">
+                        <div className="flex items-center justify-between p-8 bg-gray-50 dark:bg-gray-950 rounded-2xl border border-gray-100 group hover:border-blue-600/20 transition-all">
                             <div className="flex items-center gap-6">
-                                <div className="w-14 h-14 bg-white rounded-xl flex items-center justify-center border shadow-sm group-hover:scale-110 transition-transform">
+                                <div className="w-14 h-14 bg-white dark:bg-gray-900 rounded-xl flex items-center justify-center border shadow-sm group-hover:scale-110 transition-transform">
                                     <Mail size={24} className="text-blue-600" />
                                 </div>
                                 <div className="space-y-1">
-                                    <p className="font-bold text-gray-900 uppercase tracking-widest text-[12px]">Email Notifications</p>
-                                    <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">System alerts & management updates.</p>
+                                    <p className="font-bold text-gray-900 dark:text-white uppercase tracking-widest text-[12px]">Email Notifications</p>
+                                    <p className="text-[10px] text-gray-400 dark:text-gray-500 font-bold uppercase tracking-widest">System alerts & management updates.</p>
                                 </div>
                             </div>
                             <button 
@@ -288,7 +288,7 @@ export default function AdminSettingsPage() {
                                 )}
                             >
                                 <div className={cn(
-                                    "w-5 h-5 bg-white rounded-full shadow-xl transition-transform duration-500",
+                                    "w-5 h-5 bg-white dark:bg-gray-900 rounded-full shadow-xl transition-transform duration-500",
                                     formData.emailNotifications ? "translate-x-6" : "translate-x-0"
                                 )} />
                             </button>

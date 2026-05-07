@@ -72,7 +72,7 @@ export default function RoomManagementPage() {
                 <div className="space-y-4">
                     <Link
                         href="/owner/hostels"
-                        className="inline-flex items-center gap-2 text-xs font-black text-gray-400 hover:text-gray-950 transition-colors uppercase tracking-widest group"
+                        className="inline-flex items-center gap-2 text-xs font-black text-gray-400 dark:text-gray-500 hover:text-gray-950 transition-colors uppercase tracking-widest group"
                     >
                         <ChevronLeft size={14} className="group-hover:-translate-x-1 transition-transform" />
                         Back to Properties
@@ -86,7 +86,7 @@ export default function RoomManagementPage() {
                         <h1 className="text-4xl font-black text-gray-950 tracking-tight leading-none mb-2">
                             {hostel?.name} <span className="text-blue-600">Rooms</span>
                         </h1>
-                        <p className="text-gray-500 font-medium">Manage pricing, capacity and availability for {hostel?.name}.</p>
+                        <p className="text-gray-500 dark:text-gray-400 dark:text-gray-500 font-medium">Manage pricing, capacity and availability for {hostel?.name}.</p>
                     </div>
                 </div>
 
@@ -104,23 +104,23 @@ export default function RoomManagementPage() {
 
             {/* Room Cards Grid */}
             {rooms?.length === 0 ? (
-                <div className="bg-white border-2 border-dashed border-gray-100 rounded-[3rem] p-20 text-center space-y-6">
-                    <div className="w-20 h-20 bg-gray-50 rounded-[2rem] flex items-center justify-center mx-auto mb-6 transform rotate-3">
+                <div className="bg-white dark:bg-gray-900 border-2 border-dashed border-gray-100 rounded-[3rem] p-20 text-center space-y-6">
+                    <div className="w-20 h-20 bg-gray-50 dark:bg-gray-950 rounded-[2rem] flex items-center justify-center mx-auto mb-6 transform rotate-3">
                         <LayoutDashboard className="text-gray-300" size={40} />
                     </div>
                     <div className="max-w-md mx-auto">
                         <h3 className="text-2xl font-black text-gray-950 tracking-tight mb-2">No rooms added yet</h3>
-                        <p className="text-gray-500 font-medium">Add your different room configurations (e.g. 4-in-a-room) to start receiving bookings.</p>
+                        <p className="text-gray-500 dark:text-gray-400 dark:text-gray-500 font-medium">Add your different room configurations (e.g. 4-in-a-room) to start receiving bookings.</p>
                     </div>
                 </div>
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                     {rooms.map((room: any) => (
-                        <div key={room.id} className="bg-white rounded-[2.5rem] border border-gray-100 p-8 shadow-sm hover:shadow-xl transition-all duration-300 group flex flex-col">
+                        <div key={room.id} className="bg-white dark:bg-gray-900 rounded-[2.5rem] border border-gray-100 p-8 shadow-sm hover:shadow-xl transition-all duration-300 group flex flex-col">
                             <div className="flex justify-between items-start mb-6">
                                 <div className="space-y-1">
                                     <h3 className="text-xl font-black text-gray-950 tracking-tight group-hover:text-blue-600 transition-colors uppercase">{room.roomConfiguration}</h3>
-                                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">{room.name}</p>
+                                    <p className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em]">{room.name}</p>
                                 </div>
                                 <div className="flex gap-2">
                                     <button
@@ -128,7 +128,7 @@ export default function RoomManagementPage() {
                                             setEditingRoom(room);
                                             setIsModalOpen(true);
                                         }}
-                                        className="w-10 h-10 flex items-center justify-center bg-gray-50 text-gray-400 rounded-xl hover:bg-blue-50 hover:text-blue-600 transition-all border border-transparent hover:border-blue-100"
+                                        className="w-10 h-10 flex items-center justify-center bg-gray-50 dark:bg-gray-950 text-gray-400 dark:text-gray-500 rounded-xl hover:bg-blue-50 hover:text-blue-600 transition-all border border-transparent hover:border-blue-100"
                                     >
                                         <Edit2 size={16} />
                                     </button>
@@ -138,7 +138,7 @@ export default function RoomManagementPage() {
                                                 deleteMutation.mutate(room.id);
                                             }
                                         }}
-                                        className="w-10 h-10 flex items-center justify-center bg-gray-50 text-gray-400 rounded-xl hover:bg-red-50 hover:text-red-600 transition-all border border-transparent hover:border-red-100"
+                                        className="w-10 h-10 flex items-center justify-center bg-gray-50 dark:bg-gray-950 text-gray-400 dark:text-gray-500 rounded-xl hover:bg-red-50 hover:text-red-600 transition-all border border-transparent hover:border-red-100"
                                     >
                                         <Trash2 size={16} />
                                     </button>
@@ -148,19 +148,19 @@ export default function RoomManagementPage() {
                             <div className="space-y-5 mb-8">
                                 <div className="flex items-baseline gap-2">
                                     <span className="text-3xl font-black text-gray-950 tracking-tighter">₵{(room.pricePerTerm / 100).toLocaleString()}</span>
-                                    <span className="text-xs font-black text-gray-400 uppercase tracking-widest">/ semester</span>
+                                    <span className="text-xs font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">/ semester</span>
                                 </div>
 
                                 <div className="grid grid-cols-2 gap-3">
-                                    <div className="bg-gray-50 rounded-2xl p-4 border border-transparent transition-all">
-                                        <div className="flex items-center gap-2 text-gray-400 mb-1">
+                                    <div className="bg-gray-50 dark:bg-gray-950 rounded-2xl p-4 border border-transparent transition-all">
+                                        <div className="flex items-center gap-2 text-gray-400 dark:text-gray-500 mb-1">
                                             <Users size={12} />
                                             <span className="text-[8px] font-black uppercase tracking-widest">Capacity</span>
                                         </div>
                                         <p className="text-lg font-black text-gray-950">{room.capacity} Per Room</p>
                                     </div>
-                                    <div className="bg-gray-50 rounded-2xl p-4 border border-transparent transition-all">
-                                        <div className="flex items-center gap-2 text-gray-400 mb-1">
+                                    <div className="bg-gray-50 dark:bg-gray-950 rounded-2xl p-4 border border-transparent transition-all">
+                                        <div className="flex items-center gap-2 text-gray-400 dark:text-gray-500 mb-1">
                                             <Building2 size={12} />
                                             <span className="text-[8px] font-black uppercase tracking-widest">Inventory</span>
                                         </div>
@@ -189,11 +189,11 @@ export default function RoomManagementPage() {
                                         "w-2 h-2 rounded-full",
                                         room.availableSlots > 0 ? "bg-emerald-500 animate-pulse" : "bg-red-500"
                                     )} />
-                                    <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest">
+                                    <span className="text-[10px] font-black text-gray-500 dark:text-gray-400 dark:text-gray-500 uppercase tracking-widest">
                                         {room.availableSlots} Slots Available
                                     </span>
                                 </div>
-                                <div className="text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                                <div className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">
                                     {Math.round((room.availableSlots / (room.totalUnits * room.capacity)) * 100)}% Free
                                 </div>
                             </div>

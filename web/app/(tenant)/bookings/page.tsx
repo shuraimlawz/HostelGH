@@ -60,9 +60,9 @@ export default function TenantBookingsPage() {
             case "PAYMENT_SECURED": return "bg-blue-50 text-blue-700 border-blue-100";
             case "RESERVED": return "bg-indigo-50 text-indigo-700 border-indigo-100";
             case "CHECKED_IN": return "bg-emerald-50 text-emerald-700 border-emerald-100";
-            case "COMPLETED": return "bg-gray-50 text-gray-700 border-gray-100";
+            case "COMPLETED": return "bg-gray-50 dark:bg-gray-950 text-gray-700 border-gray-100";
             case "CANCELLED": return "bg-red-50 text-red-700 border-red-100";
-            default: return "bg-gray-50 text-gray-500 border-gray-200";
+            default: return "bg-gray-50 dark:bg-gray-950 text-gray-500 dark:text-gray-400 dark:text-gray-500 border-gray-200";
         }
     };
 
@@ -79,7 +79,7 @@ export default function TenantBookingsPage() {
         <div className="flex h-[60vh] items-center justify-center">
             <div className="flex flex-col items-center gap-4 text-center">
                 <Loader2 className="animate-spin text-blue-600" size={32} />
-                <p className="text-sm font-medium text-gray-400">Syncing your stays...</p>
+                <p className="text-sm font-medium text-gray-400 dark:text-gray-500">Syncing your stays...</p>
             </div>
         </div>
     );
@@ -91,10 +91,10 @@ export default function TenantBookingsPage() {
                 <div className="space-y-2">
                     <div className="flex items-center gap-2">
                         <div className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
-                        <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Active Itinerary</span>
+                        <span className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">Active Itinerary</span>
                     </div>
-                    <h1 className="text-3xl md:text-4xl font-bold text-gray-900 tracking-tight">My Bookings</h1>
-                    <p className="text-gray-500 text-sm max-w-md">Track your applications, payments, and stay history in real-time.</p>
+                    <h1 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white tracking-tight">My Bookings</h1>
+                    <p className="text-gray-500 dark:text-gray-400 dark:text-gray-500 text-sm max-w-md">Track your applications, payments, and stay history in real-time.</p>
                 </div>
 
                 <Link
@@ -108,13 +108,13 @@ export default function TenantBookingsPage() {
 
             <div className="grid grid-cols-1 gap-6">
                 {bookings?.length === 0 ? (
-                    <div className="bg-white border border-gray-100 border-dashed rounded-2xl p-20 text-center space-y-6">
-                        <div className="w-16 h-16 bg-gray-50 rounded-xl flex items-center justify-center mx-auto text-gray-300">
+                    <div className="bg-white dark:bg-gray-900 border border-gray-100 border-dashed rounded-2xl p-20 text-center space-y-6">
+                        <div className="w-16 h-16 bg-gray-50 dark:bg-gray-950 rounded-xl flex items-center justify-center mx-auto text-gray-300">
                             <CalendarCheck size={32} />
                         </div>
                         <div className="space-y-1">
-                            <h3 className="text-lg font-bold text-gray-900">No active bookings</h3>
-                            <p className="text-sm text-gray-500 max-w-sm mx-auto">Your future stays will appear here. Start exploring and find your perfect hostel.</p>
+                            <h3 className="text-lg font-bold text-gray-900 dark:text-white">No active bookings</h3>
+                            <p className="text-sm text-gray-500 dark:text-gray-400 dark:text-gray-500 max-w-sm mx-auto">Your future stays will appear here. Start exploring and find your perfect hostel.</p>
                         </div>
                         <Link
                             href="/"
@@ -125,12 +125,12 @@ export default function TenantBookingsPage() {
                     </div>
                 ) : (
                     bookings?.map((booking: any) => (
-                        <div key={booking.id} className="group bg-white rounded-2xl border border-gray-100 p-1.5 hover:border-gray-200 hover:shadow-xl hover:shadow-gray-200/20 transition-all duration-300 overflow-hidden">
+                        <div key={booking.id} className="group bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 p-1.5 hover:border-gray-200 hover:shadow-xl hover:shadow-gray-200/20 transition-all duration-300 overflow-hidden">
                             <div className="flex flex-col lg:flex-row">
                                 {/* Visual Context */}
                                 <div className="p-4 md:p-6 flex-1">
                                     <div className="flex flex-col md:flex-row gap-6 md:items-center">
-                                        <div className="w-full md:w-40 h-40 rounded-xl bg-gray-50 overflow-hidden relative shrink-0">
+                                        <div className="w-full md:w-40 h-40 rounded-xl bg-gray-50 dark:bg-gray-950 overflow-hidden relative shrink-0">
                                             {booking.hostel.images?.[0] ? (
                                                 <img
                                                     src={booking.hostel.images[0]}
@@ -156,27 +156,27 @@ export default function TenantBookingsPage() {
                                                         </Badge>
                                                     )}
                                                 </div>
-                                                <h3 className="text-xl font-bold text-gray-900 group-hover:text-blue-600 transition-colors">{booking.hostel.name}</h3>
-                                                <div className="flex items-center gap-1.5 text-gray-500">
+                                                <h3 className="text-xl font-bold text-gray-900 dark:text-white group-hover:text-blue-600 transition-colors">{booking.hostel.name}</h3>
+                                                <div className="flex items-center gap-1.5 text-gray-500 dark:text-gray-400 dark:text-gray-500">
                                                     <MapPin size={14} className="text-blue-500" />
                                                     <span className="text-xs font-semibold">{booking.hostel.city}, {booking.hostel.addressLine}</span>
                                                 </div>
                                             </div>
 
                                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                                <div className="flex items-start gap-3 p-3 bg-gray-50/50 rounded-xl border border-gray-100/50">
+                                                <div className="flex items-start gap-3 p-3 bg-gray-50 dark:bg-gray-950/50 rounded-xl border border-gray-100/50">
                                                     <Clock size={16} className="text-blue-500 mt-0.5" />
                                                     <div className="space-y-0.5">
-                                                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Duration</p>
+                                                        <p className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">Duration</p>
                                                         <p className="text-xs font-bold text-gray-700 truncate">
                                                             {format(new Date(booking.startDate), "MMM d, yyyy")}
                                                         </p>
                                                     </div>
                                                 </div>
-                                                <div className="flex items-start gap-3 p-3 bg-gray-50/50 rounded-xl border border-gray-100/50">
+                                                <div className="flex items-start gap-3 p-3 bg-gray-50 dark:bg-gray-950/50 rounded-xl border border-gray-100/50">
                                                     <Smartphone size={16} className="text-blue-500 mt-0.5" />
                                                     <div className="space-y-0.5">
-                                                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Units</p>
+                                                        <p className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">Units</p>
                                                         <div className="flex flex-wrap gap-1">
                                                             {booking.items?.map((item: any, idx: number) => (
                                                                 <span key={item.id} className="text-xs font-bold text-gray-700">
@@ -192,10 +192,10 @@ export default function TenantBookingsPage() {
                                 </div>
 
                                 {/* Financial Ledger / Actions */}
-                                <div className="bg-gray-50/50 p-6 md:p-8 lg:w-72 flex flex-col justify-between border-t lg:border-t-0 lg:border-l border-gray-100">
+                                <div className="bg-gray-50 dark:bg-gray-950/50 p-6 md:p-8 lg:w-72 flex flex-col justify-between border-t lg:border-t-0 lg:border-l border-gray-100">
                                     <div className="mb-6 lg:mb-0 space-y-3">
                                         <div>
-                                            <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-1">Base Price</p>
+                                            <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-1">Base Price</p>
                                             <p className="text-sm font-bold text-gray-700">
                                                 ₵{(booking.items?.reduce((acc: number, item: any) => acc + (item.unitPrice * item.quantity), 0) / 100).toLocaleString(undefined, { minimumFractionDigits: 2 })}
                                             </p>
@@ -204,10 +204,10 @@ export default function TenantBookingsPage() {
                                         {booking.status === "PENDING" && (
                                             <div className="pt-3 border-t border-gray-100 space-y-2">
                                                 <div className="flex items-center justify-between text-[10px] font-bold uppercase tracking-widest">
-                                                    <span className="text-gray-400">Processing Fee</span>
+                                                    <span className="text-gray-400 dark:text-gray-500">Processing Fee</span>
                                                     <span className="text-blue-600">+ ₵{(Math.ceil((booking.items?.reduce((acc: number, item: any) => acc + (item.unitPrice * item.quantity), 0) / 0.9805) - (booking.items?.reduce((acc: number, item: any) => acc + (item.unitPrice * item.quantity), 0))) / 100).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
                                                 </div>
-                                                <div className="flex items-center justify-between text-xs font-bold text-gray-900">
+                                                <div className="flex items-center justify-between text-xs font-bold text-gray-900 dark:text-white">
                                                     <span>Grand Total</span>
                                                     <span className="text-lg">
                                                         ₵{(Math.ceil(booking.items?.reduce((acc: number, item: any) => acc + (item.unitPrice * item.quantity), 0) / 0.9805) / 100).toLocaleString(undefined, { minimumFractionDigits: 2 })}
@@ -219,7 +219,7 @@ export default function TenantBookingsPage() {
                                         {booking.payment?.status === "SUCCESS" && (
                                             <div className="pt-3 border-t border-gray-100">
                                                 <p className="text-[10px] font-bold uppercase tracking-widest text-emerald-600">Payment Confirmed</p>
-                                                <p className="text-lg font-bold text-gray-900">
+                                                <p className="text-lg font-bold text-gray-900 dark:text-white">
                                                     ₵{(booking.payment.amount / 100).toLocaleString(undefined, { minimumFractionDigits: 2 })}
                                                 </p>
                                             </div>
@@ -269,7 +269,7 @@ export default function TenantBookingsPage() {
 
                                         <Link
                                             href={`/hostels/${booking.hostel.id}`}
-                                            className="w-full h-12 flex items-center justify-center gap-2 rounded-xl text-gray-500 font-bold text-xs uppercase tracking-widest hover:bg-white hover:text-gray-900 border border-transparent hover:border-gray-100 transition-all"
+                                            className="w-full h-12 flex items-center justify-center gap-2 rounded-xl text-gray-500 dark:text-gray-400 dark:text-gray-500 font-bold text-xs uppercase tracking-widest hover:bg-white dark:bg-gray-900 hover:text-gray-900 dark:text-white border border-transparent hover:border-gray-100 transition-all"
                                         >
                                             View Listing <ChevronRight size={14} />
                                         </Link>
@@ -303,12 +303,12 @@ export default function TenantBookingsPage() {
             <div className="bg-gray-900 p-8 rounded-2xl text-white relative overflow-hidden group shadow-xl">
                 <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/5 rounded-full -mr-32 -mt-32 blur-3xl" />
                 <div className="relative z-10 flex flex-col md:flex-row items-center gap-8 text-center md:text-left">
-                    <div className="w-14 h-14 bg-white/5 border border-white/10 rounded-xl flex items-center justify-center">
+                    <div className="w-14 h-14 bg-white dark:bg-gray-900/5 border border-white/10 rounded-xl flex items-center justify-center">
                         <CalendarCheck size={28} className="text-blue-500" />
                     </div>
                     <div className="flex-1 space-y-1">
                         <h4 className="text-lg font-bold tracking-tight">Stay Protection Protocol</h4>
-                        <p className="text-xs text-gray-400 font-medium leading-relaxed max-w-2xl">
+                        <p className="text-xs text-gray-400 dark:text-gray-500 font-medium leading-relaxed max-w-2xl">
                             All bookings are protected by our secure settlement policy. Funds are only disbursed to managers after your check-in is verified. For disputes or assistance, contact our 24/7 Support Hub.
                         </p>
                     </div>

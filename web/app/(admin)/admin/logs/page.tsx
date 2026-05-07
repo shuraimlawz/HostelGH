@@ -56,7 +56,7 @@ export default function AdminLogsPage() {
                 </div>
             </div>
 
-            <div className="bg-white rounded-[2.5rem] border overflow-hidden shadow-sm">
+            <div className="bg-white dark:bg-gray-900 rounded-[2.5rem] border overflow-hidden shadow-sm">
                 {isLoading ? (
                     <div className="flex h-[400px] items-center justify-center">
                         <Loader2 className="animate-spin text-blue-600" size={32} />
@@ -64,18 +64,18 @@ export default function AdminLogsPage() {
                 ) : (
                     <div className="overflow-x-auto">
                         <Table>
-                            <TableHeader className="bg-gray-50/50">
+                            <TableHeader className="bg-gray-50 dark:bg-gray-950/50">
                                 <TableRow>
-                                    <TableHead className="py-6 px-8 text-[10px] font-black uppercase tracking-widest text-gray-500">Status</TableHead>
-                                    <TableHead className="py-6 px-8 text-[10px] font-black uppercase tracking-widest text-gray-500">User</TableHead>
-                                    <TableHead className="py-6 px-8 text-[10px] font-black uppercase tracking-widest text-gray-500">Action</TableHead>
-                                    <TableHead className="py-6 px-8 text-[10px] font-black uppercase tracking-widest text-gray-500">Timestamp</TableHead>
-                                    <TableHead className="py-6 px-8 text-[10px] font-black uppercase tracking-widest text-gray-500 text-right">Reference</TableHead>
+                                    <TableHead className="py-6 px-8 text-[10px] font-black uppercase tracking-widest text-gray-500 dark:text-gray-400 dark:text-gray-500">Status</TableHead>
+                                    <TableHead className="py-6 px-8 text-[10px] font-black uppercase tracking-widest text-gray-500 dark:text-gray-400 dark:text-gray-500">User</TableHead>
+                                    <TableHead className="py-6 px-8 text-[10px] font-black uppercase tracking-widest text-gray-500 dark:text-gray-400 dark:text-gray-500">Action</TableHead>
+                                    <TableHead className="py-6 px-8 text-[10px] font-black uppercase tracking-widest text-gray-500 dark:text-gray-400 dark:text-gray-500">Timestamp</TableHead>
+                                    <TableHead className="py-6 px-8 text-[10px] font-black uppercase tracking-widest text-gray-500 dark:text-gray-400 dark:text-gray-500 text-right">Reference</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
                                 {activities.map((log: any, i: number) => (
-                                    <TableRow key={i} className="hover:bg-gray-50/50 transition-colors group">
+                                    <TableRow key={i} className="hover:bg-gray-50 dark:bg-gray-950/50 transition-colors group">
                                         <TableCell className="py-6 px-8">
                                             <div className={cn(
                                                 "w-2.5 h-2.5 rounded-full",
@@ -87,10 +87,10 @@ export default function AdminLogsPage() {
                                         </TableCell>
                                         <TableCell className="py-6 px-8">
                                             <div className="flex items-center gap-2">
-                                                <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-400">
+                                                <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-400 dark:text-gray-500">
                                                     <User size={14} />
                                                 </div>
-                                                <span className="font-bold text-sm text-gray-900">{log.user}</span>
+                                                <span className="font-bold text-sm text-gray-900 dark:text-white">{log.user}</span>
                                             </div>
                                         </TableCell>
                                         <TableCell className="py-6 px-8 font-medium text-gray-700">
@@ -98,10 +98,10 @@ export default function AdminLogsPage() {
                                         </TableCell>
                                         <TableCell className="py-6 px-8">
                                             <div className="flex flex-col">
-                                                <span className="text-xs font-bold text-gray-900">
+                                                <span className="text-xs font-bold text-gray-900 dark:text-white">
                                                     {new Date(log.time).toLocaleDateString()}
                                                 </span>
-                                                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-tighter">
+                                                <span className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-tighter">
                                                     {new Date(log.time).toLocaleTimeString()}
                                                 </span>
                                             </div>
@@ -118,7 +118,7 @@ export default function AdminLogsPage() {
                                 ))}
                                 {activities.length === 0 && (
                                     <TableRow>
-                                        <TableCell colSpan={5} className="py-20 text-center text-gray-400 font-bold uppercase tracking-widest text-xs">
+                                        <TableCell colSpan={5} className="py-20 text-center text-gray-400 dark:text-gray-500 font-bold uppercase tracking-widest text-xs">
                                             No system logs found
                                         </TableCell>
                                     </TableRow>
@@ -128,8 +128,8 @@ export default function AdminLogsPage() {
                     </div>
                 )}
 
-                <div className="p-8 bg-gray-50 border-t flex items-center justify-between">
-                    <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">
+                <div className="p-8 bg-gray-50 dark:bg-gray-950 border-t flex items-center justify-between">
+                    <p className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">
                         Showing {(page - 1) * limit + 1} - {Math.min(page * limit, meta.total)} of {meta.total} events
                     </p>
                     <div className="flex items-center gap-2">

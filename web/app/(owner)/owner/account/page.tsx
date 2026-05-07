@@ -160,7 +160,7 @@ export default function OwnerAccountPage() {
             <div className="flex h-[60vh] items-center justify-center">
                 <div className="flex flex-col items-center gap-4 text-center">
                     <Loader2 className="animate-spin text-blue-600" size={32} />
-                    <p className="text-sm font-medium text-gray-400">Loading profile...</p>
+                    <p className="text-sm font-medium text-gray-400 dark:text-gray-500">Loading profile...</p>
                 </div>
             </div>
         );
@@ -169,8 +169,8 @@ export default function OwnerAccountPage() {
     if (!user) {
         return (
             <div className="text-center py-40">
-                <h1 className="text-2xl font-bold text-gray-900">Access Denied</h1>
-                <p className="text-gray-500 font-medium text-sm mt-2">Please login to manage your account.</p>
+                <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Access Denied</h1>
+                <p className="text-gray-500 dark:text-gray-400 dark:text-gray-500 font-medium text-sm mt-2">Please login to manage your account.</p>
             </div>
         );
     }
@@ -182,13 +182,13 @@ export default function OwnerAccountPage() {
                 <div className="space-y-2">
                     <div className="flex items-center gap-2">
                         <div className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
-                        <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Dashboard Settings</span>
+                        <span className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">Dashboard Settings</span>
                     </div>
-                    <h1 className="text-3xl md:text-4xl font-bold text-gray-900 tracking-tight">Profile Settings</h1>
-                    <p className="text-gray-500 text-sm max-w-md">Manage your account info and payout settings.</p>
+                    <h1 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white tracking-tight">Profile Settings</h1>
+                    <p className="text-gray-500 dark:text-gray-400 dark:text-gray-500 text-sm max-w-md">Manage your account info and payout settings.</p>
                 </div>
 
-                <div className="bg-white border border-gray-100 p-4 rounded-2xl flex items-center gap-4 shadow-sm">
+                <div className="bg-white dark:bg-gray-900 border border-gray-100 p-4 rounded-2xl flex items-center gap-4 shadow-sm">
                     <div className={cn(
                         "w-12 h-12 flex items-center justify-center rounded-xl border",
                         user.isVerified ? "bg-emerald-50 text-emerald-600 border-emerald-100" : "bg-amber-50 text-amber-600 border-amber-100"
@@ -196,7 +196,7 @@ export default function OwnerAccountPage() {
                         {user.isVerified ? <ShieldCheck size={24} /> : <ShieldAlert size={24} />}
                     </div>
                     <div>
-                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest leading-none mb-1">Account Status</p>
+                        <p className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest leading-none mb-1">Account Status</p>
                         <p className={cn("text-xs font-bold uppercase", user.isVerified ? "text-emerald-700" : "text-amber-700")}>
                             {user.isVerified ? "Verified Owner" : "Identity Unverified"}
                         </p>
@@ -207,7 +207,7 @@ export default function OwnerAccountPage() {
             <div className="grid grid-cols-1 xl:grid-cols-12 gap-10">
                 {/* Sidebar: Profile Info */}
                 <div className="xl:col-span-4 space-y-6">
-                    <div className="bg-white rounded-2xl border border-gray-100 p-8 shadow-sm text-center space-y-6 relative overflow-hidden group">
+                    <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 p-8 shadow-sm text-center space-y-6 relative overflow-hidden group">
                         <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/5 rounded-full -mr-16 -mt-16 group-hover:scale-110 transition-transform duration-700 blur-3xl opacity-0 group-hover:opacity-100" />
                         
                         <div className="relative z-10 space-y-6">
@@ -224,7 +224,7 @@ export default function OwnerAccountPage() {
                                 <div className="absolute -bottom-2 -right-2 flex gap-1">
                                     <button
                                         onClick={() => document.getElementById('avatar-upload')?.click()}
-                                        className="bg-white border border-gray-100 shadow-sm rounded-xl p-2.5 hover:bg-gray-50 transition-all text-blue-600"
+                                        className="bg-white dark:bg-gray-900 border border-gray-100 shadow-sm rounded-xl p-2.5 hover:bg-gray-50 dark:bg-gray-950 transition-all text-blue-600"
                                         title="Change avatar"
                                     >
                                         <Camera size={18} />
@@ -241,7 +241,7 @@ export default function OwnerAccountPage() {
                                                     toast.error(error.message || "Failure", { id: loadingToast });
                                                 }
                                             }}
-                                            className="bg-white border border-gray-100 shadow-sm rounded-xl p-2.5 hover:bg-rose-50 transition-all text-rose-600"
+                                            className="bg-white dark:bg-gray-900 border border-gray-100 shadow-sm rounded-xl p-2.5 hover:bg-rose-50 transition-all text-rose-600"
                                             title="Remove avatar"
                                         >
                                             <XCircle size={18} />
@@ -269,10 +269,10 @@ export default function OwnerAccountPage() {
                             </div>
                             
                             <div className="space-y-1">
-                                <h2 className="text-xl font-bold text-gray-900 tracking-tight">
+                                <h2 className="text-xl font-bold text-gray-900 dark:text-white tracking-tight">
                                     {formData.firstName ? `${formData.firstName} ${formData.lastName}` : "Operations Leader"}
                                 </h2>
-                                <p className="text-sm text-gray-500 font-medium">{user.email}</p>
+                                <p className="text-sm text-gray-500 dark:text-gray-400 dark:text-gray-500 font-medium">{user.email}</p>
                             </div>
 
                             {user.isVerified ? (
@@ -294,21 +294,21 @@ export default function OwnerAccountPage() {
                         <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 rounded-full -mr-16 -mt-16 blur-2xl opacity-60 group-hover:scale-110 transition-transform" />
                         <div className="relative z-10 space-y-6">
                             <div className="flex items-center justify-between">
-                                <div className="w-12 h-12 bg-white/5 rounded-xl flex items-center justify-center border border-white/10">
+                                <div className="w-12 h-12 bg-white dark:bg-gray-900/5 rounded-xl flex items-center justify-center border border-white/10">
                                     <KeyRound size={24} className="text-blue-400" />
                                 </div>
                             </div>
                             <div className="space-y-1">
                                 <h3 className="text-lg font-bold tracking-tight">Account Security</h3>
-                                <p className="text-xs text-gray-400 font-medium leading-relaxed">
+                                <p className="text-xs text-gray-400 dark:text-gray-500 font-medium leading-relaxed">
                                     Your property data and revenue are protected by industry-standard encryption.
                                 </p>
                             </div>
                             <div className="pt-4 border-t border-white/5 space-y-3">
-                                <button className="w-full text-left text-[10px] font-bold uppercase tracking-widest text-gray-400 hover:text-white flex items-center justify-between transition-colors group/item">
+                                <button className="w-full text-left text-[10px] font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500 hover:text-white flex items-center justify-between transition-colors group/item">
                                     Login History <ChevronRight size={14} className="group-hover/item:translate-x-1 transition-transform" />
                                 </button>
-                                <button className="w-full text-left text-[10px] font-bold uppercase tracking-widest text-gray-400 hover:text-white flex items-center justify-between transition-colors group/item">
+                                <button className="w-full text-left text-[10px] font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500 hover:text-white flex items-center justify-between transition-colors group/item">
                                     Active Sessions <ChevronRight size={14} className="group-hover/item:translate-x-1 transition-transform" />
                                 </button>
                             </div>
@@ -321,43 +321,43 @@ export default function OwnerAccountPage() {
                 {/* Main Content Area */}
                 <div className="xl:col-span-8 space-y-8">
                     {/* General Settings */}
-                    <form onSubmit={handleUpdate} className="bg-white rounded-2xl border border-gray-100 p-8 shadow-sm space-y-8">
+                    <form onSubmit={handleUpdate} className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 p-8 shadow-sm space-y-8">
                         <div className="flex items-center justify-between border-b border-gray-50 pb-6">
                             <div className="space-y-0.5">
-                                <h3 className="text-lg font-bold text-gray-900 tracking-tight">General Info</h3>
-                                <p className="text-xs text-gray-400 font-medium uppercase tracking-widest">Your basic profile details</p>
+                                <h3 className="text-lg font-bold text-gray-900 dark:text-white tracking-tight">General Info</h3>
+                                <p className="text-xs text-gray-400 dark:text-gray-500 font-medium uppercase tracking-widest">Your basic profile details</p>
                             </div>
                             <UserCircle size={20} className="text-blue-600" />
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div className="space-y-2">
-                                <Label className="text-xs font-bold text-gray-500 ml-1">First Name</Label>
+                                <Label className="text-xs font-bold text-gray-500 dark:text-gray-400 dark:text-gray-500 ml-1">First Name</Label>
                                 <input
                                     type="text"
-                                    className="w-full h-12 px-4 bg-gray-50 border border-gray-100 rounded-xl outline-none focus:bg-white focus:border-blue-500 transition-all font-bold text-sm"
+                                    className="w-full h-12 px-4 bg-gray-50 dark:bg-gray-950 border border-gray-100 rounded-xl outline-none focus:bg-white dark:bg-gray-900 focus:border-blue-500 transition-all font-bold text-sm"
                                     value={formData.firstName}
                                     onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
                                 />
                             </div>
 
                             <div className="space-y-2">
-                                <Label className="text-xs font-bold text-gray-500 ml-1">Last Name</Label>
+                                <Label className="text-xs font-bold text-gray-500 dark:text-gray-400 dark:text-gray-500 ml-1">Last Name</Label>
                                 <input
                                     type="text"
-                                    className="w-full h-12 px-4 bg-gray-50 border border-gray-100 rounded-xl outline-none focus:bg-white focus:border-blue-500 transition-all font-bold text-sm"
+                                    className="w-full h-12 px-4 bg-gray-50 dark:bg-gray-950 border border-gray-100 rounded-xl outline-none focus:bg-white dark:bg-gray-900 focus:border-blue-500 transition-all font-bold text-sm"
                                     value={formData.lastName}
                                     onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
                                 />
                             </div>
 
                             <div className="space-y-2">
-                                <Label className="text-xs font-bold text-gray-500 ml-1">Phone Number</Label>
+                                <Label className="text-xs font-bold text-gray-500 dark:text-gray-400 dark:text-gray-500 ml-1">Phone Number</Label>
                                 <div className="relative">
-                                    <Phone className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
+                                    <Phone className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500" size={16} />
                                     <input
                                         type="tel"
-                                        className="w-full h-12 pl-12 pr-4 bg-gray-50 border border-gray-100 rounded-xl outline-none focus:bg-white focus:border-blue-500 transition-all font-bold text-sm"
+                                        className="w-full h-12 pl-12 pr-4 bg-gray-50 dark:bg-gray-950 border border-gray-100 rounded-xl outline-none focus:bg-white dark:bg-gray-900 focus:border-blue-500 transition-all font-bold text-sm"
                                         value={formData.phone}
                                         onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                                         placeholder="+233 XX XXX XXXX"
@@ -366,13 +366,13 @@ export default function OwnerAccountPage() {
                             </div>
                             
                             <div className="space-y-2 opacity-60 cursor-not-allowed">
-                                <Label className="text-xs font-bold text-gray-500 ml-1">Email (Locked)</Label>
+                                <Label className="text-xs font-bold text-gray-500 dark:text-gray-400 dark:text-gray-500 ml-1">Email (Locked)</Label>
                                 <div className="relative">
-                                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
+                                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500" size={16} />
                                     <input
                                         type="email"
                                         disabled
-                                        className="w-full h-12 pl-12 pr-4 bg-gray-100 border border-gray-100 rounded-xl font-bold text-sm text-gray-500"
+                                        className="w-full h-12 pl-12 pr-4 bg-gray-100 border border-gray-100 rounded-xl font-bold text-sm text-gray-500 dark:text-gray-400 dark:text-gray-500"
                                         value={user.email}
                                     />
                                 </div>
@@ -397,57 +397,57 @@ export default function OwnerAccountPage() {
                     </div>
 
                     {/* Security Hub */}
-                    <div className="bg-white rounded-2xl border border-gray-100 p-8 shadow-sm space-y-8">
+                    <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 p-8 shadow-sm space-y-8">
                         <div className="flex items-center justify-between border-b border-gray-50 pb-6">
                             <div className="space-y-0.5">
-                                <h3 className="text-lg font-bold text-gray-900 tracking-tight">Security Settings</h3>
-                                <p className="text-xs text-gray-400 font-medium uppercase tracking-widest">Update password and access</p>
+                                <h3 className="text-lg font-bold text-gray-900 dark:text-white tracking-tight">Security Settings</h3>
+                                <p className="text-xs text-gray-400 dark:text-gray-500 font-medium uppercase tracking-widest">Update password and access</p>
                             </div>
                             <Lock size={20} className="text-blue-600" />
                         </div>
 
-                        <div className="flex flex-col md:flex-row md:items-center justify-between p-6 bg-gray-50 rounded-2xl border border-gray-100 hover:border-blue-100 transition-all gap-4">
+                        <div className="flex flex-col md:flex-row md:items-center justify-between p-6 bg-gray-50 dark:bg-gray-950 rounded-2xl border border-gray-100 hover:border-blue-100 transition-all gap-4">
                             <div className="space-y-1 text-center md:text-left">
-                                <p className="text-sm font-bold text-gray-900">Change Password</p>
-                                <p className="text-[11px] text-gray-500 font-medium">Keep your account secure by updating your password.</p>
+                                <p className="text-sm font-bold text-gray-900 dark:text-white">Change Password</p>
+                                <p className="text-[11px] text-gray-500 dark:text-gray-400 dark:text-gray-500 font-medium">Keep your account secure by updating your password.</p>
                             </div>
 
                             <Dialog open={isPasswordModalOpen} onOpenChange={setIsPasswordModalOpen}>
                                 <DialogTrigger asChild>
-                                    <button className="h-10 px-6 bg-white text-gray-900 rounded-lg text-xs font-bold border border-gray-200 hover:border-gray-900 transition-all">
+                                    <button className="h-10 px-6 bg-white dark:bg-gray-900 text-gray-900 dark:text-white rounded-lg text-xs font-bold border border-gray-200 hover:border-gray-900 transition-all">
                                         Update Password
                                     </button>
                                 </DialogTrigger>
                                 <DialogContent className="sm:max-w-md rounded-2xl p-8 border-gray-100">
                                     <DialogHeader>
                                         <DialogTitle className="text-xl font-bold tracking-tight">Update Password</DialogTitle>
-                                        <DialogDescription className="text-xs text-gray-400 font-medium">
+                                        <DialogDescription className="text-xs text-gray-400 dark:text-gray-500 font-medium">
                                             Please provide your current and new password.
                                         </DialogDescription>
                                     </DialogHeader>
                                     <form onSubmit={handleChangePassword} className="space-y-6 py-4">
                                         <div className="space-y-2">
-                                            <Label className="text-xs font-bold text-gray-500 ml-1">Current Password</Label>
+                                            <Label className="text-xs font-bold text-gray-500 dark:text-gray-400 dark:text-gray-500 ml-1">Current Password</Label>
                                             <PasswordField
                                                 value={passwordData.oldPassword}
                                                 onChange={(e) => setPasswordData({ ...passwordData, oldPassword: e.target.value })}
-                                                className="h-12 rounded-xl bg-gray-50 border-gray-100 px-4"
+                                                className="h-12 rounded-xl bg-gray-50 dark:bg-gray-950 border-gray-100 px-4"
                                             />
                                         </div>
                                         <div className="space-y-2">
-                                            <Label className="text-xs font-bold text-gray-500 ml-1">New Password</Label>
+                                            <Label className="text-xs font-bold text-gray-500 dark:text-gray-400 dark:text-gray-500 ml-1">New Password</Label>
                                             <PasswordField
                                                 value={passwordData.newPassword}
                                                 onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })}
-                                                className="h-12 rounded-xl bg-gray-50 border-gray-100 px-4"
+                                                className="h-12 rounded-xl bg-gray-50 dark:bg-gray-950 border-gray-100 px-4"
                                             />
                                         </div>
                                         <div className="space-y-2">
-                                            <Label className="text-xs font-bold text-gray-500 ml-1">Confirm New Password</Label>
+                                            <Label className="text-xs font-bold text-gray-500 dark:text-gray-400 dark:text-gray-500 ml-1">Confirm New Password</Label>
                                             <PasswordField
                                                 value={passwordData.confirmPassword}
                                                 onChange={(e) => setPasswordData({ ...passwordData, confirmPassword: e.target.value })}
-                                                className="h-12 rounded-xl bg-gray-50 border-gray-100 px-4"
+                                                className="h-12 rounded-xl bg-gray-50 dark:bg-gray-950 border-gray-100 px-4"
                                             />
                                         </div>
                                         <DialogFooter className="gap-2 pt-2">
@@ -464,22 +464,22 @@ export default function OwnerAccountPage() {
                     </div>
 
                     {/* Signaling Settings */}
-                    <div className="bg-white rounded-2xl border border-gray-100 p-8 shadow-sm space-y-6">
+                    <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 p-8 shadow-sm space-y-6">
                         <div className="flex items-center justify-between border-b border-gray-50 pb-6">
                             <div className="space-y-0.5">
-                                <h3 className="text-lg font-bold text-gray-900 tracking-tight">Notifications</h3>
-                                <p className="text-xs text-gray-400 font-medium uppercase tracking-widest">Manage your communication preferences</p>
+                                <h3 className="text-lg font-bold text-gray-900 dark:text-white tracking-tight">Notifications</h3>
+                                <p className="text-xs text-gray-400 dark:text-gray-500 font-medium uppercase tracking-widest">Manage your communication preferences</p>
                             </div>
                             <Bell size={20} className="text-blue-600" />
                         </div>
-                        <div className="flex items-center justify-between p-6 bg-gray-50 rounded-2xl border border-gray-100 group hover:border-blue-100 transition-colors">
+                        <div className="flex items-center justify-between p-6 bg-gray-50 dark:bg-gray-950 rounded-2xl border border-gray-100 group hover:border-blue-100 transition-colors">
                             <div className="flex items-center gap-5">
-                                <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center border border-gray-100 shadow-sm group-hover:scale-110 transition-transform">
+                                <div className="w-12 h-12 bg-white dark:bg-gray-900 rounded-xl flex items-center justify-center border border-gray-100 shadow-sm group-hover:scale-110 transition-transform">
                                     <Mail size={20} className="text-blue-600" />
                                 </div>
                                 <div className="space-y-0.5">
-                                    <p className="text-sm font-bold text-gray-900">Email Notifications</p>
-                                    <p className="text-[11px] text-gray-500 font-medium">Receive updates on bookings and payouts.</p>
+                                    <p className="text-sm font-bold text-gray-900 dark:text-white">Email Notifications</p>
+                                    <p className="text-[11px] text-gray-500 dark:text-gray-400 dark:text-gray-500 font-medium">Receive updates on bookings and payouts.</p>
                                 </div>
                             </div>
                             <button
@@ -500,7 +500,7 @@ export default function OwnerAccountPage() {
                                 )}
                             >
                                 <div className={cn(
-                                    "w-5 h-5 bg-white rounded-full shadow-md transition-transform duration-300",
+                                    "w-5 h-5 bg-white dark:bg-gray-900 rounded-full shadow-md transition-transform duration-300",
                                     formData.emailNotifications ? 'translate-x-5' : 'translate-x-0'
                                 )} />
                             </button>
@@ -536,8 +536,8 @@ export default function OwnerAccountPage() {
                                                 </div>
                                                 <DialogTitle className="text-xl font-bold tracking-tight text-rose-600 uppercase">Warning: Account Change</DialogTitle>
                                             </div>
-                                            <DialogDescription className="text-sm text-gray-500 font-medium leading-relaxed pt-2">
-                                                Switching to <span className="text-gray-900 font-bold">STUDENT</span> status will <span className="text-rose-600 font-bold underline">delete all properties and bookings permanently</span>. This action cannot be undone.
+                                            <DialogDescription className="text-sm text-gray-500 dark:text-gray-400 dark:text-gray-500 font-medium leading-relaxed pt-2">
+                                                Switching to <span className="text-gray-900 dark:text-white font-bold">STUDENT</span> status will <span className="text-rose-600 font-bold underline">delete all properties and bookings permanently</span>. This action cannot be undone.
                                             </DialogDescription>
                                         </DialogHeader>
                                         <DialogFooter className="gap-2 pt-6">
@@ -655,11 +655,11 @@ function SettlementSettings() {
     );
 
     return (
-        <div className="bg-white rounded-2xl border border-gray-100 p-8 shadow-sm space-y-8 group/settle">
+        <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 p-8 shadow-sm space-y-8 group/settle">
             <div className="flex items-center justify-between border-b border-gray-50 pb-6">
                 <div className="space-y-0.5">
-                    <h3 className="text-lg font-bold text-gray-900 tracking-tight">Payout Settings</h3>
-                    <p className="text-xs text-gray-400 font-medium uppercase tracking-widest leading-none">Automated Direct Payouts</p>
+                    <h3 className="text-lg font-bold text-gray-900 dark:text-white tracking-tight">Payout Settings</h3>
+                    <p className="text-xs text-gray-400 dark:text-gray-500 font-medium uppercase tracking-widest leading-none">Automated Direct Payouts</p>
                 </div>
                 <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center border border-blue-100 shadow-sm">
                     <Landmark size={20} />
@@ -675,7 +675,7 @@ function SettlementSettings() {
                             "flex items-center justify-center gap-3 h-12 rounded-xl border transition-all font-bold text-xs uppercase tracking-widest",
                             method === "MOBILE_MONEY" 
                                 ? "bg-gray-900 text-white border-gray-900 shadow-lg" 
-                                : "bg-gray-50 border-gray-100 text-gray-500 hover:bg-gray-100"
+                                : "bg-gray-50 dark:bg-gray-950 border-gray-100 text-gray-500 dark:text-gray-400 dark:text-gray-500 hover:bg-gray-100"
                         )}
                     >
                         <Smartphone size={16} /> MoMo
@@ -687,7 +687,7 @@ function SettlementSettings() {
                             "flex items-center justify-center gap-3 h-12 rounded-xl border transition-all font-bold text-xs uppercase tracking-widest",
                             method === "BANK" 
                                 ? "bg-gray-900 text-white border-gray-900 shadow-lg" 
-                                : "bg-gray-50 border-gray-100 text-gray-500 hover:bg-gray-100"
+                                : "bg-gray-50 dark:bg-gray-950 border-gray-100 text-gray-500 dark:text-gray-400 dark:text-gray-500 hover:bg-gray-100"
                         )}
                     >
                         <Landmark size={16} /> Bank
@@ -696,11 +696,11 @@ function SettlementSettings() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-2">
-                        <Label className="text-xs font-bold text-gray-500 ml-1">Network Provider</Label>
+                        <Label className="text-xs font-bold text-gray-500 dark:text-gray-400 dark:text-gray-500 ml-1">Network Provider</Label>
                         <div className="relative">
                             <select
                                 disabled={banksLoading}
-                                className="w-full h-12 px-4 bg-gray-50 border border-gray-100 rounded-xl outline-none focus:bg-white focus:border-blue-500 transition-all font-bold text-sm appearance-none cursor-pointer"
+                                className="w-full h-12 px-4 bg-gray-50 dark:bg-gray-950 border border-gray-100 rounded-xl outline-none focus:bg-white dark:bg-gray-900 focus:border-blue-500 transition-all font-bold text-sm appearance-none cursor-pointer"
                                 value={accountDetail.bankCode}
                                 onChange={(e) => {
                                     const b = banks.find((x: any) => x.code === e.target.value);
@@ -727,12 +727,12 @@ function SettlementSettings() {
                     </div>
 
                     <div className="space-y-2">
-                        <Label className="text-xs font-bold text-gray-500 ml-1">
+                        <Label className="text-xs font-bold text-gray-500 dark:text-gray-400 dark:text-gray-500 ml-1">
                             {method === "MOBILE_MONEY" ? "MoMo Number" : "Account Number"}
                         </Label>
                         <input
                             type="text"
-                            className="w-full h-12 px-4 bg-gray-50 border border-gray-100 rounded-xl outline-none focus:bg-white focus:border-blue-500 transition-all font-bold text-sm"
+                            className="w-full h-12 px-4 bg-gray-50 dark:bg-gray-950 border border-gray-100 rounded-xl outline-none focus:bg-white dark:bg-gray-900 focus:border-blue-500 transition-all font-bold text-sm"
                             value={accountDetail.accountNumber}
                             onChange={(e) => setAccountDetail({ ...accountDetail, accountNumber: e.target.value })}
                             placeholder={method === "MOBILE_MONEY" ? "055XXXXXXX" : "XXXXXXXXXX"}
@@ -742,16 +742,16 @@ function SettlementSettings() {
                 </div>
 
                 <div className="space-y-2">
-                    <Label className="text-xs font-bold text-gray-500 ml-1">Verified Holder Name</Label>
+                    <Label className="text-xs font-bold text-gray-500 dark:text-gray-400 dark:text-gray-500 ml-1">Verified Holder Name</Label>
                     <input
                         type="text"
-                        className="w-full h-12 px-4 bg-gray-50 border border-gray-100 rounded-xl outline-none focus:bg-white focus:border-blue-500 transition-all font-bold text-sm"
+                        className="w-full h-12 px-4 bg-gray-50 dark:bg-gray-950 border border-gray-100 rounded-xl outline-none focus:bg-white dark:bg-gray-900 focus:border-blue-500 transition-all font-bold text-sm"
                         value={accountDetail.accountName}
                         onChange={(e) => setAccountDetail({ ...accountDetail, accountName: e.target.value })}
                         placeholder="Legal name on account"
                         required
                     />
-                    <div className="flex items-center gap-2 text-[10px] text-gray-400 font-bold uppercase tracking-widest ml-1 mt-2">
+                    <div className="flex items-center gap-2 text-[10px] text-gray-400 dark:text-gray-500 font-bold uppercase tracking-widest ml-1 mt-2">
                         <ShieldAlert size={12} />
                         Must exactly match financial records
                     </div>
