@@ -62,11 +62,11 @@ export default function PromoCarousel() {
 
     return (
         <div 
-            className="relative w-full py-10"
+            className="relative w-full py-8 md:py-12"
             onMouseEnter={() => setIsPaused(true)}
             onMouseLeave={() => setIsPaused(false)}
         >
-            <div className="relative h-[300px] md:h-[350px] w-full overflow-hidden rounded-[2.5rem] shadow-2xl">
+            <div className="relative min-h-[380px] md:min-h-[280px] w-full overflow-hidden rounded-[2rem] shadow-xl border border-gray-100 dark:border-gray-800">
                 {PROMOS.map((promo, index) => (
                     <div
                         key={promo.id}
@@ -76,51 +76,51 @@ export default function PromoCarousel() {
                         )}
                     >
                         {/* Background Gradient & Image */}
-                        <div className={cn("absolute inset-0 bg-gradient-to-r z-10 opacity-90", promo.color)} />
+                        <div className={cn("absolute inset-0 bg-gradient-to-r z-10 opacity-95", promo.color)} />
                         <Image 
                             src={promo.image} 
                             alt={promo.title}
                             fill
                             sizes="(max-width: 768px) 100vw, 800px"
-                            className="object-cover grayscale opacity-30"
+                            className="object-cover opacity-20 mix-blend-overlay"
                         />
 
                         {/* Content */}
-                        <div className="relative z-20 px-10 md:px-20 w-full flex flex-col md:flex-row items-center justify-between gap-10">
-                            <div className="space-y-6 max-w-xl text-center md:text-left">
-                                <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-white/10 border border-white/20 rounded-full">
-                                    <span className="text-[10px] font-black text-white uppercase tracking-[0.25em]">{promo.badge}</span>
+                        <div className="relative z-20 px-6 py-10 md:px-12 md:py-0 w-full h-full flex flex-col md:flex-row items-center justify-between gap-8 md:gap-10">
+                            <div className="space-y-5 max-w-xl text-center md:text-left flex-1 flex flex-col items-center md:items-start justify-center h-full">
+                                <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/10 border border-white/20 rounded-full shadow-sm">
+                                    <span className="text-[9px] font-bold text-white uppercase tracking-widest">{promo.badge}</span>
                                 </div>
-                                <div className="space-y-3">
-                                    <h2 className="text-4xl md:text-6xl font-black text-white tracking-tighter uppercase leading-[0.85]">
-                                        {promo.title.split(' ').map((word, i) => (
-                                            <span key={i} className="block">{word}</span>
-                                        ))}
+                                <div className="space-y-2">
+                                    <h2 className="text-3xl md:text-5xl font-bold text-white tracking-tight leading-tight">
+                                        {promo.title}
                                     </h2>
-                                    <p className="text-white/70 text-sm md:text-base font-bold max-w-md leading-relaxed">
+                                    <p className="text-white/80 text-sm md:text-base font-medium max-w-md leading-relaxed mx-auto md:mx-0">
                                         {promo.subtitle}
                                     </p>
                                 </div>
-                                <div className="pt-4">
+                                <div className="pt-2">
                                     <Link href={promo.href}>
-                                        <button className="group h-14 px-8 bg-white text-gray-900 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-gray-100 transition-all active:scale-95 flex items-center gap-3">
+                                        <button className="group h-12 px-6 bg-white text-gray-900 rounded-xl font-bold text-[10px] uppercase tracking-widest hover:bg-gray-50 transition-all active:scale-95 flex items-center justify-center gap-2 shadow-lg w-full md:w-auto">
                                             {promo.cta}
-                                            <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+                                            <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
                                         </button>
                                     </Link>
                                 </div>
                             </div>
 
-                            <div className="hidden md:flex items-center justify-center w-64 h-64 bg-white/5 border border-white/10 rounded-[3rem] backdrop-blur-sm shadow-2xl relative overflow-hidden">
-                                <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent" />
-                                {promo.icon}
+                            <div className="hidden md:flex items-center justify-center w-40 h-40 lg:w-48 lg:h-48 bg-white/10 border border-white/20 rounded-3xl backdrop-blur-md shadow-2xl relative overflow-hidden shrink-0 transform rotate-3 hover:rotate-0 transition-transform duration-500">
+                                <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent" />
+                                <div className="transform scale-150">
+                                    {promo.icon}
+                                </div>
                             </div>
                         </div>
                     </div>
                 ))}
 
                 {/* Navigation Controls */}
-                <div className="absolute bottom-10 left-10 md:left-20 z-30 flex items-center gap-4">
+                <div className="absolute bottom-6 left-0 right-0 md:left-12 md:right-auto z-30 flex items-center justify-center md:justify-start gap-4">
                     <div className="flex gap-2">
                         {PROMOS.map((_, i) => (
                             <button
@@ -131,27 +131,27 @@ export default function PromoCarousel() {
                             >
                                 <div className={cn(
                                     "h-1.5 rounded-full transition-all duration-500",
-                                    i === current ? "w-8 bg-white" : "w-2 bg-white/30 group-hover:bg-white/50"
+                                    i === current ? "w-6 bg-white shadow-[0_0_10px_rgba(255,255,255,0.5)]" : "w-1.5 bg-white/40 group-hover:bg-white/70"
                                 )} />
                             </button>
                         ))}
                     </div>
                 </div>
 
-                <div className="absolute bottom-10 right-10 md:right-20 z-30 flex items-center gap-3">
+                <div className="absolute bottom-6 right-6 md:right-12 z-30 hidden md:flex items-center gap-2">
                     <button 
                         onClick={prev}
-                        className="h-10 w-10 flex items-center justify-center rounded-xl bg-white/10 border border-white/10 text-white hover:bg-white/20 transition-all active:scale-90"
+                        className="h-8 w-8 flex items-center justify-center rounded-lg bg-black/20 border border-white/20 text-white hover:bg-black/40 backdrop-blur-sm transition-all active:scale-90"
                         aria-label="Previous slide"
                     >
-                        <ChevronLeft size={20} />
+                        <ChevronLeft size={16} />
                     </button>
                     <button 
                         onClick={next}
-                        className="h-10 w-10 flex items-center justify-center rounded-xl bg-white/10 border border-white/10 text-white hover:bg-white/20 transition-all active:scale-90"
+                        className="h-8 w-8 flex items-center justify-center rounded-lg bg-black/20 border border-white/20 text-white hover:bg-black/40 backdrop-blur-sm transition-all active:scale-90"
                         aria-label="Next slide"
                     >
-                        <ChevronRight size={20} />
+                        <ChevronRight size={16} />
                     </button>
                 </div>
             </div>
