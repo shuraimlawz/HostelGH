@@ -67,8 +67,9 @@ export default function AdminSidebar({ isOpen = false, onClose = () => { } }: Ad
         refetchInterval: 30000
     });
 
-    const hasCriticalAlerts = alerts && alerts.length > 0;
-    const activeAlert = hasCriticalAlerts ? alerts[0] : null;
+    const alertsList = Array.isArray(alerts) ? alerts : (alerts?.data || []);
+    const hasCriticalAlerts = alertsList.length > 0;
+    const activeAlert = hasCriticalAlerts ? alertsList[0] : null;
 
     const SidebarContent = () => (
         <>
@@ -136,7 +137,7 @@ export default function AdminSidebar({ isOpen = false, onClose = () => { } }: Ad
                                 <AlertCircle size={14} className="text-red-500 animate-pulse" />
                                 <p className="text-[10px] font-black text-red-500 uppercase tracking-widest">System Attention</p>
                             </div>
-                            <h3 className="font-bold text-xs text-gray-200 mb-1 leading-tight">{activeAlert.message}</h3>
+                            <h3 className="font-bold text-xs text-gray-200 mb-1 leading-tight">{activeAlert?.message || "System Alert"}</h3>
                             <p className="text-[10px] text-gray-400">Action required immediately</p>
                         </div>
                     </div>

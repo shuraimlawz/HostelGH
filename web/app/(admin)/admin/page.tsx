@@ -131,7 +131,8 @@ export default function AdminDashboardPage() {
         </div>
     );
 
-    const activityList = Array.isArray(activity) ? activity : (activity?.activities || []);
+    const activityList = Array.isArray(activity) ? activity : (activity?.activities || activity?.data || []);
+    const disputesList = Array.isArray(disputes) ? disputes : (disputes?.data || []);
     const pendingApprovals = (verificationQueue?.hostels?.length || 0) + (verificationQueue?.owners?.length || 0);
     const pendingPayoutAmount = financials?.pendingPayouts || 0;
     const pendingPayoutCount = notificationCounts?.payouts || 0;
@@ -170,7 +171,7 @@ export default function AdminDashboardPage() {
                         </TabsTrigger>
                         <TabsTrigger value="financials" className="rounded-lg px-6 py-2.5 font-bold uppercase tracking-widest text-[10px]">Financials</TabsTrigger>
                         <TabsTrigger value="disputes" className="rounded-lg px-6 py-2.5 font-bold uppercase tracking-widest text-[10px]">
-                            Disputes <span className="ml-1.5 px-1.5 py-0.5 bg-red-100 text-red-700 rounded-md text-[8px]">{disputes?.length || 0}</span>
+                            Disputes <span className="ml-1.5 px-1.5 py-0.5 bg-red-100 text-red-700 rounded-md text-[8px]">{disputesList?.length || 0}</span>
                         </TabsTrigger>
                         <TabsTrigger value="activity" className="rounded-lg px-6 py-2.5 font-bold uppercase tracking-widest text-[10px]">Live Pulse</TabsTrigger>
                     </TabsList>
@@ -184,12 +185,12 @@ export default function AdminDashboardPage() {
                         <StatCard label="Total Bookings" value={stats?.bookings || 0} icon={CalendarCheck} />
                         <StatCard label="Total Revenue" value={`GH₵ ${(totalRevenue / 100).toLocaleString()}`} icon={DollarSign} />
                         <StatCard label="Pending Action" value={pendingApprovals} icon={ListChecks} />
-                        <StatCard label="Active Disputes" value={disputes?.length || 0} icon={LifeBuoy} />
+                        <StatCard label="Active Disputes" value={disputesList?.length || 0} icon={LifeBuoy} />
                     </div>
 
                     <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
                         <div className="lg:col-span-8">
-                            <RevenueChart data={analytics?.monthlyData} />
+                            <RevenueChart data={analytics?.monthlyData || []} />
                         </div>
                         <div className="lg:col-span-4">
                             <div className="bg-gray-900 rounded-2xl p-8 min-h-[400px] shadow-xl relative overflow-hidden text-white border border-gray-800">
@@ -385,12 +386,12 @@ export default function AdminDashboardPage() {
                             <LifeBuoy size={24} className="text-red-500" /> Dispute Resolution
                         </h2>
                         <div className="space-y-4">
-                            {disputes?.map((dispute: any) => (
+                            {disputesList?.map((dispute: any) => (
                                 <div key={dispute.id} className="p-6 rounded-2xl bg-gray-50 border border-gray-100 flex flex-col md:flex-row md:items-start justify-between gap-6 hover:border-red-100 transition-colors">
                                     <div className="space-y-4 max-w-2xl">
                                         <div className="flex items-center gap-3">
                                             <span className="px-2.5 py-1 bg-red-100 text-red-700 rounded-lg text-[9px] font-bold uppercase tracking-widest border border-red-200/50">{dispute.status}</span>
-                                            <p className="text-sm font-bold text-gray-900 uppercase tracking-tight">Booking #{dispute.bookingId.slice(-6).toUpperCase()}</p>
+                                            <p className="text-sm font-bold text-gray-900 uppercase tracking-tight">Booking #{dispute.bookingId?.toString().slice(-6).toUpperCase() || 'UNKNOWN'}</p>
                                         </div>
                                         <p className="text-gray-600 text-sm font-medium leading-relaxed border-l-2 border-red-500 pl-4">
                                             "{dispute.reason}"
@@ -406,7 +407,7 @@ export default function AdminDashboardPage() {
                                     </div>
                                 </div>
                             ))}
-                            {(!disputes || disputes.length === 0) && (
+                            {(!disputesList || disputesList.length === 0) && (
                                 <div className="text-center py-20 bg-gray-50 rounded-2xl border border-dashed border-gray-100">
                                     <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">Network conflict level: Zero</p>
                                 </div>
@@ -520,9 +521,9 @@ function ActivityList({ activities }: any) {
                         <div className="flex-1">
                             <p className="text-sm font-semibold text-gray-800">
                                 <span className="text-blue-600 uppercase tracking-widest text-[10px] mr-2 font-bold">{log.user || 'SYSTEM'}</span>
-                                {log.action || log.details}
+                                {log.action || log.details || 'System event recorded'}
                             </p>
-                            <p className="text-[9px] text-gray-400 font-bold uppercase tracking-widest mt-1.5">{new Date(log.time || log.createdAt).toLocaleString()}</p>
+                            <p className="text-[9px] text-gray-400 font-bold uppercase tracking-widest mt-1.5">{log.time || log.createdAt ? new Date(log.time || log.createdAt).toLocaleString() : 'Just now'}</p>
                         </div>
                         <ChevronRight className="text-gray-200" size={16} />
                     </div>
