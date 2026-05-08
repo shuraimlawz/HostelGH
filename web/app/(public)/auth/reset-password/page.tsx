@@ -114,7 +114,7 @@ function ResetPasswordContent() {
                                         required
                                         value={password}
                                         onChange={(e) => setPassword(e.target.value)}
-                                        className="w-full pl-14 pr-14 h-14 bg-gray-50 dark:bg-gray-900 border border-gray-100 rounded-2xl outline-none focus:bg-white dark:bg-gray-950 focus:border-blue-500 transition-all text-sm font-bold text-gray-900 dark:text-white placeholder:text-gray-300"
+                                        className="w-full pl-14 pr-14 h-14 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl outline-none focus:bg-white dark:focus:bg-gray-950 focus:border-blue-500 transition-all text-sm font-bold text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-600"
                                         placeholder="••••••••"
                                     />
                                     <button
@@ -138,7 +138,7 @@ function ResetPasswordContent() {
                                         required
                                         value={confirmPassword}
                                         onChange={(e) => setConfirmPassword(e.target.value)}
-                                        className="w-full pl-14 pr-14 h-14 bg-gray-50 dark:bg-gray-900 border border-gray-100 rounded-2xl outline-none focus:bg-white dark:bg-gray-950 focus:border-blue-500 transition-all text-sm font-bold text-gray-900 dark:text-white placeholder:text-gray-300"
+                                        className="w-full pl-14 pr-14 h-14 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl outline-none focus:bg-white dark:focus:bg-gray-950 focus:border-blue-500 transition-all text-sm font-bold text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-600"
                                         placeholder="••••••••"
                                     />
                                 </div>
