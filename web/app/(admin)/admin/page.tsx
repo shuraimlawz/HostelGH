@@ -115,10 +115,26 @@ export default function AdminDashboardPage() {
     const impersonateMutation = useMutation({
         mutationFn: async (userId: string) => api.post(`/admin/users/${userId}/impersonate`),
         onSuccess: (res) => {
-            const { token } = res.data;
-            localStorage.setItem("accessToken", token);
-            toast.success("Logging in as user...");
-            window.location.href = "/tenant"; 
+            toast.success("Entering Shadow Mode...");
+            
+            const currentToken = localStorage.getItem("accessToken") || sessionStorage.getItem("accessToken");
+            const currentUser = localStorage.getItem("user") || sessionStorage.getItem("user");
+            
+            if (currentToken && currentUser) {
+                localStorage.setItem("adminOriginalToken", currentToken);
+                localStorage.setItem("adminOriginalUser", currentUser);
+            }
+            
+            localStorage.setItem("accessToken", res.data.token);
+            if (res.data.user) {
+                localStorage.setItem("user", JSON.stringify(res.data.user));
+            }
+            
+            if (res.data.user?.role === 'OWNER') {
+                window.location.href = '/owner';
+            } else {
+                window.location.href = '/tenant';
+            }
         }
     });
 
