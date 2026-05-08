@@ -219,7 +219,17 @@ export default function LoginForm({ onSuccess }: { onSuccess?: (user: any) => vo
                 Continue with Google
             </button>
 
-            <div className="text-center text-[10px] font-bold text-muted-foreground uppercase tracking-widest pt-4">
+
+            <div className="pt-4 flex items-center justify-center gap-6 opacity-60">
+                <div className="flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-widest text-muted-foreground">
+                    <ShieldCheck size={12} className="text-emerald-500" /> Secure
+                </div>
+                <div className="flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-widest text-muted-foreground">
+                    <Lock size={12} className="text-blue-500" /> SSL Encrypted
+                </div>
+            </div>
+
+            <div className="text-center text-[10px] font-bold text-muted-foreground uppercase tracking-widest pt-2">
                 No account yet? <Link href="/auth/register" className="text-foreground border-b border-border hover:border-foreground transition-all ml-2">Register Here</Link>
             </div>
         </div>

@@ -350,7 +350,7 @@ export default function OwnerDashboardPage() {
                                             </div>
                                         </td>
                                         <td className="px-8 py-6">
-                                            <p className="font-bold text-gray-900 dark:text-white text-sm tracking-tight">{booking.hostel.name}</p>
+                                            <p className="font-bold text-gray-900 dark:text-white text-sm tracking-tight">{booking.hostel?.name || "Unknown Hostel"}</p>
                                             <p className="text-[10px] text-blue-600 font-bold uppercase tracking-widest mt-0.5">{booking.items?.[0]?.room?.name || "Shared Occupancy"}</p>
                                         </td>
                                         <td className="px-8 py-6">

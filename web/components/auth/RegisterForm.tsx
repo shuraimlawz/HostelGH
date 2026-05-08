@@ -4,7 +4,7 @@ import { api } from "@/lib/api";
 import { useState, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { AlertCircle, Eye, EyeOff, User, Mail, Lock, ShieldCheck, ArrowRight, Loader2 } from "lucide-react";
+import { AlertCircle, Eye, EyeOff, User, Mail, Lock, ShieldCheck, ArrowRight, Loader2, GraduationCap, Building2, CheckCircle2 } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
@@ -24,6 +24,18 @@ function RegisterContent({ onSuccess }: { onSuccess?: () => void }) {
     const router = useRouter();
     const [loading, setLoading] = useState(false);
     const [err, setErr] = useState<string | null>(null);
+
+    const getPasswordStrength = (pass: string) => {
+        let score = 0;
+        if (!pass) return score;
+        if (pass.length > 7) score += 1;
+        if (/[A-Z]/.test(pass)) score += 1;
+        if (/[0-9]/.test(pass)) score += 1;
+        if (/[^A-Za-z0-9]/.test(pass)) score += 1;
+        return score;
+    };
+    
+    const passwordStrength = getPasswordStrength(password);
 
     async function submit(e: React.FormEvent) {
         e.preventDefault();
@@ -168,26 +180,71 @@ function RegisterContent({ onSuccess }: { onSuccess?: () => void }) {
                             {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                         </button>
                     </div>
+                    {password.length > 0 && (
+                        <div className="flex gap-1 mt-2.5 px-1 animate-in fade-in duration-200">
+                            {[1, 2, 3, 4].map((level) => (
+                                <div 
+                                    key={level} 
+                                    className={cn(
+                                        "h-1 w-full rounded-full transition-all duration-300",
+                                        passwordStrength >= level 
+                                            ? (passwordStrength <= 2 ? "bg-orange-500" : passwordStrength === 3 ? "bg-amber-500" : "bg-emerald-500") 
+                                            : "bg-muted"
+                                    )} 
+                                />
+                            ))}
+                        </div>
+                    )}
                 </div>
 
-                <div className="space-y-2 group">
-                    <label htmlFor="role" className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] ml-1 group-focus-within:text-blue-600">Account Type</label>
-                    <div className="relative">
-                        <select
-                            id="role"
-                            name="role"
-                            className="w-full px-5 h-12 bg-muted/50 border border-border rounded-2xl outline-none focus:bg-card focus:border-blue-600 transition-all text-[10px] font-bold uppercase tracking-widest shadow-sm appearance-none cursor-pointer text-foreground"
-                            value={role}
-                            onChange={(e) => setRole(e.target.value as any)}
+                <div className="space-y-3 pt-2">
+                    <label className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] ml-1">Account Type</label>
+                    <div className="grid grid-cols-2 gap-3">
+                        <button
+                            type="button"
+                            onClick={() => setRole("TENANT")}
+                            className={cn(
+                                "relative p-4 rounded-2xl border-2 text-left transition-all group flex flex-col gap-2",
+                                role === "TENANT" 
+                                    ? "border-blue-600 bg-blue-50/50 dark:bg-blue-900/10 shadow-sm shadow-blue-500/10" 
+                                    : "border-border bg-muted/20 hover:border-blue-600/50 hover:bg-muted/50"
+                            )}
                         >
-                            <option value="TENANT" className="bg-card">Student Hub (Resident)</option>
-                            <option value="OWNER" className="bg-card">Owner Hub (Property Owner)</option>
-                        </select>
-                        <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400 dark:text-gray-500">
-                            <svg width="10" height="10" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M2 4L6 8L10 4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                            </svg>
-                        </div>
+                            <div className={cn(
+                                "w-8 h-8 rounded-full flex items-center justify-center transition-colors",
+                                role === "TENANT" ? "bg-blue-600 text-white" : "bg-muted-foreground/10 text-muted-foreground group-hover:text-foreground"
+                            )}>
+                                <GraduationCap size={16} />
+                            </div>
+                            <div>
+                                <p className={cn("text-xs font-bold uppercase tracking-widest", role === "TENANT" ? "text-blue-700 dark:text-blue-400" : "text-foreground")}>Student</p>
+                                <p className="text-[9px] text-muted-foreground font-semibold mt-0.5 leading-tight">Looking for a room</p>
+                            </div>
+                            {role === "TENANT" && <CheckCircle2 size={16} className="absolute top-4 right-4 text-blue-600" />}
+                        </button>
+
+                        <button
+                            type="button"
+                            onClick={() => setRole("OWNER")}
+                            className={cn(
+                                "relative p-4 rounded-2xl border-2 text-left transition-all group flex flex-col gap-2",
+                                role === "OWNER" 
+                                    ? "border-emerald-600 bg-emerald-50/50 dark:bg-emerald-900/10 shadow-sm shadow-emerald-500/10" 
+                                    : "border-border bg-muted/20 hover:border-emerald-600/50 hover:bg-muted/50"
+                            )}
+                        >
+                            <div className={cn(
+                                "w-8 h-8 rounded-full flex items-center justify-center transition-colors",
+                                role === "OWNER" ? "bg-emerald-600 text-white" : "bg-muted-foreground/10 text-muted-foreground group-hover:text-foreground"
+                            )}>
+                                <Building2 size={16} />
+                            </div>
+                            <div>
+                                <p className={cn("text-xs font-bold uppercase tracking-widest", role === "OWNER" ? "text-emerald-700 dark:text-emerald-400" : "text-foreground")}>Owner</p>
+                                <p className="text-[9px] text-muted-foreground font-semibold mt-0.5 leading-tight">Listing property</p>
+                            </div>
+                            {role === "OWNER" && <CheckCircle2 size={16} className="absolute top-4 right-4 text-emerald-600" />}
+                        </button>
                     </div>
                 </div>
 
@@ -238,6 +295,15 @@ function RegisterContent({ onSuccess }: { onSuccess?: () => void }) {
                 </svg>
                 Continue with Google
             </button>
+
+            <div className="pt-4 flex items-center justify-center gap-6 opacity-60">
+                <div className="flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-widest text-muted-foreground">
+                    <ShieldCheck size={12} className="text-emerald-500" /> Secure
+                </div>
+                <div className="flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-widest text-muted-foreground">
+                    <Lock size={12} className="text-blue-500" /> SSL Encrypted
+                </div>
+            </div>
 
             <div className="text-center text-[10px] font-bold text-muted-foreground uppercase tracking-widest pt-2">
                 Already have an account? <Link href="/auth/login" className="text-foreground border-b border-border hover:border-foreground transition-all ml-2">Login Here</Link>

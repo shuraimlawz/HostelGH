@@ -270,7 +270,7 @@ export default function TenantDashboardPage() {
                     {/* Quick Links */}
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                         {[
-                            { href: "/account/payments", icon: CreditCard, label: "Payments", sub: "History", color: "text-blue-600", bg: "bg-blue-50" },
+                            { href: "/bookings", icon: CreditCard, label: "Payments", sub: "History", color: "text-blue-600", bg: "bg-blue-50" },
                             { href: "/account", icon: Settings, label: "Settings", sub: "My Profile", color: "text-gray-600", bg: "bg-gray-50 dark:bg-gray-950" },
                             { href: "/support", icon: LifeBuoy, label: "Support", sub: "Get Help", color: "text-orange-600", bg: "bg-orange-50" }
                         ].map((hub, i) => (
