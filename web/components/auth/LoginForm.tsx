@@ -94,10 +94,12 @@ export default function LoginForm({ onSuccess }: { onSuccess?: (user: any) => vo
                 <div className="space-y-5">
                     {/* Email Input */}
                     <div className="space-y-2 group">
-                        <label className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] ml-1 group-focus-within:text-blue-600 transition-colors">Email Address</label>
+                        <label htmlFor="email" className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] ml-1 group-focus-within:text-blue-600 transition-colors">Email Address</label>
                         <div className="relative">
                             <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-blue-600 transition-colors" size={18} />
                             <input
+                                id="email"
+                                name="email"
                                 type="email"
                                 className="w-full pl-12 pr-4 h-14 bg-muted/50 border border-border rounded-2xl outline-none focus:bg-card focus:border-blue-600 transition-all text-[13px] font-bold text-foreground placeholder:text-muted-foreground/50"
                                 value={email}
@@ -112,7 +114,7 @@ export default function LoginForm({ onSuccess }: { onSuccess?: (user: any) => vo
                     {/* Password Input */}
                     <div className="space-y-2 group">
                         <div className="flex justify-between items-center px-1">
-                            <label className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] group-focus-within:text-blue-600 transition-colors">Password</label>
+                            <label htmlFor="password" className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] group-focus-within:text-blue-600 transition-colors">Password</label>
                             <Link href="/auth/forgot-password" title="Reset password" className="text-[11px] font-bold text-blue-600 uppercase tracking-widest hover:text-black transition-colors">
                                 Forgot Password?
                             </Link>
@@ -120,6 +122,8 @@ export default function LoginForm({ onSuccess }: { onSuccess?: (user: any) => vo
                         <div className="relative">
                             <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-blue-600 transition-colors" size={18} />
                             <input
+                                id="password"
+                                name="password"
                                 type={showPassword ? "text" : "password"}
                                 className="w-full pl-12 pr-12 h-14 bg-muted/50 border border-border rounded-2xl outline-none focus:bg-card focus:border-blue-600 transition-all text-[13px] font-bold tracking-widest text-foreground placeholder:text-muted-foreground/50"
                                 value={password}
@@ -140,9 +144,11 @@ export default function LoginForm({ onSuccess }: { onSuccess?: (user: any) => vo
                 </div>
 
                 <div className="flex items-center px-1">
-                    <label className="flex items-center gap-2.5 cursor-pointer group/check">
+                    <label htmlFor="rememberMe" className="flex items-center gap-2.5 cursor-pointer group/check">
                         <div className="relative flex items-center">
                             <input
+                                id="rememberMe"
+                                name="rememberMe"
                                 type="checkbox"
                                 checked={rememberMe}
                                 onChange={(e) => setRememberMe(e.target.checked)}

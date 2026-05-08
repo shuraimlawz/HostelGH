@@ -98,10 +98,12 @@ function RegisterContent({ onSuccess }: { onSuccess?: () => void }) {
             <form onSubmit={submit} className="space-y-6">
                 <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2 group">
-                        <label className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] ml-1 group-focus-within:text-blue-600">First Name</label>
+                        <label htmlFor="firstName" className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] ml-1 group-focus-within:text-blue-600">First Name</label>
                         <div className="relative">
                             <User className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-blue-600 transition-colors" size={16} />
                             <input
+                                id="firstName"
+                                name="firstName"
                                 type="text"
                                 className="w-full pl-11 pr-4 h-12 bg-muted/50 border border-border rounded-2xl outline-none focus:bg-card focus:border-blue-600 transition-all text-xs font-bold uppercase tracking-tight placeholder:text-muted-foreground/50 text-foreground"
                                 value={firstName}
@@ -113,8 +115,10 @@ function RegisterContent({ onSuccess }: { onSuccess?: () => void }) {
                     </div>
 
                     <div className="space-y-2 group">
-                        <label className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] ml-1 group-focus-within:text-blue-600">Last Name</label>
+                        <label htmlFor="lastName" className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] ml-1 group-focus-within:text-blue-600">Last Name</label>
                         <input
+                            id="lastName"
+                            name="lastName"
                             type="text"
                             className="w-full px-4 h-12 bg-muted/50 border border-border rounded-2xl outline-none focus:bg-card focus:border-blue-600 transition-all text-xs font-bold uppercase tracking-tight placeholder:text-muted-foreground/50 text-foreground"
                             value={lastName}
@@ -126,10 +130,12 @@ function RegisterContent({ onSuccess }: { onSuccess?: () => void }) {
                 </div>
 
                 <div className="space-y-2 group">
-                    <label className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] ml-1 group-focus-within:text-blue-600">Email Address</label>
+                    <label htmlFor="email" className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] ml-1 group-focus-within:text-blue-600">Email Address</label>
                     <div className="relative">
                         <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-blue-600 transition-colors" size={16} />
                         <input
+                            id="email"
+                            name="email"
                             type="email"
                             className="w-full pl-11 pr-4 h-12 bg-muted/50 border border-border rounded-2xl outline-none focus:bg-card focus:border-blue-600 transition-all text-xs font-bold uppercase tracking-tight placeholder:text-muted-foreground/50 text-foreground"
                             value={email}
@@ -141,10 +147,12 @@ function RegisterContent({ onSuccess }: { onSuccess?: () => void }) {
                 </div>
 
                 <div className="space-y-2 group">
-                    <label className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] ml-1 group-focus-within:text-blue-600">Password</label>
+                    <label htmlFor="password" className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] ml-1 group-focus-within:text-blue-600">Password</label>
                     <div className="relative">
                         <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-blue-600 transition-colors" size={16} />
                         <input
+                            id="password"
+                            name="password"
                             type={showPassword ? "text" : "password"}
                             className="w-full pl-11 pr-11 h-12 bg-muted/50 border border-border rounded-2xl outline-none focus:bg-card focus:border-blue-600 transition-all text-xs font-bold tracking-widest placeholder:text-muted-foreground/50 text-foreground"
                             value={password}
@@ -163,9 +171,11 @@ function RegisterContent({ onSuccess }: { onSuccess?: () => void }) {
                 </div>
 
                 <div className="space-y-2 group">
-                    <label className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] ml-1 group-focus-within:text-blue-600">Account Type</label>
+                    <label htmlFor="role" className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] ml-1 group-focus-within:text-blue-600">Account Type</label>
                     <div className="relative">
                         <select
+                            id="role"
+                            name="role"
                             className="w-full px-5 h-12 bg-muted/50 border border-border rounded-2xl outline-none focus:bg-card focus:border-blue-600 transition-all text-[10px] font-bold uppercase tracking-widest shadow-sm appearance-none cursor-pointer text-foreground"
                             value={role}
                             onChange={(e) => setRole(e.target.value as any)}
