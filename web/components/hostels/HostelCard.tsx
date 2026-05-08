@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { Star, MapPin } from "lucide-react";
+import { Star, MapPin, ShieldCheck } from "lucide-react";
 
 export default function HostelCard({ hostel, compact = false }: { hostel: any, compact?: boolean }) {
     const minPrice = hostel.minPrice
@@ -46,8 +46,11 @@ export default function HostelCard({ hostel, compact = false }: { hostel: any, c
 
             <div className="flex flex-col text-[15px] leading-snug">
                 <div className="flex justify-between items-start gap-2">
-                    <h3 className="font-semibold text-gray-900 dark:text-white truncate">
+                    <h3 className="font-semibold text-gray-900 dark:text-white truncate flex items-center gap-1.5">
                         {hostel.name}
+                        {hostel.verificationStatus === 'APPROVED' && (
+                            <ShieldCheck size={14} className="text-blue-500 fill-blue-50 shrink-0" aria-label="Verified Hostel" />
+                        )}
                     </h3>
                     <div className="flex items-center gap-1 shrink-0">
                         <Star size={12} className="fill-current text-gray-900 dark:text-white" />

@@ -208,7 +208,7 @@ export default function LoginForm({ onSuccess }: { onSuccess?: (user: any) => vo
             <button
                 onClick={handleGoogleLogin}
                 type="button"
-                className="w-full h-14 flex items-center justify-center gap-3 rounded-2xl border border-border bg-card text-foreground font-bold hover:bg-muted/50 transition-all active:scale-[0.98] text-[10px] uppercase tracking-widest"
+                className="w-full h-12 flex items-center justify-center gap-3 rounded-xl border border-[#DADCE0] dark:border-gray-700 bg-white dark:bg-[#131314] text-[#3C4043] dark:text-[#E3E3E3] font-medium hover:bg-[#F8F9FA] dark:hover:bg-[#1E1F20] transition-colors shadow-sm text-[14px]"
             >
                 <svg viewBox="0 0 18 18" width="16" height="16" xmlns="http://www.w3.org/2000/svg">
                     <path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z" />

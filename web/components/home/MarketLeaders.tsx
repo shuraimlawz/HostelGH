@@ -3,12 +3,12 @@
 import Image from "next/image";
 
 const partners = [
-    { name: "Google", logo: "https://upload.wikimedia.org/wikipedia/commons/2/2f/Google_2015_logo.svg" },
-    { name: "Paystack", logo: "https://upload.wikimedia.org/wikipedia/commons/0/0b/Paystack_Logo.png" },
-    { name: "MTN", logo: "https://upload.wikimedia.org/wikipedia/commons/9/93/MTN_Logo.svg" },
-    { name: "Visa", logo: "https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg" },
-    { name: "Mastercard", logo: "https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" },
-    { name: "Glovo", logo: "https://upload.wikimedia.org/wikipedia/commons/4/4e/Glovo_logo_2021.svg" }
+    { name: "Google Maps", logo: "https://upload.wikimedia.org/wikipedia/commons/b/bd/Google_Maps_Logo_2020.svg" },
+    { name: "Firebase", logo: "https://upload.wikimedia.org/wikipedia/commons/3/37/Firebase_Logo.svg" },
+    { name: "Supabase", logo: "https://upload.wikimedia.org/wikipedia/commons/1/17/Supabase-logo.svg" },
+    { name: "Vercel", logo: "https://upload.wikimedia.org/wikipedia/commons/5/5e/Vercel_logo_black.svg" },
+    { name: "Google Maps", logo: "https://upload.wikimedia.org/wikipedia/commons/b/bd/Google_Maps_Logo_2020.svg" },
+    { name: "Firebase", logo: "https://upload.wikimedia.org/wikipedia/commons/3/37/Firebase_Logo.svg" }
 ];
 
 export default function MarketLeaders() {
@@ -16,7 +16,7 @@ export default function MarketLeaders() {
         <section className="border-y border-border bg-muted/20 overflow-hidden relative">
             <div className="container mx-auto px-4 md:px-10 py-6 md:py-8 flex flex-col md:flex-row items-center gap-6 md:gap-10">
                 <p className="text-xs md:text-sm font-bold uppercase tracking-widest text-muted-foreground whitespace-nowrap shrink-0">
-                    Trusted by Market Leaders:
+                    Powered By Trusted Technologies:
                 </p>
                 
                 {/* Marquee Container */}
