@@ -33,7 +33,8 @@ import {
     Flame,
     Info,
     ChevronLeft,
-    CheckCircle2
+    CheckCircle2,
+    MapPin
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
