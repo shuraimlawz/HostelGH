@@ -77,13 +77,6 @@ export default function HeroSearch() {
         router.push(`/hostels${searchVal ? `?query=${encodeURIComponent(searchVal)}` : ""}`);
     };
 
-    const { data: trendingLocations, isLoading: isLoadingLocations } = useQuery({
-        queryKey: ["trending-locations"],
-        queryFn: async () => {
-            const { data } = await api.get("/hostels/trending-locations");
-            return Array.isArray(data) ? data : [];
-        },
-    });
 
     return (
         <div
@@ -189,41 +182,21 @@ export default function HeroSearch() {
                         </button>
                     </div>
 
-                    {/* Suggestions Dropdown (Home Page) */}
-                    {isFocused && (
+                    {/* Suggestions Dropdown (Home Page) — only user's own recent searches */}
+                    {isFocused && recentSearches.length > 0 && (
                         <div className="absolute top-full left-0 right-0 mt-3 bg-white border border-gray-100 rounded-2xl shadow-2xl z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-300 text-left">
-                            {recentSearches.length > 0 && (
-                                <div className="p-4 border-b border-gray-50">
-                                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3 flex items-center gap-2">
-                                        Recent Searches
-                                    </p>
-                                    <div className="flex flex-wrap gap-2">
-                                        {recentSearches.map(s => (
-                                            <button 
-                                                key={s} 
-                                                onClick={() => { setCity(s); handleSearch(s); setIsFocused(false); }}
-                                                className="px-3 py-1.5 bg-gray-50 hover:bg-blue-50 text-xs font-bold text-gray-600 rounded-lg border border-gray-100 hover:border-blue-200 transition-all"
-                                            >
-                                                {s}
-                                            </button>
-                                        ))}
-                                    </div>
-                                </div>
-                            )}
-
                             <div className="p-4">
-                                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3">Popular Schools</p>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-1">
-                                    {["KNUST", "University of Ghana", "UCC", "UPSA", "UDS"].map(uni => (
+                                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3 flex items-center gap-2">
+                                    Recent Searches
+                                </p>
+                                <div className="flex flex-wrap gap-2">
+                                    {recentSearches.map(s => (
                                         <button 
-                                            key={uni}
-                                            onClick={() => { setCity(uni); handleSearch(uni); setIsFocused(false); }}
-                                            className="flex items-center gap-3 p-2.5 hover:bg-blue-50 rounded-xl transition-all group"
+                                            key={s} 
+                                            onClick={() => { setCity(s); handleSearch(s); setIsFocused(false); }}
+                                            className="px-3 py-1.5 bg-gray-50 hover:bg-blue-50 text-xs font-bold text-gray-600 rounded-lg border border-gray-100 hover:border-blue-200 transition-all"
                                         >
-                                            <div className="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center text-gray-400 group-hover:bg-white group-hover:text-blue-500 transition-all">
-                                                <Search size={14} />
-                                            </div>
-                                            <span className="text-sm font-bold text-gray-700 group-hover:text-blue-600">{uni}</span>
+                                            {s}
                                         </button>
                                     ))}
                                 </div>
@@ -232,31 +205,14 @@ export default function HeroSearch() {
                     )}
                 </div>
 
-                    {/* Trending quick-links — hides when scrolled */}
+                    {/* Simple search hint — no hardcoded locations */}
                     <div className={cn(
-                        "mt-5 flex flex-wrap justify-center gap-2 text-white/40 text-[10px] font-bold uppercase tracking-widest transition-all duration-500",
+                        "mt-5 transition-all duration-500",
                         scrolled ? "opacity-0 h-0 overflow-hidden mt-0" : "opacity-100"
                     )}>
-                        <span className="mt-2 opacity-30">Trending:</span>
-                        {trendingLocations && trendingLocations.length > 0 ? (
-                            trendingLocations.slice(0, 6).map((loc: string) => (
-                                <button
-                                    key={loc}
-                                    onClick={() => { setCity(loc); handleSearch(loc); }}
-                                    className="px-4 py-2.5 rounded-xl border border-white/10 hover:border-blue-500/50 hover:bg-blue-600 hover:text-white transition-all backdrop-blur-md active:scale-90 shadow-sm"
-                                >
-                                    {loc}
-                                </button>
-                            ))
-                        ) : (
-                            isLoadingLocations && (
-                                <div className="flex gap-2">
-                                    {[1, 2, 3, 4].map(i => (
-                                        <Skeleton key={i} className="h-9 w-24 rounded-xl bg-white/5" />
-                                    ))}
-                                </div>
-                            )
-                        )}
+                        <p className="text-white/30 text-[10px] font-bold uppercase tracking-widest text-center">
+                            Search by school name, hostel name, or city
+                        </p>
                 </div>
             </div>
 

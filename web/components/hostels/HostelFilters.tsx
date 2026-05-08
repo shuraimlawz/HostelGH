@@ -149,45 +149,26 @@ export default function HostelFilters() {
                         }}
                         className="w-full h-14 bg-transparent pl-12 pr-4 outline-none font-semibold text-gray-900 dark:text-white placeholder:text-gray-400 text-sm lg:text-base"
                         placeholder="Search hostels, schools, or cities..."
+                        autoComplete="off"
+                        autoCorrect="off"
+                        spellCheck={false}
                     />
 
-                    {/* Suggestions Dropdown */}
-                    {isFocused && (
+                    {/* Suggestions Dropdown — only shows user's own recent searches */}
+                    {isFocused && recentSearches.length > 0 && (
                         <div className="absolute top-full left-0 right-0 mt-3 bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 rounded-2xl shadow-2xl z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-300">
-                            {recentSearches.length > 0 && (
-                                <div className="p-4 border-b dark:border-slate-800">
-                                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3 flex items-center gap-2">
-                                        <Clock size={10} /> Recent Searches
-                                    </p>
-                                    <div className="flex flex-wrap gap-2">
-                                        {recentSearches.map(s => (
-                                            <button 
-                                                key={s} 
-                                                onClick={() => { setQuery(s); handleApply({ query: s }); setIsFocused(false); }}
-                                                className="px-3 py-1.5 bg-gray-50 dark:bg-slate-800 hover:bg-blue-50 dark:hover:bg-blue-500/10 text-xs font-medium text-gray-700 dark:text-gray-300 rounded-lg border border-gray-100 dark:border-slate-700 hover:border-blue-200 dark:hover:border-blue-500/30 transition-all"
-                                            >
-                                                {s}
-                                            </button>
-                                        ))}
-                                    </div>
-                                </div>
-                            )}
-
                             <div className="p-4">
                                 <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3 flex items-center gap-2">
-                                    <Star size={10} className="text-yellow-500" /> Popular Schools
+                                    <Clock size={10} /> Recent Searches
                                 </p>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-1">
-                                    {["KNUST", "University of Ghana", "UCC", "UPSA", "UDS"].map(uni => (
+                                <div className="flex flex-wrap gap-2">
+                                    {recentSearches.map(s => (
                                         <button 
-                                            key={uni}
-                                            onClick={() => { setUniversity(uni); handleApply({ university: uni }); setIsFocused(false); }}
-                                            className="flex items-center gap-3 p-2.5 hover:bg-blue-50 dark:hover:bg-blue-500/10 rounded-xl text-left transition-all group"
+                                            key={s} 
+                                            onClick={() => { setQuery(s); handleApply({ query: s }); setIsFocused(false); }}
+                                            className="px-3 py-1.5 bg-gray-50 dark:bg-slate-800 hover:bg-blue-50 dark:hover:bg-blue-500/10 text-xs font-medium text-gray-700 dark:text-gray-300 rounded-lg border border-gray-100 dark:border-slate-700 hover:border-blue-200 dark:hover:border-blue-500/30 transition-all"
                                         >
-                                            <div className="w-8 h-8 rounded-lg bg-gray-50 dark:bg-slate-800 flex items-center justify-center text-gray-400 group-hover:bg-white dark:group-hover:bg-slate-700 group-hover:text-blue-500 transition-all">
-                                                <School size={14} />
-                                            </div>
-                                            <span className="text-sm font-semibold text-gray-700 dark:text-gray-300 group-hover:text-blue-600 dark:group-hover:text-blue-400">{uni}</span>
+                                            {s}
                                         </button>
                                     ))}
                                 </div>

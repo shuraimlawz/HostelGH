@@ -4,11 +4,10 @@ import Image from "next/image";
 
 const partners = [
     { name: "Google Maps", logo: "https://upload.wikimedia.org/wikipedia/commons/b/bd/Google_Maps_Logo_2020.svg" },
-    { name: "Firebase", logo: "https://upload.wikimedia.org/wikipedia/commons/3/37/Firebase_Logo.svg" },
-    { name: "Supabase", logo: "https://upload.wikimedia.org/wikipedia/commons/1/17/Supabase-logo.svg" },
-    { name: "Vercel", logo: "https://upload.wikimedia.org/wikipedia/commons/5/5e/Vercel_logo_black.svg" },
-    { name: "Google Maps", logo: "https://upload.wikimedia.org/wikipedia/commons/b/bd/Google_Maps_Logo_2020.svg" },
-    { name: "Firebase", logo: "https://upload.wikimedia.org/wikipedia/commons/3/37/Firebase_Logo.svg" }
+    { name: "Supabase", logo: "https://supabase.com/brand-assets/supabase-logo-icon.png" },
+    { name: "Vercel", logo: "https://assets.vercel.com/image/upload/front/favicon/vercel/57x57.png" },
+    { name: "Next.js", logo: "https://assets.vercel.com/image/upload/v1662130559/nextjs/Icon_dark_background.png" },
+    { name: "Prisma", logo: "https://avatars.githubusercontent.com/u/17219288?s=200&v=4" },
 ];
 
 export default function MarketLeaders() {
