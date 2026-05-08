@@ -439,6 +439,13 @@ export class AuthService {
       this.prisma.emailVerificationToken.delete({ where: { id: record.id } })
     ]);
 
+    const user = await this.prisma.user.findUnique({ where: { email: record.email }, select: { email: true, firstName: true } });
+    if (user) {
+      this.emailService.sendWelcomeEmail(user.email, user.firstName || undefined).catch(err => {
+        this.logger.error(`Failed to send welcome email to ${user.email}: ${err.message}`);
+      });
+    }
+
     return { ok: true };
   }
 
