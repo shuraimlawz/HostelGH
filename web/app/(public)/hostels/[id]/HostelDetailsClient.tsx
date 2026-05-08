@@ -156,7 +156,7 @@ export default function HostelDetailsClient() {
                                 <Share size={16} /> Share
                             </button>
                             <button onClick={() => toggleFavorite.mutate()} className="flex items-center gap-2 hover:bg-gray-50 px-2 py-1.5 rounded-lg transition-colors">
-                                <Heart size={16} className={favoriteStatus?.favorited ? "fill-[#FF385C] text-[#FF385C]" : ""} /> 
+                                <Heart size={16} className={favoriteStatus?.favorited ? "fill-red-500 text-red-500" : ""} /> 
                                 {favoriteStatus?.favorited ? "Saved" : "Save"}
                             </button>
                         </div>
@@ -338,7 +338,7 @@ export default function HostelDetailsClient() {
                             
                             <Link 
                                 href={`/hostels/${hostelId}/rooms`}
-                                className="w-full block text-center py-3.5 bg-[#FF385C] hover:bg-[#E31C5F] text-white rounded-lg font-bold text-[16px] transition-colors"
+                                className="w-full block text-center py-3.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-bold text-[16px] transition-colors"
                             >
                                 Reserve
                             </Link>
@@ -470,6 +470,103 @@ export default function HostelDetailsClient() {
                     <button className="mt-4 font-semibold underline text-[16px] flex items-center gap-1">
                         Show more <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" style={{display:"block",height:"12px",width:"12px",fill:"currentColor"}}><path d="M5.41 15.65 4 14.23l6.09-6.1L4 2.05 5.41.64l7.5 7.5z"></path></svg>
                     </button>
+                </div>
+
+                {/* Meet your host */}
+                <div className="py-12 border-t border-gray-200">
+                    <h3 className="text-[22px] font-semibold text-gray-900 mb-6">Meet your host</h3>
+                    <div className="flex flex-col md:flex-row gap-12 lg:gap-24">
+                        <div className="w-full md:w-[400px] bg-white rounded-3xl p-8 shadow-[0_6px_16px_rgba(0,0,0,0.12)] border border-gray-100 flex flex-col items-center">
+                            <div className="flex items-center justify-between w-full">
+                                <div className="flex flex-col items-center">
+                                    <div className="w-24 h-24 rounded-full bg-gray-200 overflow-hidden mb-3 relative">
+                                        {hostel.owner?.avatarUrl ? (
+                                            <img src={hostel.owner.avatarUrl} className="w-full h-full object-cover" alt="Host" />
+                                        ) : (
+                                            <div className="w-full h-full flex justify-center items-center font-bold text-gray-500 text-2xl">
+                                                {hostel.owner?.firstName?.[0] || "H"}
+                                            </div>
+                                        )}
+                                        {hostel.owner?.isVerified && (
+                                            <div className="absolute bottom-0 right-0 w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center border-4 border-white shadow-sm">
+                                                <ShieldCheck size={14} />
+                                            </div>
+                                        )}
+                                    </div>
+                                    <h3 className="text-[26px] font-bold text-gray-900">{hostel.owner?.firstName}</h3>
+                                    <div className="text-[14px] text-gray-500 font-medium">Host</div>
+                                </div>
+                                <div className="space-y-4">
+                                    <div>
+                                        <div className="text-[18px] font-bold">{hostel.totalReviews > 10 ? '10+' : (hostel.totalReviews || 0)}</div>
+                                        <div className="text-[12px] text-gray-500 font-medium">Reviews</div>
+                                    </div>
+                                    <hr className="border-gray-200" />
+                                    <div>
+                                        <div className="text-[18px] font-bold flex items-center gap-1">
+                                            {hostel.averageRating?.toFixed(2) || "New"} <Star size={12} className="fill-current" />
+                                        </div>
+                                        <div className="text-[12px] text-gray-500 font-medium">Rating</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div className="flex-1 space-y-6">
+                            <div>
+                                <h4 className="text-[18px] font-semibold text-gray-900 mb-2">Host details</h4>
+                                <div className="text-[16px] text-gray-900 space-y-1">
+                                    <p>Response rate: 100%</p>
+                                    <p>Responds within an hour</p>
+                                </div>
+                            </div>
+                            <ContentGate message="Sign in to message the host">
+                                <a 
+                                    href={hostel.whatsappNumber ? `https://wa.me/${hostel.whatsappNumber.startsWith('0') ? '233' + hostel.whatsappNumber.slice(1) : hostel.whatsappNumber}` : '#'}
+                                    target="_blank"
+                                    className="inline-block px-6 py-3 bg-gray-900 text-white rounded-lg text-[16px] font-semibold hover:bg-black transition-colors"
+                                >
+                                    Message host
+                                </a>
+                            </ContentGate>
+                            <div className="pt-6 border-t border-gray-200 flex items-start gap-4 text-[12px] text-gray-500">
+                                <ShieldCheck size={20} className="shrink-0 text-blue-600" />
+                                <p>To help protect your payment, always use the HostelGH platform to send money and communicate securely with hosts.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Things to know */}
+                <div className="py-12 border-t border-gray-200">
+                    <h3 className="text-[22px] font-semibold text-gray-900 mb-6">Things to know</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-[16px] text-gray-900">
+                        <div>
+                            <h4 className="font-semibold mb-3">Hostel rules</h4>
+                            <ul className="space-y-2 text-[15px]">
+                                <li>Check-in: After 3:00 PM</li>
+                                <li>Checkout: Before 12:00 PM</li>
+                                <li>No smoking indoors</li>
+                                <li>Quiet hours: 10 PM - 6 AM</li>
+                            </ul>
+                            <button className="mt-3 font-semibold underline text-[15px]">Show more</button>
+                        </div>
+                        <div>
+                            <h4 className="font-semibold mb-3">Safety & property</h4>
+                            <ul className="space-y-2 text-[15px]">
+                                <li>Security cameras on property</li>
+                                <li>Smoke alarm installed</li>
+                                <li>Gated compound</li>
+                                <li>24/7 Security guard</li>
+                            </ul>
+                            <button className="mt-3 font-semibold underline text-[15px]">Show more</button>
+                        </div>
+                        <div>
+                            <h4 className="font-semibold mb-3">Cancellation policy</h4>
+                            <p className="text-[15px] mb-2">Review this hostel's full policy for details on refunds and deadlines.</p>
+                            <button className="font-semibold underline text-[15px]">Learn more</button>
+                        </div>
+                    </div>
                 </div>
 
             </div>
