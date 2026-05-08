@@ -53,9 +53,12 @@ function NearUniversitySections({ uniSections, isLoading }: {
                 <Skeleton className="h-8 w-64 rounded-lg mb-6" />
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-5">
                     {[1, 2, 3, 4].map(i => (
-                        <div key={i} className="space-y-3">
-                            <Skeleton className="aspect-[16/11] w-full rounded-2xl" />
-                            <Skeleton className="h-5 w-3/4 rounded-lg" />
+                        <div key={i} className="flex flex-col">
+                            <Skeleton className="aspect-square w-full rounded-xl mb-3" />
+                            <Skeleton className="h-4 w-3/4 mb-1" />
+                            <Skeleton className="h-4 w-1/2 mb-1" />
+                            <Skeleton className="h-4 w-2/3 mb-2" />
+                            <Skeleton className="h-4 w-1/3" />
                         </div>
                     ))}
                 </div>
