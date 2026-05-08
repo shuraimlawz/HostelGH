@@ -200,12 +200,12 @@ function HostelsListingContent() {
             {isLoading ? (
                 <HostelGrid>
                     {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
-                        <div key={i} className="space-y-4">
-                            <Skeleton className="aspect-[16/11] w-full rounded-2xl bg-gray-100" />
-                            <div className="space-y-2">
-                                <Skeleton className="h-5 w-3/4 rounded-md" />
-                                <Skeleton className="h-3 w-1/2 rounded-md" />
-                            </div>
+                        <div key={i} className="flex flex-col">
+                            <Skeleton className="aspect-square w-full rounded-2xl mb-3 bg-gray-100 dark:bg-gray-800" />
+                            <Skeleton className="h-4 w-3/4 mb-1" />
+                            <Skeleton className="h-4 w-1/2 mb-1" />
+                            <Skeleton className="h-4 w-2/3 mb-2" />
+                            <Skeleton className="h-4 w-1/3" />
                         </div>
                     ))}
                 </HostelGrid>

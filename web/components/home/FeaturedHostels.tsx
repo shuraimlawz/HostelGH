@@ -99,10 +99,11 @@ export default function FeaturedHostels() {
                 {isLoading ? (
                     <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
                         {[1, 2, 3, 4].map((i) => (
-                            <div key={i} className="space-y-4">
-                                <Skeleton className="aspect-[4/5] w-full rounded-3xl" />
-                                <Skeleton className="h-5 w-3/4" />
-                                <Skeleton className="h-4 w-1/2" />
+                            <div key={i} className="flex flex-col">
+                                <Skeleton className="aspect-square w-full rounded-2xl mb-3" />
+                                <Skeleton className="h-4 w-3/4 mb-1" />
+                                <Skeleton className="h-4 w-1/2 mb-1" />
+                                <Skeleton className="h-4 w-2/3" />
                             </div>
                         ))}
                     </div>
