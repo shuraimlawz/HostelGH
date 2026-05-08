@@ -172,7 +172,7 @@ export default function Navbar() {
                             href={WHATSAPP_CHANNEL}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="inline-flex h-10 items-center gap-2 rounded-2xl border border-green-500/20 bg-emerald-500/10 px-4 text-xs font-bold uppercase tracking-[0.18em] text-emerald-300 transition hover:bg-emerald-500/15 focus:outline-none focus:ring-2 focus:ring-emerald-400/40"
+                            className="hidden sm:inline-flex h-10 items-center gap-2 rounded-2xl border border-green-500/20 bg-emerald-500/10 px-4 text-xs font-bold uppercase tracking-[0.18em] text-emerald-300 transition hover:bg-emerald-500/15 focus:outline-none focus:ring-2 focus:ring-emerald-400/40"
                             aria-label="Chat with HostelGH on WhatsApp"
                         >
                             <svg viewBox="0 0 24 24" className="h-4 w-4 fill-current" aria-hidden="true">
@@ -191,7 +191,9 @@ export default function Navbar() {
                             </Link>
                         )}
 
-                        <ThemeToggle />
+                        <div className="hidden sm:block">
+                            <ThemeToggle />
+                        </div>
 
                         {/* Control Center Pill */}
                         <div className="relative" ref={menuRef}>
@@ -276,6 +278,9 @@ export default function Navbar() {
                                                     Sign Out
                                                 </button>
                                             </div>
+                                            <div className="sm:hidden px-4 py-3 border-t border-border mt-2 flex justify-center">
+                                                <ThemeToggle />
+                                            </div>
                                         </>
                                     ) : (
                                         <div className="px-2 space-y-1">
@@ -302,6 +307,9 @@ export default function Navbar() {
                                                 <Building2 size={16} />
                                                 List your property
                                             </Link>
+                                            <div className="sm:hidden px-4 py-3 border-t border-border mt-2 flex justify-center">
+                                                <ThemeToggle />
+                                            </div>
                                         </div>
                                     )}
                                 </div>
