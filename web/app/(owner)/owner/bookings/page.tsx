@@ -132,7 +132,7 @@ export default function OwnerBookingsPage() {
                                 "h-9 px-5 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all whitespace-nowrap border shrink-0",
                                 filter === f
                                     ? "bg-gray-900 text-white border-gray-900 shadow-md"
-                                    : "bg-white dark:bg-gray-900 text-gray-500 dark:text-gray-400 dark:text-gray-500 border-gray-100 hover:bg-gray-50 dark:bg-gray-950"
+                                    : "bg-white dark:bg-gray-900 text-gray-500 dark:text-gray-400 dark:text-gray-500 border-gray-100 hover:bg-gray-50 dark:hover:bg-gray-800 dark:bg-gray-950"
                             )}
                         >
                             {f.replace(/_/g, " ")}
@@ -281,7 +281,7 @@ export default function OwnerBookingsPage() {
                                                 </button>
                                             </DropdownMenuTrigger>
                                             <DropdownMenuContent align="end" className="w-52 rounded-xl p-2 shadow-xl border border-gray-100 bg-white dark:bg-gray-900">
-                                                <DropdownMenuItem className="rounded-lg p-2.5 font-bold text-xs cursor-pointer hover:bg-gray-50 dark:bg-gray-950 flex items-center gap-3">
+                                                <DropdownMenuItem className="rounded-lg p-2.5 font-bold text-xs cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 dark:bg-gray-950 flex items-center gap-3">
                                                     <UserCircle2 size={14} className="text-blue-600" /> Tenant Details
                                                 </DropdownMenuItem>
                                                 {!booking.deletionRequested && (

@@ -65,10 +65,26 @@ export default function UserAuditPage() {
         mutationFn: async () => api.post(`/admin/users/${id}/impersonate`),
         onSuccess: (res) => {
             toast.success("Entering Shadow Mode...");
+            
+            const currentToken = localStorage.getItem("accessToken") || sessionStorage.getItem("accessToken");
+            const currentUser = localStorage.getItem("user") || sessionStorage.getItem("user");
+            
+            if (currentToken && currentUser) {
+                localStorage.setItem("adminOriginalToken", currentToken);
+                localStorage.setItem("adminOriginalUser", currentUser);
+            }
+            
             localStorage.setItem("accessToken", res.data.token);
-            // Redirect to the appropriate dashboard
-            if (user.role === 'OWNER') router.push('/owner');
-            else router.push('/tenant');
+            if (res.data.user) {
+                localStorage.setItem("user", JSON.stringify(res.data.user));
+            }
+            
+            // Redirect using window.location.href to fully reload AuthContext with new credentials
+            if (user.role === 'OWNER') {
+                window.location.href = '/owner';
+            } else {
+                window.location.href = '/tenant';
+            }
         },
         onError: (err: any) => toast.error(err.message)
     });
@@ -400,7 +416,7 @@ export default function UserAuditPage() {
                                     </thead>
                                     <tbody className="divide-y divide-gray-50">
                                         {user.bookings?.map((booking: any) => (
-                                            <tr key={booking.id} className="hover:bg-gray-50 dark:bg-gray-950/50 transition-colors">
+                                            <tr key={booking.id} className="hover:bg-gray-50 dark:hover:bg-gray-800 dark:bg-gray-950/50 transition-colors">
                                                 <td className="px-8 py-6">
                                                     <p className="font-bold text-gray-900 dark:text-white text-sm">{booking.hostel.name}</p>
                                                     <p className="text-[10px] text-gray-400 dark:text-gray-500 uppercase font-bold tracking-tight">Reference: {booking.id}</p>

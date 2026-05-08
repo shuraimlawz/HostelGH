@@ -101,7 +101,7 @@ export default function PromoCarousel() {
                                 </div>
                                 <div className="pt-2">
                                     <Link href={promo.href}>
-                                        <button className="group h-12 px-6 bg-white text-gray-900 rounded-xl font-bold text-[10px] uppercase tracking-widest hover:bg-gray-50 transition-all active:scale-95 flex items-center justify-center gap-2 shadow-lg w-full md:w-auto">
+                                        <button className="group h-12 px-6 bg-white text-gray-900 rounded-xl font-bold text-[10px] uppercase tracking-widest hover:bg-gray-50 dark:hover:bg-gray-800 transition-all active:scale-95 flex items-center justify-center gap-2 shadow-lg w-full md:w-auto">
                                             {promo.cta}
                                             <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
                                         </button>

@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useEffect, useState, ReactNode, useCallback } from "react";
 import { api } from "@/lib/api";
+import { ShieldAlert, X } from "lucide-react";
 
 type User = {
     id: string;
@@ -24,13 +25,16 @@ type AuthContextType = {
     login: (token: string, userData: User, remember?: boolean) => void;
     logout: () => void;
     updateUser: (user: Partial<User>) => void;
+    exitShadowMode: () => void;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
+export function AuthProvider({ children }: { children: ReactNode }) {
     const [user, setUser] = useState<User | null>(null);
     const [isLoading, setIsLoading] = useState(true);
+    const [isShadowMode, setIsShadowMode] = useState(false);
 
     useEffect(() => {
         const initAuth = () => {
@@ -48,6 +52,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                     sessionStorage.removeItem("accessToken");
                 }
             }
+            
+            if (localStorage.getItem("adminOriginalToken")) {
+                setIsShadowMode(true);
+            }
+            
             setIsLoading(false);
         };
         initAuth();
@@ -81,9 +90,45 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         });
     }, []);
 
+    const exitShadowMode = useCallback(() => {
+        const originalToken = localStorage.getItem("adminOriginalToken");
+        const originalUser = localStorage.getItem("adminOriginalUser");
+        
+        if (originalToken && originalUser) {
+            localStorage.setItem("accessToken", originalToken);
+            localStorage.setItem("user", originalUser);
+            
+            localStorage.removeItem("adminOriginalToken");
+            localStorage.removeItem("adminOriginalUser");
+            
+            setUser(JSON.parse(originalUser));
+            setIsShadowMode(false);
+            window.location.href = "/admin";
+        }
+    }, []);
+
     return (
-        <AuthContext.Provider value={{ user, isLoading, login, logout, updateUser }}>
+        <AuthContext.Provider value={{ user, isLoading, login, logout, updateUser, exitShadowMode }}>
             {children}
+            {isShadowMode && (
+                <div className="fixed bottom-6 right-6 z-[9999] animate-in fade-in slide-in-from-bottom-5">
+                    <div className="bg-violet-600 text-white rounded-2xl p-4 shadow-2xl flex items-center gap-4 border-2 border-violet-400/30">
+                        <div className="flex items-center gap-2">
+                            <ShieldAlert className="animate-pulse text-violet-200" size={20} />
+                            <div className="space-y-0.5">
+                                <p className="text-[10px] font-bold uppercase tracking-widest leading-none text-violet-200">System Override</p>
+                                <p className="text-sm font-bold tracking-tight">Shadow Mode Active</p>
+                            </div>
+                        </div>
+                        <button 
+                            onClick={exitShadowMode}
+                            className="h-10 px-4 bg-white text-violet-900 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-violet-50 transition-colors flex items-center gap-2 ml-4"
+                        >
+                            <X size={14} /> Exit
+                        </button>
+                    </div>
+                </div>
+            )}
         </AuthContext.Provider>
     );
 }

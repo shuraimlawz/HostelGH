@@ -153,7 +153,7 @@ export default function AdminDashboardPage() {
                 </div>
 
                 <div className="flex flex-wrap items-center gap-3">
-                    <Link href="/admin/settings" className="h-10 px-5 rounded-xl bg-white dark:bg-gray-900 border border-gray-100 text-[10px] font-bold uppercase tracking-widest hover:bg-gray-50 dark:bg-gray-950 transition-all flex items-center gap-2 shadow-sm">
+                    <Link href="/admin/settings" className="h-10 px-5 rounded-xl bg-white dark:bg-gray-900 border border-gray-100 text-[10px] font-bold uppercase tracking-widest hover:bg-gray-50 dark:hover:bg-gray-800 dark:bg-gray-950 transition-all flex items-center gap-2 shadow-sm">
                         <Settings size={14} /> Configure
                     </Link>
                     <Link href="/admin/logs" className="h-10 px-5 rounded-xl bg-gray-900 text-white text-[10px] font-bold uppercase tracking-widest hover:bg-black transition-all flex items-center gap-2 shadow-lg shadow-gray-900/10">
@@ -516,7 +516,7 @@ function ActivityList({ activities }: any) {
             </div>
             <div className="space-y-4">
                 {activities.slice(0, 10).map((log: any, i: number) => (
-                    <div key={i} className="flex items-center gap-6 p-5 rounded-2xl hover:bg-gray-50 dark:bg-gray-950 transition-all border border-transparent hover:border-gray-100">
+                    <div key={i} className="flex items-center gap-6 p-5 rounded-2xl hover:bg-gray-50 dark:hover:bg-gray-800 dark:bg-gray-950 transition-all border border-transparent hover:border-gray-100">
                         <div className={cn("w-1.5 h-10 rounded-full shrink-0 shadow-sm", log.type === "success" ? "bg-emerald-500" : log.type === "warning" ? "bg-amber-500" : "bg-blue-600")} />
                         <div className="flex-1">
                             <p className="text-sm font-semibold text-gray-800">

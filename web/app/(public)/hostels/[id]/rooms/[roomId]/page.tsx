@@ -312,7 +312,7 @@ export default function RoomDetailPage() {
                                                     "w-full h-16 rounded-[1.5rem] font-bold text-xs uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-3 border shadow-sm",
                                                     hasBooking 
                                                         ? "bg-blue-50 text-blue-600 border-blue-100 hover:bg-blue-100" 
-                                                        : "bg-white text-gray-900 border-gray-100 hover:bg-gray-50"
+                                                        : "bg-white text-gray-900 border-gray-100 hover:bg-gray-50 dark:hover:bg-gray-800"
                                                 )}
                                             >
                                                 <WhatsAppIcon size={18} />

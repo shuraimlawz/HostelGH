@@ -75,7 +75,7 @@ export default function AdminLogsPage() {
                             </TableHeader>
                             <TableBody>
                                 {activities.map((log: any, i: number) => (
-                                    <TableRow key={i} className="hover:bg-gray-50 dark:bg-gray-950/50 transition-colors group">
+                                    <TableRow key={i} className="hover:bg-gray-50 dark:hover:bg-gray-800 dark:bg-gray-950/50 transition-colors group">
                                         <TableCell className="py-6 px-8">
                                             <div className={cn(
                                                 "w-2.5 h-2.5 rounded-full",

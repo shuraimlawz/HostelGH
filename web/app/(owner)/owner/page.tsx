@@ -337,7 +337,7 @@ export default function OwnerDashboardPage() {
                             </thead>
                             <tbody className="divide-y divide-gray-50">
                                 {filteredBookings.slice(0, 10).map((booking: any) => (
-                                    <tr key={booking.id} className="hover:bg-gray-50 dark:bg-gray-950/50 transition-all group/row">
+                                    <tr key={booking.id} className="hover:bg-gray-50 dark:hover:bg-gray-800 dark:bg-gray-950/50 transition-all group/row">
                                         <td className="px-8 py-6">
                                             <div className="flex items-center gap-4">
                                                 <div className="w-10 h-10 bg-gray-900 text-white rounded-xl flex items-center justify-center font-bold text-xs shadow-md shadow-gray-200">

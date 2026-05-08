@@ -230,7 +230,7 @@ export default function Navbar() {
                                     <div className="lg:hidden px-2 mb-2">
                                         <Link
                                             href="/hostels"
-                                            className="flex items-center gap-3 px-5 py-3 rounded-2xl hover:bg-gray-50 text-xs font-bold text-gray-900 transition-colors"
+                                            className="flex items-center gap-3 px-5 py-3 rounded-2xl hover:bg-gray-50 dark:hover:bg-gray-800 text-xs font-bold text-gray-900 transition-colors"
                                             onClick={() => setIsOpen(false)}
                                         >
                                             <Home size={16} className="text-gray-400" />
@@ -257,7 +257,7 @@ export default function Navbar() {
                                                             "flex items-center gap-3 px-4 py-3 rounded-2xl text-xs font-bold transition-all group",
                                                             isActive(item.href) 
                                                                 ? "bg-blue-50 text-blue-600 shadow-sm" 
-                                                                : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                                                                : "text-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-900"
                                                         )}
                                                         onClick={() => setIsOpen(false)}
                                                     >
@@ -281,14 +281,14 @@ export default function Navbar() {
                                         <div className="px-2 space-y-1">
                                             <button
                                                 onClick={() => { setIsOpen(false); open("login"); }}
-                                                className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-xs font-bold text-gray-900 hover:bg-gray-50 transition-all"
+                                                className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-xs font-bold text-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all"
                                             >
                                                 <UserIcon size={16} className="text-gray-400" />
                                                 Log In
                                             </button>
                                             <button
                                                 onClick={() => { setIsOpen(false); open("register"); }}
-                                                className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-xs font-bold text-gray-700 hover:bg-gray-50 transition-all"
+                                                className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-xs font-bold text-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all"
                                             >
                                                 <CreditCard size={16} className="text-gray-400" />
                                                 Join Now

@@ -66,7 +66,7 @@ export default function ImageUpload({ value, onChange, maxImages = 10 }: ImageUp
 
                 {value.length < maxImages && (
                     <label className={cn(
-                        "relative aspect-square rounded-2xl border-2 border-dashed border-gray-200 flex flex-col items-center justify-center gap-3 cursor-pointer transition-all hover:border-black hover:bg-gray-50 active:scale-[0.98]",
+                        "relative aspect-square rounded-2xl border-2 border-dashed border-gray-200 flex flex-col items-center justify-center gap-3 cursor-pointer transition-all hover:border-black hover:bg-gray-50 dark:hover:bg-gray-800 active:scale-[0.98]",
                         uploading && "opacity-50 cursor-not-allowed pointer-events-none"
                     )}>
                         {uploading ? (

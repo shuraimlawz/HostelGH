@@ -199,7 +199,7 @@ export default function HostelFilters() {
                 <div className="hidden lg:block w-px h-8 bg-gray-200 dark:bg-slate-800 mx-2" />
 
                 {/* Desktop-Only University Select */}
-                <div className="hidden lg:flex w-full lg:w-56 relative hover:bg-gray-50 dark:hover:bg-slate-800/50 rounded-xl lg:rounded-2xl transition-colors">
+                <div className="hidden lg:flex w-full lg:w-56 relative hover:bg-gray-50 dark:hover:bg-gray-800 dark:hover:bg-slate-800/50 rounded-xl lg:rounded-2xl transition-colors">
                     <School className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
                     <select
                         value={university}
@@ -225,7 +225,7 @@ export default function HostelFilters() {
                 <div className="hidden lg:block w-px h-8 bg-gray-200 dark:bg-slate-800 mx-2" />
 
                 {/* Desktop-Only Tenant Type */}
-                <div className="hidden lg:flex w-full lg:w-48 relative hover:bg-gray-50 dark:hover:bg-slate-800/50 rounded-xl lg:rounded-2xl transition-colors">
+                <div className="hidden lg:flex w-full lg:w-48 relative hover:bg-gray-50 dark:hover:bg-gray-800 dark:hover:bg-slate-800/50 rounded-xl lg:rounded-2xl transition-colors">
                     <Users className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
                     <select
                         value={gender}

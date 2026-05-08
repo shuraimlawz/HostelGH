@@ -176,12 +176,12 @@ export default function OwnerHostelsPage() {
                                             </button>
                                         </DropdownMenuTrigger>
                                         <DropdownMenuContent align="end" className="w-48 rounded-xl p-2 shadow-xl border border-gray-100 bg-white dark:bg-gray-900">
-                                            <DropdownMenuItem asChild className="rounded-lg p-2.5 font-bold text-xs cursor-pointer hover:bg-gray-50 dark:bg-gray-950 flex items-center gap-3">
+                                            <DropdownMenuItem asChild className="rounded-lg p-2.5 font-bold text-xs cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 dark:bg-gray-950 flex items-center gap-3">
                                                 <Link href={`/hostels/${hostel.id}`} target="_blank">
                                                     <ArrowUpRight size={14} className="text-blue-600" /> Preview Listing
                                                 </Link>
                                             </DropdownMenuItem>
-                                            <DropdownMenuItem asChild className="rounded-lg p-2.5 font-bold text-xs cursor-pointer hover:bg-gray-50 dark:bg-gray-950 flex items-center gap-3">
+                                            <DropdownMenuItem asChild className="rounded-lg p-2.5 font-bold text-xs cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 dark:bg-gray-950 flex items-center gap-3">
                                                 <Link href={`/owner/hostels/${hostel.id}/edit`}>
                                                     <Settings2 size={14} className="text-gray-500 dark:text-gray-400 dark:text-gray-500" /> Operational Config
                                                 </Link>

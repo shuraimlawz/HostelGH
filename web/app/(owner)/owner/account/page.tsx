@@ -224,7 +224,7 @@ export default function OwnerAccountPage() {
                                 <div className="absolute -bottom-2 -right-2 flex gap-1">
                                     <button
                                         onClick={() => document.getElementById('avatar-upload')?.click()}
-                                        className="bg-white dark:bg-gray-900 border border-gray-100 shadow-sm rounded-xl p-2.5 hover:bg-gray-50 dark:bg-gray-950 transition-all text-blue-600"
+                                        className="bg-white dark:bg-gray-900 border border-gray-100 shadow-sm rounded-xl p-2.5 hover:bg-gray-50 dark:hover:bg-gray-800 dark:bg-gray-950 transition-all text-blue-600"
                                         title="Change avatar"
                                     >
                                         <Camera size={18} />

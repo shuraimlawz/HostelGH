@@ -62,7 +62,7 @@ export default function TenantSidebar({ isOpen = false, onClose = () => { } }: T
                                 "flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-200 group relative",
                                 isActive
                                     ? "bg-blue-50 text-blue-700"
-                                    : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"
+                                    : "text-gray-500 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-900"
                             )}
                         >
                             <div className="flex items-center gap-3.5">

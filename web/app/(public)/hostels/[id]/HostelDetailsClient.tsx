@@ -153,10 +153,10 @@ export default function HostelDetailsClient() {
                             <span className="underline cursor-pointer">{hostel.city}, Ghana</span>
                         </div>
                         <div className="flex items-center gap-4 text-sm font-medium underline">
-                            <button onClick={handleShare} className="flex items-center gap-2 hover:bg-gray-50 px-2 py-1.5 rounded-lg transition-colors">
+                            <button onClick={handleShare} className="flex items-center gap-2 hover:bg-gray-50 dark:hover:bg-gray-800 px-2 py-1.5 rounded-lg transition-colors">
                                 <Share size={16} /> Share
                             </button>
-                            <button onClick={() => toggleFavorite.mutate()} className="flex items-center gap-2 hover:bg-gray-50 px-2 py-1.5 rounded-lg transition-colors">
+                            <button onClick={() => toggleFavorite.mutate()} className="flex items-center gap-2 hover:bg-gray-50 dark:hover:bg-gray-800 px-2 py-1.5 rounded-lg transition-colors">
                                 <Heart size={16} className={favoriteStatus?.favorited ? "fill-red-500 text-red-500" : ""} /> 
                                 {favoriteStatus?.favorited ? "Saved" : "Save"}
                             </button>
@@ -185,7 +185,7 @@ export default function HostelDetailsClient() {
                         ))}
                     </div>
                     {hostel.images?.length > 0 && (
-                        <button className="absolute bottom-6 right-6 px-4 py-1.5 bg-white border border-black rounded-lg text-[14px] font-semibold flex items-center gap-2 hover:bg-gray-50 transition shadow-sm">
+                        <button className="absolute bottom-6 right-6 px-4 py-1.5 bg-white border border-black rounded-lg text-[14px] font-semibold flex items-center gap-2 hover:bg-gray-50 dark:hover:bg-gray-800 transition shadow-sm">
                             <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" style={{display:"block",height:"16px",width:"16px",fill:"currentColor"}}><path d="M3 3h2v2H3V3zm4 0h2v2H7V3zm4 0h2v2h-2V3zM3 7h2v2H3V7zm4 0h2v2H7V7zm4 0h2v2h-2V7zM3 11h2v2H3v-2zm4 0h2v2H7v-2zm4 0h2v2h-2v-2z"></path></svg>
                             Show all photos
                         </button>
@@ -302,7 +302,7 @@ export default function HostelDetailsClient() {
                                     </div>
                                 ))}
                             </div>
-                            <button className="mt-8 px-6 py-3 border border-black rounded-lg text-[16px] font-semibold hover:bg-gray-50 transition">
+                            <button className="mt-8 px-6 py-3 border border-black rounded-lg text-[16px] font-semibold hover:bg-gray-50 dark:hover:bg-gray-800 transition">
                                 Show all amenities
                             </button>
                         </div>
@@ -426,7 +426,7 @@ export default function HostelDetailsClient() {
                         ))}
                     </div>
                     {hostel.reviews?.length > 6 && (
-                        <button className="mt-10 px-6 py-3 border border-black rounded-lg text-[16px] font-semibold hover:bg-gray-50 transition">
+                        <button className="mt-10 px-6 py-3 border border-black rounded-lg text-[16px] font-semibold hover:bg-gray-50 dark:hover:bg-gray-800 transition">
                             Show all {hostel.reviews.length} reviews
                         </button>
                     )}

@@ -73,7 +73,7 @@ export function ConfirmModal({
                                 variant="outline"
                                 onClick={onClose}
                                 disabled={isLoading}
-                                className="rounded-2xl h-12 text-xs font-bold border-gray-100 hover:bg-gray-50 uppercase tracking-widest flex-1"
+                                className="rounded-2xl h-12 text-xs font-bold border-gray-100 hover:bg-gray-50 dark:hover:bg-gray-800 uppercase tracking-widest flex-1"
                             >
                                 {cancelText}
                             </Button>

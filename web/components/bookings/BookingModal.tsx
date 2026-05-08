@@ -480,7 +480,7 @@ export default function BookingModal({
                                         else if (step === "summary") setStep("kyc");
                                         else if (step === "payment") setStep("summary");
                                     }}
-                                    className="flex-1 py-2.5 border border-gray-200 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors"
+                                    className="flex-1 py-2.5 border border-gray-200 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
                                 >
                                     Back
                                 </button>

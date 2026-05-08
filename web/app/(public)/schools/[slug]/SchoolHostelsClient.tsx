@@ -226,7 +226,7 @@ function SchoolContent({ slug, school }: { slug: string; school: (typeof SCHOOLS
                     </p>
                     <Link
                         href="/auth/register?role=OWNER"
-                        className="inline-block bg-white text-gray-900 px-8 py-3 rounded-xl font-bold text-sm hover:bg-gray-50 transition-colors shadow-xl"
+                        className="inline-block bg-white text-gray-900 px-8 py-3 rounded-xl font-bold text-sm hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors shadow-xl"
                     >
                         List Your Hostel — It's Free
                     </Link>

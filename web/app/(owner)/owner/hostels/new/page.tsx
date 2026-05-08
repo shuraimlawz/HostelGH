@@ -467,7 +467,7 @@ export default function NewHostelPage() {
                         <button
                             type="button"
                             onClick={() => setStep(s => s - 1)}
-                            className="px-5 py-2.5 text-sm font-medium text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50 dark:bg-gray-950 transition-colors"
+                            className="px-5 py-2.5 text-sm font-medium text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 dark:bg-gray-950 transition-colors"
                         >
                             Back
                         </button>

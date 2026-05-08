@@ -177,7 +177,7 @@ function AdminBookingsContent() {
                             </thead>
                             <tbody className="divide-y divide-gray-50">
                                 {bookings.map((booking: any) => (
-                                    <tr key={booking.id} className="hover:bg-gray-50 dark:bg-gray-950 transition-all group">
+                                    <tr key={booking.id} className="hover:bg-gray-50 dark:hover:bg-gray-800 dark:bg-gray-950 transition-all group">
                                         <td className="px-8 py-6">
                                             <div>
                                                 <p className="font-bold text-gray-900 dark:text-white font-mono text-[10px] mb-1">#{booking.id.substring(0, 12).toUpperCase()}</p>

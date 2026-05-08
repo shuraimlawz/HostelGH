@@ -537,7 +537,7 @@ function AddRoomForm({ onCancel, onSave, isLoading }: any) {
                 </div>
             </div>
             <div className="flex gap-3 mt-8">
-                <button type="button" onClick={onCancel} className="flex-1 py-4 font-bold text-gray-500 dark:text-gray-400 dark:text-gray-500 hover:bg-gray-50 dark:bg-gray-950 rounded-2xl transition-colors text-sm">Cancel</button>
+                <button type="button" onClick={onCancel} className="flex-1 py-4 font-bold text-gray-500 dark:text-gray-400 dark:text-gray-500 hover:bg-gray-50 dark:hover:bg-gray-800 dark:bg-gray-950 rounded-2xl transition-colors text-sm">Cancel</button>
                 <button
                     disabled={isLoading}
                     className="flex-1 bg-black text-white py-4 rounded-2xl font-bold shadow-lg shadow-black/10 hover:opacity-90 active:scale-95 transition-all text-sm flex items-center justify-center gap-2"

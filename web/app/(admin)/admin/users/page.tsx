@@ -296,7 +296,7 @@ function AdminUsersContent() {
                             </thead>
                             <tbody className="divide-y divide-gray-50">
                                 {users.map((user: any) => (
-                                    <tr key={user.id} className={cn("hover:bg-gray-50 dark:bg-gray-950/50 transition-all group", !user.isActive && "opacity-60")}>
+                                    <tr key={user.id} className={cn("hover:bg-gray-50 dark:hover:bg-gray-800 dark:bg-gray-950/50 transition-all group", !user.isActive && "opacity-60")}>
                                         <td className="px-8 py-6">
                                             <div className="flex items-center gap-4">
                                                 <div className="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center text-blue-600 font-bold text-lg shadow-inner overflow-hidden shrink-0 border border-gray-100">

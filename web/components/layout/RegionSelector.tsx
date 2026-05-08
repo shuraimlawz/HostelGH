@@ -58,7 +58,7 @@ export default function RegionSelector() {
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
-                <div className="hidden md:flex items-center justify-center w-10 h-10 rounded-xl hover:bg-gray-50 cursor-pointer transition-all mr-1 group border border-transparent hover:border-gray-200">
+                <div className="hidden md:flex items-center justify-center w-10 h-10 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer transition-all mr-1 group border border-transparent hover:border-gray-200">
                     <div className="relative">
                         <Globe size={18} className={cn(
                             "transition-all duration-300",
@@ -83,7 +83,7 @@ export default function RegionSelector() {
                         onClick={() => handleSelect("All")}
                         className={cn(
                             "mx-2 px-4 py-3 cursor-pointer flex items-center justify-between transition-all rounded-2xl mb-1",
-                            !currentRegion ? "bg-blue-50 text-blue-600 font-bold" : "hover:bg-gray-50"
+                            !currentRegion ? "bg-blue-50 text-blue-600 font-bold" : "hover:bg-gray-50 dark:hover:bg-gray-800"
                         )}
                     >
                         <div className="flex items-center gap-4">
@@ -103,7 +103,7 @@ export default function RegionSelector() {
                             onClick={() => handleSelect(r.name)}
                             className={cn(
                                 "mx-2 px-4 py-3 cursor-pointer flex items-center justify-between transition-all rounded-2xl mb-1",
-                                currentRegion === r.name ? "bg-blue-50 text-blue-600 font-bold" : "hover:bg-gray-50"
+                                currentRegion === r.name ? "bg-blue-50 text-blue-600 font-bold" : "hover:bg-gray-50 dark:hover:bg-gray-800"
                             )}
                         >
                             <div className="flex items-center gap-4">
