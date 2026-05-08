@@ -3,11 +3,13 @@ import CityCarousel from "@/components/home/CityCarousel";
 import FeaturedHostels from "@/components/home/FeaturedHostels";
 import HomeDiscovery from "@/components/home/HomeDiscovery";
 import HowItWorks from "@/components/home/HowItWorks";
+import MarketLeaders from "@/components/home/MarketLeaders";
 
 export default function LandingPage() {
     return (
         <div className="pb-20">
             <HeroSearch />
+            <MarketLeaders />
             <HowItWorks />
 
             <div className="container mx-auto px-4 md:px-10 mt-8">
