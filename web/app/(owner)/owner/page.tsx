@@ -145,7 +145,7 @@ export default function OwnerDashboardPage() {
     };
 
     return (
-        <div className="max-w-[1400px] mx-auto space-y-10 pb-20 pt-4 px-4">
+        <div className="max-w-[1400px] mx-auto space-y-10 pb-20 pt-16 md:pt-4 px-4">
             {/* Header */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 pb-4">
                 <div className="space-y-2">
@@ -313,9 +313,9 @@ export default function OwnerDashboardPage() {
                     </div>
                 </div>
 
-                <div className="overflow-x-auto">
+                <div>
                     {filteredBookings.length === 0 ? (
-                        <div className="p-24 text-center space-y-4">
+                        <div className="p-16 text-center space-y-4">
                             <div className="w-16 h-16 bg-gray-50 dark:bg-gray-950 rounded-2xl flex items-center justify-center mx-auto text-gray-200 border border-gray-100 shadow-inner">
                                 <Activity size={32} />
                             </div>
@@ -325,56 +325,87 @@ export default function OwnerDashboardPage() {
                             </div>
                         </div>
                     ) : (
-                        <table className="w-full text-left border-collapse">
-                            <thead>
-                                <tr className="bg-gray-50 dark:bg-gray-950/50">
-                                    <th className="px-8 py-5 text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">Student Info</th>
-                                    <th className="px-8 py-5 text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">Hostel & Room</th>
-                                    <th className="px-8 py-5 text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">Date</th>
-                                    <th className="px-8 py-5 text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">Status</th>
-                                    <th className="px-8 py-5 text-right text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">View</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-gray-50">
+                        <>
+                            {/* Mobile card list */}
+                            <div className="md:hidden divide-y divide-gray-50">
                                 {filteredBookings.slice(0, 10).map((booking: any) => (
-                                    <tr key={booking.id} className="hover:bg-gray-50 dark:hover:bg-gray-800 dark:bg-gray-950/50 transition-all group/row">
-                                        <td className="px-8 py-6">
-                                            <div className="flex items-center gap-4">
-                                                <div className="w-10 h-10 bg-gray-900 text-white rounded-xl flex items-center justify-center font-bold text-xs shadow-md shadow-gray-200">
-                                                    {booking.user?.firstName?.[0] || 'U'}
-                                                </div>
-                                                <div className="min-w-0">
-                                                    <p className="font-bold text-gray-900 dark:text-white text-sm tracking-tight truncate max-w-[150px]">{booking.user?.firstName || 'Guest'} {booking.user?.lastName || ''}</p>
-                                                    <p className="text-[10px] text-gray-400 dark:text-gray-500 font-bold uppercase tracking-widest truncate">{booking.user?.email || 'No email provided'}</p>
-                                                </div>
+                                    <div key={booking.id} className="p-5 flex items-start gap-4 hover:bg-gray-50 dark:hover:bg-gray-900/50 transition-all">
+                                        <div className="w-10 h-10 bg-gray-900 text-white rounded-xl flex items-center justify-center font-bold text-xs shadow-md shrink-0">
+                                            {booking.user?.firstName?.[0] || 'U'}
+                                        </div>
+                                        <div className="flex-1 min-w-0">
+                                            <div className="flex items-start justify-between gap-2">
+                                                <p className="font-bold text-gray-900 dark:text-white text-sm truncate">{booking.user?.firstName || 'Guest'} {booking.user?.lastName || ''}</p>
+                                                <span className={cn("px-2 py-1 rounded-lg text-[9px] font-bold uppercase tracking-widest border shrink-0", getStatusStyles(booking.status))}>
+                                                    {booking.status.replace(/_/g, " ")}
+                                                </span>
                                             </div>
-                                        </td>
-                                        <td className="px-8 py-6">
-                                            <p className="font-bold text-gray-900 dark:text-white text-sm tracking-tight">{booking.hostel?.name || "Unknown Hostel"}</p>
-                                            <p className="text-[10px] text-blue-600 font-bold uppercase tracking-widest mt-0.5">{booking.items?.[0]?.room?.name || "Shared Occupancy"}</p>
-                                        </td>
-                                        <td className="px-8 py-6">
-                                            <span className="text-[11px] font-bold text-gray-900 dark:text-white bg-gray-50 dark:bg-gray-950 px-2 py-1 rounded-md border border-gray-100">
-                                                {new Date(booking.items?.[0]?.startDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
-                                            </span>
-                                        </td>
-                                        <td className="px-8 py-6">
-                                            <span className={cn("px-2.5 py-1.5 rounded-lg text-[9px] font-bold uppercase tracking-widest border", getStatusStyles(booking.status))}>
-                                                {booking.status.replace(/_/g, " ")}
-                                            </span>
-                                        </td>
-                                        <td className="px-8 py-6 text-right">
-                                            <Link
-                                                href={`/owner/bookings/${booking.id}`}
-                                                className="w-10 h-10 inline-flex items-center justify-center bg-white dark:bg-gray-900 border border-gray-100 rounded-xl text-gray-400 dark:text-gray-500 hover:text-blue-600 hover:border-blue-200 transition-all shadow-sm"
-                                            >
-                                                <Eye size={18} />
-                                            </Link>
-                                        </td>
-                                    </tr>
+                                            <p className="text-[10px] text-gray-400 dark:text-gray-500 font-bold uppercase tracking-widest truncate mt-0.5">{booking.hostel?.name || "Unknown Hostel"}</p>
+                                            <div className="flex items-center justify-between mt-2">
+                                                <p className="text-[10px] text-blue-600 font-bold">{booking.items?.[0]?.room?.name || "Shared"}</p>
+                                                <Link href={`/owner/bookings/${booking.id}`} className="text-[10px] font-bold text-gray-400 dark:text-gray-500 hover:text-blue-600 flex items-center gap-1">
+                                                    View <Eye size={12} />
+                                                </Link>
+                                            </div>
+                                        </div>
+                                    </div>
                                 ))}
-                            </tbody>
-                        </table>
+                            </div>
+
+                            {/* Desktop table */}
+                            <div className="hidden md:block overflow-x-auto">
+                                <table className="w-full text-left border-collapse">
+                                    <thead>
+                                        <tr className="bg-gray-50 dark:bg-gray-950/50">
+                                            <th className="px-8 py-5 text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">Student Info</th>
+                                            <th className="px-8 py-5 text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">Hostel & Room</th>
+                                            <th className="px-8 py-5 text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">Date</th>
+                                            <th className="px-8 py-5 text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">Status</th>
+                                            <th className="px-8 py-5 text-right text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">View</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-gray-50">
+                                        {filteredBookings.slice(0, 10).map((booking: any) => (
+                                            <tr key={booking.id} className="hover:bg-gray-50 dark:hover:bg-gray-800 dark:bg-gray-950/50 transition-all group/row">
+                                                <td className="px-8 py-6">
+                                                    <div className="flex items-center gap-4">
+                                                        <div className="w-10 h-10 bg-gray-900 text-white rounded-xl flex items-center justify-center font-bold text-xs shadow-md shadow-gray-200">
+                                                            {booking.user?.firstName?.[0] || 'U'}
+                                                        </div>
+                                                        <div className="min-w-0">
+                                                            <p className="font-bold text-gray-900 dark:text-white text-sm tracking-tight truncate max-w-[150px]">{booking.user?.firstName || 'Guest'} {booking.user?.lastName || ''}</p>
+                                                            <p className="text-[10px] text-gray-400 dark:text-gray-500 font-bold uppercase tracking-widest truncate">{booking.user?.email || 'No email provided'}</p>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td className="px-8 py-6">
+                                                    <p className="font-bold text-gray-900 dark:text-white text-sm tracking-tight">{booking.hostel?.name || "Unknown Hostel"}</p>
+                                                    <p className="text-[10px] text-blue-600 font-bold uppercase tracking-widest mt-0.5">{booking.items?.[0]?.room?.name || "Shared Occupancy"}</p>
+                                                </td>
+                                                <td className="px-8 py-6">
+                                                    <span className="text-[11px] font-bold text-gray-900 dark:text-white bg-gray-50 dark:bg-gray-950 px-2 py-1 rounded-md border border-gray-100">
+                                                        {new Date(booking.items?.[0]?.startDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
+                                                    </span>
+                                                </td>
+                                                <td className="px-8 py-6">
+                                                    <span className={cn("px-2.5 py-1.5 rounded-lg text-[9px] font-bold uppercase tracking-widest border", getStatusStyles(booking.status))}>
+                                                        {booking.status.replace(/_/g, " ")}
+                                                    </span>
+                                                </td>
+                                                <td className="px-8 py-6 text-right">
+                                                    <Link
+                                                        href={`/owner/bookings/${booking.id}`}
+                                                        className="w-10 h-10 inline-flex items-center justify-center bg-white dark:bg-gray-900 border border-gray-100 rounded-xl text-gray-400 dark:text-gray-500 hover:text-blue-600 hover:border-blue-200 transition-all shadow-sm"
+                                                    >
+                                                        <Eye size={18} />
+                                                    </Link>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </>
                     )}
                 </div>
                 <div className="p-8 bg-gray-50 dark:bg-gray-950/30 text-center border-t border-gray-50">

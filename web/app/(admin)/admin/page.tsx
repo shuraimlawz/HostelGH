@@ -156,7 +156,7 @@ export default function AdminDashboardPage() {
     const totalRevenue = financials?.totalVolume || stats?.revenue || 0;
 
     return (
-        <div className="max-w-[1400px] mx-auto space-y-10 pb-20 pt-4 px-4">
+        <div className="max-w-[1400px] mx-auto space-y-10 pb-20 pt-16 lg:pt-4 px-4">
             {/* Header */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 pb-4">
                 <div className="space-y-2">
@@ -195,7 +195,7 @@ export default function AdminDashboardPage() {
 
                 {/* --- OVERVIEW --- */}
                 <TabsContent value="overview" className="space-y-10 animate-in fade-in duration-500">
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-4 sm:gap-6">
                         <StatCard label="Live Hostels" value={stats?.liveHostels || 0} icon={Building2} />
                         <StatCard label="Total Users" value={stats?.totalUsers || 0} icon={Users} trend={stats?.trends?.users} up />
                         <StatCard label="Total Bookings" value={stats?.bookings || 0} icon={CalendarCheck} />

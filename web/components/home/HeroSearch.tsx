@@ -164,6 +164,10 @@ export default function HeroSearch() {
                                     placeholder="School, city, or area..."
                                     className="w-full text-white group-focus-within:text-gray-900 placeholder:text-gray-500 font-bold bg-transparent border-none outline-none text-sm uppercase tracking-widest"
                                     value={city}
+                                    autoComplete="off"
+                                    autoCorrect="off"
+                                    autoCapitalize="off"
+                                    spellCheck={false}
                                     onChange={(e) => setCity(e.target.value)}
                                     onFocus={() => setIsFocused(true)}
                                     onBlur={() => setTimeout(() => setIsFocused(false), 200)}

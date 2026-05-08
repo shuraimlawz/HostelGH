@@ -116,7 +116,7 @@ export default function TenantDashboardPage() {
     const profileCompletion = Math.round((completedFields / profileFields.length) * 100);
 
     return (
-        <div className="max-w-[1400px] mx-auto space-y-10 pb-20 pt-4 px-4">
+        <div className="max-w-[1400px] mx-auto space-y-10 pb-20 pt-16 md:pt-4 px-4">
             {/* Header */}
             <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-8 pb-4">
                 <div className="space-y-2">
