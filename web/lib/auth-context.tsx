@@ -110,7 +110,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         <AuthContext.Provider value={{ user, isLoading, login, logout, updateUser, exitShadowMode }}>
             {children}
             {isShadowMode && (
-                <div className="fixed bottom-6 right-6 z-[9999] animate-in fade-in slide-in-from-bottom-5">
+                <div className="fixed bottom-6 left-6 z-[9999] animate-in fade-in slide-in-from-bottom-5">
                     <div className="bg-violet-600 text-white rounded-2xl p-4 shadow-2xl flex items-center gap-4 border-2 border-violet-400/30">
                         <div className="flex items-center gap-2">
                             <ShieldAlert className="animate-pulse text-violet-200" size={20} />
