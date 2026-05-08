@@ -341,11 +341,11 @@ export default function OwnerDashboardPage() {
                                         <td className="px-8 py-6">
                                             <div className="flex items-center gap-4">
                                                 <div className="w-10 h-10 bg-gray-900 text-white rounded-xl flex items-center justify-center font-bold text-xs shadow-md shadow-gray-200">
-                                                    {booking.user.firstName?.[0] || 'U'}
+                                                    {booking.user?.firstName?.[0] || 'U'}
                                                 </div>
                                                 <div className="min-w-0">
-                                                    <p className="font-bold text-gray-900 dark:text-white text-sm tracking-tight truncate max-w-[150px]">{booking.user.firstName} {booking.user.lastName}</p>
-                                                    <p className="text-[10px] text-gray-400 dark:text-gray-500 font-bold uppercase tracking-widest truncate">{booking.user.email}</p>
+                                                    <p className="font-bold text-gray-900 dark:text-white text-sm tracking-tight truncate max-w-[150px]">{booking.user?.firstName || 'Guest'} {booking.user?.lastName || ''}</p>
+                                                    <p className="text-[10px] text-gray-400 dark:text-gray-500 font-bold uppercase tracking-widest truncate">{booking.user?.email || 'No email provided'}</p>
                                                 </div>
                                             </div>
                                         </td>

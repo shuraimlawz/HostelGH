@@ -223,10 +223,10 @@ export default function TenantDashboardPage() {
                                         </span>
                                     </div>
                                     <div className="space-y-1">
-                                        <h3 className="text-2xl font-bold text-gray-900 dark:text-white tracking-tight">{nextBooking.hostel.name}</h3>
+                                        <h3 className="text-2xl font-bold text-gray-900 dark:text-white tracking-tight">{nextBooking.hostel?.name || "Unknown Hostel"}</h3>
                                         <div className="flex items-center gap-2 text-gray-400 dark:text-gray-500 text-sm font-medium">
                                             <MapPin size={14} className="text-blue-500" />
-                                            {nextBooking.hostel.location}
+                                            {nextBooking.hostel?.location || "Location not provided"}
                                         </div>
                                     </div>
                                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 pt-6 border-t border-gray-50">
@@ -304,7 +304,7 @@ export default function TenantDashboardPage() {
                                         <div key={booking.id} className="flex gap-5 group cursor-pointer">
                                             <div className="w-1.5 h-10 rounded-full bg-blue-500 group-hover:bg-blue-600 transition-colors shrink-0" />
                                             <div className="flex-1 min-w-0">
-                                                <p className="text-sm font-bold text-gray-900 dark:text-white truncate mb-1">{booking.hostel.name}</p>
+                                                <p className="text-sm font-bold text-gray-900 dark:text-white truncate mb-1">{booking.hostel?.name || "Unknown Hostel"}</p>
                                                 <div className="flex items-center justify-between">
                                                     <span className="text-[9px] text-gray-400 dark:text-gray-500 font-bold uppercase tracking-widest">#{booking?.id?.slice(-6)?.toUpperCase() || "UNKNOWN"}</span>
                                                     <span className={cn("text-[8px] font-bold px-2 py-0.5 rounded-md uppercase tracking-widest border", 
