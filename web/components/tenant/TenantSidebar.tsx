@@ -19,10 +19,9 @@ import { useAuth } from "@/lib/auth-context";
 
 const links = [
     { name: "Dashboard", href: "/tenant", icon: LayoutDashboard },
-    { name: "My Profile", href: "/account", icon: User },
-    { name: "My Bookings", href: "/bookings", icon: CalendarCheck },
-
-    { name: "Settings", href: "/account/settings", icon: Settings },
+    { name: "My Profile", href: "/tenant/account", icon: User },
+    { name: "My Bookings", href: "/tenant/bookings", icon: CalendarCheck },
+    { name: "Settings", href: "/tenant/settings", icon: Settings },
 ];
 
 interface TenantSidebarProps {
@@ -52,7 +51,9 @@ export default function TenantSidebar({ isOpen = false, onClose = () => { } }: T
             {/* Main Nav */}
             <nav className="space-y-1.5 flex-1">
                 {links.map((link) => {
-                    const isActive = pathname === link.href;
+                    const isActive = link.href === "/tenant"
+                        ? pathname === "/tenant"
+                        : pathname.startsWith(link.href);
                     return (
                         <Link
                             key={link.href}
