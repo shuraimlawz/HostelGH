@@ -1,5 +1,5 @@
 import { Injectable, OnModuleInit, Logger, Inject } from "@nestjs/common";
-import { MeiliSearch, Index } from "meilisearch";
+import { Meilisearch, Index } from "meilisearch";
 import { PrismaService } from "../../prisma/prisma.service";
 
 @Injectable()
@@ -8,7 +8,7 @@ export class SearchService implements OnModuleInit {
   private readonly indexName = "hostels";
 
   constructor(
-    @Inject("MEILISEARCH_CLIENT") private readonly meiliClient: MeiliSearch,
+    @Inject("MEILISEARCH_CLIENT") private readonly meiliClient: Meilisearch,
     private readonly prisma: PrismaService,
   ) {}
 

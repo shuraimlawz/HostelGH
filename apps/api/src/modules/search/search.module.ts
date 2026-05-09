@@ -4,7 +4,7 @@ import { BullModule } from "@nestjs/bullmq";
 import { SearchService } from "./search.service";
 import { PrismaModule } from "../../prisma/prisma.module";
 import { HostelProcessor } from "./hostel.processor";
-import { MeiliSearch } from "meilisearch";
+import { Meilisearch } from "meilisearch";
 
 @Module({
   imports: [
@@ -21,7 +21,7 @@ import { MeiliSearch } from "meilisearch";
       useFactory: (config: ConfigService) => {
         const host = config.get<string>("MEILISEARCH_HOST") || "http://localhost:7700";
         const apiKey = config.get<string>("MEILISEARCH_KEY");
-        return new MeiliSearch({ host, apiKey });
+        return new Meilisearch({ host, apiKey });
       },
       inject: [ConfigService],
     },
