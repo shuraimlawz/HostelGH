@@ -597,6 +597,9 @@ export class HostelsService {
         sort,
         limit: take,
         offset: skip,
+        lat: searchParams.lat,
+        lng: searchParams.lng,
+        radius: searchParams.radius,
       });
 
       if (esResults && esResults.data.length > 0) {

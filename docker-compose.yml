@@ -1,4 +1,3 @@
-version: '3.8'
 services:
   postgres:
     image: postgres:15
@@ -65,31 +64,18 @@ services:
     networks:
       - hostel_net
 
-  elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:8.11.1
-    container_name: hostel_elasticsearch
+  meilisearch:
+    image: getmeili/meilisearch:latest
+    container_name: hostel_meilisearch
     environment:
-      - discovery.type=single-node
-      - xpack.security.enabled=false
-      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - MEILI_MASTER_KEY=${MEILISEARCH_KEY:-masterKey}
+      - MEILI_NO_ANALYTICS=true
     ports:
-      - "9200:9200"
+      - "7700:7700"
     networks:
       - hostel_net
     volumes:
-      - es_data:/usr/share/elasticsearch/data
-
-  kibana:
-    image: docker.elastic.co/kibana/kibana:8.11.1
-    container_name: hostel_kibana
-    environment:
-      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
-    ports:
-      - "5601:5601"
-    depends_on:
-      - elasticsearch
-    networks:
-      - hostel_net
+      - meili_data:/meili_data
 
 networks:
   hostel_net:
@@ -97,4 +83,4 @@ networks:
 
 volumes:
   postgres_data:
-  es_data:
+  meili_data:
