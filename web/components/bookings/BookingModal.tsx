@@ -133,7 +133,7 @@ export default function BookingModal({
 
     const token = typeof window !== "undefined" ? (localStorage.getItem("accessToken") || sessionStorage.getItem("accessToken")) : null;
 
-    const steps = ["Your Info", "Student Details", "Review", "Payment"];
+    const steps = ["Your Info", "Your Details", "Review", "Payment"];
     const stepIndex = { personal: 0, kyc: 1, summary: 2, payment: 3, done: 4 }[step];
 
     const inputCls = (field: string) => cn(
@@ -298,7 +298,7 @@ export default function BookingModal({
                         {step === "kyc" && (
                             <div className="space-y-4">
                                 <div>
-                                    <p className="font-medium text-gray-900 text-sm">Student & guardian details</p>
+                                    <p className="font-medium text-gray-900 text-sm">Tenant & guardian details</p>
                                     <p className="text-xs text-gray-400 mt-0.5">Required for identity verification by the hostel owner.</p>
                                 </div>
                                 <div>
@@ -342,7 +342,7 @@ export default function BookingModal({
                                 <div className="space-y-3 pt-1">
                                     <p className="text-xs font-medium text-gray-500">Documents (optional, helps speed up approval)</p>
                                     {([
-                                        { type: "admission" as const, label: "Admission letter / Student ID", url: admissionDocUrl },
+                                        { type: "admission" as const, label: "Admission letter / Tenant ID", url: admissionDocUrl },
                                         { type: "passport" as const, label: "Passport photo", url: passportPhotoUrl },
                                     ]).map(doc => (
                                         <div key={doc.type} className={cn(

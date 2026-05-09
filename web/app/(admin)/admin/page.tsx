@@ -233,7 +233,7 @@ export default function AdminDashboardPage() {
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                         {[
                             { label: "Verified Hostels", val: stats?.verifiedHostels ?? 0, icon: CheckCircle2, color: "text-emerald-600", bg: "bg-emerald-50 dark:bg-emerald-500/10" },
-                            { label: "Active Students", val: stats?.activeStudents ?? stats?.totalStudents ?? 0, icon: UserCheck, color: "text-blue-600", bg: "bg-blue-50 dark:bg-blue-500/10" },
+                            { label: "Active Tenants", val: stats?.activeStudents ?? stats?.totalStudents ?? 0, icon: UserCheck, color: "text-blue-600", bg: "bg-blue-50 dark:bg-blue-500/10" },
                             { label: "Platform Revenue", val: `₵${((stats?.totalRevenue ?? 0) / 100).toLocaleString()}`, icon: TrendingUp, color: "text-violet-600", bg: "bg-violet-50 dark:bg-violet-500/10" },
                         ].map(({ label, val, icon: Icon, color, bg }) => (
                             <div key={label} className={cn("rounded-2xl border border-border p-5 flex items-center gap-4", bg)}>
@@ -353,7 +353,7 @@ export default function AdminDashboardPage() {
                         {[
                             { label: "Total Users", val: stats?.totalUsers ?? 0, color: "bg-blue-500", icon: Users },
                             { label: "Property Owners", val: stats?.totalOwners ?? 0, color: "bg-violet-500", icon: Building2 },
-                            { label: "Students", val: stats?.totalStudents ?? stats?.totalTenants ?? 0, color: "bg-emerald-500", icon: UserCheck },
+                            { label: "Tenants", val: stats?.totalStudents ?? stats?.totalTenants ?? 0, color: "bg-emerald-500", icon: UserCheck },
                         ].map(({ label, val, color, icon: Icon }) => (
                             <KpiCard key={label} label={label} value={val} icon={Icon} iconBg={color} />
                         ))}

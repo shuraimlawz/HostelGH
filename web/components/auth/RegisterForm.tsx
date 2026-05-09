@@ -217,7 +217,7 @@ function RegisterContent({ onSuccess }: { onSuccess?: () => void }) {
                                 <GraduationCap size={16} />
                             </div>
                             <div>
-                                <p className={cn("text-xs font-bold uppercase tracking-widest", role === "TENANT" ? "text-blue-700 dark:text-blue-400" : "text-foreground")}>Student</p>
+                                <p className={cn("text-xs font-bold uppercase tracking-widest", role === "TENANT" ? "text-blue-700 dark:text-blue-400" : "text-foreground")}>Tenant</p>
                                 <p className="text-[9px] text-muted-foreground font-semibold mt-0.5 leading-tight">Looking for a room</p>
                             </div>
                             {role === "TENANT" && <CheckCircle2 size={16} className="absolute top-4 right-4 text-blue-600" />}

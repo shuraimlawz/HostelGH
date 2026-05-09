@@ -164,7 +164,7 @@ export default function RoomModal({ hostelId, room, onClose, onSuccess }: RoomMo
                             </div>
 
                             <div className="space-y-2">
-                                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Students Per Room</label>
+                                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Tenants Per Room</label>
                                 <div className="relative">
                                     <Users className="absolute left-6 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
                                     <input

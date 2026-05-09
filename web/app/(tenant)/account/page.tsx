@@ -391,7 +391,7 @@ export default function AccountPage() {
                 isOpen={isDeleteModalOpen}
                 onClose={() => setIsDeleteModalOpen(false)}
                 onConfirm={handleDeleteAccount}
-                title="Delete Student Account"
+                title="Delete Tenant Account"
                 description="Are you absolutely sure you want to delete your account? This action is permanent and all your data, including booking history and saved hostels, will be removed from our systems."
                 confirmText="DELETE ACCOUNT"
                 cancelText="CANCEL"

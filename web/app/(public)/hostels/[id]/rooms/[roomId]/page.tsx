@@ -172,7 +172,7 @@ export default function RoomDetailPage() {
                             <div className="flex flex-wrap items-center gap-6 pt-4">
                                 <div className="flex items-center gap-3 bg-gray-50 px-6 py-3 rounded-2xl border border-gray-100">
                                     <Users size={18} className="text-gray-400" />
-                                    <span className="text-xs font-bold text-gray-900 uppercase tracking-tight">{room.capacity} Student Capacity</span>
+                                    <span className="text-xs font-bold text-gray-900 uppercase tracking-tight">{room.capacity} Max Tenants</span>
                                 </div>
                                 <div className="flex items-center gap-3 bg-gray-50 px-6 py-3 rounded-2xl border border-gray-100">
                                     <Clock size={18} className="text-gray-400" />

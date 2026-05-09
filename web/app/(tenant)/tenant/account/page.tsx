@@ -49,8 +49,8 @@ export default function TenantProfilePage() {
     };
 
     const u = profile ?? authUser;
-    const fullName = [u?.firstName, u?.lastName].filter(Boolean).join(" ") || "Student";
-    const profileFields = [u?.firstName, u?.lastName, u?.phone, u?.emailVerified];
+    const fullName = [u?.firstName, u?.lastName].filter(Boolean).join(" ") || "Tenant";
+    const profileFields = [u?.firstName, u?.lastName, u?.phone, u?.isVerified];
     const pct = Math.round((profileFields.filter(Boolean).length / profileFields.length) * 100);
 
     return (
@@ -59,7 +59,7 @@ export default function TenantProfilePage() {
             <div>
                 <div className="flex items-center gap-2 mb-1">
                     <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-                    <span className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Student Portal</span>
+                    <span className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Tenant Portal</span>
                 </div>
                 <h1 className="text-2xl md:text-3xl font-bold text-foreground tracking-tight">My Profile</h1>
                 <p className="text-muted-foreground text-sm font-medium mt-1">Manage your personal information and account details.</p>
@@ -92,9 +92,9 @@ export default function TenantProfilePage() {
                                 <h2 className="text-xl font-bold text-foreground">{fullName}</h2>
                                 <p className="text-sm text-muted-foreground font-medium">{u?.email}</p>
                                 <div className="flex flex-wrap items-center gap-2 mt-3">
-                                    <span className="h-6 px-2.5 bg-blue-50 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400 border border-blue-100 dark:border-blue-500/20 rounded-full text-[10px] font-bold uppercase tracking-wider">Student</span>
+                                    <span className="h-6 px-2.5 bg-blue-50 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400 border border-blue-100 dark:border-blue-500/20 rounded-full text-[10px] font-bold uppercase tracking-wider">Tenant</span>
                                     {u?.isVerified && <span className="h-6 px-2.5 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-500/20 rounded-full text-[10px] font-bold uppercase tracking-wider flex items-center gap-1"><ShieldCheck size={10} /> Verified</span>}
-                                    {!u?.emailVerified && <span className="h-6 px-2.5 bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-100 dark:border-amber-500/20 rounded-full text-[10px] font-bold uppercase tracking-wider flex items-center gap-1"><AlertCircle size={10} /> Email Unverified</span>}
+                                    {!u?.isVerified && <span className="h-6 px-2.5 bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-100 dark:border-amber-500/20 rounded-full text-[10px] font-bold uppercase tracking-wider flex items-center gap-1"><AlertCircle size={10} /> Not Verified</span>}
                                 </div>
                             </div>
 
@@ -198,8 +198,8 @@ export default function TenantProfilePage() {
                         <SectionHeader title="Account Verification" sub="Your identity and security status" />
                         <div className="space-y-3">
                             {[
-                                { label: "Email Verified", ok: u?.emailVerified, desc: u?.emailVerified ? "Your email address has been confirmed." : "Please verify your email to secure your account." },
-                                { label: "Identity Verified", ok: u?.isVerified, desc: u?.isVerified ? "Your identity has been verified by HostelGH." : u?.verificationStatus === "PENDING" ? "Verification is under review." : "Upload your Ghana Card to get verified." },
+                                { label: "Account Verified", ok: u?.isVerified, desc: u?.isVerified ? "Your identity has been confirmed." : "Get verified to access all features." },
+                                { label: "Identity Check", ok: u?.isVerified, desc: u?.isVerified ? "Your Ghana Card has been verified by HostelGH." : u?.verificationStatus === "PENDING" ? "Your verification is being reviewed." : "Upload your Ghana Card to complete verification." },
                             ].map(({ label, ok, desc }) => (
                                 <div key={label} className="flex items-start gap-4 p-4 rounded-xl border border-border bg-muted/30">
                                     <div className={cn("w-9 h-9 rounded-lg flex items-center justify-center shrink-0",

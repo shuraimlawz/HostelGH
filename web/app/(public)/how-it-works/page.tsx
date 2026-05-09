@@ -61,7 +61,7 @@ export default function HowItWorksPage() {
                         <div className="absolute top-0 right-0 p-12 opacity-[0.05] group-hover:opacity-[0.1] transition-opacity">
                             <Search size={120} />
                         </div>
-                        <h2 className="text-4xl font-black mb-8 italic uppercase tracking-tighter">For <span className="text-blue-500">Students</span></h2>
+                        <h2 className="text-4xl font-black mb-8 italic uppercase tracking-tighter">For <span className="text-blue-500">Tenants</span></h2>
                         <ul className="space-y-6">
                             {[
                                 { title: "Smart Discovery", text: "Filter by university proximity, price, and amenities including WiFi, water supply, and security." },
@@ -130,7 +130,7 @@ export default function HowItWorksPage() {
                     <h2 className="text-3xl font-black mb-12 italic uppercase tracking-tighter text-center">Frequently <span className="text-blue-500">Answered</span></h2>
                     <div className="space-y-4">
                         {[
-                            { q: "How much does it cost?", a: "Listing is free for owners. Students pay a small platform fee upon successful booking." },
+                            { q: "How much does it cost?", a: "Listing is free for owners. Tenants pay a small platform fee upon successful booking." },
                             { q: "Is my payment secure?", a: "Yes. All payments are processed via Paystack and held in escrow until verification." },
                             { q: "What if the hostel is full?", a: "Our live inventory system prevents overbooking, showing you only available rooms." }
                         ].map((faq, i) => (

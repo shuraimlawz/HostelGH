@@ -408,7 +408,7 @@ export default function HostelDetailsClient() {
                                     </div>
                                     <div>
                                         <div className="font-semibold text-[16px] text-gray-900">{review.user?.firstName || "Student"}</div>
-                                        <div className="text-[14px] text-gray-500">{review.user?.university || "University Student"}</div>
+                                        <div className="text-[14px] text-gray-500">{review.user?.university || "Verified Tenant"}</div>
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-2 text-[14px] text-gray-900 mb-2">

@@ -49,7 +49,7 @@ export default function TenantDashboardPage() {
     });
 
     const isLoading = bLoading || wLoading;
-    const firstName = user?.firstName || "Student";
+    const firstName = user?.firstName || "Tenant";
 
     const activeBookings = bookings.filter((b: any) => ["RESERVED", "CHECKED_IN"].includes(b.status));
     const pendingBookings = bookings.filter((b: any) => ["PENDING", "PAYMENT_SECURED"].includes(b.status));
@@ -79,7 +79,7 @@ export default function TenantDashboardPage() {
                     <div className="space-y-2">
                         <div className="flex items-center gap-2">
                             <Sparkles size={13} className="text-blue-200" />
-                            <span className="text-blue-200 text-[10px] font-bold uppercase tracking-widest">Student Portal</span>
+                            <span className="text-blue-200 text-[10px] font-bold uppercase tracking-widest">Tenant Portal</span>
                         </div>
                         <h1 className="text-2xl md:text-3xl font-bold tracking-tight">Welcome back, {firstName} 👋</h1>
                         <p className="text-blue-200 text-sm font-medium">
@@ -215,7 +215,7 @@ export default function TenantDashboardPage() {
                             <div className="flex-1 min-w-0">
                                 <p className="font-bold text-foreground truncate">{user?.firstName} {user?.lastName}</p>
                                 <p className="text-[11px] text-muted-foreground truncate">{user?.email}</p>
-                                <span className="inline-block mt-1 text-[10px] font-bold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-500/10 px-2 py-0.5 rounded-full border border-blue-100 dark:border-blue-500/20 uppercase tracking-wider">Student</span>
+                                <span className="inline-block mt-1 text-[10px] font-bold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-500/10 px-2 py-0.5 rounded-full border border-blue-100 dark:border-blue-500/20 uppercase tracking-wider">Tenant</span>
                             </div>
                         </div>
                         <div className="space-y-2">

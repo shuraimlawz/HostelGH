@@ -58,7 +58,7 @@ export default function AdminStatsPage() {
                     />
                     <KpiCard label="Revenue" value={`₵${((stats?.totalRevenue ?? stats?.revenue ?? 0) / 100).toLocaleString()}`} icon={DollarSign} iconBg="bg-amber-500" />
                     <KpiCard label="Owners" value={stats?.totalOwners ?? 0} icon={Building2} iconBg="bg-indigo-500" />
-                    <KpiCard label="Students" value={stats?.totalStudents ?? stats?.totalTenants ?? 0} icon={Users} iconBg="bg-rose-500" />
+                    <KpiCard label="Tenants" value={stats?.totalStudents ?? stats?.totalTenants ?? 0} icon={Users} iconBg="bg-rose-500" />
                 </>)}
             </div>
 

@@ -62,7 +62,7 @@ export default function TenantSettingsPage() {
             <div>
                 <div className="flex items-center gap-2 mb-1">
                     <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-                    <span className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Account</span>
+                    <span className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Tenant Account</span>
                 </div>
                 <h1 className="text-2xl md:text-3xl font-bold text-foreground tracking-tight">Settings</h1>
                 <p className="text-muted-foreground text-sm font-medium mt-1">Manage your account security and notification preferences.</p>
@@ -149,9 +149,9 @@ export default function TenantSettingsPage() {
                 <SectionHeader title="Security" sub="Account security overview" />
                 <div className="space-y-3">
                     {[
-                        { icon: CheckCircle2, label: "Password Protected", desc: "Your account is password protected", ok: true },
-                        { icon: Shield, label: "Email Verified", desc: user?.emailVerified ? "Email address confirmed" : "Verify your email to improve security", ok: user?.emailVerified },
-                        { icon: Shield, label: "Identity Verified", desc: user?.isVerified ? "Ghana Card verified" : "Upload your Ghana Card for full verification", ok: user?.isVerified },
+                        { icon: CheckCircle2, label: "Password Set", desc: "Your account has a password.", ok: true },
+                        { icon: Shield, label: "Account Verified", desc: user?.isVerified ? "Your identity has been confirmed." : "Get verified to access all features.", ok: user?.isVerified },
+                        { icon: Shield, label: "Identity Check", desc: user?.isVerified ? "Ghana Card confirmed." : "Upload your Ghana Card to get fully verified.", ok: user?.isVerified },
                     ].map(({ icon: Icon, label, desc, ok }) => (
                         <div key={label} className="flex items-center gap-4 p-4 rounded-xl border border-border bg-muted/30">
                             <div className={cn("w-9 h-9 rounded-lg flex items-center justify-center shrink-0",

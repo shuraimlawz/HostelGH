@@ -147,7 +147,7 @@ export default function OwnerAccountPage() {
             const { data } = await api.patch("/auth/role", { role: "TENANT" });
             updateUser(data.user);
             localStorage.setItem("accessToken", data.accessToken);
-            toast.success("Account changed to Student.");
+            toast.success("Account changed to Tenant.");
             window.location.href = "/tenant";
         } catch (error: any) {
             toast.error(error.response?.data?.message || "Failed to switch account type");
@@ -518,14 +518,14 @@ export default function OwnerAccountPage() {
                                         <h3 className="text-xl font-bold text-amber-900 tracking-tight leading-none uppercase">Change Account Type</h3>
                                     </div>
                                     <p className="text-xs font-medium text-amber-700 leading-relaxed max-w-sm">
-                                        Switch to a Student account. Note: This will remove your hostel listings.
+                                        Switch to a Tenant account. Note: This will remove your hostel listings.
                                     </p>
                                 </div>
 
                                 <Dialog open={isAccountTypeModalOpen} onOpenChange={setIsAccountTypeModalOpen}>
                                     <DialogTrigger asChild>
                                         <button className="h-12 px-8 bg-amber-600 text-white rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-amber-700 transition-all shadow-lg shadow-amber-900/10">
-                                            Migrate to Student
+                                            Migrate to Tenant
                                         </button>
                                     </DialogTrigger>
                                     <DialogContent className="sm:max-w-md rounded-2xl p-8 border-amber-100 shadow-2xl">

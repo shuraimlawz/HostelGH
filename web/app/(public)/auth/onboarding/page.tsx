@@ -75,7 +75,7 @@ export default function OnboardingPage() {
                         </div>
                         
                         <div className="space-y-3">
-                            <h3 className="text-2xl font-bold text-gray-900 dark:text-white tracking-tight uppercase">Student Hub</h3>
+                            <h3 className="text-2xl font-bold text-gray-900 dark:text-white tracking-tight uppercase">Tenant Hub</h3>
                             <p className="text-[11px] text-gray-400 dark:text-gray-500 font-bold uppercase tracking-widest leading-relaxed">
                                 Join Ghana's top student housing network and book your room easily.
                             </p>
@@ -85,7 +85,7 @@ export default function OnboardingPage() {
                             "mt-auto flex items-center gap-3 text-[11px] font-bold uppercase tracking-widest transition-all",
                             role === "TENANT" ? "text-blue-600" : "text-gray-300 group-hover:text-gray-900 dark:text-white"
                         )}>
-                            Join as Student <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+                            Join as Tenant <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
                         </div>
                     </button>
 

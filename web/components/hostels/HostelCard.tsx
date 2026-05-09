@@ -62,7 +62,7 @@ export default function HostelCard({ hostel, compact = false }: { hostel: any, c
                     {hostel.distanceToCampus ? `${hostel.distanceToCampus} from campus` : `${hostel.city}, Ghana`}
                 </p>
                 <p className="text-gray-500 dark:text-gray-400 truncate">
-                    {hostel.university || 'Student Accommodation'}
+                    {hostel.university || 'Tenant Accommodation'}
                 </p>
                 
                 <div className="mt-1 flex items-baseline gap-1 text-gray-900 dark:text-white">

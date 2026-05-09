@@ -42,7 +42,7 @@ export default function TenantSidebar({ isOpen = false, onClose = () => { } }: T
                         <Shield size={20} />
                     </div>
                     <div>
-                        <p className="text-[10px] font-bold text-blue-600 uppercase tracking-widest leading-none mb-1">Students</p>
+                        <p className="text-[10px] font-bold text-blue-600 uppercase tracking-widest leading-none mb-1">Tenants</p>
                         <h2 className="text-lg font-bold text-gray-900 tracking-tight leading-none">Resident<span className="text-blue-600">.</span></h2>
                     </div>
                 </div>
@@ -116,7 +116,7 @@ export default function TenantSidebar({ isOpen = false, onClose = () => { } }: T
                             <div className="min-w-0">
                                 <p className="text-xs font-bold text-gray-900 truncate leading-none mb-1">{user?.firstName || "Resident"}</p>
                                 <p className="text-[10px] text-gray-500 truncate font-medium">
-                                    {user?.isVerified ? "Verified Student" : user?.verificationStatus === 'PENDING' ? "Verification Pending" : "Unverified Account"}
+                                    {user?.isVerified ? "Verified Tenant" : user?.verificationStatus === 'PENDING' ? "Verification Pending" : "Unverified Account"}
                                 </p>
                             </div>
                         </div>
