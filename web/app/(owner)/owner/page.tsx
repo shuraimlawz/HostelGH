@@ -2,415 +2,372 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/api";
+import { useAuth } from "@/lib/auth-context";
 import {
-    Building2,
-    CalendarCheck,
-    Users,
-    Clock,
-    TrendingUp,
-    ArrowUpRight,
-    Loader2,
-    DollarSign,
-    CheckCircle2,
-    Eye,
-    LucideIcon,
-    Wallet,
-    ArrowRight,
-    LayoutDashboard,
-    Activity,
-    PlusCircle,
-    ChevronRight,
-    BarChart3,
-    Zap
+    Building2, CalendarCheck, Users, DollarSign, PlusCircle,
+    ArrowUpRight, ChevronRight, Home, Settings, BarChart3,
+    Loader2, CheckCircle2, Clock, Eye, TrendingUp, MoreHorizontal
 } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
+import {
+    KpiCard, StatusBadge, SectionHeader, EmptyState,
+    DashCard, Skeleton
+} from "@/components/dashboard/DashComponents";
+import {
+    AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid
+} from "recharts";
 import { useState } from "react";
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 
-function StatCard({ 
-    label, 
-    value, 
-    icon: Icon, 
-    color, 
-    bgColor, 
-    detail, 
-    premium 
-}: { 
-    label: string, 
-    value: string | number, 
-    icon: LucideIcon, 
-    color: string, 
-    bgColor: string, 
-    detail: string, 
-    premium?: boolean 
+/* ── Mini Quick Link ─────────────────────────────────────────────── */
+function NavTile({ href, icon: Icon, label, sub, accent }: {
+    href: string; icon: any; label: string; sub: string; accent: string;
 }) {
     return (
-        <div className={cn(
-            "p-6 rounded-2xl border transition-all duration-300 group overflow-hidden relative",
-            premium 
-               ? "bg-gray-900 text-white border-gray-900 shadow-xl shadow-gray-200" 
-               : "bg-white dark:bg-gray-900 border-gray-100 shadow-sm hover:shadow-xl hover:shadow-blue-500/5"
-        )}>
-            {premium && <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 rounded-full -mr-16 -mt-16 blur-2xl group-hover:scale-110 transition-transform" />}
-            <div className="flex items-center justify-between mb-6 relative z-10">
-                <div className={cn(
-                    "w-12 h-12 rounded-xl flex items-center justify-center transition-transform group-hover:scale-110 shadow-sm border border-gray-100/10",
-                    premium ? "bg-white dark:bg-gray-900/10 text-white" : cn(bgColor, color)
-                )}>
-                    <Icon size={22} />
-                </div>
-                <ArrowUpRight size={14} className={premium ? "text-white/20" : "text-gray-200 group-hover:text-blue-500 transition-colors"} />
+        <Link href={href} className="group flex items-center gap-4 p-4 bg-card rounded-2xl border border-border hover:border-primary/30 hover:shadow-md transition-all duration-200">
+            <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center shadow-sm shrink-0", accent)}>
+                <Icon size={17} className="text-white" />
             </div>
-            <div className="relative z-10">
-                <p className={cn("text-[10px] font-bold uppercase tracking-widest mb-1", premium ? "text-gray-400 dark:text-gray-500" : "text-gray-400 dark:text-gray-500")}>{label}</p>
-                <h3 className="text-2xl font-bold tracking-tight mb-1">{value}</h3>
-                <p className={cn("text-[9px] font-bold uppercase tracking-widest opacity-80", premium ? "text-blue-400" : color)}>{detail}</p>
+            <div className="flex-1 min-w-0">
+                <p className="text-sm font-bold text-foreground">{label}</p>
+                <p className="text-[11px] text-muted-foreground font-medium">{sub}</p>
             </div>
+            <ChevronRight size={14} className="text-muted-foreground group-hover:text-primary transition-colors shrink-0" />
+        </Link>
+    );
+}
+
+/* ── Custom Tooltip ──────────────────────────────────────────────── */
+function ChartTooltip({ active, payload, label }: any) {
+    if (!active || !payload?.length) return null;
+    return (
+        <div className="bg-card border border-border rounded-xl px-4 py-3 shadow-xl text-xs">
+            <p className="font-bold text-muted-foreground mb-1">{label}</p>
+            <p className="font-bold text-foreground text-base">₵{payload[0]?.value?.toLocaleString()}</p>
         </div>
     );
 }
 
 export default function OwnerDashboardPage() {
-    const [selectedTab, setSelectedTab] = useState<"all" | "pending" | "active" | "completed">("all");
+    const { user } = useAuth();
+    const [chartMetric, setChartMetric] = useState<"revenue" | "bookings">("revenue");
 
-    const { data: hostels, isLoading: hostelsLoading } = useQuery({
+    const { data: hostels = [], isLoading: hLoading } = useQuery({
         queryKey: ["owner-hostels"],
         queryFn: async () => {
-            const res = await api.get("/hostels/my-hostels");
-            return res.data;
+            const { data } = await api.get("/hostels/my-hostels");
+            return Array.isArray(data) ? data : (data?.data ?? []);
         }
     });
 
-    const { data: bookings, isLoading: bookingsLoading } = useQuery({
+    const { data: bookings = [], isLoading: bLoading } = useQuery({
         queryKey: ["owner-bookings"],
         queryFn: async () => {
-            const res = await api.get("/bookings/owner");
-            return res.data;
+            const { data } = await api.get("/bookings/owner");
+            return Array.isArray(data) ? data : [];
         }
     });
 
-    const { data: analytics, isLoading: analyticsLoading } = useQuery({
+    const { data: analytics } = useQuery({
         queryKey: ["owner-analytics"],
-        queryFn: async () => {
-            const res = await api.get("/bookings/owner/analytics");
-            return res.data;
-        }
+        queryFn: async () => (await api.get("/bookings/owner/analytics")).data,
+        retry: false
     });
 
+    const isLoading = hLoading || bLoading;
+    const firstName = user?.firstName || "Owner";
 
+    const publishedHostels = (hostels as any[]).filter((h: any) => h.isPublished);
+    const totalRooms = (hostels as any[]).reduce((s: number, h: any) => s + (h._count?.rooms ?? h.rooms?.length ?? 0), 0);
+    const pendingBookings = (bookings as any[]).filter((b: any) => ["PENDING", "PAYMENT_SECURED"].includes(b.status));
+    const activeBookings = (bookings as any[]).filter((b: any) => ["RESERVED", "CHECKED_IN"].includes(b.status));
+    const totalRevenue = (bookings as any[])
+        .filter((b: any) => ["RESERVED", "CHECKED_IN", "COMPLETED"].includes(b.status))
+        .reduce((s: number, b: any) => s + ((b.items ?? []).reduce((a: number, i: any) => a + (i.unitPrice * i.quantity) / 100, 0)), 0);
 
-    if (hostelsLoading || bookingsLoading || analyticsLoading) {
-        return (
-            <div className="flex h-[60vh] items-center justify-center">
-                <div className="flex flex-col items-center gap-4 text-center">
-                    <Loader2 className="animate-spin text-blue-600" size={32} />
-                    <p className="text-sm font-medium text-gray-400 dark:text-gray-500">Loading dashboard...</p>
-                </div>
-            </div>
-        );
-    }
+    const recentBookings = [...(bookings as any[])]
+        .sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+        .slice(0, 6);
 
-    const totalHostels = hostels?.length || 0;
-    const totalRooms = hostels?.reduce((acc: number, h: any) => acc + (h._count?.rooms || 0), 0) || 0;
-
-    const statsOverview = {
-        totalHostels,
-        totalApprovedBookings: bookings?.filter((b: any) => ["RESERVED", "CHECKED_IN", "COMPLETED"].includes(b.status))?.length || 0,
-        totalPendingBookings: bookings?.filter((b: any) => ["PENDING", "PAYMENT_SECURED"].includes(b.status))?.length || 0,
-    };
-
-
-    const bookingTrendData = analytics?.monthlyTrends || [];
-
-    const filteredBookings = bookings?.filter((b: any) => {
-        if (selectedTab === "all") return true;
-        if (selectedTab === "pending") return ["PENDING", "PAYMENT_SECURED"].includes(b.status);
-        if (selectedTab === "active") return ["RESERVED", "CHECKED_IN", "DISPUTED"].includes(b.status);
-        if (selectedTab === "completed") return b.status === "COMPLETED";
-        return true;
-    }) || [];
-
-    const getStatusStyles = (status: string) => {
-        switch (status) {
-            case "PENDING": return "bg-orange-50 text-orange-600 border-orange-100";
-            case "PAYMENT_SECURED": return "bg-blue-50 text-blue-600 border-blue-100";
-            case "RESERVED": return "bg-indigo-50 text-indigo-600 border-indigo-100";
-            case "CHECKED_IN": return "bg-emerald-50 text-emerald-600 border-emerald-100";
-            case "COMPLETED": return "bg-teal-50 text-teal-600 border-teal-100";
-            case "CANCELLED": return "bg-red-50 text-red-600 border-red-100";
-            case "DISPUTED": return "bg-rose-50 text-rose-600 border-rose-100";
-            default: return "bg-gray-50 dark:bg-gray-950 text-gray-500 dark:text-gray-400 dark:text-gray-500 border-gray-100";
-        }
-    };
+    // Build chart data from analytics or dummy monthly buckets
+    const chartData: any[] = analytics?.monthly ?? [
+        { month: "Jan", revenue: 0, bookings: 0 },
+        { month: "Feb", revenue: 0, bookings: 0 },
+        { month: "Mar", revenue: 0, bookings: 0 },
+        { month: "Apr", revenue: 0, bookings: 0 },
+        { month: "May", revenue: 0, bookings: 0 },
+        { month: "Jun", revenue: 0, bookings: 0 },
+    ];
 
     return (
-        <div className="max-w-[1400px] mx-auto space-y-10 pb-20 pt-16 md:pt-4 px-4">
-            {/* Header */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 pb-4">
-                <div className="space-y-2">
-                    <div className="flex items-center gap-2">
-                        <div className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
-                        <span className="text-[10px] font-bold text-blue-600 uppercase tracking-widest leading-none">Open Access Launch</span>
-                    </div>
-                    <h1 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white tracking-tight">Owner Dashboard</h1>
-                    <div className="flex flex-col md:flex-row md:items-center gap-4">
-                        <p className="text-gray-500 dark:text-gray-400 dark:text-gray-500 text-sm max-w-md font-medium">Managing {totalHostels} Hostels with {totalRooms} total rooms.</p>
-                        <div className="flex items-center gap-2 px-3 py-1 bg-emerald-50 text-emerald-700 rounded-full border border-emerald-100 text-[10px] font-bold uppercase tracking-widest">
-                            <Zap size={12} className="fill-emerald-600" /> 0% Platform Commission Enabled
-                        </div>
-                    </div>
-                </div>
+        <div className="max-w-7xl mx-auto px-4 pb-20 pt-16 md:pt-6 space-y-6">
 
-                <div className="flex flex-wrap items-center gap-3">
-                    <Link href="/owner/hostels/new" className="h-10 px-5 bg-blue-600 text-white rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-blue-700 transition-all flex items-center gap-2 shadow-lg shadow-blue-100 active:scale-95">
-                        <PlusCircle size={16} /> Add Hostel
+            {/* ── Header ── */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                    <div className="flex items-center gap-2 mb-1">
+                        <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                        <span className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Property Manager</span>
+                    </div>
+                    <h1 className="text-2xl md:text-3xl font-bold text-foreground tracking-tight">
+                        Hello, {firstName} 👋
+                    </h1>
+                    <p className="text-muted-foreground text-sm font-medium mt-1">Here's what's happening with your properties today.</p>
+                </div>
+                <div className="flex gap-2">
+                    <Link href="/owner/hostels/new" className="h-10 px-5 bg-primary text-primary-foreground rounded-xl font-bold text-xs uppercase tracking-widest flex items-center gap-2 hover:opacity-90 transition-opacity shadow-md shadow-primary/20 whitespace-nowrap">
+                        <PlusCircle size={14} /> Add Hostel
                     </Link>
-
+                    <Link href="/owner/bookings" className="h-10 px-5 bg-card border border-border text-foreground rounded-xl font-bold text-xs uppercase tracking-widest flex items-center gap-2 hover:bg-muted transition-colors whitespace-nowrap">
+                        <CalendarCheck size={14} /> Bookings
+                    </Link>
                 </div>
             </div>
 
-            {/* Metrics */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                <StatCard 
-                    label="Total Hostels" 
-                    value={totalHostels} 
-                    icon={Building2} 
-                    color="text-blue-600" 
-                    bgColor="bg-blue-50" 
-                    detail={`${totalRooms} Total Rooms`} 
-                />
-                <StatCard 
-                    label="Active Bookings" 
-                    value={statsOverview.totalApprovedBookings} 
-                    icon={Users} 
-                    color="text-emerald-600" 
-                    bgColor="bg-emerald-50" 
-                    detail="Confirmed stays" 
-                />
-                <StatCard 
-                    label="Pending Action" 
-                    value={statsOverview.totalPendingBookings} 
-                    icon={Clock} 
-                    color="text-orange-600" 
-                    bgColor="bg-orange-50" 
-                    detail="Review required" 
-                />
-
+            {/* ── KPI Row ── */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                {isLoading ? [1,2,3,4].map(i => <Skeleton key={i} className="h-32" />) : (<>
+                    <KpiCard label="My Hostels" value={hostels.length} sub={`${publishedHostels.length} published`} icon={Building2} iconBg="bg-blue-500" />
+                    <KpiCard label="Total Rooms" value={totalRooms} sub="Across all properties" icon={Home} iconBg="bg-violet-500" />
+                    <KpiCard label="Active Bookings" value={activeBookings.length} sub="Currently occupied" icon={Users} iconBg="bg-emerald-500"
+                        trend={activeBookings.length > 0 ? { value: `${activeBookings.length} live`, up: true } : undefined}
+                    />
+                    <KpiCard label="Pending Action" value={pendingBookings.length} sub="Needs review" icon={Clock} iconBg="bg-amber-500"
+                        trend={pendingBookings.length > 0 ? { value: "Urgent", up: false } : undefined}
+                    />
+                </>)}
             </div>
 
-            <div className="grid grid-cols-1 xl:grid-cols-12 gap-10">
-                {/* Financial Trajectory */}
-                <div className="xl:col-span-8 bg-white dark:bg-gray-900 p-8 rounded-2xl border border-gray-100 shadow-sm flex flex-col space-y-8">
-                    <div className="flex items-center justify-between border-b border-gray-50 pb-4">
-                        <div className="flex items-center gap-3">
-                            <BarChart3 className="text-blue-600" size={20} />
-                            <h2 className="text-xl font-bold text-gray-900 dark:text-white tracking-tight">Income History</h2>
+            {/* ── Revenue Summary ── */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                {[
+                    { label: "Total Revenue", val: `₵${totalRevenue.toLocaleString()}`, color: "text-emerald-600 dark:text-emerald-400", bg: "bg-emerald-50 dark:bg-emerald-500/10" },
+                    { label: "Completed Stays", val: (bookings as any[]).filter((b: any) => b.status === "COMPLETED").length, color: "text-blue-600 dark:text-blue-400", bg: "bg-blue-50 dark:bg-blue-500/10" },
+                    { label: "Published Hostels", val: publishedHostels.length, color: "text-violet-600 dark:text-violet-400", bg: "bg-violet-50 dark:bg-violet-500/10" },
+                ].map(({ label, val, color, bg }) => (
+                    <div key={label} className={cn("rounded-2xl border border-border p-5 flex items-center gap-4", bg)}>
+                        <div className="flex-1">
+                            <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1">{label}</p>
+                            <p className={cn("text-2xl font-bold", color)}>{val}</p>
                         </div>
-                        <span className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">Last 6 Months</span>
+                        <TrendingUp size={28} className={cn("opacity-20", color)} />
                     </div>
-
-                    <div className="h-[300px] w-full">
-                        <ResponsiveContainer width="100%" height="100%">
-                            <AreaChart data={bookingTrendData}>
-                                <defs>
-                                    <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
-                                        <stop offset="5%" stopColor="#2563eb" stopOpacity={0.1} />
-                                        <stop offset="95%" stopColor="#2563eb" stopOpacity={0} />
-                                    </linearGradient>
-                                </defs>
-                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f3f4f6" />
-                                <XAxis 
-                                    dataKey="month" 
-                                    axisLine={false} 
-                                    tickLine={false} 
-                                    tick={{ fill: '#9ca3af', fontSize: 10, fontWeight: 700 }} 
-                                    dy={10}
-                                />
-                                <YAxis 
-                                    axisLine={false} 
-                                    tickLine={false} 
-                                    tick={{ fill: '#9ca3af', fontSize: 10, fontWeight: 700 }} 
-                                    tickFormatter={(val) => `₵${val}`}
-                                    dx={-10}
-                                />
-                                <Tooltip 
-                                    contentStyle={{ borderRadius: '1rem', border: 'none', backgroundColor: '#fff', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)', fontSize: '10px', fontWeight: '700' }}
-                                />
-                                <Area 
-                                    type="monotone" 
-                                    dataKey="revenue" 
-                                    stroke="#2563eb" 
-                                    strokeWidth={3} 
-                                    fillOpacity={1} 
-                                    fill="url(#colorRevenue)" 
-                                />
-                            </AreaChart>
-                        </ResponsiveContainer>
-                    </div>
-                </div>
-
-                {/* Portfolio Control */}
-                <div className="xl:col-span-4 bg-gray-900 text-white p-8 rounded-2xl shadow-xl relative overflow-hidden group border border-gray-800 flex flex-col justify-between shadow-gray-200">
-                    <div className="absolute top-0 right-0 w-48 h-48 bg-blue-500/10 rounded-full -mr-24 -mt-24 blur-3xl group-hover:scale-110 transition-transform duration-1000" />
-                    <div className="relative z-10">
-                        <div className="w-12 h-12 bg-white dark:bg-gray-900/5 rounded-xl flex items-center justify-center border border-white/10 mb-8 shadow-sm">
-                            <LayoutDashboard size={24} className="text-blue-500" />
-                        </div>
-                        <h3 className="text-2xl font-bold tracking-tight mb-2 uppercase">My Hostels</h3>
-                        <p className="text-xs text-white/40 font-medium leading-relaxed">Manage your hostels and view their current status.</p>
-                    </div>
-
-                    <div className="relative z-10 space-y-6 pt-8">
-                        <div className="grid grid-cols-2 gap-4">
-                            <div className="p-4 bg-white dark:bg-gray-900/5 rounded-xl border border-white/5 shadow-inner">
-                                <p className="text-2xl font-bold mb-0.5 tracking-tighter">{totalHostels}</p>
-                                <p className="text-[9px] font-bold text-blue-400 uppercase tracking-widest">Assets</p>
-                            </div>
-                            <div className="p-4 bg-white dark:bg-gray-900/5 rounded-xl border border-white/5 shadow-inner">
-                                <p className="text-2xl font-bold mb-0.5 tracking-tighter">{totalRooms}</p>
-                                <p className="text-[9px] font-bold text-blue-400 uppercase tracking-widest">Units</p>
-                            </div>
-                        </div>
-                        <Link href="/owner/hostels" className="w-full h-12 bg-white dark:bg-gray-900 text-gray-900 dark:text-white rounded-xl font-bold text-[10px] uppercase tracking-widest hover:bg-gray-100 transition-all flex items-center justify-center gap-2">
-                            View All Hostels <ArrowRight size={14} />
-                        </Link>
-                    </div>
-                </div>
+                ))}
             </div>
 
-            {/* Occupation Ledger */}
-            <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 shadow-sm overflow-hidden flex flex-col">
-                <div className="p-8 border-b border-gray-50 flex flex-col sm:flex-row sm:items-center justify-between gap-6">
-                    <div className="flex items-center gap-3">
-                        <Activity className="text-blue-600" size={20} />
-                        <div className="space-y-0.5">
-                            <h2 className="text-xl font-bold text-gray-900 dark:text-white tracking-tight">Recent Bookings</h2>
-                            <p className="text-[10px] text-gray-400 dark:text-gray-500 font-bold uppercase tracking-widest">Track your latest student bookings</p>
-                        </div>
-                    </div>
+            {/* ── Chart + Quick Actions ── */}
+            <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
 
-                    <div className="overflow-x-auto pb-2 -mx-4 px-4 sm:mx-0 sm:px-0 scrollbar-hide">
-                        <div className="flex bg-gray-50 dark:bg-gray-950 p-1 rounded-xl border border-gray-100 w-max shrink-0">
-                            {[
-                                { key: "all", label: "All" },
-                                { key: "pending", label: "Pending" },
-                                { key: "active", label: "Active" }
-                            ].map((tab) => (
+                {/* Area Chart */}
+                <DashCard className="xl:col-span-2 p-6">
+                    <div className="flex items-center justify-between mb-6 gap-4 flex-wrap">
+                        <div>
+                            <h2 className="text-base font-bold text-foreground">Booking Performance</h2>
+                            <p className="text-xs text-muted-foreground font-medium mt-0.5">Monthly overview for the current year</p>
+                        </div>
+                        <div className="flex gap-1 p-1 bg-muted rounded-xl">
+                            {(["revenue", "bookings"] as const).map(m => (
                                 <button
-                                    key={tab.key}
-                                    onClick={() => setSelectedTab(tab.key as any)}
+                                    key={m}
+                                    onClick={() => setChartMetric(m)}
                                     className={cn(
-                                        "px-6 py-2 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-all",
-                                        selectedTab === tab.key
-                                            ? "bg-white dark:bg-gray-900 text-gray-900 dark:text-white shadow-sm border border-gray-100"
-                                            : "text-gray-400 dark:text-gray-500 hover:text-gray-900 dark:text-white"
-                                    )}>
-                                    {tab.label}
-                                </button>
+                                        "h-8 px-4 rounded-lg text-[11px] font-bold uppercase tracking-wider transition-all",
+                                        chartMetric === m
+                                            ? "bg-card shadow-sm text-foreground border border-border"
+                                            : "text-muted-foreground hover:text-foreground"
+                                    )}
+                                >{m}</button>
                             ))}
                         </div>
                     </div>
-                </div>
+                    <ResponsiveContainer width="100%" height={220}>
+                        <AreaChart data={chartData} margin={{ top: 5, right: 0, left: -20, bottom: 0 }}>
+                            <defs>
+                                <linearGradient id="ownerGrad" x1="0" y1="0" x2="0" y2="1">
+                                    <stop offset="5%" stopColor="#2563eb" stopOpacity={0.15} />
+                                    <stop offset="95%" stopColor="#2563eb" stopOpacity={0} />
+                                </linearGradient>
+                            </defs>
+                            <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
+                            <XAxis dataKey="month" tick={{ fontSize: 11, fill: "var(--muted-foreground)" }} axisLine={false} tickLine={false} />
+                            <YAxis tick={{ fontSize: 11, fill: "var(--muted-foreground)" }} axisLine={false} tickLine={false} />
+                            <Tooltip content={<ChartTooltip />} />
+                            <Area
+                                type="monotone"
+                                dataKey={chartMetric}
+                                stroke="#2563eb"
+                                strokeWidth={2.5}
+                                fill="url(#ownerGrad)"
+                                dot={false}
+                                activeDot={{ r: 5, fill: "#2563eb" }}
+                            />
+                        </AreaChart>
+                    </ResponsiveContainer>
+                </DashCard>
 
-                <div>
-                    {filteredBookings.length === 0 ? (
-                        <div className="p-16 text-center space-y-4">
-                            <div className="w-16 h-16 bg-gray-50 dark:bg-gray-950 rounded-2xl flex items-center justify-center mx-auto text-gray-200 border border-gray-100 shadow-inner">
-                                <Activity size={32} />
+                {/* Quick Actions Panel */}
+                <div className="space-y-4">
+                    <SectionHeader title="Quick Actions" sub="Jump to key sections" />
+                    <div className="space-y-2">
+                        <NavTile href="/owner/hostels" icon={Building2} label="My Properties" sub={`${hostels.length} hostel(s) listed`} accent="bg-blue-500" />
+                        <NavTile href="/owner/hostels/new" icon={PlusCircle} label="Add New Hostel" sub="List a new property" accent="bg-emerald-500" />
+                        <NavTile href="/owner/bookings" icon={CalendarCheck} label="Manage Bookings" sub={`${pendingBookings.length} pending`} accent="bg-amber-500" />
+                        <NavTile href="/owner/account" icon={Settings} label="Account & Settings" sub="Profile & preferences" accent="bg-slate-600" />
+                    </div>
+
+                    {/* Pending Alert */}
+                    {pendingBookings.length > 0 && (
+                        <div className="bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20 rounded-2xl p-4">
+                            <div className="flex items-center gap-3 mb-2">
+                                <Clock size={16} className="text-amber-600 dark:text-amber-400 shrink-0" />
+                                <p className="text-sm font-bold text-amber-800 dark:text-amber-300">Action Required</p>
                             </div>
-                            <div className="space-y-1">
-                                <h3 className="text-lg font-bold text-gray-900 dark:text-white uppercase tracking-tight">No bookings found</h3>
-                                <p className="text-gray-400 dark:text-gray-500 text-sm font-medium">No bookings match your selected filter.</p>
-                            </div>
+                            <p className="text-xs text-amber-700 dark:text-amber-400 font-medium leading-relaxed">
+                                You have <strong>{pendingBookings.length}</strong> booking{pendingBookings.length > 1 ? "s" : ""} awaiting your confirmation.
+                            </p>
+                            <Link href="/owner/bookings?filter=RESERVED" className="inline-flex items-center gap-1.5 mt-3 text-xs font-bold text-amber-700 dark:text-amber-400 hover:underline uppercase tracking-wider">
+                                Review Now <ArrowUpRight size={11} />
+                            </Link>
                         </div>
-                    ) : (
-                        <>
-                            {/* Mobile card list */}
-                            <div className="md:hidden divide-y divide-gray-50">
-                                {filteredBookings.slice(0, 10).map((booking: any) => (
-                                    <div key={booking.id} className="p-5 flex items-start gap-4 hover:bg-gray-50 dark:hover:bg-gray-900/50 transition-all">
-                                        <div className="w-10 h-10 bg-gray-900 text-white rounded-xl flex items-center justify-center font-bold text-xs shadow-md shrink-0">
-                                            {booking.user?.firstName?.[0] || 'U'}
-                                        </div>
-                                        <div className="flex-1 min-w-0">
-                                            <div className="flex items-start justify-between gap-2">
-                                                <p className="font-bold text-gray-900 dark:text-white text-sm truncate">{booking.user?.firstName || 'Guest'} {booking.user?.lastName || ''}</p>
-                                                <span className={cn("px-2 py-1 rounded-lg text-[9px] font-bold uppercase tracking-widest border shrink-0", getStatusStyles(booking.status))}>
-                                                    {booking.status.replace(/_/g, " ")}
-                                                </span>
-                                            </div>
-                                            <p className="text-[10px] text-gray-400 dark:text-gray-500 font-bold uppercase tracking-widest truncate mt-0.5">{booking.hostel?.name || "Unknown Hostel"}</p>
-                                            <div className="flex items-center justify-between mt-2">
-                                                <p className="text-[10px] text-blue-600 font-bold">{booking.items?.[0]?.room?.name || "Shared"}</p>
-                                                <Link href={`/owner/bookings/${booking.id}`} className="text-[10px] font-bold text-gray-400 dark:text-gray-500 hover:text-blue-600 flex items-center gap-1">
-                                                    View <Eye size={12} />
-                                                </Link>
-                                            </div>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
+                    )}
+                </div>
+            </div>
 
-                            {/* Desktop table */}
+            {/* ── Recent Bookings ── */}
+            <div>
+                <SectionHeader title="Recent Bookings" sub="Latest reservation activity" href="/owner/bookings" />
+                <DashCard>
+                    {isLoading ? (
+                        <div className="p-4 space-y-3">{[1,2,3,4,5].map(i => <Skeleton key={i} className="h-16" />)}</div>
+                    ) : recentBookings.length > 0 ? (
+                        <>
+                            {/* Desktop Table */}
                             <div className="hidden md:block overflow-x-auto">
-                                <table className="w-full text-left border-collapse">
+                                <table className="w-full text-sm">
                                     <thead>
-                                        <tr className="bg-gray-50 dark:bg-gray-950/50">
-                                            <th className="px-8 py-5 text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">Student Info</th>
-                                            <th className="px-8 py-5 text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">Hostel & Room</th>
-                                            <th className="px-8 py-5 text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">Date</th>
-                                            <th className="px-8 py-5 text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">Status</th>
-                                            <th className="px-8 py-5 text-right text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">View</th>
+                                        <tr className="border-b border-border">
+                                            <th className="text-left px-5 py-3.5 text-xs font-bold text-muted-foreground uppercase tracking-widest">Tenant</th>
+                                            <th className="text-left px-5 py-3.5 text-xs font-bold text-muted-foreground uppercase tracking-widest">Property</th>
+                                            <th className="text-left px-5 py-3.5 text-xs font-bold text-muted-foreground uppercase tracking-widest">Amount</th>
+                                            <th className="text-left px-5 py-3.5 text-xs font-bold text-muted-foreground uppercase tracking-widest">Status</th>
+                                            <th className="text-left px-5 py-3.5 text-xs font-bold text-muted-foreground uppercase tracking-widest">Date</th>
+                                            <th className="px-5 py-3.5" />
                                         </tr>
                                     </thead>
-                                    <tbody className="divide-y divide-gray-50">
-                                        {filteredBookings.slice(0, 10).map((booking: any) => (
-                                            <tr key={booking.id} className="hover:bg-gray-50 dark:hover:bg-gray-800 dark:bg-gray-950/50 transition-all group/row">
-                                                <td className="px-8 py-6">
-                                                    <div className="flex items-center gap-4">
-                                                        <div className="w-10 h-10 bg-gray-900 text-white rounded-xl flex items-center justify-center font-bold text-xs shadow-md shadow-gray-200">
-                                                            {booking.user?.firstName?.[0] || 'U'}
+                                    <tbody className="divide-y divide-border">
+                                        {recentBookings.map((b: any) => {
+                                            const amt = (b.items ?? []).reduce((s: number, i: any) => s + (i.unitPrice * i.quantity) / 100, 0);
+                                            return (
+                                                <tr key={b.id} className="hover:bg-muted/40 transition-colors">
+                                                    <td className="px-5 py-4">
+                                                        <div className="flex items-center gap-3">
+                                                            <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center text-primary text-xs font-bold shrink-0 uppercase">
+                                                                {b.tenant?.firstName?.[0] ?? "T"}
+                                                            </div>
+                                                            <div>
+                                                                <p className="font-bold text-foreground leading-tight">{b.tenant?.firstName} {b.tenant?.lastName}</p>
+                                                                <p className="text-[11px] text-muted-foreground">{b.tenant?.email}</p>
+                                                            </div>
                                                         </div>
-                                                        <div className="min-w-0">
-                                                            <p className="font-bold text-gray-900 dark:text-white text-sm tracking-tight truncate max-w-[150px]">{booking.user?.firstName || 'Guest'} {booking.user?.lastName || ''}</p>
-                                                            <p className="text-[10px] text-gray-400 dark:text-gray-500 font-bold uppercase tracking-widest truncate">{booking.user?.email || 'No email provided'}</p>
-                                                        </div>
-                                                    </div>
-                                                </td>
-                                                <td className="px-8 py-6">
-                                                    <p className="font-bold text-gray-900 dark:text-white text-sm tracking-tight">{booking.hostel?.name || "Unknown Hostel"}</p>
-                                                    <p className="text-[10px] text-blue-600 font-bold uppercase tracking-widest mt-0.5">{booking.items?.[0]?.room?.name || "Shared Occupancy"}</p>
-                                                </td>
-                                                <td className="px-8 py-6">
-                                                    <span className="text-[11px] font-bold text-gray-900 dark:text-white bg-gray-50 dark:bg-gray-950 px-2 py-1 rounded-md border border-gray-100">
-                                                        {new Date(booking.items?.[0]?.startDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
-                                                    </span>
-                                                </td>
-                                                <td className="px-8 py-6">
-                                                    <span className={cn("px-2.5 py-1.5 rounded-lg text-[9px] font-bold uppercase tracking-widest border", getStatusStyles(booking.status))}>
-                                                        {booking.status.replace(/_/g, " ")}
-                                                    </span>
-                                                </td>
-                                                <td className="px-8 py-6 text-right">
-                                                    <Link
-                                                        href={`/owner/bookings/${booking.id}`}
-                                                        className="w-10 h-10 inline-flex items-center justify-center bg-white dark:bg-gray-900 border border-gray-100 rounded-xl text-gray-400 dark:text-gray-500 hover:text-blue-600 hover:border-blue-200 transition-all shadow-sm"
-                                                    >
-                                                        <Eye size={18} />
-                                                    </Link>
-                                                </td>
-                                            </tr>
-                                        ))}
+                                                    </td>
+                                                    <td className="px-5 py-4">
+                                                        <p className="font-semibold text-foreground text-[13px] truncate max-w-[160px]">{b.hostel?.name}</p>
+                                                        <p className="text-[11px] text-muted-foreground">{b.items?.[0]?.room?.name ?? "Room"}</p>
+                                                    </td>
+                                                    <td className="px-5 py-4">
+                                                        <span className="font-bold text-foreground">₵{amt.toLocaleString()}</span>
+                                                    </td>
+                                                    <td className="px-5 py-4"><StatusBadge status={b.status} /></td>
+                                                    <td className="px-5 py-4 text-xs text-muted-foreground font-medium whitespace-nowrap">
+                                                        {new Date(b.createdAt).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}
+                                                    </td>
+                                                    <td className="px-5 py-4">
+                                                        <Link href="/owner/bookings" className="text-primary hover:underline text-[11px] font-bold uppercase tracking-wider flex items-center gap-1 whitespace-nowrap">
+                                                            View <ArrowUpRight size={11} />
+                                                        </Link>
+                                                    </td>
+                                                </tr>
+                                            );
+                                        })}
                                     </tbody>
                                 </table>
                             </div>
+
+                            {/* Mobile Cards */}
+                            <div className="md:hidden divide-y divide-border">
+                                {recentBookings.map((b: any) => {
+                                    const amt = (b.items ?? []).reduce((s: number, i: any) => s + (i.unitPrice * i.quantity) / 100, 0);
+                                    return (
+                                        <div key={b.id} className="p-4 flex items-start gap-3">
+                                            <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary text-sm font-bold shrink-0 uppercase">
+                                                {b.tenant?.firstName?.[0] ?? "T"}
+                                            </div>
+                                            <div className="flex-1 min-w-0">
+                                                <div className="flex items-start justify-between gap-2">
+                                                    <div>
+                                                        <p className="text-sm font-bold text-foreground">{b.tenant?.firstName} {b.tenant?.lastName}</p>
+                                                        <p className="text-[11px] text-muted-foreground font-medium truncate">{b.hostel?.name}</p>
+                                                    </div>
+                                                    <StatusBadge status={b.status} />
+                                                </div>
+                                                <div className="flex items-center justify-between mt-2">
+                                                    <span className="text-sm font-bold text-foreground">₵{amt.toLocaleString()}</span>
+                                                    <span className="text-[11px] text-muted-foreground">{new Date(b.createdAt).toLocaleDateString(undefined, { month: "short", day: "numeric" })}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+                            </div>
                         </>
+                    ) : (
+                        <EmptyState icon={CalendarCheck} title="No bookings yet" description="Once students book your hostels, they'll appear here." />
                     )}
-                </div>
-                <div className="p-8 bg-gray-50 dark:bg-gray-950/30 text-center border-t border-gray-50">
-                    <Link href="/owner/bookings" className="text-[10px] font-bold text-gray-400 dark:text-gray-500 hover:text-blue-600 uppercase tracking-widest flex items-center justify-center gap-2 group">
-                        View All Bookings <ChevronRight size={14} className="group-hover:translate-x-1 transition-transform" />
+                </DashCard>
+            </div>
+
+            {/* ── Hostel Portfolio ── */}
+            <div>
+                <SectionHeader title="My Properties" sub="Your listed hostels" href="/owner/hostels" linkLabel="Manage all" />
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {isLoading
+                        ? [1,2,3].map(i => <Skeleton key={i} className="h-40" />)
+                        : (hostels as any[]).slice(0, 3).map((h: any) => (
+                            <DashCard key={h.id} className="p-5 flex flex-col gap-4">
+                                <div className="flex items-start justify-between gap-3">
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-11 h-11 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+                                            <Building2 size={20} className="text-primary" />
+                                        </div>
+                                        <div className="min-w-0">
+                                            <p className="font-bold text-foreground text-sm truncate">{h.name}</p>
+                                            <p className="text-[11px] text-muted-foreground font-medium">{h.city}</p>
+                                        </div>
+                                    </div>
+                                    <StatusBadge status={h.isPublished ? "published" : "unpublished"} />
+                                </div>
+                                <div className="grid grid-cols-2 gap-3 pt-2 border-t border-border">
+                                    <div>
+                                        <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Rooms</p>
+                                        <p className="text-sm font-bold text-foreground">{h._count?.rooms ?? h.rooms?.length ?? 0}</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Bookings</p>
+                                        <p className="text-sm font-bold text-foreground">{h._count?.bookings ?? 0}</p>
+                                    </div>
+                                </div>
+                                <Link href={`/owner/hostels/${h.id}`} className="text-[11px] font-bold text-primary hover:underline uppercase tracking-wider flex items-center gap-1">
+                                    Manage <ArrowUpRight size={11} />
+                                </Link>
+                            </DashCard>
+                        ))
+                    }
+                    {/* Add Hostel CTA */}
+                    <Link href="/owner/hostels/new" className="flex flex-col items-center justify-center gap-3 p-6 rounded-2xl border-2 border-dashed border-border hover:border-primary/40 hover:bg-muted/30 transition-all group">
+                        <div className="w-12 h-12 rounded-xl bg-muted group-hover:bg-primary/10 flex items-center justify-center transition-colors">
+                            <PlusCircle size={22} className="text-muted-foreground group-hover:text-primary transition-colors" />
+                        </div>
+                        <p className="text-sm font-bold text-muted-foreground group-hover:text-foreground transition-colors">Add New Hostel</p>
                     </Link>
                 </div>
             </div>
